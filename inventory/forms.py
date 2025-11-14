@@ -1360,42 +1360,61 @@ class ItemLocationForm(forms.ModelForm):
 # CLOSING STOCK FORMS
 # ============================================================================
 
-# NOTE: Commented out due to schema mismatch - see FORMS_SCHEMA_MISMATCH.md
-# class ClosingStockForm(forms.Form):
-#     """Form for closing stock physical count entry"""
-    
-#     item = forms.ModelChoiceField(
-#         queryset=None,
-#         widget=forms.Select(attrs={
-#             'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-#         }),
-#         label='Item'
-#     )
-    
-#     system_qty = forms.DecimalField(
-#         disabled=True,
-#         widget=forms.NumberInput(attrs={
-#             'class': 'w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50',
-#             'readonly': 'readonly'
-#         }),
-#         label='System Quantity'
-#     )
-    
-#     physical_qty = forms.DecimalField(
-#         max_digits=18,
-#         decimal_places=3,
-#         widget=forms.NumberInput(attrs={
-#             'placeholder': 'Physical count',
-#             'step': '0.001',
-#             'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-#         }),
-#         label='Physical Quantity'
-#     )
-    
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         from inventory.models import Tblitemmaster
-#         self.fields['item'].queryset = Tblitemmaster.objects.all()
+class ClosingStockForm(forms.Form):
+    """
+    Form for closing stock physical count entry
+
+    Converted from: aspnet/Module/Inventory/Transactions/ClosingStock.aspx
+    """
+
+    item = forms.ModelChoiceField(
+        queryset=None,
+        widget=forms.Select(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+        }),
+        label='Item'
+    )
+
+    system_qty = forms.DecimalField(
+        required=False,
+        disabled=True,
+        widget=forms.NumberInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50',
+            'readonly': 'readonly'
+        }),
+        label='System Quantity'
+    )
+
+    physical_qty = forms.DecimalField(
+        max_digits=18,
+        decimal_places=3,
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Enter physical count',
+            'step': '0.001',
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+        }),
+        label='Physical Quantity'
+    )
+
+    remarks = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'rows': 3,
+            'placeholder': 'Enter any remarks or notes',
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+        }),
+        label='Remarks'
+    )
+
+    def __init__(self, *args, **kwargs):
+        compid = kwargs.pop('compid', None)
+        super().__init__(*args, **kwargs)
+        # Fixed: Import from design module where item master actually exists
+        from design.models import TbldgItemMaster
+        queryset = TbldgItemMaster.objects.all()
+        if compid:
+            queryset = queryset.filter(compid=compid)
+        self.fields['item'].queryset = queryset.order_by('itemcode')
 
 
 
