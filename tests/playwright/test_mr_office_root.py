@@ -28,7 +28,7 @@ class TestMrOfficeRoot:
         authenticated_page.goto("http://localhost:8000/mr_office/mr_office_root/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Mr_Office Root/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Mr_Office Root", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Mr_Office Root")

@@ -41,7 +41,7 @@ class TestSysAdminRoot:
         authenticated_page.goto("http://localhost:8000/sys_admin/sys_admin_root/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Sys_Admin Root/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Sys_Admin Root", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Sys_Admin Root")

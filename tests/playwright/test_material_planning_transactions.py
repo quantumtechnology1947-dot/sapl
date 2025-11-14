@@ -41,7 +41,7 @@ class TestMaterialPlanningTransactions:
         authenticated_page.goto("http://localhost:8000/material_planning/material_planning_transactions/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Material_Planning Transactions/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Material_Planning Transactions", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Material_Planning Transactions")

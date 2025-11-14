@@ -28,7 +28,7 @@ class TestQualityControlRoot:
         authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Quality_Control Root/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Quality_Control Root", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Quality_Control Root")

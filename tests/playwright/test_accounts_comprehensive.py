@@ -3,6 +3,7 @@ Comprehensive Playwright tests for Accounts module
 Covers all 182 views across Masters, Transactions, Reports, and Reconciliation
 """
 import pytest
+import re
 from playwright.sync_api import Page, expect
 from datetime import datetime, timedelta
 
@@ -72,7 +73,7 @@ class TestAccountHeadMaster:
         authenticated_page.goto("http://localhost:8000/accounts/masters/acchead/")
 
         # Verify page loads
-        expect(authenticated_page).to_have_title(/Account.*Head|Accounts/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Account.*Head|Accounts", re.IGNORECASE))
 
         # Check for table or list
         authenticated_page.wait_for_selector("table, .list-group, .grid", timeout=5000)
@@ -121,7 +122,7 @@ class TestBankMaster:
         """Test that bank list view loads"""
         authenticated_page.goto("http://localhost:8000/accounts/masters/bank/")
 
-        expect(authenticated_page).to_have_title(/Bank|Accounts/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Bank|Accounts", re.IGNORECASE))
         authenticated_page.wait_for_selector("table, .list-group, .grid", timeout=5000)
 
     def test_bank_create_form_loads(self, authenticated_page: Page):
@@ -138,7 +139,7 @@ class TestCurrencyMaster:
     def test_currency_list_view_loads(self, authenticated_page: Page):
         """Test currency list view"""
         authenticated_page.goto("http://localhost:8000/accounts/masters/currency/")
-        expect(authenticated_page).to_have_title(/Currency|Accounts/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Currency|Accounts", re.IGNORECASE))
 
     def test_currency_create_form(self, authenticated_page: Page):
         """Test currency create form"""
@@ -185,7 +186,7 @@ class TestSalesInvoice:
         """Test sales invoice list view"""
         authenticated_page.goto("http://localhost:8000/accounts/transactions/sales-invoice/")
 
-        expect(authenticated_page).to_have_title(/Sales.*Invoice|Accounts/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Sales.*Invoice|Accounts", re.IGNORECASE))
         authenticated_page.wait_for_selector("table, .list-group", timeout=5000)
 
     def test_sales_invoice_create_form(self, authenticated_page: Page):

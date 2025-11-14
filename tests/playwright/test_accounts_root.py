@@ -32,7 +32,7 @@ class TestAccountsRoot:
         authenticated_page.goto("http://localhost:8000/accounts/accounts_root/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Accounts Root/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Accounts Root", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Accounts Root")

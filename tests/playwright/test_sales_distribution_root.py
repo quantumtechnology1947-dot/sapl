@@ -32,7 +32,7 @@ class TestSalesDistributionRoot:
         authenticated_page.goto("http://localhost:8000/sales_distribution/sales_distribution_root/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Sales_Distribution Root/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Sales_Distribution Root", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Sales_Distribution Root")

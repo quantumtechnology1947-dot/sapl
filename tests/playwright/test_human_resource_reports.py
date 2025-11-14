@@ -32,7 +32,7 @@ class TestHumanResourceReports:
         authenticated_page.goto("http://localhost:8000/human_resource/human_resource_reports/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Human_Resource Reports/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Human_Resource Reports", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Human_Resource Reports")

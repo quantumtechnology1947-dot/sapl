@@ -41,7 +41,7 @@ class TestProjectManagementReports:
         authenticated_page.goto("http://localhost:8000/project_management/project_management_reports/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Project_Management Reports/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Project_Management Reports", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Project_Management Reports")

@@ -41,7 +41,7 @@ class TestDailyReportSystemMasters:
         authenticated_page.goto("http://localhost:8000/daily_report_system/daily_report_system_masters/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Daily_Report_System Masters/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Daily_Report_System Masters", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Daily_Report_System Masters")

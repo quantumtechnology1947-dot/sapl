@@ -35,7 +35,7 @@ class TestSalesDistributionReports:
         authenticated_page.goto("http://localhost:8000/sales_distribution/sales_distribution_reports/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(/Sales_Distribution Reports/i)
+        expect(authenticated_page).to_have_title(re.compile(r"Sales_Distribution Reports", re.IGNORECASE))
 
         # TODO: Verify key elements are present
         # expect(authenticated_page.locator("h1")).to_contain_text("Sales_Distribution Reports")
