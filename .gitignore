@@ -95,7 +95,9 @@ Thumbs.db
 # Project-Specific
 # ============================================================================
 # Test scripts (optional - remove if you want to commit them)
+# NOTE: Proper test files in tests/ directory ARE tracked
 test_*.py
+!tests/**/test_*.py
 check_*.py
 create_*.py
 verify_*.py
