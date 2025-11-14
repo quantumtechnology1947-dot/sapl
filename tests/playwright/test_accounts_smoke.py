@@ -26,13 +26,15 @@ class TestAccountsModuleSmoke:
         """Verify accounts dashboard is accessible"""
         authenticated_page.goto("http://localhost:8000/accounts/")
 
-        # Should not show error
-        assert "404" not in authenticated_page.content()
-        assert "500" not in authenticated_page.content()
+        # Should not show error pages
+        page_content = authenticated_page.content()
+        assert "404 Not Found" not in page_content
+        assert "500 Internal Server Error" not in page_content
+        assert "Server Error (500)" not in page_content
 
         # Should have accounts-related content
-        page_content = authenticated_page.content().lower()
-        assert any(word in page_content for word in ["accounts", "dashboard", "master", "transaction"])
+        page_content_lower = page_content.lower()
+        assert any(word in page_content_lower for word in ["accounts", "dashboard", "master", "transaction"])
 
     def test_masters_dashboard_loads(self, authenticated_page: Page):
         """Verify masters dashboard is accessible"""
