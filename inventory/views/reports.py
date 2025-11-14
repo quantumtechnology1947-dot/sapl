@@ -170,53 +170,75 @@ class MCNPrintView(LoginRequiredMixin, CompanyFinancialYearMixin, DetailView):
 
 
 class ClosingStockView(LoginRequiredMixin, CompanyFinancialYearMixin, FormView):
-    """Closing Stock Process View"""
+    """
+    Closing Stock Process View
+
+    Converted from: aspnet/Module/Inventory/Transactions/ClosingStock.aspx
+    """
     template_name = 'inventory/transactions/closing_stock.html'
-    # form_class = ClosingStockForm  # Form commented out
+    form_class = None  # Set in get_form_class()
     success_url = reverse_lazy('inventory:closing-stock-report')
-    
+
+    def get_form_class(self):
+        from ..forms import ClosingStockForm
+        return ClosingStockForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['compid'] = self.get_compid()
+        return kwargs
+
     def form_valid(self, form):
-        from .services import ClosingStockService
-        
+        from ..services import ClosingStockService
+
         item_id = form.cleaned_data['item'].itemid
         physical_qty = form.cleaned_data['physical_qty']
-        
+        remarks = form.cleaned_data.get('remarks', '')
+
         system_qty = ClosingStockService.get_system_stock(item_id)
         variance = ClosingStockService.calculate_variance(system_qty, physical_qty)
-        
+
         # Store in session for report
         self.request.session['closing_stock_data'] = {
             'item_id': item_id,
             'system_qty': str(system_qty),
             'physical_qty': str(physical_qty),
-            'variance': str(variance)
+            'variance': str(variance),
+            'remarks': remarks
         }
-        
+
         messages.success(self.request, 'Closing stock recorded successfully!')
         return super().form_valid(form)
 
 
 
 class ClosingStockReportView(LoginRequiredMixin, CompanyFinancialYearMixin, TemplateView):
-    """Closing Stock Report View"""
+    """
+    Closing Stock Report View
+
+    Displays all items with system stock quantities and variance analysis.
+    Converted from: aspnet/Module/Inventory/Transactions/ClosingStock.aspx (report page)
+    """
     template_name = 'inventory/transactions/closing_stock_report.html'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         # Get all items with stock
-        from inventory.models import Tblitemmaster
-        items = Tblitemmaster.objects.all()
-        
+        from design.models import TbldgItemMaster
+        from ..services import ClosingStockService
+
+        compid = self.get_compid()
+        items = TbldgItemMaster.objects.filter(compid=compid).order_by('itemcode')
+
         stock_data = []
         for item in items:
-            from .services import ClosingStockService
             system_qty = ClosingStockService.get_system_stock(item.itemid)
             stock_data.append({
                 'item': item,
                 'system_qty': system_qty
             })
-        
+
         context['stock_data'] = stock_data
         return context
 

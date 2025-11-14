@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q, Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 # Import core mixins instead of inventory-specific mixins
 from core.mixins import (
@@ -44,6 +44,7 @@ from ..forms import (
     VehicleMasterForm,
     AutoWISTimeScheduleForm,
     StockLedgerFilterForm,
+    WISMasterForm,
 )
 from ..services import (
     MaterialRequisitionService,
@@ -57,8 +58,8 @@ class WISListView(BaseListViewMixin, ListView):
     """
     WIS List View
     Display all work instruction sheets with status filtering
-    
-    Converted from: aspnet/Module/Inventory/Transactions/WIS_ActualRun_Material.aspx
+
+    Converted from: aspnet/Module/Inventory/Transactions/ReleaseWIS.aspx
     Optimized: Uses BaseListViewMixin with built-in search, pagination, and query optimization.
     """
     model = TblinvWisMaster
@@ -67,203 +68,220 @@ class WISListView(BaseListViewMixin, ListView):
     paginate_by = 20
     search_fields = ['wisno', 'wono']
     ordering = ['-id']
-    
+
     # No need to override get_queryset() - BaseListViewMixin handles company/year filtering and search
     # No need to override get_context_data() - BaseListViewMixin handles search_query
 
 
 
 class WISCreateView(LoginRequiredMixin, CompanyFinancialYearMixin, CreateView):
-    """WIS Create View"""
+    """
+    WIS Create View
+
+    Converted from: aspnet/Module/Inventory/Transactions/WIS_ActualRun_Material.aspx (create section)
+    """
     model = TblinvWisMaster
-    # form_class = WISMasterForm  # Form commented out
+    form_class = WISMasterForm
     template_name = 'inventory/transactions/wis_form.html'
     success_url = reverse_lazy('inventory:wis-list')
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['compid'] = self.request.session.get('compid', 1)
         kwargs['finyearid'] = self.request.session.get('finyearid', 1)
         kwargs['sessionid'] = self.request.session.get('sessionid', 1)
         return kwargs
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        if self.request.POST:
-            context['detail_formset'] = WISDetailFormSet(
-                self.request.POST,
-                instance=self.object
-            )
-        else:
-            context['detail_formset'] = WISDetailFormSet(
-                instance=self.object
-            )
-        
-        return context
-    
+
     def form_valid(self, form):
-        context = self.get_context_data()
-        detail_formset = context['detail_formset']
-        
-        if detail_formset.is_valid():
-            from .services import WISService
-            compid = self.request.session.get('compid', 1)
-            finyearid = self.request.session.get('finyearid', 1)
-            
-            wis_number = WISService.generate_wis_number(compid, finyearid)
-            form.instance.wisno = wis_number
-            
-            self.object = form.save()
-            detail_formset.instance = self.object
-            detail_formset.save()
-            
-            messages.success(
-                self.request,
-                f'WIS {wis_number} created successfully!'
-            )
-            
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.form_invalid(form)
+        """Save WIS with audit fields"""
+        from datetime import datetime
+
+        # Set audit fields
+        now = datetime.now()
+        form.instance.sysdate = now.strftime('%d-%m-%Y')
+        form.instance.systime = now.strftime('%H:%M:%S')
+        form.instance.compid = self.request.session.get('compid', 1)
+        form.instance.finyearid = self.request.session.get('finyearid', 1)
+        form.instance.sessionid = str(self.request.user.id)
+
+        # Generate WIS number if not provided
+        if not form.instance.wisno:
+            from ..services import generate_transaction_number
+            form.instance.wisno = generate_transaction_number('WIS', form.instance.compid, form.instance.finyearid)
+
+        self.object = form.save()
+
+        messages.success(
+            self.request,
+            f'WIS {self.object.wisno} created successfully!'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
 
 
 
 class WISDetailView(LoginRequiredMixin, CompanyFinancialYearMixin, DetailView):
-    """WIS Detail View with shortage display"""
+    """
+    WIS Detail View with material details
+
+    Converted from: aspnet/Module/Inventory/Transactions/WIS_View_TransWise.aspx
+    """
     model = TblinvWisMaster
     template_name = 'inventory/transactions/wis_detail.html'
     context_object_name = 'wis'
-    pk_url_kwarg = 'wisid'
-    
+    pk_url_kwarg = 'pk'  # Fixed: use 'pk' not 'wisid'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        details = Tblwisdetail.objects.filter(
-            wisid=self.object
-        ).select_related('itemid')
-        
+
+        # Get WIS details - fixed model name and filter field
+        details = TblinvWisDetails.objects.filter(
+            mid=self.object
+        )
+
         context['details'] = details
-        
-        # Check stock availability for each item
-        from .services import WISService
-        availability_list = []
+
+        # Get item information for each detail
+        from design.models import TbldgItemMaster
+        details_with_items = []
         for detail in details:
+            item = None
             if detail.itemid:
-                availability = WISService.check_stock_availability(
-                    detail.itemid.itemid,
-                    detail.requiredqty
-                )
-                availability_list.append(availability)
-            else:
-                availability_list.append(None)
-        
-        context['availability_list'] = availability_list
-        
+                try:
+                    item = TbldgItemMaster.objects.get(itemid=detail.itemid)
+                except TbldgItemMaster.DoesNotExist:
+                    pass
+            details_with_items.append({
+                'detail': detail,
+                'item': item
+            })
+
+        context['details_with_items'] = details_with_items
+
         return context
 
 
 
 class WISReleaseView(LoginRequiredMixin, CompanyFinancialYearMixin, View):
-    """WIS Release View - Change status to Released"""
-    
+    """
+    WIS Release View - Mark WIS as released
+
+    Converted from: aspnet/Module/Inventory/Transactions/ReleaseWIS.aspx
+    """
+
     def post(self, request, *args, **kwargs):
-        wisid = kwargs.get('wisid')
-        
-        from .services import WISService
-        success = WISService.release_wis(wisid)
-        
-        if success:
-            messages.success(request, 'WIS released successfully!')
-        else:
-            messages.error(request, 'Error releasing WIS!')
-        
+        pk = kwargs.get('pk')
+
+        try:
+            wis = TblinvWisMaster.objects.get(pk=pk)
+
+            # Record in release table
+            from ..models import TblinvWoreleaseWis
+            from datetime import datetime
+
+            release_record, created = TblinvWoreleaseWis.objects.get_or_create(
+                compid=wis.compid,
+                finyearid=wis.finyearid,
+                wono=wis.wono,
+                defaults={
+                    'releasesysdate': datetime.now().strftime('%d-%m-%Y')
+                }
+            )
+
+            messages.success(request, f'WIS {wis.wisno} released successfully!')
+        except TblinvWisMaster.DoesNotExist:
+            messages.error(request, 'WIS not found!')
+        except Exception as e:
+            messages.error(request, f'Error releasing WIS: {str(e)}')
+
         return HttpResponseRedirect(
-            reverse_lazy('inventory:wis-detail', kwargs={'wisid': wisid})
+            reverse_lazy('inventory:wis-detail', kwargs={'pk': pk})
         )
 
 
 
-class WISActualRunView(LoginRequiredMixin, CompanyFinancialYearMixin, FormView):
-    """WIS Actual Run View - Record actual material consumption"""
+class WISActualRunView(LoginRequiredMixin, CompanyFinancialYearMixin, TemplateView):
+    """
+    WIS Actual Run View - Display materials for actual run
+
+    Converted from: aspnet/Module/Inventory/Transactions/WIS_ActualRun_Material.aspx
+    Note: Complex BOM calculation logic from ASP.NET deferred to Phase 2
+    """
     template_name = 'inventory/transactions/wis_actual_run.html'
-    # form_class = forms.Form  # Commented out - forms.Form not in inventory.forms
-    
+
     def get_wis(self):
-        wisid = self.kwargs.get('wisid')
-        return get_object_or_404(TblinvWisMaster, wisid=wisid)
-    
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(TblinvWisMaster, pk=pk)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         wis = self.get_wis()
-        details = Tblwisdetail.objects.filter(
-            wisid=wis
-        ).select_related('itemid')
-        
+
+        # Get WIS details
+        details = TblinvWisDetails.objects.filter(mid=wis)
+
+        # Get item information
+        from design.models import TbldgItemMaster
+        details_with_items = []
+        for detail in details:
+            item = None
+            if detail.itemid:
+                try:
+                    item = TbldgItemMaster.objects.get(itemid=detail.itemid)
+                except TbldgItemMaster.DoesNotExist:
+                    pass
+            details_with_items.append({
+                'detail': detail,
+                'item': item
+            })
+
         context['wis'] = wis
-        context['details'] = details
-        
+        context['details_with_items'] = details_with_items
+
         return context
-    
-    def post(self, request, *args, **kwargs):
-        wis = self.get_wis()
-        
-        # Extract actual quantities
-        actual_materials = []
-        for key, value in request.POST.items():
-            if key.startswith('actual_qty_') and value:
-                detail_id = int(key.replace('actual_qty_', ''))
-                item_id = request.POST.get(f'item_id_{detail_id}')
-                actual_materials.append({
-                    'detail_id': detail_id,
-                    'item_id': item_id,
-                    'actual_qty': value
-                })
-        
-        if not actual_materials:
-            messages.warning(request, 'No actual quantities entered!')
-            return self.form_invalid(None)
-        
-        # Record actual run
-        from .services import WISService
-        success = WISService.record_actual_run(wis.wisid, actual_materials)
-        
-        if success:
-            messages.success(
-                self.request,
-                f'Actual run recorded for WIS {wis.wisno}!'
-            )
-            return HttpResponseRedirect(
-                reverse_lazy('inventory:wis-detail', kwargs={'wisid': wis.wisid})
-            )
-        else:
-            messages.error(request, 'Error recording actual run!')
-            return self.form_invalid(None)
 
 
 
 class WISPrintView(LoginRequiredMixin, CompanyFinancialYearMixin, DetailView):
-    """WIS Print View"""
+    """
+    WIS Print View
+
+    Converted from: aspnet/Module/Inventory/Transactions/WIS_ActualRun_Print.aspx
+    """
     model = TblinvWisMaster
     template_name = 'inventory/transactions/wis_print.html'
     context_object_name = 'wis'
-    pk_url_kwarg = 'wisid'
-    
+    pk_url_kwarg = 'pk'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        details = Tblwisdetail.objects.filter(
-            wisid=self.object
-        ).select_related('itemid')
-        
-        context['details'] = details
-        
+
+        # Get WIS details
+        details = TblinvWisDetails.objects.filter(mid=self.object)
+
+        # Get item information
+        from design.models import TbldgItemMaster
+        details_with_items = []
+        for detail in details:
+            item = None
+            if detail.itemid:
+                try:
+                    item = TbldgItemMaster.objects.get(itemid=detail.itemid)
+                except TbldgItemMaster.DoesNotExist:
+                    pass
+            details_with_items.append({
+                'detail': detail,
+                'item': item
+            })
+
+        context['details_with_items'] = details_with_items
+
         return context
 
 
 
 # ============================================================================
-# ITEM LOCATION VIEWS
+# AUTO WIS TIME SCHEDULE VIEWS
 # ============================================================================
 
 
@@ -322,10 +340,3 @@ class AutoWISTimeScheduleRowView(LoginRequiredMixin, DetailView):
     model = TblinvAutowisTimeschedule
     template_name = 'inventory/masters/partials/autowis_timeschedule_row.html'
     context_object_name = 'schedule'
-
-
-# ============================================================================
-# STOCK LEDGER VIEWS
-# ============================================================================
-
-
