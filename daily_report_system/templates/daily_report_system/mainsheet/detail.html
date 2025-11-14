@@ -1,0 +1,24 @@
+{% extends "daily_report_system/base.html" %}
+{% block content %}
+<div class="bg-white rounded shadow p-6">
+    <h1 class="text-sm font-bold mb-4">{{ sheet.name_proj }}</h1>
+    <div class="grid grid-cols-2 gap-4">
+        <div><strong>WO No:</strong> {{ sheet.wo_no }}</div>
+        <div><strong>Design Leader:</strong> {{ sheet.des_lea }}</div>
+        <div><strong>No of Fixtures:</strong> {{ sheet.no_fix_rqu }}</div>
+        <div><strong>Activity:</strong> {{ sheet.name_act }}</div>
+    </div>
+    <div class="mt-6">
+        <a href="{% url 'daily_report_system:mainsheet-edit' sheet.pk %}" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</a>
+        <a href="{% url 'daily_report_system:mainsheet-list' %}" class="bg-gray-500 text-white px-4 py-2 rounded ml-2">Back</a>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

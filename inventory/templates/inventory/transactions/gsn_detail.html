@@ -1,0 +1,92 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}GSN Details - {{ gsn.gsnno }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Goods Service Note Details</h1>
+                <p class="text-sm text-gray-600 mt-1">GSN Number: <span class="font-semibold text-orange-600">{{ gsn.gsnno }}</span></p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:gsn-print' gsn.id %}" 
+                   target="_blank"
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md transition-colors">
+                    <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print
+                </a>
+                <a href="{% url 'inventory:gsn-delete' gsn.id %}" 
+                   class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-md transition-colors">
+                    <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete
+                </a>
+                <a href="{% url 'inventory:gsn-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Master Information -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Service Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-600">GSN Number</label>
+                <p class="mt-1 text-sm text-gray-900 font-semibold">{{ gsn.gsnno }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600">GIN Number</label>
+                <p class="mt-1 text-sm text-gray-900">{{ gsn.ginno|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Invoice Details -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Tax Invoice Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Tax Invoice Number</label>
+                <p class="mt-1 text-sm text-gray-900">{{ gsn.taxinvoiceno|default:"-" }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Tax Invoice Date</label>
+                <p class="mt-1 text-sm text-gray-900">{{ gsn.taxinvoicedate|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Notice -->
+    <div class="bg-orange-50 border-l-4 border-orange-400 p-4 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-orange-700">
+                    <strong>Service Receipt:</strong> This GSN is for service receipts only. No stock has been updated.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+<tr id="acchead-{{ acchead.id }}" class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+    <td class="w-12 px-3 py-2 text-xs text-gray-600">
+        {{ forloop.counter }}
+    </td>
+    <td class="w-32 px-3 py-2 text-xs font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ acchead.category|default:"-" }}
+    </td>
+    <td class="w-64 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+        title="{{ acchead.description|default:'' }}">
+        {{ acchead.description|default:"-" }}
+    </td>
+    <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ acchead.symbol|default:"-" }}
+    </td>
+    <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ acchead.abbrivation|default:"-" }}
+    </td>
+    <td class="w-32 px-3 py-2 text-right text-xs">
+        <a href="{% url 'accounts:acchead-edit' acchead.id %}" 
+           class="text-sap-blue hover:text-sap-blue-dark hover:underline mr-2">
+            Edit
+        </a>
+        <button hx-delete="{% url 'accounts:acchead-delete' acchead.id %}"
+                hx-target="#acchead-{{ acchead.id }}"
+                hx-swap="outerHTML swap:1s"
+                hx-confirm="Are you sure you want to delete this account head?"
+                class="text-sap-red hover:text-sap-red-dark hover:underline">
+            Delete
+        </button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

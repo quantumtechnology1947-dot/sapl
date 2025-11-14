@@ -1,0 +1,143 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Document Management - MR Office{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    {% include "core/components/layout/page_header.html" with title="Document Management" subtitle="Manage and organize documents by module" %}
+    
+    <!-- Filters and Actions -->
+    <div class="bg-white border border-gray-200 rounded border border-gray-200 mb-3 p-3">
+        <form method="get" class="flex items-center gap-3">
+            <!-- Search Input -->
+            <div class="relative flex-1 max-w-md">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <input type="text" 
+                       name="search" 
+                       value="{{ request.GET.search }}"
+                       placeholder="Search by filename..."
+                       class="block w-full pl-10 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue">
+            </div>
+            
+            <!-- Module Filter -->
+            <select name="module" class="block w-48 py-1.5 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue">
+                <option value="">All Modules</option>
+                {% for id, name in modules %}
+                <option value="{{ id }}" {% if selected_module == id|stringformat:"s" %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            
+            <!-- Filter Button -->
+            <button type="submit" class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-dark transition-colors">
+                <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                Filter
+            </button>
+            
+            {% if request.GET.search or request.GET.module %}
+            <a href="{% url 'mr_office:document-list' %}" class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-gray-500 text-white hover:bg-gray-600 transition-colors">
+                Clear
+            </a>
+            {% endif %}
+            
+            <!-- Upload Button -->
+            <a href="{% url 'mr_office:document-create' %}" class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-dark transition-colors ml-auto">
+                <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                Upload Document
+            </a>
+        </form>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-12 px-3 py-2 text-left text-xs font-semibold text-gray-700">SN</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Filename</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Module</th>
+                        <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Format</th>
+                        <th class="w-24 px-3 py-2 text-right text-xs font-semibold text-gray-700">Size</th>
+                        <th class="w-28 px-3 py-2 text-left text-xs font-semibold text-gray-700">Upload Date</th>
+                        <th class="w-40 px-3 py-2 text-center text-xs font-semibold text-gray-700">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for doc in documents %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+                        <td class="w-12 px-3 py-2 text-xs text-gray-600">{{ forloop.counter }}</td>
+                        <td class="px-3 py-2 text-xs font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis" title="{{ doc.filename }}">
+                            {{ doc.filename }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" title="{{ doc.get_module_display }}">
+                            {{ doc.get_module_display }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-center text-xs">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                {{ doc.file_extension|upper }}
+                            </span>
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-right text-gray-700">
+                            {{ doc.file_size_display }}
+                        </td>
+                        <td class="w-28 px-3 py-2 text-xs text-gray-700 whitespace-nowrap">
+                            {{ doc.sysdate|date:"d-m-Y" }}
+                        </td>
+                        <td class="w-40 px-3 py-2 text-center text-xs whitespace-nowrap">
+                            <a href="{% url 'mr_office:document-detail' doc.id %}" class="text-sap-blue hover:text-sap-blue-dark transition-colors mr-2" title="View">
+                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'mr_office:document-download' doc.id %}" class="text-sap-green hover:text-sap-green-dark transition-colors mr-2" title="Download">
+                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'mr_office:document-delete' doc.id %}" class="text-sap-red hover:text-sap-red-dark transition-colors" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
+                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-16 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No documents found</h3>
+                            <p class="mt-1 text-sm text-gray-500">Get started by uploading your first document.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        {% include "core/components/tables/pagination.html" with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

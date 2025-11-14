@@ -1,0 +1,97 @@
+{% extends "core/base.html" %}
+
+{% block title %}Customer PO - Cortex ERP{% endblock %}
+{% block page_title %}Customer Purchase Orders{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <h2 class="text-sm font-semibold text-gray-800">Customer Purchase Orders</h2>
+            <a href="{% url 'sales_distribution:po-search' %}"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors inline-flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                New PO
+            </a>
+        </div>
+
+        <input type="text"
+               name="search"
+               value="{{ search_query }}"
+               placeholder="Search by PO number or customer..."
+               hx-get="{% url 'sales_distribution:po-list' %}"
+               hx-trigger="input changed delay:500ms"
+               hx-target="#po-table"
+               hx-include="[name='search']"
+               class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+    
+    <div id="po-table" class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Fin Year</th>
+                        <th class="w-[30%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Customer Name</th>
+                        <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Code</th>
+                        <th class="w-[16%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">PO Number</th>
+                        <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Enquiry</th>
+                        <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Date</th>
+                        <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Gen By</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for po in pos %}
+                    <tr id="po-{{ po.poid }}" class="hover:bg-gray-50">
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600" title="{{ po.finyear_name }}">{{ po.finyear_name }}</td>
+                        <td class="px-2 py-2 text-[11px] truncate" title="{{ po.customer_name }}">
+                            <span class="text-gray-900">{{ po.customer_name }}</span>
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">{{ po.customerid }}</td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                            <a href="{% url 'sales_distribution:po-detail' po.poid %}"
+                               class="text-blue-600 hover:text-blue-900 hover:underline font-medium"
+                               title="View PO details">
+                                {{ po.pono }}
+                            </a>
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                            {% if po.enqid %}
+                            {{ po.enqid.enqid }}
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">{{ po.podate }}</td>
+                        <td class="px-2 py-2 text-[11px] truncate" title="{{ po.generated_by }}">
+                            <span class="text-gray-600">{{ po.generated_by }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    {% include 'core/components/empty_state.html' with
+                        in_table=True
+                        colspan=7
+                        title="No purchase orders found"
+                        message="Create one"
+                        action_url='sales_distribution:po-search'
+                        action_text="Create one"
+                    %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% include 'core/components/tables/pagination.html' with page_obj=page_obj is_paginated=is_paginated htmx_enabled=True htmx_target="#po-table" %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

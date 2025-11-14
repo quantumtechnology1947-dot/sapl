@@ -1,0 +1,105 @@
+{% extends "material_costing/base.html" %}
+
+{% block title %}Dashboard - Material Costing{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="bg-gradient-to-r from-green-600 to-green-800 text-white rounded border border-gray-200 p-4 mb-4">
+    <h1 class="text-sm font-bold">Material Costing Dashboard</h1>
+    <p class="mt-1 text-xs text-green-100">Track live material costs with effective dates</p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-xs font-medium">Total Materials</p>
+                <p class="text-sm font-bold text-sap-green">{{ total_materials }}</p>
+            </div>
+            <div class="bg-green-100 rounded-full p-2">
+                <svg class="w-6 h-6 text-sap-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-xs font-medium">Cost Entries</p>
+                <p class="text-sm font-bold text-sap-blue">{{ total_costs }}</p>
+            </div>
+            <div class="bg-blue-100 rounded-full p-2">
+                <svg class="w-6 h-6 text-sap-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <h2 class="text-sm font-bold text-gray-800 mb-3">Quick Actions</h2>
+        <div class="space-y-2">
+            <a href="{% url 'material_costing:live-cost-create' %}" class="block inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-hover transition-colors text-center">
+                + Add Live Cost
+            </a>
+            <a href="{% url 'material_costing:live-cost-list' %}" class="block inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-center">
+                View All Costs
+            </a>
+            <a href="{% url 'material_costing:material-category' %}" class="block inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-center">
+                View Materials
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <h2 class="text-sm font-bold text-gray-800 mb-3">Recent Cost Entries</h2>
+        {% if recent_costs %}
+        <div class="space-y-2 max-h-64 overflow-y-auto">
+            {% for cost in recent_costs %}
+            <div class="hover:bg-gray-50 p-2 rounded border border-gray-200">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-xs font-medium text-gray-800">{{ cost.material.material }}</p>
+                        <p class="text-xs text-gray-600">Cost: ₹{{ cost.live_cost }} | {{ cost.eff_date }}</p>
+                    </div>
+                    <a href="{% url 'material_costing:live-cost-update' cost.id %}" class="text-xs text-sap-green hover:underline">Edit</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-xs text-gray-500 text-center py-3">No recent cost entries</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Info Card -->
+<div class="bg-green-50 border-l-4 border-green-400 p-3 rounded">
+    <div class="flex">
+        <div class="flex-shrink-0">
+            <svg class="h-4 w-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+        </div>
+        <div class="ml-2">
+            <p class="text-xs text-green-700">
+                <strong>Tip:</strong> Material Costing tracks the live costs of materials with effective dates. This helps in accurate costing calculations and price tracking over time.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

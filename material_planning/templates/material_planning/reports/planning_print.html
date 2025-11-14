@@ -1,0 +1,161 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Planning Print - {{ plan.plno }}{% endblock %}
+
+{% block page_title %}Planning Details - {{ plan.plno }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Print Button -->
+    <div class="flex justify-end mb-4 print:hidden">
+        <button onclick="window.print()" 
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Print
+        </button>
+    </div>
+
+    <!-- Planning Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="text-center mb-6">
+            <h1 class="text-sm font-bold text-gray-800">Material Planning</h1>
+            <p class="text-gray-600">Planning No: {{ plan.plno }}</p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <p><span class="font-semibold">Work Order:</span> {{ plan.wono }}</p>
+                <p><span class="font-semibold">Date:</span> {{ plan.sysdate }}</p>
+            </div>
+            <div class="text-right">
+                <p><span class="font-semibold">Company ID:</span> {{ plan.compid }}</p>
+                <p><span class="font-semibold">Financial Year:</span> {{ plan.finyearid }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Raw Materials -->
+    {% if raw_materials %}
+    <div class="bg-white rounded border border-gray-200 mb-6">
+        <div class="px-6 py-4 bg-gray-50 border-b">
+            <h2 class="text-lg font-semibold">Raw Materials</h2>
+        </div>
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Qty</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Del. Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for rm in raw_materials %}
+                <tr>
+                    <td class="px-6 py-4 text-sm">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4 text-sm">{{ rm.item }}</td>
+                    <td class="px-6 py-4 text-sm">{{ rm.supplierid }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ rm.qty }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ rm.rate }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ rm.amount }}</td>
+                    <td class="px-6 py-4 text-sm">{{ rm.deldate }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Processing Materials -->
+    {% if processes %}
+    <div class="bg-white rounded border border-gray-200 mb-6">
+        <div class="px-6 py-4 bg-gray-50 border-b">
+            <h2 class="text-lg font-semibold">Processing Materials</h2>
+        </div>
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Qty</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Del. Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for pro in processes %}
+                <tr>
+                    <td class="px-6 py-4 text-sm">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4 text-sm">{{ pro.item }}</td>
+                    <td class="px-6 py-4 text-sm">{{ pro.supplierid }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ pro.qty }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ pro.rate }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ pro.amount }}</td>
+                    <td class="px-6 py-4 text-sm">{{ pro.deldate }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Finished Materials -->
+    {% if finishes %}
+    <div class="bg-white rounded border border-gray-200 mb-6">
+        <div class="px-6 py-4 bg-gray-50 border-b">
+            <h2 class="text-lg font-semibold">Finished Materials</h2>
+        </div>
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Qty</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Del. Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for fin in finishes %}
+                <tr>
+                    <td class="px-6 py-4 text-sm">{{ forloop.counter }}</td>
+                    <td class="px-6 py-4 text-sm">{{ fin.item }}</td>
+                    <td class="px-6 py-4 text-sm">{{ fin.supplierid }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ fin.qty }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ fin.rate }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ fin.amount }}</td>
+                    <td class="px-6 py-4 text-sm">{{ fin.deldate }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+@media print {
+    .print\\:hidden {
+        display: none !important;
+    }
+    body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,584 @@
+{% extends "core/base.html" %}
+
+{% block title %}New Quotation - Details - Cortex ERP{% endblock %}
+{% block page_title %}New Quotation{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-gray-800">Customer Quotation - New</h2>
+            <a href="{% url 'sales_distribution:quotation-search' %}"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-1.5 rounded-md text-sm transition-colors">
+                Back
+            </a>
+        </div>
+    </div>
+
+    <form method="post" class="bg-white rounded border border-gray-200 overflow-hidden">
+        {% csrf_token %}
+
+        <!-- Form Errors Display -->
+        {% if form.errors %}
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 m-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Form Validation Errors:</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li><strong>{{ field }}:</strong> {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tabs -->
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex" aria-label="Tabs">
+                <button type="button" data-tab="customer"
+                    class="tab-button active w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm"
+                    onclick="switchTab('customer')">
+                    Customer Details
+                </button>
+                <button type="button" data-tab="goods"
+                    class="tab-button w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm"
+                    onclick="switchTab('goods')">
+                    Goods Details
+                </button>
+                <button type="button" data-tab="terms"
+                    class="tab-button w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm"
+                    onclick="switchTab('terms')">
+                    Terms & Conditions
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="p-6">
+            <!-- Tab 1: Customer Details -->
+            <div id="customer-tab" class="tab-content">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Name of Customer</label>
+                            <p class="text-sm text-gray-900">: {{ enquiry.customername }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Enquiry No</label>
+                            <p class="text-sm text-gray-900 font-semibold">: {{ enquiry.enqid }}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Regd. Office Address</label>
+                        <p class="text-sm text-gray-900">: {{ enquiry.regdaddress|default:"-" }}</p>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onclick="switchTab('goods')"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm">
+                            Next
+                        </button>
+                        <a href="{% url 'sales_distribution:quotation-search' %}"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md text-sm">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Goods Details -->
+            <div id="goods-tab" class="tab-content hidden">
+                <div class="space-y-4">
+                    <!-- Add Line Item Form -->
+                    <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description & Specification of goods <span class="text-red-500">*</span>
+                                </label>
+                                <textarea id="item-desc" rows="3"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter item description and specifications"></textarea>
+                                <span class="text-red-500 text-xs hidden" id="desc-error">Required</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Total Qty of goods <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number" step="0.001" id="item-qty"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="0.000" />
+                                <span class="text-red-500 text-xs hidden" id="qty-error">Required</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Rate per unit <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number" step="0.001" id="item-rate"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="0.000" />
+                                <span class="text-red-500 text-xs hidden" id="rate-error">Required</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Discount (in %) <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number" step="0.001" id="item-discount" value="0"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="0.000" />
+                                <span class="text-red-500 text-xs hidden" id="discount-error">Required</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Unit <span class="text-red-500">*</span>
+                                </label>
+                                <select id="item-unit"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select</option>
+                                    {% for unit in units %}
+                                    <option value="{{ unit.id }}">{{ unit.symbol }}</option>
+                                    {% endfor %}
+                                </select>
+                                <span class="text-red-500 text-xs hidden" id="unit-error">Required</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-4">
+                            <button type="button" onclick="addLineItem()"
+                                class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm">
+                                Add Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Line Items Table -->
+                    <div class="overflow-x-auto border border-gray-200 rounded">
+                        <table class="w-full text-xs" id="line-items-table">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                                    <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                                    <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Unit</th>
+                                    <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Qty</th>
+                                    <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Rate</th>
+                                    <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Discount %</th>
+                                    <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Amount</th>
+                                    <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="line-items-body" class="bg-white divide-y divide-gray-200">
+                                <tr id="empty-row">
+                                    <td colspan="8" class="px-6 py-16 text-center text-gray-500">
+                                        No items added yet. Add items using the form above.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onclick="switchTab('terms')"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm">
+                            Next
+                        </button>
+                        <button type="button" onclick="switchTab('customer')"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md text-sm">
+                            Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Terms & Conditions -->
+            <div id="terms-tab" class="tab-content hidden">
+                <div class="space-y-4">
+                    <input type="hidden" name="enqid" value="{{ enquiry.enqid }}" />
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Payment Terms
+                            </label>
+                            {{ form.paymentterms }}
+                            {% if form.paymentterms.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.paymentterms.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Delivery Terms
+                            </label>
+                            {{ form.deliveryterms }}
+                            {% if form.deliveryterms.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ form.deliveryterms.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- GST 2.0 Section -->
+                    <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-4">
+                        <h3 class="text-sm font-semibold text-blue-900 mb-3">GST 2.0 Tax Details (Effective Sep 2025)</h3>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Transaction Type <span class="text-red-500">*</span></label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="transaction_type" value="intrastate" id="txn-intrastate" checked
+                                            class="mr-2" onchange="updateGSTDisplay()" />
+                                        <span class="text-sm">Intrastate (Within State)</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="transaction_type" value="interstate" id="txn-interstate"
+                                            class="mr-2" onchange="updateGSTDisplay()" />
+                                        <span class="text-sm">Interstate (Between States)</span>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Intrastate: CGST + SGST | Interstate: IGST</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">GST Rate <span class="text-red-500">*</span></label>
+                                <select name="gst_rate" id="gst-rate-select"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onchange="updateGSTDisplay()">
+                                    <option value="">Select GST Rate</option>
+                                    {% for rate in gst_rates %}
+                                    <option value="{{ rate.id }}"
+                                        data-rate="{{ rate.ratevalue }}"
+                                        data-cgst="{{ rate.cgstrate }}"
+                                        data-sgst="{{ rate.sgstrate }}"
+                                        data-igst="{{ rate.igstrate }}">
+                                        {{ rate.gstrate }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Tax Breakdown Display -->
+                        <div id="tax-breakdown" class="mt-4 p-3 bg-white rounded border border-gray-200 hidden">
+                            <h4 class="text-xs font-semibold text-gray-700 mb-2">Tax Breakdown:</h4>
+                            <div class="grid grid-cols-3 gap-3 text-xs">
+                                <div id="cgst-display" class="hidden">
+                                    <span class="text-gray-600">CGST:</span>
+                                    <span class="font-semibold text-blue-600" id="cgst-value">0%</span>
+                                </div>
+                                <div id="sgst-display" class="hidden">
+                                    <span class="text-gray-600">SGST:</span>
+                                    <span class="font-semibold text-blue-600" id="sgst-value">0%</span>
+                                </div>
+                                <div id="igst-display" class="hidden">
+                                    <span class="text-gray-600">IGST:</span>
+                                    <span class="font-semibold text-blue-600" id="igst-value">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                            {{ form.duedate }}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Validity</label>
+                            {{ form.validity }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Warranty</label>
+                        {{ form.warrenty }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
+                        {{ form.remarks }}
+                    </div>
+
+                    <!-- Hidden field for line items JSON -->
+                    <input type="hidden" name="line_items" id="line-items-json" value="[]" />
+
+                    <div class="flex justify-end gap-3 pt-4 border-t">
+                        <button type="submit"
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm font-medium">
+                            Submit Quotation
+                        </button>
+                        <button type="button" onclick="switchTab('goods')"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md text-sm">
+                            Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Tab switching
+function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+    });
+
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active', 'border-blue-600', 'text-blue-600');
+        btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+    });
+
+    // Show selected tab
+    document.getElementById(tabName + '-tab').classList.remove('hidden');
+
+    // Add active class to selected button
+    const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+    activeBtn.classList.add('active', 'border-blue-600', 'text-blue-600');
+    activeBtn.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+}
+
+// Line items management
+let lineItems = [];
+let itemCounter = 0;
+
+function addLineItem() {
+    // Get values
+    const desc = document.getElementById('item-desc').value.trim();
+    const qty = parseFloat(document.getElementById('item-qty').value);
+    const rate = parseFloat(document.getElementById('item-rate').value);
+    const discount = parseFloat(document.getElementById('item-discount').value);
+    const unitSelect = document.getElementById('item-unit');
+    const unitId = unitSelect.value;
+    const unitSymbol = unitSelect.options[unitSelect.selectedIndex].text;
+
+    // Validate
+    let isValid = true;
+    if (!desc) {
+        document.getElementById('desc-error').classList.remove('hidden');
+        isValid = false;
+    } else {
+        document.getElementById('desc-error').classList.add('hidden');
+    }
+    if (!qty || qty <= 0) {
+        document.getElementById('qty-error').classList.remove('hidden');
+        isValid = false;
+    } else {
+        document.getElementById('qty-error').classList.add('hidden');
+    }
+    if (!rate || rate <= 0) {
+        document.getElementById('rate-error').classList.remove('hidden');
+        isValid = false;
+    } else {
+        document.getElementById('rate-error').classList.add('hidden');
+    }
+    if (discount < 0 || discount > 100) {
+        document.getElementById('discount-error').classList.remove('hidden');
+        isValid = false;
+    } else {
+        document.getElementById('discount-error').classList.add('hidden');
+    }
+    if (!unitId) {
+        document.getElementById('unit-error').classList.remove('hidden');
+        isValid = false;
+    } else {
+        document.getElementById('unit-error').classList.add('hidden');
+    }
+
+    if (!isValid) return;
+
+    // Calculate amount
+    const amount = (qty * rate) - ((qty * rate * discount) / 100);
+
+    // Add to array
+    itemCounter++;
+    const item = {
+        id: itemCounter,
+        itemdesc: desc,
+        totalqty: qty,
+        rate: rate,
+        discount: discount,
+        unit: unitId,
+        unit_symbol: unitSymbol,
+        amount: amount.toFixed(2)
+    };
+    lineItems.push(item);
+
+    // Update table
+    updateLineItemsTable();
+
+    // Clear form
+    document.getElementById('item-desc').value = '';
+    document.getElementById('item-qty').value = '';
+    document.getElementById('item-rate').value = '';
+    document.getElementById('item-discount').value = '0';
+    document.getElementById('item-unit').value = '';
+
+    // Update hidden field
+    document.getElementById('line-items-json').value = JSON.stringify(lineItems);
+}
+
+function deleteLineItem(id) {
+    if (confirm('Delete this line item?')) {
+        lineItems = lineItems.filter(item => item.id !== id);
+        updateLineItemsTable();
+        document.getElementById('line-items-json').value = JSON.stringify(lineItems);
+    }
+}
+
+function updateLineItemsTable() {
+    const tbody = document.getElementById('line-items-body');
+    const emptyRow = document.getElementById('empty-row');
+
+    if (lineItems.length === 0) {
+        emptyRow.classList.remove('hidden');
+        return;
+    }
+
+    emptyRow.classList.add('hidden');
+    tbody.innerHTML = '';
+
+    lineItems.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+        row.innerHTML = `
+            <td class="px-2 py-2 text-xs text-gray-900">${index + 1}</td>
+            <td class="px-2 py-2 text-xs text-gray-900">${item.itemdesc}</td>
+            <td class="px-2 py-2 text-xs text-gray-600">${item.unit_symbol}</td>
+            <td class="px-2 py-2 text-xs text-gray-900 text-right">${parseFloat(item.totalqty).toFixed(3)}</td>
+            <td class="px-2 py-2 text-xs text-gray-900 text-right">${parseFloat(item.rate).toFixed(3)}</td>
+            <td class="px-2 py-2 text-xs text-gray-600 text-right">${parseFloat(item.discount).toFixed(2)}</td>
+            <td class="px-2 py-2 text-xs text-gray-900 text-right font-medium">${item.amount}</td>
+            <td class="px-2 py-2 text-xs text-center">
+                <button type="button" onclick="deleteLineItem(${item.id})"
+                    class="text-red-600 hover:text-red-900" title="Delete">
+                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Form submission validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    if (lineItems.length === 0) {
+        e.preventDefault();
+        alert('Please add at least one line item before submitting the quotation.');
+        switchTab('goods');
+        return false;
+    }
+});
+
+// GST 2.0 Auto-calculation
+function updateGSTDisplay() {
+    const gstSelect = document.getElementById('gst-rate-select');
+    const selectedOption = gstSelect.options[gstSelect.selectedIndex];
+    const transactionType = document.querySelector('input[name="transaction_type"]:checked').value;
+    const taxBreakdown = document.getElementById('tax-breakdown');
+
+    // Hide all displays first
+    document.getElementById('cgst-display').classList.add('hidden');
+    document.getElementById('sgst-display').classList.add('hidden');
+    document.getElementById('igst-display').classList.add('hidden');
+
+    if (!selectedOption.value) {
+        taxBreakdown.classList.add('hidden');
+        return;
+    }
+
+    // Show tax breakdown
+    taxBreakdown.classList.remove('hidden');
+
+    const cgstRate = parseFloat(selectedOption.dataset.cgst || 0);
+    const sgstRate = parseFloat(selectedOption.dataset.sgst || 0);
+    const igstRate = parseFloat(selectedOption.dataset.igst || 0);
+
+    if (transactionType === 'intrastate') {
+        // Show CGST + SGST
+        document.getElementById('cgst-display').classList.remove('hidden');
+        document.getElementById('sgst-display').classList.remove('hidden');
+        document.getElementById('cgst-value').textContent = cgstRate + '%';
+        document.getElementById('sgst-value').textContent = sgstRate + '%';
+    } else {
+        // Show IGST
+        document.getElementById('igst-display').classList.remove('hidden');
+        document.getElementById('igst-value').textContent = igstRate + '%';
+    }
+}
+
+// Initialize existing line items for edit mode
+{% if is_edit and existing_line_items_json %}
+document.addEventListener('DOMContentLoaded', function() {
+    const existingItems = JSON.parse('{{ existing_line_items_json|escapejs }}');
+
+    existingItems.forEach(function(item) {
+        itemCounter++;
+        const amount = (item.totalqty * item.rate) - ((item.totalqty * item.rate * item.discount) / 100);
+
+        lineItems.push({
+            id: itemCounter,
+            itemdesc: item.itemdesc,
+            totalqty: item.totalqty,
+            rate: item.rate,
+            discount: item.discount || 0,
+            unit: item.unit__id,
+            unit_symbol: item.unit__unitname,
+            amount: amount.toFixed(2)
+        });
+    });
+
+    // Update the table display
+    updateLineItemsTable();
+
+    // Update hidden field
+    document.getElementById('line-items-json').value = JSON.stringify(lineItems);
+});
+{% endif %}
+</script>
+
+<style>
+.tab-button.active {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+.tab-button:not(.active) {
+    border-color: transparent;
+    color: #6b7280;
+}
+.tab-button:not(.active):hover {
+    color: #374151;
+    border-color: #d1d5db;
+}
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+

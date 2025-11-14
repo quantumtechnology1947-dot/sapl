@@ -1,0 +1,115 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Bank Voucher{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+        <div class="px-4 py-4">
+            <h1 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} Bank Voucher</h1>
+        </div>
+    </div>
+    
+    <div class="max-w-5xl mx-auto bg-white rounded border border-gray-200 p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Header Section -->
+            <div class="border-b pb-4">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Voucher Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Voucher Number</label>
+                        {{ form.bvpno }}
+                        {% if form.bvpno.errors %}<p class="text-red-500 text-sm">{{ form.bvpno.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Pay To <span class="text-red-500">*</span></label>
+                        {{ form.payto }}
+                        {% if form.payto.errors %}<p class="text-red-500 text-sm">{{ form.payto.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Bank <span class="text-red-500">*</span></label>
+                        {{ form.bank }}
+                        {% if form.bank.errors %}<p class="text-red-500 text-sm">{{ form.bank.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Transaction Type</label>
+                        {{ form.transactiontype }}
+                        {% if form.transactiontype.errors %}<p class="text-red-500 text-sm">{{ form.transactiontype.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Cheque/DD Number</label>
+                        {{ form.chequeno }}
+                        {% if form.chequeno.errors %}<p class="text-red-500 text-sm">{{ form.chequeno.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Cheque Date</label>
+                        {{ form.chequedate }}
+                        {% if form.chequedate.errors %}<p class="text-red-500 text-sm">{{ form.chequedate.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Payment Amount</label>
+                        {{ form.payamt }}
+                        {% if form.payamt.errors %}<p class="text-red-500 text-sm">{{ form.payamt.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Line Items Section -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Line Items</h2>
+                {{ detail_formset.management_form }}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Invoice No</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Date</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">PO No</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Particulars</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Amount</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for form in detail_formset %}
+                            <tr>
+                                <td class="px-2 py-2">{{ form.proformainvno }}</td>
+                                <td class="px-2 py-2">{{ form.invdate }}</td>
+                                <td class="px-2 py-2">{{ form.pono }}</td>
+                                <td class="px-2 py-2">{{ form.particular }}</td>
+                                <td class="px-2 py-2">{{ form.amount }}</td>
+                                <td class="px-2 py-2">{{ form.DELETE }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Form Buttons -->
+            <div class="flex gap-2">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">
+                    {% if object %}Update{% else %}Create{% endif %}
+                </button>
+                <a href="{% url 'accounts:bank-voucher-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

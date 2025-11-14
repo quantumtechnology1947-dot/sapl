@@ -1,0 +1,186 @@
+{% extends 'core/base.html' %}
+{% block title %}Authorize PO - {{ po.po_no }}{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-sm font-bold text-gray-900">Authorize PO - {{ po.po_no }}</h1>
+            <p class="text-gray-600 mt-1">Final authorization for approved purchase order</p>
+        </div>
+        <a href="{% url 'material_management:po-authorize-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Back to List
+        </a>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- PO Details -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">PO Information</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">PO Number</label>
+                        <p class="text-sm text-gray-900 font-semibold">{{ po.po_no }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">PO Date</label>
+                        <p class="text-sm text-gray-900">{{ po.po_date|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Supplier</label>
+                        <p class="text-sm text-gray-900">{{ po.supplier_name|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Total Amount</label>
+                        <p class="text-sm text-gray-900 font-semibold text-lg">₹{{ po.total_amount|default:"0"|floatformat:2 }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Delivery Date</label>
+                        <p class="text-sm text-gray-900">{{ po.delivery_date|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Approval Status</label>
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            <i class="fas fa-check-double mr-1"></i>{{ po.approve_status }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Approval History -->
+            <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Approval History</h3>
+                
+                <!-- Check Stage -->
+                <div class="mb-4 pb-4 border-b">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <h4 class="font-semibold text-gray-900">Stage 1: Check</h4>
+                    </div>
+                    <div class="ml-6 text-sm text-gray-600">
+                        <p><strong>Status:</strong> {{ po.check_status }}</p>
+                        <p><strong>Checked by:</strong> {{ po.check_by|default:"-" }}</p>
+                        <p><strong>Date:</strong> {{ po.check_date|default:"-" }}</p>
+                        {% if po.check_remark %}
+                        <p><strong>Remarks:</strong> {{ po.check_remark }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Approve Stage -->
+                <div class="mb-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-check-double text-green-500 mr-2"></i>
+                        <h4 class="font-semibold text-gray-900">Stage 2: Approval</h4>
+                    </div>
+                    <div class="ml-6 text-sm text-gray-600">
+                        <p><strong>Status:</strong> {{ po.approve_status }}</p>
+                        <p><strong>Approved by:</strong> {{ po.approve_by|default:"-" }}</p>
+                        <p><strong>Date:</strong> {{ po.approve_date|default:"-" }}</p>
+                        {% if po.approve_remark %}
+                        <p><strong>Remarks:</strong> {{ po.approve_remark }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PO Items -->
+            <div class="bg-white rounded border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">PO Items</h3>
+                {% if po_details %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in po_details %}
+                            <tr>
+                                <td class="px-4 py-4 text-sm text-gray-900">{{ item.item_name|default:"-" }}</td>
+                                <td class="px-4 py-4 text-sm text-gray-500">{{ item.qty|default:"0" }}</td>
+                                <td class="px-4 py-4 text-sm text-gray-500">₹{{ item.rate|default:"0"|floatformat:2 }}</td>
+                                <td class="px-4 py-4 text-sm text-gray-500">₹{{ item.amount|default:"0"|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-center py-4">No items found for this PO.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Action Panel -->
+        <div class="lg:col-span-1">
+            {% if can_authorize %}
+            <div class="bg-white rounded border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Final Authorization</h3>
+                <form method="POST" action="{% url 'material_management:po-authorize-action' po.po_id %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Authorization Remarks</label>
+                        <textarea name="remark" rows="4" class="w-full px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full" 
+                                  placeholder="Enter your authorization remarks (optional)"></textarea>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <button type="submit" name="action" value="authorize" 
+                                class="w-full btn btn-success"
+                                onclick="return confirm('Are you sure you want to authorize this PO? This will activate the PO.')">
+                            <i class="fas fa-shield-alt mr-2"></i>Authorize PO
+                        </button>
+                        
+                        <button type="submit" name="action" value="reject" 
+                                class="w-full btn btn-danger"
+                                onclick="return confirm('Are you sure you want to reject this PO authorization?')">
+                            <i class="fas fa-times mr-2"></i>Reject Authorization
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="bg-white rounded border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Authorization Status</h3>
+                <div class="text-center">
+                    {% if po.authorize_status == 'Authorized' %}
+                        <i class="fas fa-shield-alt text-lg text-green-500 mb-3"></i>
+                        <p class="text-green-600 font-semibold">Already Authorized</p>
+                    {% elif po.authorize_status == 'Rejected' %}
+                        <i class="fas fa-times-circle text-lg text-red-500 mb-3"></i>
+                        <p class="text-red-600 font-semibold">Authorization Rejected</p>
+                    {% else %}
+                        <i class="fas fa-clock text-lg text-yellow-500 mb-3"></i>
+                        <p class="text-yellow-600 font-semibold">Cannot Authorize</p>
+                        <p class="text-sm text-gray-500 mt-2">PO must be approved first</p>
+                    {% endif %}
+                    
+                    {% if po.authorize_status %}
+                    <div class="mt-4 text-sm text-gray-600">
+                        <p><strong>Authorized by:</strong> {{ po.authorize_by|default:"-" }}</p>
+                        <p><strong>Authorization date:</strong> {{ po.authorize_date|default:"-" }}</p>
+                        {% if po.authorize_remark %}
+                        <p><strong>Remarks:</strong> {{ po.authorize_remark }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

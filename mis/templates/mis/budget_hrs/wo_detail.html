@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hrs Budget For Work Order No: {{ wo_no }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="p-4">
+        <!-- Header -->
+        <div class="bg-gray-50 px-4 py-2 mb-4 rounded border border-gray-200">
+            <h2 class="text-sm font-bold text-gray-800">
+                Hrs Budget For Work Order No: <span class="text-blue-600">{{ wo_no }}</span>
+            </h2>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="px-4 py-2 rounded border text-xs {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Add Budget Hours Form -->
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+
+            <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                <div class="grid grid-cols-5 gap-2 items-end">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Equip. No [ Desc ]</label>
+                        <select name="equip_id"
+                                id="equip_id"
+                                required
+                                class="w-full h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500">
+                            <option value="">Select</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.itemcode }} [ {{ product.description|truncatewords:5 }} ]</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Category</label>
+                        <select name="category_id"
+                                id="category_id"
+                                required
+                                onchange="loadSubCategories()"
+                                class="w-full h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500">
+                            <option value="">Select</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Sub Category</label>
+                        <select name="subcategory_id"
+                                id="subcategory_id"
+                                required
+                                class="w-full h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500">
+                            <option value="">Select Category First</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Hrs</label>
+                        <input type="number"
+                               name="hours"
+                               step="0.01"
+                               min="0"
+                               required
+                               placeholder="0.00"
+                               class="w-full h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                                class="w-full h-8 px-3 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Budget Hours Table -->
+        <div class="overflow-auto max-h-[330px]">
+            <table class="min-w-full divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                        <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">Select</th>
+                        <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">CK</th>
+                        <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">Equip. No</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Sub Cate.</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Budget Hrs</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Utilized Hrs</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Bal Hrs</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in budget_hours %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 text-gray-600">{{ forloop.counter }}</td>
+                        <td class="px-3 py-2 text-center">
+                            <form method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this budget hour allocation?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="budget_id" value="{{ item.id }}">
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-xs">Delete</button>
+                            </form>
+                        </td>
+                        <td class="px-3 py-2 text-center">
+                            <input type="checkbox" class="h-3 w-3">
+                        </td>
+                        <td class="px-3 py-2 text-center text-gray-900">{{ item.equip_id|default:"-" }}</td>
+                        <td class="px-3 py-2 text-gray-900">
+                            {% for product in products %}
+                                {% if product.id == item.equip_id %}
+                                    {{ product.description|truncatewords:8 }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td class="px-3 py-2 text-gray-900">
+                            {% for category in categories %}
+                                {% if category.id == item.hrs_budget_cat %}
+                                    {{ category.category }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td class="px-3 py-2 text-gray-900">
+                            {{ item.hrs_budget_sub_cat|default:"-" }}
+                        </td>
+                        <td class="px-3 py-2 text-right text-gray-900 font-medium">{{ item.hour|floatformat:2 }}</td>
+                        <td class="px-3 py-2 text-right text-gray-600">0.00</td>
+                        <td class="px-3 py-2 text-right text-blue-600 font-medium">{{ item.hour|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" class="px-6 py-12 text-center text-gray-500">
+                            <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p class="text-xs font-medium">No budget hours allocated yet</p>
+                            <p class="text-xs mt-1">Use the form above to add budget hours</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function loadSubCategories() {
+            const categoryId = document.getElementById('category_id').value;
+            const subcategorySelect = document.getElementById('subcategory_id');
+
+            if (!categoryId) {
+                subcategorySelect.innerHTML = '<option value="">Select Category First</option>';
+                return;
+            }
+
+            // Fetch subcategories via AJAX
+            fetch(`/mis/api/subcategories/?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
+                    data.subcategories.forEach(subcat => {
+                        const option = document.createElement('option');
+                        option.value = subcat.id;
+                        option.textContent = subcat.subcategory;
+                        subcategorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading subcategories:', error);
+                    subcategorySelect.innerHTML = '<option value="">Error loading subcategories</option>';
+                });
+        }
+
+        // Auto-dismiss success messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.bg-green-50');
+            messages.forEach(function(msg) {
+                msg.style.transition = 'opacity 0.5s';
+                msg.style.opacity = '0';
+                setTimeout(function() { msg.remove(); }, 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

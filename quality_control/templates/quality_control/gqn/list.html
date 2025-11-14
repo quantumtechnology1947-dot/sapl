@@ -1,0 +1,145 @@
+{% extends "core/base.html" %}
+
+{% block title %}Goods Quality Note (GQN) - Cortex ERP{% endblock %}
+{% block page_title %}GQN List{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Navigation Tabs -->
+    {% include 'core/components/layout/tabs.html' with tabs=nav_tabs active_tab='gqn' %}
+
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+            {% include 'core/components/buttons/primary.html' with text="+ New GQN" url="/quality/gqn/new/" size="compact" %}
+        </div>
+        
+        <form method="get" id="searchForm" class="flex items-center gap-2">
+            {% include 'core/components/forms/select_input.html' with name="search_by" id="searchBySelect" value=request.GET.search_by options=search_options onchange="toggleSearchFields()" inline=True %}
+
+            <div class="relative w-[300px]" id="supplier-container" x-data="{ show: {% if not request.GET.search_by or request.GET.search_by == '0' %}true{% else %}false{% endif %} }" x-show="show">
+                {% include 'core/components/forms/text_input.html' with name="search_value_supplier" id="txtSupplier" value=request.GET.search_value placeholder="Type supplier name..." inline=True oninput="searchSuppliers(this.value)" autocomplete="off" %}
+                <div id="supplier-autocomplete" class="absolute bg-white border border-gray-300 rounded shadow-lg z-50 mt-1 w-full max-h-60 overflow-y-auto hidden"></div>
+            </div>
+
+            <div class="w-64" x-data="{ show: {% if request.GET.search_by and request.GET.search_by != '0' %}true{% else %}false{% endif %} }" x-show="show">
+                {% include 'core/components/forms/text_input.html' with name="search_value" id="txtField" value=request.GET.search_value placeholder="Enter value..." inline=True %}
+            </div>
+
+            {% include 'core/components/buttons/primary.html' with text="Search" type="submit" size="compact" %}
+
+            {% if request.GET.search_value %}
+            {% include 'core/components/buttons/secondary.html' with text="Clear" href=gqn_list_url size="compact" %}
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- GQN List -->
+    <!-- DEBUG: rows count = {{ rows|length }} -->
+    {% include 'core/components/tables/data_table.html' with headers=table_headers rows=rows empty_message="No GQN records found" empty_description="Try adjusting your search criteria" %}
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    {% include 'core/components/tables/pagination.html' with page_obj=page_obj %}
+    {% endif %}
+</div>
+
+<script>
+function toggleSearchFields() {
+    const searchBy = document.getElementById('searchBySelect').value;
+    const supplierContainer = document.getElementById('supplier-container');
+    const txtSupplier = document.getElementById('txtSupplier');
+    const txtField = document.getElementById('txtField');
+
+    if (searchBy === '0') {
+        // Supplier Name selected
+        supplierContainer.style.display = 'inline-block';
+        txtField.style.display = 'none';
+        txtSupplier.name = 'search_value';
+        txtField.name = '';
+    } else {
+        // GQN No, GRR No, or PO No selected
+        supplierContainer.style.display = 'none';
+        txtField.style.display = 'inline-block';
+        txtSupplier.name = '';
+        txtField.name = 'search_value';
+
+        // Update placeholder
+        if (searchBy === '1') {
+            txtField.placeholder = 'Enter GQN No...';
+        } else if (searchBy === '2') {
+            txtField.placeholder = 'Enter GRR No...';
+        } else if (searchBy === '3') {
+            txtField.placeholder = 'Enter PO No...';
+        }
+    }
+}
+
+// Supplier autocomplete function
+function searchSuppliers(query) {
+    console.log('searchSuppliers called with:', query);
+    const autocomplete = document.getElementById('supplier-autocomplete');
+    
+    if (query.length < 1) {
+        autocomplete.innerHTML = '';
+        autocomplete.classList.add('hidden');
+        return;
+    }
+    
+    // Make AJAX request
+    const url = '/quality/gqn/supplier-autocomplete/?search_value_supplier=' + encodeURIComponent(query);
+    console.log('Fetching:', url);
+    
+    fetch(url)
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.text();
+        })
+        .then(html => {
+            console.log('Response HTML:', html);
+            autocomplete.innerHTML = html;
+            if (html.trim()) {
+                autocomplete.classList.remove('hidden');
+                console.log('Showing autocomplete');
+            } else {
+                autocomplete.classList.add('hidden');
+                console.log('Hiding autocomplete - no results');
+            }
+        })
+        .catch(error => {
+            console.error('Autocomplete error:', error);
+            autocomplete.classList.add('hidden');
+        });
+}
+
+// Handle autocomplete selection
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('autocomplete-item')) {
+        document.getElementById('txtSupplier').value = e.target.textContent;
+        document.getElementById('supplier-autocomplete').classList.add('hidden');
+        document.getElementById('searchForm').submit();
+    }
+});
+
+// Hide autocomplete when clicking outside
+document.addEventListener('click', function(e) {
+    const autocomplete = document.getElementById('supplier-autocomplete');
+    const input = document.getElementById('txtSupplier');
+    if (e.target !== input && e.target !== autocomplete) {
+        autocomplete.classList.add('hidden');
+    }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleSearchFields();
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+

@@ -1,0 +1,197 @@
+<!-- Buyer Information Tab Content -->
+<div class="space-y-6">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Buyer Details</h3>
+        <button type="button" 
+                class="text-sm text-blue-600 hover:text-blue-800"
+                onclick="copyToConsignee()">
+            <i class="fas fa-copy mr-1"></i>
+            Copy to Consignee
+        </button>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+            <label for="id_buyer_name" class="block text-sm font-medium text-gray-700 mb-1">
+                Buyer Name <span class="text-red-500">*</span>
+            </label>
+            {{ form.buyer_name }}
+            {% if form.buyer_name.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.buyer_name.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="md:col-span-2">
+            <label for="id_buyer_address" class="block text-sm font-medium text-gray-700 mb-1">
+                Address <span class="text-red-500">*</span>
+            </label>
+            {{ form.buyer_address }}
+            {% if form.buyer_address.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.buyer_address.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="id_buyer_city" class="block text-sm font-medium text-gray-700 mb-1">
+                City <span class="text-red-500">*</span>
+            </label>
+            {{ form.buyer_city }}
+            {% if form.buyer_city.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.buyer_city.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="id_buyer_state" class="block text-sm font-medium text-gray-700 mb-1">
+                State <span class="text-red-500">*</span>
+            </label>
+            {{ form.buyer_state }}
+            {% if form.buyer_state.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.buyer_state.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="id_buyer_country" class="block text-sm font-medium text-gray-700 mb-1">
+                Country <span class="text-red-500">*</span>
+            </label>
+            {{ form.buyer_country }}
+            {% if form.buyer_country.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.buyer_country.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="id_buyer_pincode" class="block text-sm font-medium text-gray-700 mb-1">
+                Pincode
+            </label>
+            {{ form.buyer_pincode }}
+            {% if form.buyer_pincode.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.buyer_pincode.errors.0 }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="border-t pt-6">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">Contact Information</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="id_buyer_contact_person" class="block text-sm font-medium text-gray-700 mb-1">
+                    Contact Person
+                </label>
+                {{ form.buyer_contact_person }}
+            </div>
+
+            <div>
+                <label for="id_buyer_phone" class="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                </label>
+                {{ form.buyer_phone }}
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="id_buyer_email" class="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                </label>
+                {{ form.buyer_email }}
+                {% if form.buyer_email.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.buyer_email.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Information -->
+    <div class="border-t pt-6">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">Tax Information</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="id_buyer_gst_no" class="block text-sm font-medium text-gray-700 mb-1">
+                    GST Number
+                </label>
+                {{ form.buyer_gst_no }}
+                {% if form.buyer_gst_no.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.buyer_gst_no.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_buyer_pan_no" class="block text-sm font-medium text-gray-700 mb-1">
+                    PAN Number
+                </label>
+                {{ form.buyer_pan_no }}
+                {% if form.buyer_pan_no.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.buyer_pan_no.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_buyer_tin_no" class="block text-sm font-medium text-gray-700 mb-1">
+                    TIN Number
+                </label>
+                {{ form.buyer_tin_no }}
+            </div>
+
+            <div>
+                <label for="id_buyer_cst_no" class="block text-sm font-medium text-gray-700 mb-1">
+                    CST Number
+                </label>
+                {{ form.buyer_cst_no }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Text -->
+    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 mr-2 mt-1"></i>
+            <div class="text-sm text-blue-800">
+                <p class="font-medium mb-1">Note:</p>
+                <p>Buyer information is pre-populated from the customer master. You can modify these details if needed for this specific invoice.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Copy buyer information to consignee
+    function copyToConsignee() {
+        if (confirm('This will overwrite all consignee information with buyer details. Continue?')) {
+            // Get all buyer fields
+            const buyerFields = [
+                'name', 'address', 'city', 'state', 'country', 'pincode',
+                'contact_person', 'phone', 'email',
+                'gst_no', 'pan_no', 'tin_no', 'cst_no'
+            ];
+            
+            buyerFields.forEach(field => {
+                const buyerField = document.getElementById(`id_buyer_${field}`);
+                const consigneeField = document.getElementById(`id_consignee_${field}`);
+                
+                if (buyerField && consigneeField) {
+                    consigneeField.value = buyerField.value;
+                }
+            });
+            
+            // Show success message
+            const message = document.createElement('div');
+            message.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded border border-gray-200 z-50';
+            message.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Buyer information copied to consignee';
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 3000);
+        }
+    }
+</script>
+
+
+
+
+
+
+
+

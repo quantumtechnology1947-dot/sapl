@@ -1,0 +1,19 @@
+﻿Id,SubCategory,Abbrivation,MId
+0,Select	, ,0
+1,Telephone,TELEPHONE,2
+2,Hard Disk,HARD DISK,3
+3,Electric Material,ELECTRIC MATERIAL,2
+4,Repair and Maintenance,REPAIR AND MAINTENANCE,4
+5,Repair and Maintenance,REPAIR & MAINTENANCE,5
+6,Repair and Maintenance,REPAIRANDMAINTENANCE,6
+7,Faro,FARO,7
+17,FANS,FAN,8
+18,"LED Light, Tube Light, Light",LIGHT,9
+19,tv,TV,10
+20,GENRATOR,GEN,11
+21,compressor,COMPRESSOR,12
+22,ups,UPS,13
+23,crain,CRAIN,14
+24,AC,AC,15
+25,Refrigerator,REF,16
+26,switches,SWITCHES,17

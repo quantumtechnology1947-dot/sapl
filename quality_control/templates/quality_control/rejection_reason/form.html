@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Rejection Reason{% endblock %}
+{% block page_title %}{% if object %}Edit{% else %}Add{% endif %} Rejection Reason{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include 'core/components/layout/page_header.html' with title=page_title breadcrumbs=breadcrumbs %}
+
+    <!-- Form -->
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                {% for field in form %}
+                {% include 'core/components/forms/form_row.html' with field=field %}
+                {% endfor %}
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end gap-2 pt-4 border-t border-gray-200 mt-4">
+                {% include 'core/components/buttons/secondary.html' with text="Cancel" href=cancel_url %}
+                {% include 'core/components/buttons/primary.html' with text="Save" type="submit" %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

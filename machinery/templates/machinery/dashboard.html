@@ -1,0 +1,68 @@
+{% extends "machinery/base.html" %}
+
+{% block title %}Dashboard - Machinery Module{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include "core/components/layout/page_header.html" with title="Machinery Module Dashboard" subtitle="Vehicle and machinery management system" %}
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {% include "core/components/cards/stat_card.html" with value=total_vehicles label="Total Vehicles" color="blue" %}
+        {% include "core/components/cards/stat_card.html" with value=total_processes label="Vehicle Processes" color="green" %}
+        {% include "core/components/cards/stat_card.html" with value=total_schedules label="Active Schedules" color="purple" %}
+    </div>
+
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Quick Actions Card -->
+        <div class="bg-white border border-gray-200 rounded">
+            {% include "core/components/cards/card_header.html" with title="Quick Actions" %}
+            <div class="p-4 space-y-2">
+                <a href="{% url 'machinery:vehicle-create' %}" class="block">
+                    {% include "core/components/buttons/primary.html" with text="Add New Vehicle" icon="plus" full_width=True %}
+                </a>
+                <a href="{% url 'machinery:process-create' %}" class="block">
+                    {% include "core/components/buttons/success.html" with text="Add Vehicle Process" icon="plus" full_width=True %}
+                </a>
+                <a href="{% url 'machinery:schedule-create' %}" class="block">
+                    {% include "core/components/buttons/secondary.html" with text="Create Schedule" icon="plus" full_width=True %}
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Vehicles Card -->
+        <div class="bg-white border border-gray-200 rounded">
+            {% include "core/components/cards/card_header.html" with title="Recent Vehicles" %}
+            <div class="p-4">
+                {% if recent_vehicles %}
+                    <div class="space-y-3">
+                        {% for vehicle in recent_vehicles %}
+                            <div class="border-b border-gray-100 pb-2 last:border-0">
+                                <div class="text-sm font-medium text-gray-900">{{ vehicle.vehno }} - {{ vehicle.vehical_name }}</div>
+                                <div class="text-xs text-gray-500 mt-0.5">{{ vehicle.date }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-500">No vehicles found</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

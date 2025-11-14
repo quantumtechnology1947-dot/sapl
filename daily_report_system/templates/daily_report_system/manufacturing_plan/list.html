@@ -1,0 +1,124 @@
+{% extends "daily_report_system/base.html" %}
+
+{% block title %}Manufacturing Plans - Daily Report System{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    {% include "core/components/layout/page_header.html" with title="Manufacturing Plans" subtitle="Manage manufacturing planning and production" %}
+    
+    <!-- Toolbar -->
+    <div class="bg-white border border-gray-200 rounded border border-gray-200 mb-3 p-3">
+        <div class="flex items-center justify-between gap-3">
+            <!-- Search Form -->
+            <form method="get" class="flex-1 flex items-center gap-2">
+                <div class="relative flex-1 max-w-md">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ request.GET.search }}"
+                           placeholder="Search manufacturing plans..."
+                           class="block w-full pl-10 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue">
+                </div>
+                <button type="submit" class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-dark transition-colors">
+                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+                {% if request.GET.search %}
+                <a href="{% url 'daily_report_system:manufacturing-plan-list' %}" class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-gray-500 text-white hover:bg-gray-600 transition-colors">
+                    Clear
+                </a>
+                {% endif %}
+            </form>
+            
+            <!-- Add Button -->
+            <a href="{% url 'daily_report_system:manufacturing-plan-create' %}" class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-dark transition-colors">
+                <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add Manufacturing Plan
+            </a>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-12 px-3 py-2 text-left text-xs font-semibold text-gray-700">SN</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">WO No</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Item Code</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Description</th>
+                        <th class="w-32 px-3 py-2 text-center text-xs font-semibold text-gray-700">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for plan in plans %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+                        <td class="w-12 px-3 py-2 text-xs text-gray-600">{{ forloop.counter }}</td>
+                        <td class="w-32 px-3 py-2 text-xs font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis" title="{{ plan.wono }}">
+                            {{ plan.wono }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis" title="{{ plan.itemcode }}">
+                            {{ plan.itemcode }}
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" title="{{ plan.description }}">
+                            {{ plan.description|default:"-" }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-center text-xs whitespace-nowrap">
+                            <a href="{% url 'daily_report_system:manufacturing-plan-detail' plan.pk %}" class="text-sap-blue hover:text-sap-blue-dark transition-colors mr-2" title="View">
+                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'daily_report_system:manufacturing-plan-edit' plan.pk %}" class="text-sap-green hover:text-sap-green-dark transition-colors mr-2" title="Edit">
+                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </a>
+                            <a href="{% url 'daily_report_system:manufacturing-plan-delete' plan.pk %}" class="text-sap-red hover:text-sap-red-dark transition-colors" title="Delete" onclick="return confirm('Are you sure you want to delete this manufacturing plan?')">
+                                <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-16 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No manufacturing plans found</h3>
+                            <p class="mt-1 text-sm text-gray-500">Get started by creating a new manufacturing plan.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        {% include "core/components/tables/pagination.html" with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

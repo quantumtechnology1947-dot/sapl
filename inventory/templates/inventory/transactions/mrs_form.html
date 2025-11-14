@@ -1,0 +1,222 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Material Requisition Slip [MRS] - New{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Material Requisition</span>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">New</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+    <div class="px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Material Requisition Slip [MRS] - New</h2>
+            </div>
+            <a href="{% url 'inventory:mrs-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 text-sm rounded-md transition-colors">
+                Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Container -->
+<div class="bg-white rounded border border-gray-200" x-data="{ activeTab: 'item-master', cartCount: {{ cart_items|length|default:0 }} }">
+    <!-- Tab Headers -->
+    <div class="border-b border-gray-300">
+        <div class="flex">
+            <button @click="activeTab = 'item-master'"
+                    :class="activeTab === 'item-master' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                    class="px-6 py-2 font-medium text-sm transition-colors">
+                Item Master
+            </button>
+            <button @click="activeTab = 'selected-items'"
+                    :class="activeTab === 'selected-items' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                    class="px-6 py-2 font-medium text-sm transition-colors">
+                Selected Items
+                <span x-show="cartCount > 0" class="ml-2 bg-white text-blue-600 px-2 py-0.5 rounded-full text-xs font-bold" x-text="cartCount"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab 1: Item Master -->
+    <div x-show="activeTab === 'item-master'" class="p-4">
+        <!-- Search Filters -->
+        <div class="mb-3 flex gap-2 items-end">
+            <div>
+                <select id="category-select"
+                        hx-get="{% url 'inventory:mrs-search-items' %}"
+                        hx-target="#items-grid"
+                        hx-include="#search-type, #category-select, #search-text"
+                        class="px-2 py-1.5 border border-gray-300 rounded text-sm w-64">
+                    <option value="">Select Category</option>
+                    {% for category in categories %}
+                    <option value="{{ category.cid }}">{{ category.symbol }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <select id="search-type" class="px-2 py-1.5 border border-gray-300 rounded text-sm w-40">
+                    <option value="itemcode">Item Code</option>
+                    <option value="description">Description</option>
+                    <option value="location">Location</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                <input type="text"
+                       id="search-text"
+                       placeholder="Search..."
+                       class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+            </div>
+            <button type="button"
+                    hx-get="{% url 'inventory:mrs-search-items' %}"
+                    hx-target="#items-grid"
+                    hx-include="#search-type, #category-select, #search-text"
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-1.5 text-sm rounded transition-colors">
+                Search
+            </button>
+        </div>
+
+        <!-- Items Grid -->
+        <div id="items-grid" class="overflow-x-auto border border-gray-300">
+            {% include 'inventory/transactions/partials/mrs_items_grid.html' %}
+        </div>
+    </div>
+
+    <!-- Tab 2: Selected Items -->
+    <div x-show="activeTab === 'selected-items'" class="p-4">
+        <div id="cart-grid" class="overflow-x-auto border border-gray-300">
+            {% include 'inventory/transactions/partials/mrs_cart_grid.html' %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle HTMX responses
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'cart-grid') {
+        // Update cart count
+        const cartRows = document.querySelectorAll('#cart-grid tbody tr:not(.empty-state)');
+        const alpineData = document.querySelector('[x-data]').__x.$data;
+        alpineData.cartCount = cartRows.length;
+    }
+});
+
+// Handle BGGroup/WONo dropdown change
+function handleTypeChange(selectEl) {
+    const row = selectEl.closest('tr');
+    const deptSelect = row.querySelector('.dept-dropdown');
+    const wonoInput = row.querySelector('.wono-input');
+
+    if (selectEl.value === 'bggroup') {
+        deptSelect.classList.remove('hidden');
+        deptSelect.required = true;
+        wonoInput.classList.add('hidden');
+        wonoInput.required = false;
+        wonoInput.value = '';
+    } else if (selectEl.value === 'wono') {
+        deptSelect.classList.add('hidden');
+        deptSelect.required = false;
+        deptSelect.value = '';
+        wonoInput.classList.remove('hidden');
+        wonoInput.required = true;
+    } else {
+        deptSelect.classList.add('hidden');
+        deptSelect.required = false;
+        wonoInput.classList.add('hidden');
+        wonoInput.required = false;
+    }
+}
+
+// Add item to cart via fetch
+function addItemToCart(button, url) {
+    const row = button.closest('tr');
+
+    // Get data from row inputs
+    const req_qty = row.querySelector('.req-qty-input').value;
+    const type = row.querySelector('.type-selector').value;
+    const dept_id = row.querySelector('.dept-dropdown').value;
+    const wono = row.querySelector('.wono-input').value;
+    const remarks = row.querySelector('.remarks-input').value;
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('item_id', button.dataset.itemId);
+    formData.append('item_code', button.dataset.itemCode);
+    formData.append('item_desc', button.dataset.itemDesc);
+    formData.append('uom', button.dataset.uom);
+    formData.append('stock_qty', button.dataset.stockQty);
+    formData.append('location', button.dataset.location);
+    formData.append('req_qty', req_qty);
+    formData.append('type', type);
+    formData.append('dept_id', dept_id);
+    formData.append('wono', wono);
+    formData.append('remarks', remarks);
+
+    // Add CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    formData.append('csrfmiddlewaretoken', csrfToken);
+
+    // Send request
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => Promise.reject(text));
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Update cart grid
+        document.getElementById('cart-grid').innerHTML = html;
+
+        // Update cart count
+        const cartRows = document.querySelectorAll('#cart-grid tbody tr:not(.empty-state)');
+        const alpineEl = document.querySelector('[x-data]');
+        if (alpineEl && alpineEl.__x) {
+            alpineEl.__x.$data.cartCount = cartRows.length;
+        }
+
+        // Clear the row inputs
+        row.querySelector('.req-qty-input').value = '';
+        row.querySelector('.type-selector').value = '';
+        row.querySelector('.dept-dropdown').value = '';
+        row.querySelector('.dept-dropdown').classList.add('hidden');
+        row.querySelector('.wono-input').value = '';
+        row.querySelector('.wono-input').classList.add('hidden');
+        row.querySelector('.remarks-input').value = '';
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

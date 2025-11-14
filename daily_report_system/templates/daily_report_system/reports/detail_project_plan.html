@@ -1,0 +1,16 @@
+{% extends "daily_report_system/base.html" %}
+{% block content %}
+<h1 class="text-sm font-bold mb-6">Detail Project Plan</h1>
+<div class="bg-white rounded shadow p-6">
+    <h2 class="text-xl font-bold mb-4">Projects</h2>
+    {% for project in projects %}<div class="mb-4 p-4 border-b"><strong>WO:</strong> {{ project.wono }} | <strong>Date:</strong> {{ project.sysdate }}</div>{% endfor %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

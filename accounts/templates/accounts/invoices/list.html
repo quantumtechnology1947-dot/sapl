@@ -1,0 +1,148 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Sales Invoices - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include 'core/components/layout/page_header.html' with 
+        title="Sales Invoices"
+        subtitle="View and manage all sales invoices"
+    %}
+    
+    <div class="flex justify-end mb-4">
+        {% include 'core/components/buttons/primary.html' with 
+            text="Create New Invoice"
+            icon="plus"
+            url="accounts:invoices:invoice-dashboard"
+        %}
+    </div>
+
+    <!-- Search and Filter Form -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        <h2 class="text-sm font-semibold text-gray-700 mb-3">Search Invoices</h2>
+        
+        <form method="GET" 
+              class="space-y-3"
+              hx-get="{% url 'accounts:invoices:invoice-list' %}"
+              hx-target="#invoice-results"
+              hx-swap="innerHTML"
+              hx-indicator="#loading">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {% include 'core/components/forms/text_input.html' with 
+                    name="invoice_no"
+                    label="Invoice Number"
+                    value=search_data.invoice_no
+                    placeholder="Search by invoice no..."
+                %}
+
+                {% include 'core/components/forms/text_input.html' with 
+                    name="customer_name"
+                    label="Customer Name"
+                    value=search_data.customer_name
+                    placeholder="Search by customer..."
+                %}
+
+                {% include 'core/components/forms/text_input.html' with 
+                    name="po_no"
+                    label="PO Number"
+                    value=search_data.po_no
+                    placeholder="Search by PO no..."
+                %}
+
+                {% include 'core/components/forms/text_input.html' with 
+                    name="wo_no"
+                    label="WO Number"
+                    value=search_data.wo_no
+                    placeholder="Search by WO no..."
+                %}
+
+                {% include 'core/components/forms/date_input.html' with 
+                    name="date_from"
+                    label="Date From"
+                    value=search_data.date_from
+                %}
+
+                {% include 'core/components/forms/date_input.html' with 
+                    name="date_to"
+                    label="Date To"
+                    value=search_data.date_to
+                %}
+
+                <div>
+                    <label for="invoice_type" class="block text-xs font-medium text-gray-700 mb-1">
+                        Invoice Type
+                    </label>
+                    <select id="invoice_type" name="invoice_type" class="h-9 px-3 text-sm border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full">
+                        {% for value, label in invoice_types %}
+                            <option value="{{ value }}" {% if search_data.invoice_type == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Search Buttons -->
+            {% include 'core/components/buttons/button_group.html' with 
+                buttons=search_buttons
+            %}
+            <div class="flex gap-2 pt-2">
+                {% include 'core/components/buttons/primary.html' with 
+                    text="Search"
+                    icon="search"
+                    type="submit"
+                    size="compact"
+                %}
+                {% include 'core/components/buttons/secondary.html' with 
+                    text="Clear"
+                    icon="times"
+                    url="accounts:invoices:invoice-list"
+                    size="compact"
+                %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Invoice Results -->
+    <div id="invoice-results">
+        {% include 'accounts/invoices/partials/list_partial.html' %}
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+{% include 'core/components/feedback/loading_spinner.html' with 
+    id="loading"
+    overlay=True
+%}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit form when search fields change (with debounce)
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input, select');
+        let searchTimeout;
+        
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    htmx.trigger(form, 'submit');
+                }, 500);
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

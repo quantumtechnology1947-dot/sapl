@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Delete Loan{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="max-w-2xl mx-auto bg-white rounded border border-gray-200 p-6">
+        <h2 class="text-sm font-bold text-gray-900 mb-4">Confirm Deletion</h2>
+        <p class="text-gray-600 mb-6">Are you sure you want to delete this loan record?</p>
+
+        <div class="bg-gray-50 rounded p-4 mb-6">
+            <p><strong>Particulars:</strong> {{ object.particulars|truncatewords:20 }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex justify-end gap-3">
+                <a href="{% url 'accounts:loan-list' %}" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
+                <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

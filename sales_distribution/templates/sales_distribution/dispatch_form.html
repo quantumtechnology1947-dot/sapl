@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+
+{% block title %}Work Order Dispatch - Cortex ERP{% endblock %}
+{% block page_title %}Work Order Dispatch{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-sm font-bold text-gray-800">New Work Order Dispatch</h2>
+    </div>
+
+    <form method="post" class="bg-white rounded border border-gray-200 p-6 space-y-6">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">DA Number <span class="text-red-500">*</span></label>
+                {{ form.dano }}
+                {% if form.dano.errors %}<p class="text-red-500 text-sm">{{ form.dano.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">WR Number <span class="text-red-500">*</span></label>
+                {{ form.wrno }}
+                {% if form.wrno.errors %}<p class="text-red-500 text-sm">{{ form.wrno.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-4">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">WR ID</label>
+                {{ form.wrid }}
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Item ID</label>
+                {{ form.itemid }}
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Issued Qty</label>
+                {{ form.issuedqty }}
+            </div>
+        </div>
+        
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Dispatch Quantity <span class="text-red-500">*</span></label>
+            {{ form.dispatchqty }}
+            {% if form.dispatchqty.errors %}<p class="text-red-500 text-sm">{{ form.dispatchqty.errors.0 }}</p>{% endif %}
+        </div>
+        
+        <div class="grid grid-cols-3 gap-4">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Freight Charges</label>
+                {{ form.freightcharges }}
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Vehicle By</label>
+                {{ form.vehicleby }}
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Octroi Charges</label>
+                {{ form.octroicharges }}
+            </div>
+        </div>
+        
+        <div class="flex gap-4 justify-end pt-6 border-t">
+            <a href="{% url 'sales_distribution:dispatch-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md">Cancel</a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-sm">Create Dispatch</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

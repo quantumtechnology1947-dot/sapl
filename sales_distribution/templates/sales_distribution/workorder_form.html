@@ -1,0 +1,411 @@
+{% extends "core/base.html" %}
+{% block title %}Work Order - {% if is_edit %}Edit{% else %}New{% endif %}{% endblock %}
+{% block page_title %}Work Order - {% if is_edit %}Edit{% else %}New{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2 py-1" x-data="{ currentTab: 1 }">
+    <!-- Page Heading Outside Form -->
+    <div class="flex justify-between items-center mb-2">
+        <h1 class="text-sm font-semibold text-gray-800">Work Order - {% if is_edit %}Edit{% if work_order %} ({{ work_order.wono }}){% endif %}{% else %}New{% endif %}</h1>
+        <button type="submit" form="workorder-form" class="bg-red-600 hover:bg-red-700 text-white text-sm px-5 py-1 rounded shadow">
+            {% if is_edit %}Update{% else %}Submit{% endif %}
+        </button>
+    </div>
+
+    {% if po %}
+    <!-- Context Information Row -->
+    <div class="bg-white border border-gray-300 mb-2">
+        <table class="w-full text-xs">
+            <tr>
+                <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Customer's Name</td>
+                <td class="px-2 py-1 w-[35%]">{{ po.enqid.customername|default:"-" }}</td>
+                <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">PO No</td>
+                <td class="px-2 py-1 w-[15%]">{{ po.pono }}</td>
+                <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">Enquiry No</td>
+                <td class="px-2 py-1 w-[15%]">{{ po.enqid.enqid|default:"-" }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <form method="post" id="workorder-form">
+        {% csrf_token %}
+        {% if po %}
+        <input type="hidden" name="poid" value="{{ po.poid }}">
+        <input type="hidden" name="customerid" value="{{ po.customerid }}">
+        <input type="hidden" name="pono" value="{{ po.pono }}">
+        <input type="hidden" name="enqid" value="{{ po.enqid_id }}">
+        {% endif %}
+
+        <!-- Tab Navigation Bar -->
+        <div class="bg-white border border-gray-300 mb-2">
+            <div class="flex">
+                <button type="button"
+                        @click="currentTab = 1"
+                        :class="currentTab === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                        class="flex-1 px-3 py-1 text-xs font-medium border-r border-gray-300">
+                    Task Execution
+                </button>
+                <button type="button"
+                        @click="currentTab = 2"
+                        :class="currentTab === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                        class="flex-1 px-3 py-1 text-xs font-medium border-r border-gray-300">
+                    Shipping
+                </button>
+                <button type="button"
+                        @click="currentTab = 3"
+                        :class="currentTab === 3 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                        class="flex-1 px-3 py-1 text-xs font-medium border-r border-gray-300">
+                    Products
+                </button>
+                <button type="button"
+                        @click="currentTab = 4"
+                        :class="currentTab === 4 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                        class="flex-1 px-3 py-1 text-xs font-medium">
+                    Instructions
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 1: Task Execution -->
+        <div x-show="currentTab === 1">
+            <!-- Category & Subcategory -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Category <span class="text-red-500">*</span></td>
+                        <td class="px-2 py-1 w-[35%]">{{ form.cid }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Sub-Category</td>
+                        <td class="px-2 py-1 w-[35%]" id="id_scid_container">{{ form.scid }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Basic Info -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">WO Date</td>
+                        <td class="px-2 py-1 w-[18%]">{{ form.taskworkorderdate }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Project Title</td>
+                        <td class="px-2 py-1 w-[18%]">{{ form.taskprojecttitle }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Project Leader</td>
+                        <td class="px-2 py-1 w-[19%]">{{ form.taskprojectleader }}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50">Business Group</td>
+                        <td colspan="5" class="px-2 py-1">{{ form.taskbusinessgroup }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Target Dates Section -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-2 py-1 text-center font-semibold text-gray-700" colspan="6">Target Dates</th>
+                        </tr>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-2 py-1 text-left text-xs font-semibold text-gray-700 w-[15%]">Phase</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center text-xs font-semibold text-gray-700 w-[14%]">From Date</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center text-xs font-semibold text-gray-700 w-[14%]">To Date</th>
+                            <th class="border border-gray-300 px-2 py-1 text-left text-xs font-semibold text-gray-700 w-[15%]">Phase</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center text-xs font-semibold text-gray-700 w-[14%]">From Date</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center text-xs font-semibold text-gray-700 w-[14%]">To Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">DAP</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetdap_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetdap_tdate }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Design Finalization</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.taskdesignfinalization_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.taskdesignfinalization_tdate }}</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Manufacturing</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetmanufg_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetmanufg_tdate }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Try-out</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargettryout_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargettryout_tdate }}</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Despatch</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetdespach_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetdespach_tdate }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Assembly</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetassembly_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetassembly_tdate }}</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Installation</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetinstalation_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.tasktargetinstalation_tdate }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Customer Inspection</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.taskcustinspection_fdate }}</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.taskcustinspection_tdate }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Material Procurement -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Manuf. Material Date</td>
+                        <td class="px-2 py-1 w-[28%]">{{ form.manufmaterialdate }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Buyer</td>
+                        <td class="px-2 py-1 w-[13%]">{{ form.buyer }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Boughtout Material Date</td>
+                        <td class="px-2 py-1 w-[14%]">{{ form.boughtoutmaterialdate }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Shipping -->
+        <div x-show="currentTab === 2">
+            <!-- Shipping Address -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Shipping Address</td>
+                        <td class="px-2 py-1" colspan="5">{{ form.shippingadd }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Location -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Country</td>
+                        <td class="px-2 py-1 w-[28%]" id="id_shippingcountry_container">{{ form.shippingcountry }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">State</td>
+                        <td class="px-2 py-1 w-[18%]" id="id_shippingstate_container">{{ form.shippingstate }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">City</td>
+                        <td class="px-2 py-1 w-[19%]" id="id_shippingcity_container">{{ form.shippingcity }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-2 py-1 text-center font-semibold text-gray-700" colspan="6">Contact Information</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Contact Person 1</td>
+                            <td class="border border-gray-300 px-1 py-1 w-[18%]">{{ form.shippingcontactperson1 }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">Contact No</td>
+                            <td class="border border-gray-300 px-1 py-1 w-[18%]">{{ form.shippingcontactno1 }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">Email</td>
+                            <td class="border border-gray-300 px-1 py-1 w-[29%]">{{ form.shippingemail1 }}</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Contact Person 2</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.shippingcontactperson2 }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Contact No</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.shippingcontactno2 }}</td>
+                            <td class="border border-gray-300 px-2 py-1 font-medium text-gray-700 bg-gray-50">Email</td>
+                            <td class="border border-gray-300 px-1 py-1">{{ form.shippingemail2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tax Information -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Fax No</td>
+                        <td class="px-2 py-1 w-[18%]">{{ form.shippingfaxno }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">ECC No</td>
+                        <td class="px-2 py-1 w-[18%]">{{ form.shippingeccno }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[10%]">TIN/CST No</td>
+                        <td class="px-2 py-1 w-[29%]">{{ form.shippingtincstno }}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50">TIN/VAT No</td>
+                        <td colspan="5" class="px-2 py-1">{{ form.shippingtinvatno }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: Products -->
+        <div x-show="currentTab === 3">
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-0 w-1/2 align-top">
+                            <!-- Add Product Form -->
+                            <div class="border-r border-gray-300 p-2">
+                                <div class="font-semibold text-gray-700 mb-2">Add Product</div>
+                                <form hx-post="{% url 'sales_distribution:workorder-product-add' %}"
+                                      hx-target="#workorder-products-grid"
+                                      hx-swap="innerHTML">
+                                    {% csrf_token %}
+                                    <table class="w-full text-xs">
+                                        <tr>
+                                            <td class="py-1 pr-1 font-medium text-gray-700">Item Code <span class="text-red-500">*</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pb-2">
+                                                <input type="text" name="itemcode" required
+                                                       class="w-full px-2 py-1 border border-gray-300 rounded text-xs">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-1 pr-1 font-medium text-gray-700">Description <span class="text-red-500">*</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pb-2">
+                                                <textarea name="description" rows="2" required
+                                                          class="w-full px-2 py-1 border border-gray-300 rounded text-xs"></textarea>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-1 pr-1 font-medium text-gray-700">Quantity <span class="text-red-500">*</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pb-2">
+                                                <input type="number" name="qty" step="0.001" min="0" required
+                                                       class="w-full px-2 py-1 border border-gray-300 rounded text-xs">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded">
+                                                    Add Product
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            </div>
+                        </td>
+                        <td class="px-2 py-2 w-1/2 align-top">
+                            <!-- Products Grid -->
+                            <div class="font-semibold text-gray-700 mb-2">Products List</div>
+                            <div id="workorder-products-grid"
+                                 hx-get="{% url 'sales_distribution:workorder-product-list' %}"
+                                 hx-trigger="load">
+                                <!-- Products will load here via HTMX -->
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 4: Instructions -->
+        <div x-show="currentTab === 4">
+            <!-- Checkboxes -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 w-[33%]">
+                            <label class="inline-flex items-center">
+                                {{ form.instractionprimerpainting }}
+                                <span class="ml-1 text-gray-700">Primer Painting</span>
+                            </label>
+                        </td>
+                        <td class="px-2 py-1 w-[33%]">
+                            <label class="inline-flex items-center">
+                                {{ form.instractionpainting }}
+                                <span class="ml-1 text-gray-700">Painting</span>
+                            </label>
+                        </td>
+                        <td class="px-2 py-1 w-[34%]">
+                            <label class="inline-flex items-center">
+                                {{ form.instractionselfcertrept }}
+                                <span class="ml-1 text-gray-700">Self Certification Report</span>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Text Fields -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Others</td>
+                        <td class="px-2 py-1 w-[35%]">{{ form.instractionother }}</td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50 w-[15%]">Export Case Mark</td>
+                        <td class="px-2 py-1 w-[35%]">{{ form.instractionexportcasemark }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Packing Instructions -->
+            <div class="bg-blue-50 border border-blue-200 px-2 py-1 mb-2">
+                <span class="text-xs font-semibold text-blue-900">Packing Instructions:</span>
+                <span class="text-xs text-blue-800">Material should be properly packed to avoid damage during transportation and handling.</span>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="bg-white border border-gray-300 p-4 text-center">
+        <div class="text-red-600 text-base mb-2">⚠</div>
+        <h2 class="text-lg font-bold text-gray-900 mb-1">Error</h2>
+        <p class="text-sm text-gray-600 mb-3">The specified Purchase Order could not be found.</p>
+        <a href="{% url 'sales_distribution:workorder-po-search' %}"
+           class="inline-block bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-1 rounded">
+            Return to Search
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Date Picker Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize date pickers for all date fields
+    const dateFields = document.querySelectorAll('input[placeholder="dd-MM-yyyy"]');
+    dateFields.forEach(field => {
+        field.addEventListener('click', function() {
+            if (this.type !== 'date') {
+                this.type = 'date';
+                this.addEventListener('change', function() {
+                    if (this.value) {
+                        const date = new Date(this.value);
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        this.value = `${day}-${month}-${year}`;
+                        this.type = 'text';
+                    }
+                });
+            }
+        });
+    });
+
+    // Set WO Date to today on load
+    const woDateField = document.getElementById('id_taskworkorderdate');
+    if (woDateField && !woDateField.value) {
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        woDateField.value = `${day}-${month}-${year}`;
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

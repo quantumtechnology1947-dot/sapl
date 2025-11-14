@@ -1,0 +1,77 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Create GSN
+{{ load static }}
+<script src="{{ static 'inventory/js/form.js' }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="mb-6">
+        <h1 class="text-sm font-bold text-gray-900">Create Goods Service Note (GSN)</h1>
+        <p class="text-gray-600">Record service materials received</p>
+    </div>
+
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold mb-4">Service Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Select GIN *</label>
+                    <select name="gin_id" id="gin_id" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full" required onchange="loadGINDetails(this.value)">
+                        <option value="">-- Select GIN --</option>
+                        {% for gin in pending_gins %}
+                        <option value="{{ gin.id }}" {% if gin.id == request.GET.gin_id|add:0 %}selected{% endif %}>
+                            {{ gin.ginno }} - {{ gin.receiptdate }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tax Invoice No</label>
+                    <input type="text" name="tax_invoice_no" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full" 
+                           placeholder="Supplier invoice number">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tax Invoice Date</label>
+                    <input type="date" name="tax_invoice_date" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Received Qty *</label>
+                    <input type="number" name="received_qty" step="0.01" min="0" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'inventory:gsn-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+            </a>
+            <button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Create GSN
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
+{{ load static }}
+<script src="{{ static 'inventory/js/form.js' }}"></script>
+{% endblock %}
+
+
+
+
+
+
+
+

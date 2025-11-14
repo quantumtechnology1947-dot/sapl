@@ -1,0 +1,45 @@
+<table class="w-full text-xs border-collapse">
+    <thead class="bg-[#FAFAFA] sticky top-0 z-10">
+        <tr class="border-b border-gray-300">
+            <th class="w-10 px-2 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">#</th>
+            <th class="w-[90px] px-2 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">Fin Year</th>
+            <th class="w-[200px] px-3 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">Customer Name</th>
+            <th class="w-20 px-2 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">Code</th>
+            <th class="w-[120px] px-2 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">PO No</th>
+            <th class="w-[100px] px-2 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">WO No</th>
+            <th class="px-3 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">Project Title</th>
+            <th class="w-[90px] px-2 py-2 text-center font-semibold text-gray-700">Gen. Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for wo in work_orders %}
+        <tr class="border-b border-gray-200 hover:bg-blue-50/40 transition-colors">
+            <td class="px-2 py-1.5 text-gray-600 border-r border-gray-200">{{ forloop.counter }}</td>
+            <td class="px-2 py-1.5 text-gray-700 border-r border-gray-200">{{ wo.finyear_text|default:wo.finyearid|default:"-" }}</td>
+            <td class="px-3 py-1.5 font-medium text-gray-900 border-r border-gray-200">{{ wo.customer_name|default:wo.customerid|default:"-" }}</td>
+            <td class="px-2 py-1.5 text-center text-gray-700 border-r border-gray-200">{{ wo.customerid|default:"-" }}</td>
+            <td class="px-2 py-1.5 text-gray-700 border-r border-gray-200">{{ wo.pono|default:"-" }}</td>
+            <td class="px-2 py-1.5 text-center border-r border-gray-200">
+                <a href="{% url 'mis:wo_budget_detail' wo_no=wo.wono %}"
+                   class="text-[#0854A0] hover:text-[#0a6fc9] font-medium hover:underline">
+                    {{ wo.wono }}
+                </a>
+            </td>
+            <td class="px-3 py-1.5 text-gray-700 border-r border-gray-200">{{ wo.taskprojecttitle|truncatewords:10|default:"-" }}</td>
+            <td class="px-2 py-1.5 text-center text-gray-700">{{ wo.sysdate|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8" class="px-6 py-12 text-center">
+                <div class="flex flex-col items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h3 class="text-sm font-medium text-gray-700">No Results Found</h3>
+                    <p class="text-xs text-gray-500 mt-1">No work orders match your search.</p>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

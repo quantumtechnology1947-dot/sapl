@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Financial Year: {{ finyear_obj.finyear }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-sm font-bold text-gray-900">{{ finyear_obj.finyear }}</h1>
+            <p class="text-gray-600">Financial Year Details</p>
+        </div>
+        <a href="{% url 'sys_admin:financial-year-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to List
+        </a>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h2 class="text-lg font-semibold mb-4">Year Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Financial Year</label>
+                <p class="text-gray-900 font-medium">{{ finyear_obj.finyear }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Status</label>
+                {% if finyear_obj.status == 'Active' %}
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    Active
+                </span>
+                {% else %}
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                    Closed
+                </span>
+                {% endif %}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">From Date</label>
+                <p class="text-gray-900">{{ finyear_obj.fromdate }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">To Date</label>
+                <p class="text-gray-900">{{ finyear_obj.todate }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Created Date</label>
+                <p class="text-gray-900">{{ finyear_obj.sysdate }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Company ID</label>
+                <p class="text-gray-900">{{ finyear_obj.compid }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

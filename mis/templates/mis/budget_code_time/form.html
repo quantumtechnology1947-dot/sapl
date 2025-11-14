@@ -1,0 +1,23 @@
+{% extends 'mis/base.html' %}
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Time Code{% endblock %}
+{% block content %}
+<div class="mb-6"><h2 class="text-sm font-bold">{% if object %}Edit{% else %}Create{% endif %} Budget Code Time</h2></div>
+<div class="bg-white rounded border border-gray-200 p-6">
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="flex justify-end space-x-4 pt-6 border-t">
+            <a href="{% url 'mis:budget-code-time-list' %}" class="px-6 py-2 border rounded">Cancel</a>
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

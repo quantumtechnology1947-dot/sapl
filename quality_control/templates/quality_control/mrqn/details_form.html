@@ -1,0 +1,134 @@
+{% extends "core/base.html" %}
+
+{% block title %}Material Return Quality Note - Details - Cortex ERP{% endblock %}
+{% block page_title %}Material Return Quality Note - Details{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include 'core/components/layout/page_header.html' with title="Material Return Quality Note [MRQN] - New" breadcrumbs=breadcrumbs %}
+
+    <!-- Form -->
+    <form method="post" id="mrqn-form">
+        {% csrf_token %}
+
+        <!-- Basic Information Section -->
+        <div class="bg-white border border-gray-200 rounded p-3 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                <div class="grid grid-cols-12 gap-2 items-center mb-2">
+                    <label class="col-span-3 text-xs font-medium text-gray-700">Mrqnno:</label>
+                    <div class="col-span-9">
+                        {{ form.mrqnno }}
+                        {% if form.mrqnno.errors %}
+                        <span class="text-sap-red text-xs">{{ form.mrqnno.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 gap-2 items-center mb-2">
+                    <label class="col-span-3 text-xs font-medium text-gray-700">Date <span class="text-sap-red">*</span></label>
+                    <div class="col-span-9">
+                        {{ form.sysdate }}
+                        {% if form.sysdate.errors %}
+                        <span class="text-sap-red text-xs">{{ form.sysdate.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MRN Information Section -->
+        <div class="bg-white border border-gray-200 rounded p-3 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                <div class="grid grid-cols-12 gap-2 items-center mb-2">
+                    <label class="col-span-3 text-xs font-medium text-gray-700">Mrnno:</label>
+                    <div class="col-span-9">
+                        {% include 'core/components/forms/text_input.html' with value=mrn_no readonly=True inline=True %}
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 gap-2 items-center mb-2">
+                    <label class="col-span-3 text-xs font-medium text-gray-700">Mrnid:</label>
+                    <div class="col-span-9">
+                        {% include 'core/components/forms/text_input.html' with value=mrn_id readonly=True inline=True %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MRN Details Grid (Items to inspect) -->
+        <div class="bg-white border border-gray-200 rounded mb-4">
+            {% include 'core/components/cards/card_header.html' with title="MRN Items" %}
+            
+            <div class="overflow-x-auto mt-3">
+                <table class="w-full border-collapse text-xs">
+                    <thead class="bg-gray-50">
+                        <tr class="h-8">
+                            {% include 'core/components/tables/table_header.html' with text="SN" align="left" %}
+                            {% include 'core/components/tables/table_header.html' with text="Select" align="center" %}
+                            {% include 'core/components/tables/table_header.html' with text="Item Code" align="left" %}
+                            {% include 'core/components/tables/table_header.html' with text="Manf Desc" align="left" %}
+                            {% include 'core/components/tables/table_header.html' with text="UOM" align="left" %}
+                            {% include 'core/components/tables/table_header.html' with text="Dept" align="left" %}
+                            {% include 'core/components/tables/table_header.html' with text="WO No" align="left" %}
+                            {% include 'core/components/tables/table_header.html' with text="Ret Qty" align="right" %}
+                            {% include 'core/components/tables/table_header.html' with text="Accepted Qty" align="right" %}
+                            {% include 'core/components/tables/table_header.html' with text="Accp Qty" align="right" %}
+                            {% include 'core/components/tables/table_header.html' with text="Type" align="left" %}
+                            {% include 'core/components/tables/table_header.html' with text="ScrapQty" align="right" %}
+                            {% include 'core/components/tables/table_header.html' with text="Remarks" align="left" %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for item in mrn_items %}
+                        <tr class="h-8 hover:bg-gray-50">
+                            <td class="px-3 py-1 text-left text-gray-600">{{ forloop.counter }}</td>
+                            <td class="px-3 py-1 text-center">
+                                {% include 'core/components/forms/checkbox.html' with name="selected_items" value=item.id inline=True %}
+                            </td>
+                            <td class="px-3 py-1 text-gray-700">{{ item.item_code|default:"-" }}</td>
+                            <td class="px-3 py-1 text-gray-700">{{ item.manf_desc|default:"-" }}</td>
+                            <td class="px-3 py-1 text-center text-gray-700">{{ item.uom|default:"-" }}</td>
+                            <td class="px-3 py-1 text-center text-gray-700">{{ item.dept|default:"-" }}</td>
+                            <td class="px-3 py-1 text-center text-gray-700">{{ item.wo_no|default:"-" }}</td>
+                            <td class="px-3 py-1 text-right text-gray-700">{{ item.ret_qty|default:"0" }}</td>
+                            <td class="px-3 py-1 text-right text-gray-700">{{ item.accepted_qty|default:"0" }}</td>
+                            <td class="px-3 py-1">
+                                <input type="number" step="0.001" value="0" 
+                                       class="w-full h-8 px-2 text-xs border border-gray-300 rounded text-right focus:border-sap-blue focus:ring-1 focus:ring-sap-blue"
+                                       name="accp_qty_{{ item.id }}">
+                            </td>
+                            <td class="px-3 py-1">
+                                <select name="type_{{ item.id }}" class="w-full h-8 px-2 text-xs border border-gray-300 rounded focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                                    <option value="0">Hold</option>
+                                    <option value="1">Scrap</option>
+                                </select>
+                            </td>
+                            <td class="px-3 py-1 text-right text-gray-700">{{ item.scrap_qty|default:"0" }}</td>
+                            <td class="px-3 py-1 text-gray-700">{{ item.remarks|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="13" class="px-3 py-8 text-center">
+                                {% include 'core/components/tables/table_empty.html' with message="No data to display!" %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-2">
+            {% include 'core/components/buttons/primary.html' with text="Generate MRQN" type="submit" %}
+            {% include 'core/components/buttons/secondary.html' with text="Cancel" href=cancel_url %}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+

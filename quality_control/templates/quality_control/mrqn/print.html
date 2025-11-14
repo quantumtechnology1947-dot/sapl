@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MRQN {{ mrqn.mrqnno }}</title>
+    <style>body{font-family:Arial;margin:40px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:8px;text-align:left;}</style>
+</head>
+<body>
+    <h1>Material Return Quality Note</h1>
+    <p><strong>MRQN No:</strong> {{ mrqn.mrqnno }} | <strong>MRN No:</strong> {{ mrqn.mrnno }} | <strong>Date:</strong> {{ mrqn.sysdate }}</p>
+    <table>
+        <thead><tr><th>MRN ID</th><th>Accepted</th><th>Rejected</th><th>Total</th></tr></thead>
+        <tbody>
+            {% for detail in details %}
+            <tr>
+                <td>{{ detail.mrnid }}</td>
+                <td>{{ detail.acceptedqty|default:'0' }}</td>
+                <td>{{ detail.rejectedqty|default:'0' }}</td>
+                <td>{{ detail.total_qty }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p style="margin-top:40px;"><small>Printed: {{ print_date }}</small></p>
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,24 @@
+﻿Id,SysDate,SysTime,CompId,SessionId,FinYearId,Title,InDetails,FromDate,ToDate,FileName,FileSize,ContentType,FileData,Flag
+8,2013-04-01,11:48:53 AM,1,Sapl0001,1,Change in Office Shift Timing,Plz. ref. Attached Doc.,2013-03-31,2013-04-05,,0.0,,,1
+9,2013-04-10,4:29:58 PM,1,Sapl0004,1,Happy Gudi Padwa,"DEAR ALL, 
+GUDI PADWA WISHES IN ADVANCE",2013-04-10,2013-04-11,gudi-padwa-marathi-sms-messages-i11.gif,89072.0,image/gif,,1
+10,2013-04-10,4:30:26 PM,1,Sapl0004,1,Holiday on 11th Apr,"COMPANY SHALL REMAIN CLOSED 
+ON 11TH APR 2013",2013-04-10,2013-04-11,Holiday.docx,36370.0,application/vnd.openxmlformats-officedocument.wordprocessingml.document,,1
+12,2014-01-28,5:31:40 PM,1,Sapl0003,1,CODE OF CONDUCT,-,2014-01-27,2014-03-31,Code of Conduct.pdf,184610.0,application/pdf,,1
+13,2014-01-28,5:32:56 PM,1,Sapl0003,1,TERMS OF INCREMENT,-,2014-01-27,2014-02-27,TERMS OF INCREMENT LETTER.pdf,239553.0,application/pdf,,1
+14,2014-06-04,2:41:58 PM,1,Sapl0003,2,NOTICE 1,TERMS OF INCREMENT,2014-06-03,2014-07-31,TERMS OF INCREMENT LETTER.pdf,240251.0,application/pdf,,1
+15,2014-06-04,2:42:29 PM,1,Sapl0003,2,NOTICE 2,CODE OF CONDUCT,2014-06-03,2014-07-31,Code of Conduct.pdf,184389.0,application/pdf,,1
+16,2014-08-01,5:34:28 PM,1,Sapl0205,2,HR POLICIES,HR POLICIES FOR ALL EMPLOYEES W.E.F. 1st AUGUST,2014-08-01,2015-08-31,HR POLICIES.pdf,41440.0,application/pdf,,1
+17,2014-09-15,12:36:56 PM,1,Sapl0001,2,How to deal with a Customer,-,2014-09-15,2014-12-31,How to deal with a customer.pptx,112994.0,application/vnd.openxmlformats-officedocument.presentationml.presentation,,1
+18,2014-12-27,2:03:48 PM,1,Sapl0001,2,ERP Training: Dt. 27-12-2014,"Time: 2.00 pm
+Venue:EDP dept",2014-12-27,2014-12-27,,0.0,application/octet-stream,,1
+20,2017-03-31,11:40:40 AM,1,Sapl0003,4,PHOTOS,GROUP PHOTO,2017-03-31,2017-03-31,IMG_1889.JPG,2576829.0,image/jpeg,,1
+21,2017-03-31,11:41:42 AM,1,Sapl0003,4,GROUP PHOTO,1,2017-03-31,2017-03-31,IMG_1876.JPG,2630367.0,image/jpeg,,1
+23,2017-03-31,11:43:05 AM,1,Sapl0003,4,GROUP PHOTO,2,2017-03-31,2017-03-31,IMG_1909.JPG,3491456.0,image/jpeg,,1
+24,2017-03-31,11:43:29 AM,1,Sapl0003,4,GROUP PHOTO,3,2017-03-24,2017-03-31,IMG_1915.JPG,3240334.0,image/jpeg,,1
+25,2017-03-31,11:43:50 AM,1,Sapl0003,4,GROUP PHOTO,4,2017-03-31,2017-03-31,IMG_1923.JPG,3317144.0,image/jpeg,,1
+26,2018-03-31,4:39:30 PM,1,Sapl0269,5,ERP Downtime,"Please complete your work as soon as possible related to ERP.
+We are going to upgrade system in new financial year on 11th April 2018.",2018-03-31,2018-04-28,,0.0,application/octet-stream,,1
+27,2019-05-16,9:31:24 AM,1,sapl0311,7,THOUGHT OF THE DAY,"""ARISE AWAKE AND STOP NOT TILL THE GOAL IS REACHED.""",2019-05-16,2019-05-17,,0.0,application/octet-stream,,1
+28,2020-01-02,4:48:17 PM,1,Sapl0001,7,WISH YOU A VERY HAPPY NEW YEAR !!!,"May this year be a joyful
+ride for you and your family...",2020-01-01,2020-01-05,happy-new-year-2020-gif-image-fireworks.gif,1025072.0,image/gif,,1

@@ -1,0 +1,116 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Challan {{ challan.challanno }} - Inventory{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-5xl">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Challan {{ challan.challanno }}</h1>
+                <p class="text-sm text-gray-600 mt-1">Challan details and line items</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:challan-print' challan.challanid %}" target="_blank"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Print
+                </a>
+                <a href="{% url 'inventory:challan-delete' challan.challanid %}"
+                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challan Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Challan Information</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div>
+                <p class="text-sm text-gray-600">Challan Number</p>
+                <p class="text-lg font-semibold text-gray-900">{{ challan.challanno }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Challan Date</p>
+                <p class="text-lg font-semibold text-gray-900">{{ challan.challandate|date:"d/m/Y" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Destination</p>
+                <p class="text-lg font-semibold text-gray-900">{{ challan.destination }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Vehicle Number</p>
+                <p class="text-lg font-semibold text-gray-900">{{ challan.vehicleno|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Driver Name</p>
+                <p class="text-lg font-semibold text-gray-900">{{ challan.drivername|default:"-" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Created Date</p>
+                <p class="text-lg font-semibold text-gray-900">{{ challan.createddate|default:"-" }}</p>
+            </div>
+        </div>
+        {% if challan.remarks %}
+        <div class="mt-4 pt-4 border-t border-gray-200">
+            <p class="text-sm text-gray-600">Remarks</p>
+            <p class="text-gray-900 mt-1">{{ challan.remarks }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Line Items -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-800">Line Items</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for detail in details %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ detail.itemid.itemcode|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ detail.itemid.itemname }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">
+                            {{ detail.qty|floatformat:3 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ detail.itemid.unit|default:"Nos" }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ detail.remarks|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=6 title="No records found" message="" %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="mt-6">
+        <a href="{% url 'inventory:challan-list' %}" class="text-blue-600 hover:text-blue-800">
+            ← Back to Challan List
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+

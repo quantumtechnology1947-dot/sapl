@@ -1,0 +1,26 @@
+{% if results %}
+<div class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+    {% for result in results %}
+    <div class="px-3 py-2 text-xs hover:bg-blue-50 cursor-pointer supplier-result"
+         data-supplier-id="{{ result.id }}"
+         data-supplier-text="{{ result.text }}"
+         onclick="selectSupplier(this)">
+        {{ result.text }}
+    </div>
+    {% endfor %}
+</div>
+{% elif query %}
+<div class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+    <div class="px-3 py-2 text-xs text-gray-500">
+        No suppliers found
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+
+

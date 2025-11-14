@@ -1,0 +1,381 @@
+{% extends "core/base.html" %}
+
+{% block title %}Material Planning - Edit Details - Cortex ERP{% endblock %}
+{% block page_title %}Material Planning - Edit{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-semibold text-gray-800">Material Planning - Edit</h2>
+                <p class="text-xs text-gray-600 mt-1">
+                    Planning No: <span class="font-medium text-blue-600">{{ plno }}</span> |
+                    WO No: <span class="font-medium">{{ wono }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Raw Material Section -->
+    <div class="bg-white rounded border border-gray-200 mb-4 overflow-hidden">
+        <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+            <h3 class="text-sm font-semibold text-gray-800">Raw Material</h3>
+        </div>
+
+        <form method="post" id="raw-material-form">
+            {% csrf_token %}
+            <input type="hidden" name="update_type" value="raw">
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-[4%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Edit</th>
+                            <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">PL No</th>
+                            <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                            <th class="w-[30%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                            <th class="w-[6%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Unit</th>
+                            <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Supplier Name</th>
+                            <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Comp Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for item in raw_materials %}
+                        <tr class="hover:bg-gray-50 {% if item.in_pr %}bg-red-50{% endif %}">
+                            <td class="px-2 py-2 text-center">
+                                {% if item.in_pr %}
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-red-100 text-red-800">
+                                    PR
+                                </span>
+                                {% else %}
+                                <input type="checkbox"
+                                       name="check_raw_{{ item.id }}"
+                                       class="rounded raw-checkbox"
+                                       onchange="toggleEditRaw({{ item.id }}, this.checked)">
+                                {% endif %}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ item.plno }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                                {{ item.item_code }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px] truncate" title="{{ item.description }}">
+                                {{ item.description }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ item.uom }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px]">
+                                <span id="label_raw_{{ item.id }}" class="block">
+                                    {{ item.supplier_name|default:"-" }}
+                                </span>
+                                <input type="text"
+                                       id="supplier_raw_{{ item.id }}"
+                                       name="supplier_raw_{{ item.id }}"
+                                       value="{{ item.supplier_name }}"
+                                       class="hidden w-full px-2 py-1 text-[11px] border border-gray-300 rounded"
+                                       placeholder="Enter supplier name...">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <span id="label_date_raw_{{ item.id }}" class="block">
+                                    {{ item.compdate_display|default:"-" }}
+                                </span>
+                                <input type="text"
+                                       id="compdate_raw_{{ item.id }}"
+                                       name="compdate_raw_{{ item.id }}"
+                                       value="{{ item.compdate_display }}"
+                                       class="hidden w-full px-2 py-1 text-[11px] border border-gray-300 rounded"
+                                       placeholder="DD-MM-YYYY">
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-sm text-gray-500">
+                                No raw material items found for this planning record.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if raw_materials %}
+            <div class="bg-gray-50 px-3 py-3 border-t border-gray-200 text-center">
+                <button type="submit"
+                        class="px-6 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors">
+                    Update Raw Material
+                </button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Processing Material Section -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+            <h3 class="text-sm font-semibold text-gray-800">Processing Material</h3>
+        </div>
+
+        <form method="post" id="process-material-form">
+            {% csrf_token %}
+            <input type="hidden" name="update_type" value="process">
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-[4%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Edit</th>
+                            <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">PL No</th>
+                            <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                            <th class="w-[30%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                            <th class="w-[6%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Unit</th>
+                            <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Supplier Name</th>
+                            <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Comp Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for item in process_items %}
+                        <tr class="hover:bg-gray-50 {% if item.in_pr %}bg-red-50{% endif %}">
+                            <td class="px-2 py-2 text-center">
+                                {% if item.in_pr %}
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-red-100 text-red-800">
+                                    PR
+                                </span>
+                                {% else %}
+                                <input type="checkbox"
+                                       name="check_process_{{ item.id }}"
+                                       class="rounded process-checkbox"
+                                       onchange="toggleEditProcess({{ item.id }}, this.checked)">
+                                {% endif %}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ item.plno }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                                {{ item.item_code }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px] truncate" title="{{ item.description }}">
+                                {{ item.description }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ item.uom }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px]">
+                                <span id="label_process_{{ item.id }}" class="block">
+                                    {{ item.supplier_name|default:"-" }}
+                                </span>
+                                <input type="text"
+                                       id="supplier_process_{{ item.id }}"
+                                       name="supplier_process_{{ item.id }}"
+                                       value="{{ item.supplier_name }}"
+                                       class="hidden w-full px-2 py-1 text-[11px] border border-gray-300 rounded"
+                                       placeholder="Enter supplier name...">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <span id="label_date_process_{{ item.id }}" class="block">
+                                    {{ item.compdate_display|default:"-" }}
+                                </span>
+                                <input type="text"
+                                       id="compdate_process_{{ item.id }}"
+                                       name="compdate_process_{{ item.id }}"
+                                       value="{{ item.compdate_display }}"
+                                       class="hidden w-full px-2 py-1 text-[11px] border border-gray-300 rounded"
+                                       placeholder="DD-MM-YYYY">
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-sm text-gray-500">
+                                No processing material items found for this planning record.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if process_items %}
+            <div class="bg-gray-50 px-3 py-3 border-t border-gray-200 text-center">
+                <button type="submit"
+                        class="px-6 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors">
+                    Update Processing Material
+                </button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Finish Material Section -->
+    <div class="bg-white rounded border border-gray-200 mb-4 overflow-hidden">
+        <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+            <h3 class="text-sm font-semibold text-gray-800">Finish Material</h3>
+        </div>
+
+        <form method="post" id="finish-material-form">
+            {% csrf_token %}
+            <input type="hidden" name="update_type" value="finish">
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-[4%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Edit</th>
+                            <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">PL No</th>
+                            <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                            <th class="w-[30%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                            <th class="w-[6%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Unit</th>
+                            <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Supplier Name</th>
+                            <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Comp Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for item in finish_items %}
+                        <tr class="hover:bg-gray-50 {% if item.in_pr %}bg-red-50{% endif %}">
+                            <td class="px-2 py-2 text-center">
+                                {% if item.in_pr %}
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-red-100 text-red-800">
+                                    PR
+                                </span>
+                                {% else %}
+                                <input type="checkbox"
+                                       name="check_finish_{{ item.id }}"
+                                       class="rounded finish-checkbox"
+                                       onchange="toggleEditFinish({{ item.id }}, this.checked)">
+                                {% endif %}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ item.plno }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                                {{ item.item_code }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px] truncate" title="{{ item.description }}">
+                                {{ item.description }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ item.uom }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px]">
+                                <span id="label_finish_{{ item.id }}" class="block">
+                                    {{ item.supplier_name|default:"-" }}
+                                </span>
+                                <input type="text"
+                                       id="supplier_finish_{{ item.id }}"
+                                       name="supplier_finish_{{ item.id }}"
+                                       value="{{ item.supplier_name }}"
+                                       class="hidden w-full px-2 py-1 text-[11px] border border-gray-300 rounded"
+                                       placeholder="Enter supplier name...">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <span id="label_date_finish_{{ item.id }}" class="block">
+                                    {{ item.compdate_display|default:"-" }}
+                                </span>
+                                <input type="text"
+                                       id="compdate_finish_{{ item.id }}"
+                                       name="compdate_finish_{{ item.id }}"
+                                       value="{{ item.compdate_display }}"
+                                       class="hidden w-full px-2 py-1 text-[11px] border border-gray-300 rounded"
+                                       placeholder="DD-MM-YYYY">
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-sm text-gray-500">
+                                No finish material items found for this planning record.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if finish_items %}
+            <div class="bg-gray-50 px-3 py-3 border-t border-gray-200 text-center">
+                <button type="submit"
+                        class="px-6 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors">
+                    Update Finish Material
+                </button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Cancel Button -->
+    <div class="mt-4 text-center">
+        <a href="{% url 'material_planning:plan-list' %}"
+           class="inline-flex items-center px-6 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            Cancel
+        </a>
+    </div>
+</div>
+
+<script>
+function toggleEditRaw(itemId, checked) {
+    const label = document.getElementById('label_raw_' + itemId);
+    const input = document.getElementById('supplier_raw_' + itemId);
+    const labelDate = document.getElementById('label_date_raw_' + itemId);
+    const inputDate = document.getElementById('compdate_raw_' + itemId);
+
+    if (checked) {
+        label.style.display = 'none';
+        input.style.display = 'block';
+        labelDate.style.display = 'none';
+        inputDate.style.display = 'block';
+    } else {
+        label.style.display = 'block';
+        input.style.display = 'none';
+        labelDate.style.display = 'block';
+        inputDate.style.display = 'none';
+    }
+}
+
+function toggleEditProcess(itemId, checked) {
+    const label = document.getElementById('label_process_' + itemId);
+    const input = document.getElementById('supplier_process_' + itemId);
+    const labelDate = document.getElementById('label_date_process_' + itemId);
+    const inputDate = document.getElementById('compdate_process_' + itemId);
+
+    if (checked) {
+        label.style.display = 'none';
+        input.style.display = 'block';
+        labelDate.style.display = 'none';
+        inputDate.style.display = 'block';
+    } else {
+        label.style.display = 'block';
+        input.style.display = 'none';
+        labelDate.style.display = 'block';
+        inputDate.style.display = 'none';
+    }
+}
+
+function toggleEditFinish(itemId, checked) {
+    const label = document.getElementById('label_finish_' + itemId);
+    const input = document.getElementById('supplier_finish_' + itemId);
+    const labelDate = document.getElementById('label_date_finish_' + itemId);
+    const inputDate = document.getElementById('compdate_finish_' + itemId);
+
+    if (checked) {
+        label.style.display = 'none';
+        input.style.display = 'block';
+        labelDate.style.display = 'none';
+        inputDate.style.display = 'block';
+    } else {
+        label.style.display = 'block';
+        input.style.display = 'none';
+        labelDate.style.display = 'block';
+        inputDate.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

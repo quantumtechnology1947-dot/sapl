@@ -1,0 +1,73 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Cash Receipt Voucher{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+        <div class="px-4 py-4">
+            <h1 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} Cash Receipt Voucher</h1>
+        </div>
+    </div>
+    
+    <div class="max-w-3xl mx-auto bg-white rounded border border-gray-200 p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Voucher Number</label>
+                    {{ form.cvrno }}
+                    {% if form.cvrno.errors %}<p class="text-red-500 text-sm">{{ form.cvrno.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Cash Received Against <span class="text-red-500">*</span></label>
+                    {{ form.cashreceivedagainst }}
+                    {% if form.cashreceivedagainst.errors %}<p class="text-red-500 text-sm">{{ form.cashreceivedagainst.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Cash Received By</label>
+                    {{ form.cashreceivedby }}
+                    {% if form.cashreceivedby.errors %}<p class="text-red-500 text-sm">{{ form.cashreceivedby.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Work Order No</label>
+                    {{ form.wono }}
+                    {% if form.wono.errors %}<p class="text-red-500 text-sm">{{ form.wono.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Account Head</label>
+                    {{ form.achead }}
+                    {% if form.achead.errors %}<p class="text-red-500 text-sm">{{ form.achead.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Amount <span class="text-red-500">*</span></label>
+                    {{ form.amount }}
+                    {% if form.amount.errors %}<p class="text-red-500 text-sm">{{ form.amount.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
+                    {% if object %}Update{% else %}Create{% endif %}
+                </button>
+                <a href="{% url 'accounts:cash-voucher-receipt-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

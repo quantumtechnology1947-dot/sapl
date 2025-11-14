@@ -1,0 +1,65 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Account Head - Cortex ERP{% endblock %}
+{% block form_header %}{% if object %}Edit{% else %}Add{% endif %} Account Head{% endblock %}
+{% block back_url %}{% url 'accounts:acchead-list' %}{% endblock %}
+{% block cancel_url %}{% url 'accounts:acchead-list' %}{% endblock %}
+
+{% block form_sections %}
+    <div class="p-4 space-y-6">
+        {# Basic Information Section #}
+        <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">Basic Information</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <p class="text-red-500 text-xs">{{ form.category.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Symbol
+                    </label>
+                    {{ form.symbol }}
+                    {% if form.symbol.errors %}
+                        <p class="text-red-500 text-xs">{{ form.symbol.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Description <span class="text-red-500">*</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="text-red-500 text-xs">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Abbreviation
+                </label>
+                {{ form.abbrivation }}
+                {% if form.abbrivation.errors %}
+                    <p class="text-red-500 text-xs">{{ form.abbrivation.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+

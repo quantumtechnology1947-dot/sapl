@@ -1,0 +1,134 @@
+{% extends "core/base.html" %}
+{% block title %}Work Order Dispatch - {{ wrno }} - Cortex ERP{% endblock %}
+{% block page_title %}Work Order - Dispatch{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header Info -->
+    <div class="bg-white border border-gray-200 rounded p-4 mb-4">
+        <h2 class="text-lg font-semibold mb-3">Dispatch Details</h2>
+        <div class="grid grid-cols-4 gap-4 text-sm">
+            <div>
+                <span class="text-gray-600">WO No:</span>
+                <span class="font-medium ml-2">{{ wono }}</span>
+            </div>
+            <div>
+                <span class="text-gray-600">WR No:</span>
+                <span class="font-medium ml-2">{{ wrno }}</span>
+            </div>
+            <div>
+                <span class="text-gray-600">Customer:</span>
+                <span class="font-medium ml-2">{{ customer.customername|default:"-" }}</span>
+            </div>
+            <div>
+                <span class="text-gray-600">Customer Code:</span>
+                <span class="font-medium ml-2">{{ customer.customerid|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dispatch Form -->
+    <form method="post" action="{% url 'sales_distribution:dispatch-detail' wono=wono wrno=wrno %}">
+        {% csrf_token %}
+
+        <!-- Products Table -->
+        <div class="bg-white border border-gray-200 rounded overflow-hidden mb-4">
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200">
+                            <th class="px-2 py-2 text-center font-semibold text-gray-700 whitespace-nowrap">SN</th>
+                            <th class="px-2 py-2 text-center font-semibold text-gray-700 whitespace-nowrap">
+                                <input type="checkbox" id="select-all" class="rounded border-gray-300">
+                            </th>
+                            <th class="px-2 py-2 text-center font-semibold text-gray-700 whitespace-nowrap">To DA Qty</th>
+                            <th class="px-2 py-2 text-left font-semibold text-gray-700 whitespace-nowrap">Item Code</th>
+                            <th class="px-2 py-2 text-left font-semibold text-gray-700 whitespace-nowrap">Description</th>
+                            <th class="px-2 py-2 text-right font-semibold text-gray-700 whitespace-nowrap">Qty</th>
+                            <th class="px-2 py-2 text-right font-semibold text-gray-700 whitespace-nowrap">Released Qty</th>
+                            <th class="px-2 py-2 text-right font-semibold text-gray-700 whitespace-nowrap">Dispatched Qty</th>
+                            <th class="px-2 py-2 text-right font-semibold text-gray-700 whitespace-nowrap">Available</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for product in products %}
+                        <tr class="border-b border-gray-200 hover:bg-blue-50/30 transition-colors">
+                            <td class="px-2 py-2 text-center text-gray-600">{{ forloop.counter }}</td>
+                            <td class="px-2 py-2 text-center">
+                                <input type="checkbox"
+                                       name="selected_items"
+                                       value="{{ product.id }}"
+                                       class="item-checkbox rounded border-gray-300"
+                                       {% if product.available_for_dispatch <= 0 %}disabled{% endif %}>
+                            </td>
+                            <td class="px-2 py-2 text-center">
+                                <input type="number"
+                                       name="da_qty_{{ product.id }}"
+                                       step="0.001"
+                                       min="0"
+                                       max="{{ product.available_for_dispatch }}"
+                                       class="w-24 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue"
+                                       {% if product.available_for_dispatch <= 0 %}disabled{% endif %}>
+                            </td>
+                            <td class="px-2 py-2 text-gray-700">{{ product.itemcode }}</td>
+                            <td class="px-2 py-2 text-gray-700 max-w-xs truncate" title="{{ product.description }}">
+                                {{ product.description }}
+                            </td>
+                            <td class="px-2 py-2 text-right text-gray-700">
+                                {{ product.qty|floatformat:3|default:"0.000" }}
+                            </td>
+                            <td class="px-2 py-2 text-right text-gray-700">
+                                {{ product.released_qty|floatformat:3|default:"0.000" }}
+                            </td>
+                            <td class="px-2 py-2 text-right text-gray-700">
+                                {{ product.dispatched_qty|floatformat:3|default:"0.000" }}
+                            </td>
+                            <td class="px-2 py-2 text-right font-medium"
+                                class="{% if product.available_for_dispatch > 0 %}text-green-600{% else %}text-gray-400{% endif %}">
+                                {{ product.available_for_dispatch|floatformat:3|default:"0.000" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                                No products found for this work release.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end gap-2">
+            <a href="{% url 'sales_distribution:dispatch-list' %}"
+               class="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                Cancel
+            </a>
+            <button type="submit"
+                    class="px-4 py-2 text-sm bg-sap-blue text-white rounded hover:bg-sap-blue-dark transition-colors">
+                Submit Dispatch
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Select all checkbox functionality
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.item-checkbox:not(:disabled)');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+// Update select-all if individual checkboxes change
+document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const allCheckboxes = document.querySelectorAll('.item-checkbox:not(:disabled)');
+        const checkedCheckboxes = document.querySelectorAll('.item-checkbox:not(:disabled):checked');
+        document.getElementById('select-all').checked = allCheckboxes.length === checkedCheckboxes.length;
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "core/base.html" %}
+
+{% block title %}Material Credit Note - New - Cortex ERP{% endblock %}
+{% block page_title %}Material Credit Note [MCN] - New{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        <div class="grid grid-cols-3 gap-4 text-sm">
+            <div>
+                <span class="font-semibold">WO No:</span>
+                <span class="text-gray-700">{{ wono }}</span>
+            </div>
+            <div>
+                <span class="font-semibold">Project Name:</span>
+                <span class="text-gray-700">{{ project_title }}</span>
+            </div>
+            <div>
+                <span class="font-semibold">Customer Name:</span>
+                <span class="text-gray-700">{{ customer_name }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOM Items Form -->
+    <form method="post" class="bg-white rounded border border-gray-200 overflow-hidden">
+        {% csrf_token %}
+        <input type="hidden" name="wono" value="{{ wono }}">
+
+        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+            <table class="w-full text-xs">
+                <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase w-[4%]">SN</th>
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase w-[10%]">Item Code</th>
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase w-[40%]">Description</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase w-[8%]">UOM</th>
+                        <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase w-[10%]">BOM Qty</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase w-[15%]">MCN Qty</th>
+                        <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase w-[13%]">Total MCN Qty</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in bom_items %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-2 py-2 text-[11px] text-gray-900 text-right">{{ forloop.counter }}</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900">{{ item.item_code }}</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900">{{ item.description }}</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-600 text-center">{{ item.uom }}</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900 text-right">{{ item.bom_qty|floatformat:3 }}</td>
+                        <td class="px-2 py-2">
+                            {% if item.total_mcn_qty >= item.bom_qty %}
+                                <span class="text-[11px] text-gray-400 italic">Fully Credited</span>
+                            {% else %}
+                                <input type="number"
+                                       name="mcn_qty_{{ item.item_id }}"
+                                       step="0.001"
+                                       min="0"
+                                       max="{{ item.bom_qty|floatformat:3 }}"
+                                       value="{{ item.mcn_qty }}"
+                                       class="w-full px-2 py-1 text-[11px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                       placeholder="0.000">
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 text-[11px] text-gray-600 text-right">{{ item.total_mcn_qty|floatformat:3 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-4 py-12 text-center text-gray-500 text-sm">
+                            No BOM items found for this Work Order.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="p-3 bg-gray-50 flex justify-center gap-2">
+            <button type="submit"
+                    class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-hover transition-colors">
+                Submit
+            </button>
+            <a href="{% url 'project_management:mcn-new' %}"
+               class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+    <!-- Info Box -->
+    <div class="mt-4 bg-blue-50 border border-blue-200 rounded p-3">
+        <div class="flex">
+            <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <div class="text-xs text-blue-800">
+                <p class="font-semibold mb-1">Instructions:</p>
+                <ul class="list-disc list-inside ml-2 space-y-1">
+                    <li>Enter the MCN Quantity for each item in the "MCN Qty" column</li>
+                    <li>The "Total MCN Qty" shows the cumulative quantity already credited for each item</li>
+                    <li>Leave quantity as 0 or blank for items you don't want to include</li>
+                    <li>Click Submit to save the Material Credit Note</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,796 @@
+<!-- Sidebar Navigation Menu - Based on Web.sitemap -->
+<div class="px-2 space-y-1" x-data="{ 
+    openMenu: null,
+    openSubmenu: null 
+}">
+    
+    <!-- Home -->
+    <a href="/" class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        Home
+    </a>
+
+    <!-- Administrator Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'admin' ? null : 'admin'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Administrator
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'admin' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'admin'" x-collapse class="ml-4 mt-1 space-y-1">
+            <a href="#" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Role Management</a>
+            <a href="{% url 'sys_admin:financial_year_list' %}" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Financial Year</a>
+            <a href="{% url 'sys_admin:country-list' %}" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Country</a>
+            <a href="{% url 'sys_admin:state-list' %}" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">State</a>
+            <a href="{% url 'sys_admin:city-list' %}" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">City</a>
+        </div>
+    </div>
+
+    <!-- Sales Distribution Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'sales' ? null : 'sales'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                Sales
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'sales' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'sales'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Master Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'sales-master' ? null : 'sales-master'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Master
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'sales-master' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'sales-master'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'sales_distribution:customer-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Customer</a>
+                    <a href="{% url 'sales_distribution:product-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Products</a>
+                    <a href="{% url 'sales_distribution:wo-category-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Category of Work Order</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">WO Release & Dispatch Authority</a>
+                </div>
+            </div>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'sales-trans' ? null : 'sales-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'sales-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'sales-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'sales_distribution:enquiry-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Enquiry</a>
+                    <a href="{% url 'sales_distribution:quotation-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Quotation</a>
+                    <a href="{% url 'sales_distribution:quotation-check' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Quotation Check</a>
+                    <a href="{% url 'sales_distribution:quotation-approve' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Quotation Approve</a>
+                    <a href="{% url 'sales_distribution:quotation-authorize' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Quotation Authorize</a>
+                    <a href="{% url 'sales_distribution:po-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Customer PO</a>
+                    <a href="{% url 'sales_distribution:workorder-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Work Order</a>
+                    <a href="{% url 'sales_distribution:wo-release-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">WO Release</a>
+                    <a href="{% url 'sales_distribution:dispatch-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">WO Dispatch</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Dispatch GunRail</a>
+                    <a href="{% url 'sales_distribution:workorder-close-open-page' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">WO Open/Close</a>
+                </div>
+            </div>
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Report</a>
+        </div>
+    </div>
+
+    <!-- Design Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'design' ? null : 'design'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                </svg>
+                Design
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'design' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'design'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Master Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'design-master' ? null : 'design-master'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Master
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'design-master' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'design-master'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'design:category-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">BoughtOut Category</a>
+                    <a href="{% url 'design:item-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Item Master</a>
+                    <a href="{% url 'design:unit-master-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Unit Master</a>
+                    <a href="{% url 'design:ecn-reason-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">ECN Reason</a>
+                </div>
+            </div>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'design-trans' ? null : 'design-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'design-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'design-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'design:bom-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">BOM</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Slido Gunrail</a>
+                    <a href="{% url 'design:ecn-wo-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">ECN Unlock</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'design-report' ? null : 'design-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'design-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'design-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'design:item-history-bom-search' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Item History - BOM</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Material Planning Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'material-planning' ? null : 'material-planning'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+                </svg>
+                Material Planning
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'material-planning' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'material-planning'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Master Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mp-master' ? null : 'mp-master'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Master
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mp-master' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mp-master'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'material_planning:process-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Item Process</a>
+                </div>
+            </div>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mp-trans' ? null : 'mp-trans'"
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mp-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mp-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'material_planning:planning-search' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">BOM</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mp-report' ? null : 'mp-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mp-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mp-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'material_planning:planning-report' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Planning Report</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management (Material Management) Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'management' ? null : 'management'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Management
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'management' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'management'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Master Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mgmt-master' ? null : 'mgmt-master'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Master
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mgmt-master' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mgmt-master'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'material_management:business-nature-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Business Nature</a>
+                    <a href="{% url 'material_management:business-type-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Business Type</a>
+                    <a href="{% url 'material_management:service-coverage-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Service Coverage</a>
+                    <a href="{% url 'material_management:buyer-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Buyer</a>
+                    <a href="{% url 'material_management:supplier-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Supplier</a>
+                    <a href="{% url 'material_management:rate-register-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Set Rate</a>
+                </div>            </div>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mgmt-trans' ? null : 'mgmt-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mgmt-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mgmt-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'material_management:rate_lock_unlock_list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Rate Lock/UnLock</a>
+                    <a href="{% url 'material_management:scope-of-supplier' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Scope of Supplier</a>
+                    <a href="{% url 'material_management:pr-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Purchase Requisition [PR]</a>
+                    <a href="{% url 'material_management:spr-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Special Purpose Requisition [SPR]</a>
+                    <a href="{% url 'material_management:spr-check-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Check SPR</a>
+                    <a href="{% url 'material_management:spr-approve-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Approve SPR</a>
+                    <a href="{% url 'material_management:spr-authorize-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Authorize SPR</a>
+                    <a href="{% url 'material_management:po-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Purchase Order [PO]</a>
+                    <a href="{% url 'material_management:po-check-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Check PO</a>
+                    <a href="{% url 'material_management:po-approve-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Approve PO</a>
+                    <a href="{% url 'material_management:po-authorize-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Authorize PO</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mgmt-report' ? null : 'mgmt-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mgmt-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mgmt-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Rate Register</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Rate Lock/UnLock</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Supplier Rating</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Material Forecasting</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Inward/Outward Register</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Search</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'projects' ? null : 'projects'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                Projects
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'projects' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'projects'" x-collapse class="ml-4 mt-1 space-y-1">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Master</a>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'proj-trans' ? null : 'proj-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'proj-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'proj-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'project_management:attendance-list-view' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Onsite Attendance</a>
+                    <a href="{% url 'project_management:manpower-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Man Power Planning</a>
+                    <a href="{% url 'project_management:project-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Project Planning</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'proj-report' ? null : 'proj-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'proj-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'proj-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Project Summary</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'inventory' ? null : 'inventory'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+                Inventory
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'inventory' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'inventory'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Master Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'inv-master' ? null : 'inv-master'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Master
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'inv-master' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'inv-master'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'inventory:item-location-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Item location</a>
+                    <a href="{% url 'inventory:vehicle-master-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Vehicle</a>
+                    <a href="{% url 'inventory:autowis-timeschedule-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">AutoWIS Timer</a>
+                </div>
+            </div>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'inv-trans' ? null : 'inv-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'inv-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'inv-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'inventory:gin-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Goods Inward Note [GIN]</a>
+                    <a href="{% url 'inventory:grr-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Goods Received Receipt [GRR]</a>
+                    <a href="{% url 'inventory:gsn-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Goods Service Note [GSN]</a>
+                    <a href="{% url 'inventory:mrs-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Material Requisition Slip [MRS]</a>
+                    <a href="{% url 'inventory:min-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Material Issue Note [MIN]</a>
+                    <a href="{% url 'inventory:mrn-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Material Return Note [MRN]</a>
+                    <a href="{% url 'inventory:wis-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Work Issue Slip [WIS]</a>
+                    <a href="{% url 'inventory:wis-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Release WIS</a>
+                    <a href="{% url 'inventory:supplier-challan-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Supplier Challan</a>
+                    <a href="{% url 'inventory:customer-challan-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Customer Challan</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Closing Stock</a>
+                </div>
+            </div>
+            <!-- Reports Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'inv-report' ? null : 'inv-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Reports
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'inv-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'inv-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Stock Ledger</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Stock Statement</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Material Issue/Shortage list</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">ABC Analysis</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Moving-Non Moving Items</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Inward/Outward Register</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Search</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quality Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'quality' ? null : 'quality'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Quality
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'quality' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'quality'" x-collapse class="ml-4 mt-1 space-y-1">
+            <a href="#" class="block px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Master</a>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'quality-trans' ? null : 'quality-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'quality-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'quality-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'quality_control:gqn-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Goods Quality Note [GQN]</a>
+                    <a href="{% url 'quality_control:mrqn-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Material Return Quality Note [MRQN]</a>
+                    <a href="{% url 'quality_control:authorized-mcn-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Authorize MCN</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'quality-report' ? null : 'quality-report'"
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'quality-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'quality-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'quality_control:quality-report' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Quality Report</a>
+                    <a href="{% url 'quality_control:rejection-analysis' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Rejection Analysis</a>
+                    <a href="{% url 'quality_control:scrap-register-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Scrap Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accounts Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'accounts' ? null : 'accounts'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Accounts
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'accounts' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'accounts'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Master Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'acc-master' ? null : 'acc-master'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Master
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'acc-master' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'acc-master'" x-collapse class="ml-3 mt-1 space-y-1 max-h-64 overflow-y-auto scrollbar-hide">
+                    <a href="{% url 'accounts:acchead-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Account Heads</a>
+                    {# TODO: Implement GST views #}
+                    {# <a href="{% url 'accounts:gst-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">CGST/IGST</a> #}
+                    {# <a href="{% url 'accounts:gst-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">SGST</a> #}
+                    <a href="{% url 'accounts:excisable-commodity-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Excisable Commodity</a>
+                    <a href="{% url 'accounts:warrenty-terms-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Warrenty Terms</a>
+                    <a href="{% url 'accounts:payment-terms-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Payment Terms</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Cash/Bank Entry</a>
+                    <a href="{% url 'accounts:iou-reasons-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">IOU Reasons</a>
+                    <a href="{% url 'accounts:bank-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bank</a>
+                    <a href="{% url 'accounts:payment-mode-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Payment Mode</a>
+                    <a href="{% url 'accounts:asset-register-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Asset</a>
+                </div>
+            </div>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'acc-trans' ? null : 'acc-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'acc-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'acc-trans'" x-collapse class="ml-3 mt-1 space-y-1 max-h-64 overflow-y-auto scrollbar-hide">
+                    <a href="{% url 'accounts:proforma-invoice-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Proforma Invoice</a>
+                    {# TODO: Fix invoice_urls and implement invoice views #}
+                    {# <a href="{% url 'accounts:invoices:invoice-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Sales Invoice</a> #}
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Services Invoice</a>
+                    <a href="{% url 'accounts:contra-entry-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Contra</a>
+                    <a href="{% url 'accounts:debit-note-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Debit Note</a>
+                    <a href="{% url 'accounts:credit-note-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Credit Note</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">IOU Payment/Receipt</a>
+                    <a href="{% url 'accounts:bill-booking-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bill Booking</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Authorize Bill Booking</a>
+                    <a href="{% url 'accounts:cash-voucher-payment-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Cash Voucher Payment</a>
+                    <a href="{% url 'accounts:cash-voucher-receipt-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Cash Voucher Receipt</a>
+                    <a href="{% url 'accounts:bank-voucher-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bank Voucher</a>
+                    <a href="{% url 'accounts:journal-entry-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Journal Entry</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Tour Voucher</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Creditors/Debitors</a>
+                    <a href="{% url 'accounts:bank-reconciliation-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bank Reconciliation</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Mail Merge</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Loan Master</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Capital Master</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'acc-report' ? null : 'acc-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'acc-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'acc-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'accounts:balance-sheet' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Balance Sheet</a>
+                    <a href="{% url 'accounts:profit-loss' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Profit & Loss</a>
+                    <a href="{% url 'accounts:trial-balance' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Trial Balance</a>
+                    <a href="{% url 'accounts:ledger' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Ledger</a>
+                    <a href="{% url 'accounts:aging-report' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Aging Report</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Sales Register</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Purchase Register</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Pending For Invoice</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">PVEV Search</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Cash/Bank Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HR Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'hr' ? null : 'hr'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                HR
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'hr' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'hr'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Master Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'hr-master' ? null : 'hr-master'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Master
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'hr-master' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'hr-master'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'human_resource:business-group-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Business Group</a>
+                    <a href="{% url 'human_resource:designation-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Designation</a>
+                    <a href="{% url 'human_resource:department-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Department</a>
+                    <a href="{% url 'human_resource:grade-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Grade</a>
+                    <a href="{% url 'human_resource:swap-card-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">SwapCard No</a>
+                    <a href="{% url 'human_resource:corporate-mobile-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Corporate Mobile</a>
+                    <a href="{% url 'human_resource:intercom-ext-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Intercom Ext</a>
+                    <a href="{% url 'human_resource:gatepass-reason-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Gate Pass Types</a>
+                    <a href="{% url 'human_resource:holiday-master-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Holiday</a>
+                    <a href="{% url 'human_resource:pf-slab-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">PF Slab</a>
+                    <a href="{% url 'human_resource:working-days-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Working Days</a>
+                </div>
+            </div>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'hr-trans' ? null : 'hr-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'hr-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'hr-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">News And Notices</a>
+                    <a href="{% url 'human_resource:offer-letter-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Offer Letter</a>
+                    <a href="{% url 'human_resource:employee-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Staff</a>
+                    <a href="{% url 'human_resource:mobile-bill-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Mobile Bill</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">SMS</a>
+                    <a href="{% url 'human_resource:gatepass-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Authorize Gate Pass</a>
+                    <a href="{% url 'human_resource:tour-intimation-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Tour Intimation</a>
+                    <a href="{% url 'human_resource:bank-loan-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bank Loan</a>
+                    <a href="{% url 'human_resource:salary-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">PayRoll</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'hr-report' ? null : 'hr-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'hr-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'hr-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'human_resource:employee-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Staff Report</a>
+                    <a href="{% url 'human_resource:salary-bank-statement' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Salary Bank Statement</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MR Office Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'mr' ? null : 'mr'"
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                MR Office
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'mr' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'mr'" x-collapse class="ml-4 mt-1 space-y-1">
+            <a href="{% url 'mr_office:dashboard' %}" class="block px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Dashboard</a>
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mr-trans' ? null : 'mr-trans'"
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mr-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mr-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'mr_office:document-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">MR Office - ISO</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mr-report' ? null : 'mr-report'"
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mr-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mr-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'mr_office:storage-report' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Storage Report</a>
+                    <a href="{% url 'mr_office:by-module-report' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Documents by Module</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MIS Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'mis' ? null : 'mis'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                MIS
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'mis' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'mis'" x-collapse class="ml-4 mt-1 space-y-1">
+            <!-- Transaction Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mis-trans' ? null : 'mis-trans'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Transaction
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mis-trans' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mis-trans'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="{% url 'mis:transaction_menu' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Financial Budget</a>
+                </div>
+            </div>
+            <!-- Report Submenu -->
+            <div>
+                <button @click="openSubmenu = openSubmenu === 'mis-report' ? null : 'mis-report'" 
+                        class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">
+                    Report
+                    <svg class="w-3 h-3 transition-transform" :class="openSubmenu === 'mis-report' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div x-show="openSubmenu === 'mis-report'" x-collapse class="ml-3 mt-1 space-y-1">
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Sales Distribution</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Purchase</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Sales</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Service</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">BOM Costing</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Purchase/Sales Computation</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">QA Report</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Module -->
+    <div>
+        <button @click="openMenu = openMenu === 'support' ? null : 'support'" 
+                class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+            <span class="flex items-center">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                Support
+            </span>
+            <svg class="w-4 h-4 transition-transform" :class="openMenu === 'support' ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+        <div x-show="openMenu === 'support'" x-collapse class="ml-4 mt-1 space-y-1">
+            <a href="#" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">Change Password</a>
+            <a href="#" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">System Credentials</a>
+            <a href="#" class="block px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-gray-700 rounded">ECN</a>
+        </div>
+    </div>
+
+    <!-- Additional Standalone Items -->
+    <a href="#" class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        Scheduler
+    </a>
+
+    <a href="#" class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+        </svg>
+        Gate Pass
+    </a>
+
+    <a href="#" class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+        IOU
+    </a>
+
+    <a href="#" class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        Chat
+    </a>
+
+    <a href="#" class="flex items-center px-3 py-2 text-sm font-medium rounded hover:bg-gray-700 transition-colors">
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        ERP List
+    </a>
+
+</div>
+
+
+
+
+
+
+
+

@@ -1,0 +1,140 @@
+{% comment %}
+Component: Pagination
+Purpose: Compact pagination controls for tables with HTMX support
+
+Parameters:
+  - page_obj (required): Django paginator page object
+  - is_paginated (required): Boolean indicating if pagination is active
+  - htmx_enabled (optional): Boolean to enable HTMX pagination (default False)
+  - htmx_target (optional): HTMX target selector (default '#data-table')
+  - base_url (optional): Base URL for pagination links
+  - show_page_numbers (optional): Boolean to show individual page numbers (default False)
+  - compact (optional): Boolean for extra compact mode (default False)
+
+Usage (standard):
+  {% include 'core/components/tables/pagination.html' with
+    page_obj=page_obj
+    is_paginated=is_paginated
+  %}
+
+Usage (with HTMX):
+  {% include 'core/components/tables/pagination.html' with
+    page_obj=page_obj
+    is_paginated=is_paginated
+    htmx_enabled=True
+    htmx_target='#table-body'
+  %}
+
+Requirements: 5.3, 11.1, 11.2, 11.3
+{% endcomment %}
+
+{% if is_paginated %}
+<div class="border-t border-gray-200 px-3 py-2 flex items-center justify-between bg-gray-50/50">
+    <!-- Left: Item count -->
+    <div class="flex items-center">
+        <span class="text-xs text-gray-600">
+            {% if page_obj.paginator.count > 0 %}
+                Items {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+            {% else %}
+                No items
+            {% endif %}
+        </span>
+    </div>
+    
+    <!-- Right: Pagination controls -->
+    <div class="flex items-center gap-1">
+        <!-- First page button -->
+        {% if page_obj.has_previous and page_obj.number > 2 %}
+            <a href="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               {% if htmx_enabled %}
+               hx-get="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-target="{{ htmx_target|default:'#data-table' }}"
+               hx-swap="innerHTML"
+               {% endif %}
+               class="inline-flex items-center justify-center w-7 h-7 text-xs border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+               aria-label="First page">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                </svg>
+            </a>
+        {% endif %}
+        
+        <!-- Previous page button -->
+        {% if page_obj.has_previous %}
+            <a href="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               {% if htmx_enabled %}
+               hx-get="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-target="{{ htmx_target|default:'#data-table' }}"
+               hx-swap="innerHTML"
+               {% endif %}
+               class="inline-flex items-center justify-center w-7 h-7 text-xs border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+               aria-label="Previous page">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+        {% else %}
+            <button disabled 
+                    class="inline-flex items-center justify-center w-7 h-7 text-xs border border-gray-200 rounded text-gray-300 cursor-not-allowed"
+                    aria-label="Previous page (disabled)">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+        {% endif %}
+
+        <!-- Page indicator -->
+        <span class="inline-flex items-center px-2 h-7 text-xs text-gray-700 font-medium">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        <!-- Next page button -->
+        {% if page_obj.has_next %}
+            <a href="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               {% if htmx_enabled %}
+               hx-get="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-target="{{ htmx_target|default:'#data-table' }}"
+               hx-swap="innerHTML"
+               {% endif %}
+               class="inline-flex items-center justify-center w-7 h-7 text-xs border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+               aria-label="Next page">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        {% else %}
+            <button disabled 
+                    class="inline-flex items-center justify-center w-7 h-7 text-xs border border-gray-200 rounded text-gray-300 cursor-not-allowed"
+                    aria-label="Next page (disabled)">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        {% endif %}
+        
+        <!-- Last page button -->
+        {% if page_obj.has_next and page_obj.number < page_obj.paginator.num_pages|add:"-1" %}
+            <a href="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               {% if htmx_enabled %}
+               hx-get="{% if base_url %}{{ base_url }}{% else %}?{% endif %}page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+               hx-target="{{ htmx_target|default:'#data-table' }}"
+               hx-swap="innerHTML"
+               {% endif %}
+               class="inline-flex items-center justify-center w-7 h-7 text-xs border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+               aria-label="Last page">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+
+

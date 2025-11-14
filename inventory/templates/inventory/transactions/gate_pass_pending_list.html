@@ -1,0 +1,94 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Pending Returnable Gate Passes - Inventory{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Pending Returnable Gate Passes</h1>
+                <p class="text-sm text-gray-600 mt-1">Items not yet returned</p>
+            </div>
+            <a href="{% url 'inventory:gate-pass-list' %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">
+                All Gate Passes
+            </a>
+        </div>
+    </div>
+
+    {% if gatepasses %}
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-orange-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">
+                            Gate Pass No
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">
+                            Party
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">
+                            Days Pending
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-orange-800 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for gatepass in gatepasses %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{% url 'inventory:gate-pass-detail' gatepass.gatepassid %}" 
+                               class="text-gray-600 hover:text-gray-900 font-medium">
+                                {{ gatepass.gatepassno }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ gatepass.gatepassdate|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {{ gatepass.partyid.partyname|default:"N/A" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <span class="text-orange-600 font-medium">
+                                {{ gatepass.gatepassdate|timesince }} ago
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{% url 'inventory:gate-pass-return' gatepass.gatepassid %}" 
+                               class="text-gray-600 hover:text-gray-900 mr-3">Record Return</a>
+                            <a href="{% url 'inventory:gate-pass-detail' gatepass.gatepassid %}" 
+                               class="text-blue-600 hover:text-blue-900">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded border border-gray-200 p-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No pending returnable passes</h3>
+        <p class="mt-1 text-sm text-gray-500">All returnable items have been returned!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

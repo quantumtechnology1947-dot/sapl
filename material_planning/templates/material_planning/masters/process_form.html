@@ -1,0 +1,61 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Process{% endblock %}
+
+{% block page_title %}{% if object %}Edit{% else %}Add{% endif %} Process{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-2xl">
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h2 class="text-sm font-bold text-gray-800 mb-6">
+            {% if object %}Edit Process{% else %}Add New Process{% endif %}
+        </h2>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <!-- Process Name -->
+            <div>
+                <label for="id_processname" class="block text-sm font-medium text-gray-700 mb-2">
+                    Process Name <span class="text-red-500">*</span>
+                </label>
+                {{ form.processname }}
+                {% if form.processname.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.processname.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Symbol -->
+            <div>
+                <label for="id_symbol" class="block text-sm font-medium text-gray-700 mb-2">
+                    Symbol <span class="text-red-500">*</span>
+                </label>
+                {{ form.symbol }}
+                {% if form.symbol.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.symbol.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3 pt-4">
+                <a href="{% url 'material_planning:process-list' %}" 
+                   class="px-6 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    {% if object %}Update{% else %}Create{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

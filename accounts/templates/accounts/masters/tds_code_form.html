@@ -1,0 +1,74 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} TDS Code - Cortex ERP{% endblock %}
+{% block form_header %}{% if object %}Edit{% else %}Add{% endif %} TDS Code{% endblock %}
+{% block back_url %}{% url 'accounts:tds-code-list' %}{% endblock %}
+{% block cancel_url %}{% url 'accounts:tds-code-list' %}{% endblock %}
+
+{% block form_sections %}
+    <div class="p-4 space-y-6">
+        {# Basic Information Section #}
+        <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">Basic Information</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Section Number <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.sectionno }}
+                    {% if form.sectionno.errors %}
+                        <p class="text-red-500 text-xs">{{ form.sectionno.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Payment Range</label>
+                    {{ form.paymentrange }}
+                    {% if form.paymentrange.errors %}
+                        <p class="text-red-500 text-xs">{{ form.paymentrange.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Nature of Payment</label>
+                {{ form.natureofpayment }}
+                {% if form.natureofpayment.errors %}
+                    <p class="text-red-500 text-xs">{{ form.natureofpayment.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# TDS Rates Section #}
+        <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">TDS Rates</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Rate for Individual (%)</label>
+                    {{ form.paytoindividual }}
+                    {% if form.paytoindividual.errors %}
+                        <p class="text-red-500 text-xs">{{ form.paytoindividual.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Rate for Others (%)</label>
+                    {{ form.others }}
+                    {% if form.others.errors %}
+                        <p class="text-red-500 text-xs">{{ form.others.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Rate Without PAN (%)</label>
+                    {{ form.withoutpan }}
+                    {% if form.withoutpan.errors %}
+                        <p class="text-red-500 text-xs">{{ form.withoutpan.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Department - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Department{% endblock %}
+{% block form_action %}{% if object %}{% url 'human_resource:dept-update' object.id %}{% else %}{% url 'human_resource:dept-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'human_resource:dept-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="description"
+        label="Department Name"
+        value=object.description
+        required=True
+        placeholder="e.g., Engineering, Sales, HR"
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="symbol"
+        label="Symbol"
+        value=object.symbol
+        placeholder="e.g., ENG, SAL, HR"
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

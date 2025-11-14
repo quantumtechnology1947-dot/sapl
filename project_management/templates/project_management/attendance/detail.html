@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block title %}Attendance - {{ attendance.empid }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between"><div><h2 class="text-sm font-bold">Attendance Details</h2></div>
+<div class="space-x-2"><a href="{% url 'project_management:attendance-update' attendance.id %}" class="bg-orange-600 text-white px-4 py-2 rounded">Edit</a>
+<a href="{% url 'project_management:attendance-list' %}" class="bg-gray-600 text-white px-4 py-2 rounded">Back</a></div></div>
+<div class="bg-white rounded border border-gray-200 p-6">
+<div class="grid grid-cols-3 gap-4">
+<div><p class="text-sm text-gray-600">Employee ID</p><p class="font-medium">{{ attendance.empid }}</p></div>
+<div><p class="text-sm text-gray-600">Date</p><p class="font-medium">{{ attendance.onsitedate }}</p></div>
+<div><p class="text-sm text-gray-600">Shift</p><p class="font-medium">{{ attendance.shift_display }}</p></div>
+<div><p class="text-sm text-gray-600">Status</p><p><span class="px-3 py-1 text-sm rounded-full {% if attendance.status == 1 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ attendance.status_display }}</span></p></div>
+<div><p class="text-sm text-gray-600">Location</p><p class="font-medium">{{ attendance.onsite|default:'N/A' }}</p></div>
+<div><p class="text-sm text-gray-600">Time</p><p class="font-medium">{{ attendance.fromtime|default:'N/A' }} - {{ attendance.totime|default:'N/A' }}</p></div>
+</div></div>
+{% endblock %}
+
+
+
+
+
+
+
+

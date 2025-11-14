@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Challan - {{ challan.supplierchallanno }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none; }
+            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body class="bg-white p-8">
+    <!-- Print Button -->
+    <div class="no-print mb-4 flex justify-end">
+        <button onclick="window.print()" 
+                class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-md">
+            Print Challan
+        </button>
+    </div>
+
+    <!-- Challan Document -->
+    <div class="max-w-4xl mx-auto border-2 border-teal-600 p-8">
+        <!-- Header -->
+        <div class="text-center mb-6 border-b-2 border-teal-600 pb-4">
+            <h1 class="text-base font-bold text-teal-800">SUPPLIER CHALLAN</h1>
+            <p class="text-sm text-gray-600 mt-2">Job Work Delivery Note</p>
+        </div>
+
+        <!-- Challan Info -->
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <div>
+                <p class="text-sm text-gray-600">Challan No:</p>
+                <p class="text-lg font-bold text-gray-900">{{ challan.supplierchallanno }}</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-600">Date:</p>
+                <p class="text-lg font-bold text-gray-900">{{ challan.supplierchallandate|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+
+        <!-- Supplier & Transport Details -->
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <div class="border border-gray-300 p-4 rounded">
+                <h3 class="font-semibold text-gray-800 mb-2">Supplier Details</h3>
+                <p class="text-sm"><strong>Name:</strong> {{ challan.supplierid.suppliername|default:"N/A" }}</p>
+            </div>
+            <div class="border border-gray-300 p-4 rounded">
+                <h3 class="font-semibold text-gray-800 mb-2">Transport Details</h3>
+                <p class="text-sm"><strong>Vehicle:</strong> {{ challan.vehicleno|default:"-" }}</p>
+                <p class="text-sm"><strong>Driver:</strong> {{ challan.drivername|default:"-" }}</p>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="w-full border-collapse border border-gray-300 mb-6">
+            <thead>
+                <tr class="bg-teal-100">
+                    <th class="border border-gray-300 px-4 py-2 text-left">SN</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Item Description</th>
+                    <th class="border border-gray-300 px-4 py-2 text-right">Quantity</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in details %}
+                <tr>
+                    <td class="border border-gray-300 px-4 py-2">{{ forloop.counter }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ detail.itemid.itemname|default:"N/A" }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-right">{{ detail.qty|floatformat:3 }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ detail.remarks|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if challan.remarks %}
+        <div class="mb-6">
+            <p class="text-sm font-semibold text-gray-700">Remarks:</p>
+            <p class="text-sm text-gray-900">{{ challan.remarks }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Signatures -->
+        <div class="grid grid-cols-3 gap-6 mt-12 pt-6 border-t border-gray-300">
+            <div class="text-center">
+                <div class="border-t border-gray-400 pt-2 mt-12">
+                    <p class="text-sm font-semibold">Prepared By</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="border-t border-gray-400 pt-2 mt-12">
+                    <p class="text-sm font-semibold">Checked By</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="border-t border-gray-400 pt-2 mt-12">
+                    <p class="text-sm font-semibold">Receiver's Signature</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

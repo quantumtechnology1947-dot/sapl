@@ -1,0 +1,201 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}PO - Item Entry - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2 py-2">
+    {% if messages %}
+    <div class="mb-2">
+        {% for message in messages %}
+        <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-2 py-1 rounded text-xs mb-1" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded shadow max-w-6xl mx-auto">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-3 py-2 rounded-t">
+            <h1 class="text-white font-semibold text-sm">&nbsp;PO - Item Entry</h1>
+        </div>
+
+        <form method="post" class="p-4">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Left Column: Item Details (Read-Only) -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">
+                            {% if is_spr %}SPR No{% else %}PR No{% endif %}
+                        </label>
+                        <div class="text-[11px] text-gray-900 font-medium">
+                            {% if is_spr %}
+                                {{ spr_master.spr_no|default:"-" }}
+                            {% else %}
+                                {{ pr_master.pr_no|default:"-" }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">
+                            {% if is_spr %}SPR Qty{% else %}PR Qty{% endif %}
+                        </label>
+                        <div class="text-[11px] text-gray-900 font-medium">
+                            {% if is_spr %}
+                                {{ spr_item.qty }}
+                            {% else %}
+                                {{ pr_item.qty }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if not is_spr %}
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">WO No</label>
+                        <div class="text-[11px] text-gray-900">{{ pr_master.wo_no|default:"-" }}</div>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">Item Code</label>
+                        <div class="text-[11px] text-gray-900 font-medium">
+                            {% if is_spr %}
+                                {{ spr_item_obj.itemcode|default:"-" }}
+                            {% else %}
+                                {{ item.itemcode|default:"-" }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">Item Description</label>
+                        <textarea readonly class="w-full px-2 py-2 border border-gray-300 rounded text-[11px] bg-gray-50 h-24">{% if is_spr %}{{ spr_item_obj.purchasedesc }}{% else %}{{ item.purchasedesc }}{% endif %}</textarea>
+                    </div>
+                </div>
+
+                <!-- Right Column: Entry Fields -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">A/c Head</label>
+                        <div class="text-[11px] text-gray-900">
+                            {% if is_spr %}
+                                {{ spr_item.ah_id|default:"-" }}
+                            {% else %}
+                                {{ pr_item.ah_id|default:"-" }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">
+                            PO Qty <span class="text-red-600">*</span>
+                        </label>
+                        <input type="number" step="0.001" name="qty" required max="{{ remain_qty }}"
+                               class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                               placeholder="Max: {{ remain_qty }}">
+                        <p class="mt-1 text-[10px] text-gray-500">Remaining: {{ remain_qty }} | Already PO: {{ po_qty }}</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">UOM Purch</label>
+                        <div class="text-[11px] text-gray-900">
+                            {% if is_spr %}
+                                {{ spr_item_obj.uompurch|default:"-" }}
+                            {% else %}
+                                {{ item.uompurch|default:"-" }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">
+                            Rate <span class="text-red-600">*</span>
+                        </label>
+                        <div class="flex gap-1 items-center">
+                            <input type="number" step="0.001" name="rate" required
+                                   class="flex-1 px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                   placeholder="Enter rate">
+                            <span class="text-xs">₹</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">
+                            Discount (%) <span class="text-red-600">*</span>
+                        </label>
+                        <input type="number" step="0.001" name="discount" value="0" required
+                               class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">PF (Packing & Forwarding)</label>
+                        <select name="pf_id" class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <option value="">-- Select --</option>
+                            <option value="0">0%</option>
+                            <!-- Add PF options from master table -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">Excise</label>
+                        <select name="exst_id" class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <option value="">-- Select --</option>
+                            <!-- Add Excise options from master table -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">VAT</label>
+                        <select name="vat_id" class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <option value="">-- Select --</option>
+                            <!-- Add VAT options from master table -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">Delivery Date</label>
+                        <input type="date" name="del_date"
+                               class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-700 mb-1">Remarks</label>
+                        <textarea name="remarks" rows="2"
+                                  class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                  placeholder="Enter any remarks..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-6 flex justify-end gap-2 border-t border-gray-200 pt-4">
+                <a href="{% if is_spr %}{% url 'material_management:po-spr-items' supplier_code %}{% else %}{% url 'material_management:po-pr-items' supplier_code %}{% endif %}"
+                   class="px-4 py-2 border border-gray-300 rounded text-[11px] text-gray-700 hover:bg-gray-50 transition">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded text-[11px] hover:bg-blue-700 transition">
+                    Save & Continue
+                </button>
+            </div>
+        </form>
+
+        <div class="p-3 bg-yellow-50 border-t border-yellow-200">
+            <p class="text-[10px] text-yellow-800">
+                <strong>Note:</strong> After saving, this item will be added to the temporary list. You can continue selecting more items or proceed to create the final PO.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

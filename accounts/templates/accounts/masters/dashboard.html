@@ -1,0 +1,94 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Master Data - Accounts Module{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+        <div class="px-4 py-4">
+            <h1 class="text-sm font-bold text-gray-800">Accounts Master Data</h1>
+            <p class="text-sm text-gray-600 mt-1">Manage all accounting master data</p>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Account Head Card -->
+        <a href="{% url 'accounts:acchead-list' %}" class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Account Heads</h3>
+                    <p class="text-sm text-gray-600 mt-1">Manage account categories</p>
+                    <p class="text-sm font-bold text-blue-600 mt-2">{{ acchead_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+        </a>
+        
+        <!-- Bank Card -->
+        <a href="{% url 'accounts:bank-list' %}" class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Banks</h3>
+                    <p class="text-sm text-gray-600 mt-1">Manage bank information</p>
+                    <p class="text-sm font-bold text-green-600 mt-2">{{ bank_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+            </div>
+        </a>
+        
+        <!-- Currency Card -->
+        <a href="{% url 'accounts:currency-list' %}" class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Currencies</h3>
+                    <p class="text-sm text-gray-600 mt-1">Manage currency information</p>
+                    <p class="text-sm font-bold text-purple-600 mt-2">{{ currency_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </a>
+        
+        <!-- Payment Terms Card -->
+        <a href="{% url 'accounts:payment-terms-list' %}" class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Payment Terms</h3>
+                    <p class="text-sm text-gray-600 mt-1">Manage payment conditions</p>
+                    <p class="text-sm font-bold text-orange-600 mt-2">{{ payment_terms_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </div>
+        </a>
+        
+        <!-- TDS Code Card -->
+        <a href="{% url 'accounts:tds-code-list' %}" class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">TDS Codes</h3>
+                    <p class="text-sm text-gray-600 mt-1">Manage TDS tax codes</p>
+                    <p class="text-sm font-bold text-red-600 mt-2">{{ tds_code_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}SPR Authorize Dashboard - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-gradient-to-r from-purple-800 to-purple-900 shadow-lg">
+        <div class="max-w-full px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-white font-bold text-xl">SPR Authorize Dashboard</h1>
+                </div>
+                <div class="flex gap-4">
+                    <a href="{% url 'material_management:spr-list' %}" class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">All SPRs</a>
+                    <a href="{% url 'material_management:spr-approve-list' %}" class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">Approve SPRs</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-full px-6 py-6">
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-sm font-bold text-gray-900 mb-6">Approved SPRs for Authorization</h2>
+
+            {% if sprs %}
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300 text-xs">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-2 py-2 text-right font-semibold text-gray-700 w-12">SN</th>
+                            <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-24">Fin Year</th>
+                            <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-28">SPR No</th>
+                            <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-24">Date</th>
+                            <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-24">Time</th>
+                            <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700">Gen. By</th>
+                            <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700">Work Order</th>
+                            <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700 w-32">Approved By</th>
+                            <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-20">Items</th>
+                            <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-28">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for spr in sprs %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="border border-gray-300 px-2 py-1.5 text-right">{{ forloop.counter }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center">{{ spr.fin_year_name|default:"-" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center">
+                                <a href="{% url 'material_management:spr-detail' spr.spr_id %}" class="text-blue-600 hover:underline">
+                                    {{ spr.spr_no }}
+                                </a>
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center">{{ spr.sys_date }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center">{{ spr.sys_time|default:"-" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-left">{{ spr.created_by_name|default:"-" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-left">{{ spr.wo_no|default:"-" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-left">{{ spr.approved_by_name|default:"-" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center">{{ spr.item_count|default:"0" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center">
+                                <form method="post" class="inline" onsubmit="return confirm('Authorize this SPR?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="spr_id" value="{{ spr.spr_id }}">
+                                    <button type="submit" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 transition">
+                                        ✓ Authorize
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-gray-50 rounded border-2 border-dashed border-gray-300">
+                <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p class="text-gray-600 text-lg font-medium">No SPRs pending for authorization</p>
+                <p class="text-gray-500 text-sm mt-2">All approved SPRs have been authorized or there are no approved SPRs.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

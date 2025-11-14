@@ -1,0 +1,174 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Supplier Details - {{ supplier.supplier_name }} - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200 max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
+            <h1 class="text-white font-semibold text-lg">&nbsp;Supplier Details</h1>
+            <div class="flex gap-2">
+                <a href="{% url 'material_management:supplier-update' supplier.supplier_id %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition">
+                    Edit
+                </a>
+                <a href="{% url 'material_management:supplier-list' %}"
+                   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm transition">
+                    Back to List
+                </a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 space-y-6">
+            <!-- Basic Information -->
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Supplier ID</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.supplier_id }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Supplier Name</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.supplier_name }}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-500">Scope of Supply</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.scope_of_supply|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Contact Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Contact Person</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.contact_person|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Contact Number</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.contact_no|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Email</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.email|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Fax Number</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.regd_fax_no|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registered Address -->
+            {% if supplier.regd_address %}
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Registered Address</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-500">Address</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.regd_address }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">City</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.regd_city|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">PIN Code</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.regd_pin_no|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Tax Information -->
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Tax Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">PAN Number</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.pan_no|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">TIN/VAT Number</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.tin_vat_no|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">TDS Code</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.tds_code|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">ECC Number</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.ecc_no|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Details -->
+            <div class="border-b border-gray-200 pb-4">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Business Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Business Type</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.business_type|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Business Nature</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.business_nature|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Service Coverage</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.service_coverage|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bank Details -->
+            {% if supplier.bank_name %}
+            <div>
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Bank Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Bank Name</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.bank_name }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Branch</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.bank_branch|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Account Number</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.bank_acc_no|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Account Type</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ supplier.bank_acc_type|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Remarks -->
+            {% if supplier.remark %}
+            <div class="bg-gray-50 p-4 rounded">
+                <label class="block text-sm font-medium text-gray-500 mb-2">Remarks</label>
+                <p class="text-sm text-gray-900">{{ supplier.remark }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

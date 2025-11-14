@@ -1,0 +1,197 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Budget Assignment{% endblock %}
+
+{% block content %}
+<!-- SAP S/4 HANA Inspired Design -->
+<div class="h-screen flex flex-col bg-gray-50">
+
+    <!-- Compact Tab Navigation -->
+    <div class="bg-white border-b border-gray-300 px-4 py-1">
+        <nav class="flex space-x-6" role="tablist">
+            <button type="button"
+                    class="tab-button border-b-2 border-[#0854A0] py-2 text-xs font-semibold text-[#0854A0]"
+                    data-tab="business-group"
+                    role="tab"
+                    aria-selected="true">
+                Business Group
+            </button>
+            <button type="button"
+                    class="tab-button border-b-2 border-transparent py-2 text-xs font-semibold text-gray-600 hover:text-[#0854A0] hover:border-gray-400"
+                    data-tab="work-order"
+                    role="tab"
+                    aria-selected="false">
+                Work Order
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 overflow-hidden px-4 py-2">
+
+        <!-- Business Group Tab -->
+        <div id="business-group-tab" class="tab-content h-full flex flex-col">
+            <!-- Real-time Search -->
+            <div class="bg-white border border-gray-300 rounded shadow-sm p-2 mb-2">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text"
+                           name="bg_search"
+                           id="bg_search"
+                           value="{{ bg_search }}"
+                           placeholder="Search business groups... (name, symbol, amounts)"
+                           class="flex-1 px-2 py-1 text-xs border border-gray-400 rounded focus:ring-1 focus:ring-[#0854A0] focus:border-[#0854A0]"
+                           hx-get="{% url 'mis:business_group_budget' %}"
+                           hx-trigger="keyup changed delay:300ms"
+                           hx-target="#bg-table-container"
+                           hx-include="[name='bg_search']">
+                    <span class="text-xs text-gray-500">{{ business_groups|length }} groups</span>
+                </div>
+            </div>
+
+            <form method="post" class="flex-1 flex flex-col overflow-hidden">
+                {% csrf_token %}
+
+                <!-- Table Container -->
+                <div id="bg-table-container" class="flex-1 bg-white border border-gray-300 rounded shadow-sm overflow-auto">
+                    {% include 'mis/transactions/partials/business_group_table.html' %}
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="mt-2 flex items-center justify-between bg-white border border-gray-300 rounded px-3 py-1.5 shadow-sm">
+                    <div class="text-xs text-gray-600">
+                        <span class="font-medium">{{ business_groups|length }}</span> business groups
+                    </div>
+                    <div class="flex space-x-2">
+                        <button type="button" onclick="window.location.href='{% url 'mis:transaction_menu' %}'"
+                                class="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-400 rounded hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-3 py-1 text-xs font-medium text-white bg-[#0854A0] border border-[#0854A0] rounded hover:bg-[#0a6fc9] transition-colors">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Work Order Tab -->
+        <div id="work-order-tab" class="tab-content h-full flex flex-col hidden">
+
+            <!-- Real-time Search -->
+            <div class="bg-white border border-gray-300 rounded shadow-sm p-2 mb-2">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text"
+                           name="wo_search"
+                           id="wo_search"
+                           value="{{ wo_search }}"
+                           placeholder="Search work orders... (customer, WO no, PO no, project title, date)"
+                           class="flex-1 px-2 py-1 text-xs border border-gray-400 rounded focus:ring-1 focus:ring-[#0854A0] focus:border-[#0854A0]"
+                           hx-get="{% url 'mis:business_group_budget' %}?tab=work-order"
+                           hx-trigger="keyup changed delay:300ms"
+                           hx-target="#wo-table-container"
+                           hx-include="[name='wo_search']">
+                    {% if work_orders %}
+                    <span class="text-xs text-gray-500">{{ page_obj.paginator.count }} work orders</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Work Orders Table Container -->
+            <div id="wo-table-container" class="flex-1 bg-white border border-gray-300 rounded shadow-sm overflow-auto">
+                {% if work_orders %}
+                    {% include 'mis/transactions/partials/work_order_table.html' %}
+                {% else %}
+                    <div class="flex h-full items-center justify-center">
+                        <div class="text-center">
+                            <svg class="mx-auto w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h3 class="text-sm font-medium text-gray-700">No Work Orders Found</h3>
+                            <p class="text-xs text-gray-500 mt-1">{% if wo_search %}No work orders match your search.{% else %}Start typing to search work orders.{% endif %}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching functionality
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Check URL parameter for active tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab') || 'business-group';
+
+    // Show active tab
+    tabButtons.forEach(button => {
+        const tabName = button.getAttribute('data-tab');
+        if (tabName === activeTab) {
+            button.classList.add('border-[#0854A0]', 'text-[#0854A0]');
+            button.classList.remove('border-transparent', 'text-gray-600');
+            button.setAttribute('aria-selected', 'true');
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+        } else {
+            button.classList.remove('border-[#0854A0]', 'text-[#0854A0]');
+            button.classList.add('border-transparent', 'text-gray-600');
+            button.setAttribute('aria-selected', 'false');
+            document.getElementById(tabName + '-tab').classList.add('hidden');
+        }
+    });
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetTab = this.getAttribute('data-tab');
+
+            // Update button states
+            tabButtons.forEach(btn => {
+                btn.classList.remove('border-[#0854A0]', 'text-[#0854A0]');
+                btn.classList.add('border-transparent', 'text-gray-600');
+                btn.setAttribute('aria-selected', 'false');
+            });
+
+            this.classList.add('border-[#0854A0]', 'text-[#0854A0]');
+            this.classList.remove('border-transparent', 'text-gray-600');
+            this.setAttribute('aria-selected', 'true');
+
+            // Update tab content visibility
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            document.getElementById(targetTab + '-tab').classList.remove('hidden');
+
+            // Update URL without reload
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set('tab', targetTab);
+            window.history.pushState({}, '', newUrl);
+        });
+    });
+
+    // Select all checkbox functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const groupCheckboxes = document.querySelectorAll('.group-checkbox');
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            groupCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+});
+</script>
+
+{% endblock %}

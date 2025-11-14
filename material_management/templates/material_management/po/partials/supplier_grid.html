@@ -1,0 +1,40 @@
+{# Supplier Grid Partial - Used by HTMX for live search #}
+{% if suppliers %}
+<div class="overflow-x-auto">
+    <table class="w-full border-collapse">
+        <thead>
+            <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-[60px]">#</th>
+                <th class="px-3 py-2 text-center text-xs font-semibold text-gray-700 w-[100px]">Action</th>
+                <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Supplier Name</th>
+                <th class="px-3 py-2 text-center text-xs font-semibold text-gray-700 w-[120px]">Code</th>
+                <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-[100px]">Items</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for supplier in suppliers %}
+            <tr class="h-8 hover:bg-blue-50/30 transition-colors">
+                <td class="px-3 py-2 text-xs text-gray-700">{{ forloop.counter }}</td>
+                <td class="px-3 py-2 text-center">
+                    <a href="{% if tab_type == 'spr' %}{% url 'material_management:po-spr-items' supplier.code %}{% else %}{% url 'material_management:po-pr-items' supplier.code %}{% endif %}"
+                       class="text-sap-blue hover:text-sap-blue-hover hover:underline font-medium text-xs">Select</a>
+                </td>
+                <td class="px-3 py-2 text-xs font-medium text-gray-900">{{ supplier.name }}</td>
+                <td class="px-3 py-2 text-center">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">{{ supplier.code }}</span>
+                </td>
+                <td class="px-3 py-2 text-xs text-right font-semibold text-gray-900">{{ supplier.items }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-12">
+    <svg class="w-16 h-16 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+    </svg>
+    <p class="text-sm font-medium text-gray-900 mb-1">No Suppliers Found</p>
+    <p class="text-xs text-gray-500">{% if search_query %}No suppliers match your search criteria{% else %}Try searching for suppliers{% endif %}</p>
+</div>
+{% endif %}

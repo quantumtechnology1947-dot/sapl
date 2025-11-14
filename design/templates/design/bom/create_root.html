@@ -1,0 +1,278 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Create New BOM - Design{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-5xl">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Create New BOM</h1>
+                <p class="text-sm text-gray-600 mt-1">Create a new Bill of Materials with root assembly</p>
+            </div>
+            <a href="{% url 'design:bom-list' %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors text-sm">
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div class="text-sm text-blue-800">
+                <p class="font-semibold mb-1">Creating Root Assembly</p>
+                <p>This form creates the root (top-level) assembly for a work order. The part number will be auto-generated in the format: Equipment-Unit-Part (e.g., E001-01-01). After creating the root assembly, you can add child items to build the complete BOM hierarchy.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-8">
+            {% csrf_token %}
+            
+            <!-- Work Order Selection -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Work Order Selection
+                </h2>
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label for="{{ form.wono.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.wono.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.wono }}
+                        {% if form.wono.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.wono.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.wono.help_text }}</p>
+                    </div>
+                    <div id="wo-info" class="bg-gray-50 rounded p-4 hidden">
+                        <!-- Work order info will be loaded here via HTMX -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Part Number Configuration -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                    </svg>
+                    Part Number Configuration
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="{{ form.equipment_no.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.equipment_no.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.equipment_no }}
+                        {% if form.equipment_no.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.equipment_no.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.equipment_no.help_text }}</p>
+                    </div>
+                    <div>
+                        <label for="{{ form.unit_no.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.unit_no.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.unit_no }}
+                        {% if form.unit_no.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.unit_no.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.unit_no.help_text }}</p>
+                    </div>
+                    <div>
+                        <label for="{{ form.part_no.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.part_no.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.part_no }}
+                        {% if form.part_no.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.part_no.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.part_no.help_text }}</p>
+                    </div>
+                </div>
+                <div class="mt-4 bg-gray-50 rounded p-3">
+                    <p class="text-sm text-gray-700">
+                        <span class="font-medium">Generated Part Number:</span>
+                        <span id="generated-part-no" class="font-mono text-blue-600 ml-2">E001-01-01</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Item Details -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    Item Details
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.description.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.description.help_text }}</p>
+                    </div>
+                    <div>
+                        <label for="{{ form.uom.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.uom.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.uom }}
+                        {% if form.uom.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.uom.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.quantity.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.quantity.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.quantity }}
+                        {% if form.quantity.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.quantity.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.quantity.help_text }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- File Uploads -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+                    File Attachments
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.drawing_file.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.drawing_file.label }}
+                        </label>
+                        {{ form.drawing_file }}
+                        {% if form.drawing_file.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.drawing_file.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.drawing_file.help_text }}</p>
+                    </div>
+                    <div>
+                        <label for="{{ form.spec_sheet_file.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.spec_sheet_file.label }}
+                        </label>
+                        {{ form.spec_sheet_file }}
+                        {% if form.spec_sheet_file.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.spec_sheet_file.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.spec_sheet_file.help_text }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Information -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Additional Information
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.revision.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.revision.label }}
+                        </label>
+                        {{ form.revision }}
+                        {% if form.revision.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.revision.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.revision.help_text }}</p>
+                    </div>
+                    <div>
+                        <label for="{{ form.material.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.material.label }}
+                        </label>
+                        {{ form.material }}
+                        {% if form.material.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.material.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.material.help_text }}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="{{ form.remarks.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.remarks.label }}
+                        </label>
+                        {{ form.remarks }}
+                        {% if form.remarks.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.remarks.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.remarks.help_text }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="flex justify-end gap-4 pt-4 border-t border-gray-200">
+                <a href="{% url 'design:bom-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Create BOM
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Help Section -->
+    <div class="mt-6 bg-gray-50 border border-gray-200 rounded p-4">
+        <h3 class="text-sm font-semibold text-gray-900 mb-2">💡 Tips</h3>
+        <ul class="text-xs text-gray-700 space-y-1 list-disc list-inside">
+            <li>The root assembly is the top-level item in your BOM hierarchy</li>
+            <li>Part numbers are generated automatically in Equipment-Unit-Part format</li>
+            <li>After creating the root, you can add child items to build the complete structure</li>
+            <li>Upload drawings and specifications to keep all documentation in one place</li>
+            <li>Use revision numbers to track design changes (A, B, C, etc.)</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Update generated part number display
+function updatePartNumber() {
+    const equipment = document.querySelector('[name="equipment_no"]').value || 'E001';
+    const unit = document.querySelector('[name="unit_no"]').value || '01';
+    const part = document.querySelector('[name="part_no"]').value || '01';
+    document.getElementById('generated-part-no').textContent = `${equipment}-${unit}-${part}`;
+}
+
+document.querySelector('[name="equipment_no"]').addEventListener('input', updatePartNumber);
+document.querySelector('[name="unit_no"]').addEventListener('input', updatePartNumber);
+document.querySelector('[name="part_no"]').addEventListener('input', updatePartNumber);
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

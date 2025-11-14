@@ -1,0 +1,17 @@
+{% extends "daily_report_system/base.html" %}
+{% block content %}
+<h1 class="text-sm font-bold mb-6">Departmental Working Plan</h1>
+<div class="bg-white rounded shadow p-6">
+    <table class="w-full"><thead><tr class="border-b"><th class="p-2">Project</th><th class="p-2">WO</th><th class="p-2">Leader</th><th class="p-2">Activity</th></tr></thead>
+        <tbody>{% for plan in plans %}<tr class="border-b"><td class="p-2">{{ plan.name_proj }}</td><td class="p-2">{{ plan.wo_no }}</td><td class="p-2">{{ plan.des_lea }}</td><td class="p-2">{{ plan.name_act }}</td></tr>{% endfor %}</tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

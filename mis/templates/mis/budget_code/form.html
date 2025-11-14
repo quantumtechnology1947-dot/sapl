@@ -1,0 +1,98 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Budget Code{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">{% if object %}Edit{% else %}Create{% endif %} Budget Code</h1>
+        <p class="text-sm text-gray-600 mt-1">{% if object %}Update budget code information{% else %}Add a new budget code to the system{% endif %}</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <form method="post" class="p-6">
+            {% csrf_token %}
+            
+            <!-- Display form errors if any -->
+            {% if form.errors %}
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-sm font-medium text-red-800 mb-2">Please correct the following errors:</p>
+                <ul class="list-disc list-inside text-sm text-red-700">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|title }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Form Fields -->
+            <div class="space-y-6">
+                <!-- Symbol Field -->
+                <div>
+                    <label for="{{ form.symbol.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Symbol <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="{{ form.symbol.name }}" 
+                        id="{{ form.symbol.id_for_label }}"
+                        value="{{ form.symbol.value|default:'' }}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        placeholder="Enter budget code symbol (e.g., BC001)"
+                        required
+                    >
+                    {% if form.symbol.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.symbol.help_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Description Field -->
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Description
+                    </label>
+                    <textarea 
+                        name="{{ form.description.name }}" 
+                        id="{{ form.description.id_for_label }}"
+                        rows="4"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        placeholder="Enter budget code description"
+                    >{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.description.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
+                <a href="{% url 'mis:budget_code_list' %}" 
+                   class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {% if object %}Update{% else %}Create{% endif %} Budget Code
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

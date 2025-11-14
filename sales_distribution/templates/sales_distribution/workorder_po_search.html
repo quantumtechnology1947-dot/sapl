@@ -1,0 +1,84 @@
+{% extends "core/base.html" %}
+{% block title %}Work Order - New{% endblock %}
+{% block page_title %}Work Order - New{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2">
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <div class="bg-gray-100 px-4 py-2 mb-4">
+            <strong class="fontcsswhite">&nbsp;Work Order - New</strong>
+        </div>
+
+        <!-- Search Filter Bar - Mirror of ASP.NET -->
+        <div class="mb-4 flex items-center gap-3" x-data="{ searchType: '0', searchValue: '', enqValue: '' }">
+            <!-- Search Type Dropdown -->
+            <select x-model="searchType"
+                    @change="searchValue=''; enqValue=''"
+                    class="w-52 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    id="search-type">
+                <option value="0">Customer Name</option>
+                <option value="1">Enquiry No</option>
+                <option value="2">PO No</option>
+            </select>
+
+            <!-- Customer Name Autocomplete (shown when searchType = 0) -->
+            <input type="text"
+                   x-show="searchType === '0'"
+                   x-model="searchValue"
+                   class="w-96 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   placeholder="Search customer name..."
+                   id="search-customer"
+                   hx-get="{% url 'sales_distribution:workorder-po-search-results' %}"
+                   hx-trigger="input changed delay:500ms, search"
+                   hx-target="#workorder-po-table"
+                   hx-swap="innerHTML"
+                   hx-include="[name='search_type']">
+
+            <!-- Enquiry/PO Number Text Input (shown when searchType = 1 or 2) -->
+            <input type="text"
+                   x-show="searchType !== '0'"
+                   x-model="enqValue"
+                   class="w-40 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   :placeholder="searchType === '1' ? 'Enquiry No' : 'PO No'"
+                   id="search-enq"
+                   hx-get="{% url 'sales_distribution:workorder-po-search-results' %}"
+                   hx-trigger="input changed delay:500ms, search"
+                   hx-target="#workorder-po-table"
+                   hx-swap="innerHTML"
+                   hx-include="[name='search_type']">
+
+            <!-- Hidden field to pass search_type to HTMX -->
+            <input type="hidden" name="search_type" :value="searchType">
+
+            <!-- Search Button -->
+            <button type="button"
+                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm"
+                    hx-get="{% url 'sales_distribution:workorder-po-search-results' %}"
+                    hx-target="#workorder-po-table"
+                    hx-swap="innerHTML"
+                    hx-include="#search-customer, #search-enq, [name='search_type']">
+                Search
+            </button>
+
+            {% if messages %}
+                {% for message in messages %}
+                <span class="text-red-700 font-bold ml-3">{{ message }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Results Table - Mirror of ASP.NET GridView -->
+        <div id="workorder-po-table">
+            {% include 'sales_distribution/partials/workorder_po_search_results.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

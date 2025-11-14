@@ -1,0 +1,156 @@
+{% extends "core/base.html" %}
+
+{% block title %}System Administration - Cortex ERP{% endblock %}
+{% block page_title %}System Administration{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Welcome Section -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-sm font-bold text-gray-800 mb-2">System Administration</h2>
+        <p class="text-gray-600">Manage master data, geographic information, and system configuration.</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <!-- Country Card -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded border border-gray-200 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium">Countries</p>
+                    <p class="text-base font-bold mt-2">{{ country_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <a href="{% url 'sys_admin:country-list' %}" class="mt-4 inline-block text-sm text-blue-100 hover:text-white">
+                Manage Countries →
+            </a>
+        </div>
+
+        <!-- State Card -->
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded border border-gray-200 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-medium">States</p>
+                    <p class="text-base font-bold mt-2">{{ state_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                </svg>
+            </div>
+            <a href="{% url 'sys_admin:state-list' %}" class="mt-4 inline-block text-sm text-green-100 hover:text-white">
+                Manage States →
+            </a>
+        </div>
+
+        <!-- City Card -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded border border-gray-200 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-purple-100 text-sm font-medium">Cities</p>
+                    <p class="text-base font-bold mt-2">{{ city_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+            </div>
+            <a href="{% url 'sys_admin:city-list' %}" class="mt-4 inline-block text-sm text-purple-100 hover:text-white">
+                Manage Cities →
+            </a>
+        </div>
+
+        <!-- Financial Year Card -->
+        <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded border border-gray-200 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm font-medium">Financial Years</p>
+                    <p class="text-base font-bold mt-2">{{ financial_year_count }}</p>
+                </div>
+                <svg class="w-12 h-12 text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+           <a href="{% url 'sys_admin:financial_year_list' %}" class="mt-4 inline-block text-sm text-orange-100 hover:text-white">
+               Manage Financial Years →
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="{% url 'sys_admin:country-list' %}" class="flex items-center p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-300 transition">
+                <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <p class="font-medium text-gray-800">Country Master</p>
+                    <p class="text-sm text-gray-600">Manage countries</p>
+                </div>
+            </a>
+
+            <a href="{% url 'sys_admin:state-list' %}" class="flex items-center p-4 border border-gray-200 rounded hover:bg-green-50 hover:border-green-300 transition">
+                <svg class="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                </svg>
+                <div>
+                    <p class="font-medium text-gray-800">State Master</p>
+                    <p class="text-sm text-gray-600">Manage states</p>
+                </div>
+            </a>
+
+            <a href="{% url 'sys_admin:city-list' %}" class="flex items-center p-4 border border-gray-200 rounded hover:bg-purple-50 hover:border-purple-300 transition">
+                <svg class="w-8 h-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <div>
+                    <p class="font-medium text-gray-800">City Master</p>
+                    <p class="text-sm text-gray-600">Manage cities</p>
+                </div>
+            </a>
+
+            <a href="#" class="flex items-center p-4 border border-gray-200 rounded hover:bg-orange-50 hover:border-orange-300 transition">
+                <svg class="w-8 h-8 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <div>
+                    <p class="font-medium text-gray-800">Financial Year</p>
+                    <p class="text-sm text-gray-600">Manage fiscal years</p>
+                </div>
+            </a>
+
+            <a href="#" class="flex items-center p-4 border border-gray-200 rounded hover:bg-red-50 hover:border-red-300 transition">
+                <svg class="w-8 h-8 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <div>
+                    <p class="font-medium text-gray-800">Role Management</p>
+                    <p class="text-sm text-gray-600">Manage user roles</p>
+                </div>
+            </a>
+
+            <a href="#" class="flex items-center p-4 border border-gray-200 rounded hover:bg-indigo-50 hover:border-indigo-300 transition">
+                <svg class="w-8 h-8 text-indigo-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <div>
+                    <p class="font-medium text-gray-800">System Settings</p>
+                    <p class="text-sm text-gray-600">Configure system</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

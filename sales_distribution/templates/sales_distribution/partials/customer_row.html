@@ -1,0 +1,37 @@
+<tr id="customer-{{ customer.salesid }}" class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors cursor-pointer group">
+    <td class="w-12 px-3 py-2 text-xs text-gray-600">
+        {{ forloop.counter }}
+    </td>
+    <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ customer.sysdate|default:"-" }}
+    </td>
+    <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+        title="{{ customer.finyear_name|default:'' }}">
+        {{ customer.finyear_name|default:"-" }}
+    </td>
+    <td class="w-32 px-3 py-2 text-xs font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ customer.customerid|default:"-" }}
+    </td>
+    <td class="w-48 px-3 py-2 text-xs whitespace-nowrap overflow-hidden text-ellipsis" 
+        title="{{ customer.customername|default:'' }}">
+        <a href="{% url 'sales_distribution:customer-detail' customer.salesid %}"
+           class="text-sap-blue hover:text-sap-blue-dark hover:underline font-medium transition-colors">
+            {{ customer.customername|default:"-" }}
+        </a>
+    </td>
+    <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ customer.contactno|default:"-" }}
+    </td>
+    <td class="w-32 px-3 py-2 text-xs text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis" 
+        title="{{ customer.generated_by|default:'' }}">
+        {{ customer.generated_by|default:"-" }}
+    </td>
+</tr>
+
+
+
+
+
+
+
+

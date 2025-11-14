@@ -1,0 +1,105 @@
+{% extends "core/base.html" %}
+
+{% block title %}Customer Enquiry - Cortex ERP{% endblock %}
+{% block page_title %}Customer Enquiry{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between mb-2">
+        <!-- Search Input -->
+        <div class="relative">
+            <input type="text" name="search" value="{{ search_query }}"
+                placeholder="Search..."
+                hx-get="{% url 'sales_distribution:enquiry-list' %}"
+                hx-trigger="input changed delay:500ms, search"
+                hx-target="#enquiry-table"
+                hx-include="[name='search']"
+                class="h-8 w-56 pl-8 pr-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue" />
+            <svg class="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+
+        <!-- Create Button -->
+        <a href="{% url 'sales_distribution:enquiry-create' %}"
+            class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-dark focus:outline-none focus:ring-2 focus:ring-sap-blue/30 transition-colors">
+            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Create
+        </a>
+    </div>
+
+    <!-- SAP Fiori Table -->
+    <div id="enquiry-table" class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-12 px-3 py-2 text-left text-xs font-semibold text-gray-700">SN</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Fin Year</th>
+                        <th class="w-48 px-3 py-2 text-left text-xs font-semibold text-gray-700">Customer</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Code</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Enquiry No.</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Gen. Date</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Gen. By</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for enquiry in enquiries %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors cursor-pointer group">
+                        <td class="w-12 px-3 py-2 text-xs text-gray-600">{{ forloop.counter }}</td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">{{ enquiry.finyear_name|default:"-" }}</td>
+                        <td class="w-48 px-3 py-2 text-xs whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ enquiry.customername|default:'' }}">
+                            <a href="{% url 'sales_distribution:enquiry-detail' enquiry.enqid %}"
+                               class="text-sap-blue hover:text-sap-blue-dark hover:underline font-medium transition-colors">
+                                {{ enquiry.customername|default:"-" }}
+                            </a>
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {% if enquiry.customerid %}
+                                {% if enquiry.customerid|slice:":8" == "ENQ-CUST" %}
+                                    {{ enquiry.customerid|slice:"8:" }}
+                                {% else %}
+                                    {{ enquiry.customerid }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">{{ enquiry.enqid }}</td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">{{ enquiry.sysdate }}</td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ enquiry.generated_by|default:'' }}">
+                            {{ enquiry.generated_by|default:"-" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    {% include 'core/components/empty_state.html' with
+                        in_table=True
+                        colspan=7
+                        icon_path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        title="No enquiries found"
+                        message="Get started by creating a new enquiry"
+                        action_url='sales_distribution:enquiry-create'
+                        action_text="Create Enquiry"
+                    %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'core/components/tables/pagination.html' with page_obj=page_obj is_paginated=is_paginated htmx_enabled=True htmx_target="#enquiry-table" %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

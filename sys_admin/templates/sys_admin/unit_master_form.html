@@ -1,0 +1,89 @@
+{% extends "core/base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Unit - Cortex ERP{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Unit{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">
+                    {% if form.instance.pk %}Edit Unit{% else %}Add New Unit{% endif %}
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">
+                    {% if form.instance.pk %}Update unit information{% else %}Enter unit details{% endif %}
+                </p>
+            </div>
+            <a href="{% url 'sys_admin:unit-master-list' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md transition-colors">
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form method="post" class="bg-white rounded border border-gray-200 p-6">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            <!-- Unit Name -->
+            <div class="space-y-2">
+                <label for="{{ form.unitname.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Unit Name <span class="text-red-500">*</span>
+                </label>
+                {{ form.unitname }}
+                {% if form.unitname.errors %}
+                <p class="text-red-500 text-sm">{{ form.unitname.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Symbol -->
+            <div class="space-y-2">
+                <label for="{{ form.symbol.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Symbol <span class="text-red-500">*</span>
+                </label>
+                {{ form.symbol }}
+                {% if form.symbol.errors %}
+                <p class="text-red-500 text-sm">{{ form.symbol.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Effect On Invoice -->
+            <div class="space-y-2">
+                <div class="flex items-center space-x-2">
+                    {{ form.effectoninvoice }}
+                    <label for="{{ form.effectoninvoice.id_for_label }}" class="text-sm text-gray-700">
+                        Effect On Invoice
+                    </label>
+                </div>
+                <p class="text-gray-500 text-xs">Check if this unit affects invoice calculations</p>
+                {% if form.effectoninvoice.errors %}
+                <p class="text-red-500 text-sm">{{ form.effectoninvoice.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex gap-4 justify-end mt-6 pt-6 border-t">
+            <a href="{% url 'sys_admin:unit-master-list' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                Cancel
+            </a>
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                {% if form.instance.pk %}Update{% else %}Create{% endif %} Unit
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

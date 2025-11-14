@@ -1,0 +1,196 @@
+{% extends "core/base.html" %}
+
+{% block title %}OnSite Attendance - Print - Cortex ERP{% endblock %}
+{% block page_title %}OnSite Attendance - Print{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <h2 class="text-sm font-semibold text-gray-800">Onsite Attendance Report</h2>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="grid grid-cols-6 gap-3">
+                <!-- Year -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Year:</label>
+                    <select name="year"
+                            id="year-select"
+                            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select</option>
+                        {% for fy in financial_years %}
+                        <option value="{{ fy.finyearid }}" {% if selected_year == fy.finyearid|stringformat:"s" %}selected{% endif %}>
+                            {{ fy.finyear }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Month -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Month:</label>
+                    <select name="month"
+                            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="0">Select</option>
+                        <option value="1" {% if selected_month == "1" %}selected{% endif %}>January</option>
+                        <option value="2" {% if selected_month == "2" %}selected{% endif %}>February</option>
+                        <option value="3" {% if selected_month == "3" %}selected{% endif %}>March</option>
+                        <option value="4" {% if selected_month == "4" %}selected{% endif %}>April</option>
+                        <option value="5" {% if selected_month == "5" %}selected{% endif %}>May</option>
+                        <option value="6" {% if selected_month == "6" %}selected{% endif %}>June</option>
+                        <option value="7" {% if selected_month == "7" %}selected{% endif %}>July</option>
+                        <option value="8" {% if selected_month == "8" %}selected{% endif %}>August</option>
+                        <option value="9" {% if selected_month == "9" %}selected{% endif %}>September</option>
+                        <option value="10" {% if selected_month == "10" %}selected{% endif %}>October</option>
+                        <option value="11" {% if selected_month == "11" %}selected{% endif %}>November</option>
+                        <option value="12" {% if selected_month == "12" %}selected{% endif %}>December</option>
+                    </select>
+                </div>
+
+                <!-- From Date -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">From Date:</label>
+                    <input type="text"
+                           name="from_date"
+                           value="{{ from_date }}"
+                           placeholder="DD-MM-YYYY"
+                           class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- To Date -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">To Date:</label>
+                    <input type="text"
+                           name="to_date"
+                           value="{{ to_date }}"
+                           placeholder="DD-MM-YYYY"
+                           class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- Employee Name -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Employee Name:</label>
+                    <input type="text"
+                           name="employee_name"
+                           value="{{ employee_name }}"
+                           placeholder="Employee Name..."
+                           class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <!-- BG Group -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">BG Group:</label>
+                    <select name="bg_group"
+                            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Select">Select</option>
+                        {% for bg in bg_groups %}
+                        <option value="{{ bg.id }}" {% if bg_group == bg.id|stringformat:"s" %}selected{% endif %}>{{ bg.symbol }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <button type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors inline-flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Report Data -->
+    {% if report_data %}
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="w-[4%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                        <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Date</th>
+                        <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Employee ID</th>
+                        <th class="w-[18%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Employee Name</th>
+                        <th class="w-[8%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Shift</th>
+                        <th class="w-[8%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Status</th>
+                        <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Site Location</th>
+                        <th class="w-[10%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">From Time</th>
+                        <th class="w-[10%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">To Time</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for att in report_data %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900 text-right">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                            {{ att.onsitedate }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                            {{ att.empid }}
+                        </td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900">
+                            <!-- Employee name would need to be fetched from HR model -->
+                            {{ att.empid }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-center">
+                            {% if att.shift == 0 %}Day{% else %}Night{% endif %}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-center">
+                            {% if att.status == 0 %}Present{% else %}Absent{% endif %}
+                        </td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900">
+                            {{ att.onsite }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-center">
+                            {{ att.fromtime }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-center">
+                            {{ att.totime }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+                Showing <span class="font-medium">{{ report_data|length }}</span> records
+            </div>
+            <button type="button"
+                    onclick="window.print()"
+                    class="px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+                Print Report
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="mt-4 text-center">
+        <a href="{% url 'project_management:dashboard' %}"
+           class="inline-flex items-center px-6 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

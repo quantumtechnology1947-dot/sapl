@@ -1,0 +1,24 @@
+<tr id="country-{{ country.cid }}" class="hover:bg-gray-50 transition-colors" data-row-id="{{ country.cid }}">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 row-sn">{{ forloop.counter }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ country.countryname }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ country.currency|default:"-" }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ country.symbol|default:"-" }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button hx-get="{% url 'sys_admin:country-edit' country.cid %}"
+                hx-target="#country-{{ country.cid }}"
+                hx-swap="outerHTML"
+                hx-confirm="Are you sure you want to Update this record?"
+                hx-on::after-request="recalculateRowNumbers()"
+                class="text-blue-600 hover:text-blue-900 transition">
+            Edit
+        </button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

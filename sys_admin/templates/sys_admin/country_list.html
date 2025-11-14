@@ -1,0 +1,73 @@
+{% extends "core/base.html" %}
+
+{% block title %}Country Master - Cortex ERP{% endblock %}
+{% block page_title %}Country Master{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="flex items-center justify-between mb-2">
+        <div class="relative">
+            <input type="text" 
+                   name="search"
+                   value="{{ search_query }}"
+                   placeholder="Search countries..."
+                   hx-get="{% url 'sys_admin:country-list' %}"
+                   hx-trigger="input changed delay:500ms"
+                   hx-target="#country-table"
+                   hx-include="[name='search']"
+                   class="h-8 w-56 pl-8 pr-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue" />
+            <svg class="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+
+        <button hx-get="{% url 'sys_admin:country-create' %}"
+                hx-target="#country-form"
+                hx-swap="innerHTML"
+                class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Country
+        </button>
+    </div>
+    
+    <div id="country-form" class="mb-4"></div>
+    
+    <div id="country-table">
+        {% include 'sys_admin/partials/country_list_partial.html' %}
+    </div>
+</div>
+
+<!-- HTMX CSRF Configuration -->
+<script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+
+    // Recalculate row numbers after HTMX updates
+    function recalculateRowNumbers() {
+        const rows = document.querySelectorAll('table tbody tr[data-row-id]');
+        rows.forEach((row, index) => {
+            const snCell = row.querySelector('.row-sn');
+            if (snCell) {
+                snCell.textContent = index + 1;
+            }
+        });
+    }
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', recalculateRowNumbers);
+
+    // Run after any HTMX swap
+    document.body.addEventListener('htmx:afterSwap', recalculateRowNumbers);
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,77 @@
+{% comment %}
+Component: Form Section
+Purpose: Collapsible section container for grouping related form fields
+Parameters:
+  - title (required): Section header text
+  - subtitle (optional): Descriptive text below title
+  - collapsible (optional): Boolean to enable collapse/expand functionality (default: False)
+  - collapsed (optional): Boolean to start in collapsed state (default: False)
+  - no_margin (optional): Boolean to remove bottom margin (default: False)
+  - section_id (optional): Unique ID for the section (required if collapsible=True)
+Usage:
+  {% include 'core/components/forms/form_section.html' with
+    title="Basic Information"
+    subtitle="Enter customer details"
+    collapsible=True
+    section_id="basic-info"
+  %}
+    <div>Your form fields here</div>
+  {% endinclude %}
+{% endcomment %}
+
+<div class="bg-white border border-gray-200 rounded {% if not no_margin %}mb-4{% endif %}">
+    {% if title %}
+    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 {% if collapsible %}cursor-pointer hover:bg-gray-100 transition-colors{% endif %}"
+         {% if collapsible %}
+         onclick="toggleSection('{% if section_id %}{{ section_id }}{% else %}section{% endif %}')"
+         {% endif %}>
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+                <h3 class="text-sm font-semibold text-gray-700">{{ title }}</h3>
+                {% if subtitle %}
+                <p class="text-xs text-gray-500 mt-1">{{ subtitle }}</p>
+                {% endif %}
+            </div>
+            {% if collapsible %}
+            <svg id="{% if section_id %}{{ section_id }}{% else %}section{% endif %}-icon" 
+                 class="w-5 h-5 text-gray-500 transition-transform {% if collapsed %}rotate-180{% endif %}" 
+                 fill="none" 
+                 stroke="currentColor" 
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div id="{% if section_id %}{{ section_id }}{% else %}section{% endif %}-content" 
+         class="p-4 {% if collapsed %}hidden{% endif %}">
+        {% block section_content %}{% endblock %}
+    </div>
+</div>
+
+{% if collapsible %}
+<script>
+function toggleSection(sectionId) {
+    const content = document.getElementById(sectionId + '-content');
+    const icon = document.getElementById(sectionId + '-icon');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.remove('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        icon.classList.add('rotate-180');
+    }
+}
+</script>
+{% endif %}
+
+
+
+
+
+
+
+

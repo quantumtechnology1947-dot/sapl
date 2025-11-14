@@ -1,0 +1,310 @@
+<!-- Tax & Charges Tab Content -->
+<div class="space-y-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Tax and Additional Charges</h3>
+
+    <!-- Additional Charges -->
+    <div class="bg-gray-50 rounded p-6">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">Additional Charges</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="id_freight_charges" class="block text-sm font-medium text-gray-700 mb-1">
+                    Freight Charges
+                </label>
+                {{ form.freight_charges }}
+                {% if form.freight_charges.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.freight_charges.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_packing_charges" class="block text-sm font-medium text-gray-700 mb-1">
+                    Packing & Forwarding Charges
+                </label>
+                {{ form.packing_charges }}
+                {% if form.packing_charges.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.packing_charges.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_insurance_charges" class="block text-sm font-medium text-gray-700 mb-1">
+                    Insurance Charges
+                </label>
+                {{ form.insurance_charges }}
+                {% if form.insurance_charges.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.insurance_charges.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_other_charges" class="block text-sm font-medium text-gray-700 mb-1">
+                    Other Charges
+                </label>
+                {{ form.other_charges }}
+                {% if form.other_charges.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.other_charges.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="id_discount_amount" class="block text-sm font-medium text-gray-700 mb-1">
+                    Discount Amount
+                </label>
+                {{ form.discount_amount }}
+                {% if form.discount_amount.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.discount_amount.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Information -->
+    <div class="bg-gray-50 rounded p-6">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">Tax Details</h4>
+        
+        <!-- Tax Type Selection -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tax Type</label>
+            <div class="flex space-x-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" 
+                           name="tax_type" 
+                           value="cgst_sgst" 
+                           class="h-4 w-4 text-sap-blue border-gray-300 focus:ring-sap-blue text-blue-600"
+                           onchange="toggleTaxFields('cgst_sgst')"
+                           checked>
+                    <span class="ml-2 text-sm text-gray-700">CGST + SGST (Intra-state)</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" 
+                           name="tax_type" 
+                           value="igst" 
+                           class="h-4 w-4 text-sap-blue border-gray-300 focus:ring-sap-blue text-blue-600"
+                           onchange="toggleTaxFields('igst')">
+                    <span class="ml-2 text-sm text-gray-700">IGST (Inter-state)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- CGST -->
+            <div id="cgst-field">
+                <label for="id_cgst_rate" class="block text-sm font-medium text-gray-700 mb-1">
+                    CGST Rate (%)
+                </label>
+                {{ form.cgst_rate }}
+                {% if form.cgst_rate.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.cgst_rate.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-gray-500 mt-1">
+                    Amount: <span id="cgst-amount" class="font-medium">₹0.00</span>
+                </p>
+            </div>
+
+            <!-- SGST -->
+            <div id="sgst-field">
+                <label for="id_sgst_rate" class="block text-sm font-medium text-gray-700 mb-1">
+                    SGST Rate (%)
+                </label>
+                {{ form.sgst_rate }}
+                {% if form.sgst_rate.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.sgst_rate.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-gray-500 mt-1">
+                    Amount: <span id="sgst-amount" class="font-medium">₹0.00</span>
+                </p>
+            </div>
+
+            <!-- IGST -->
+            <div id="igst-field" class="hidden">
+                <label for="id_igst_rate" class="block text-sm font-medium text-gray-700 mb-1">
+                    IGST Rate (%)
+                </label>
+                {{ form.igst_rate }}
+                {% if form.igst_rate.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.igst_rate.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-gray-500 mt-1">
+                    Amount: <span id="igst-amount" class="font-medium">₹0.00</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Tax Summary -->
+        <div class="mt-4 p-4 bg-white rounded border border-gray-200">
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-medium text-gray-700">Total Tax Amount:</span>
+                <span class="text-lg font-bold text-blue-600" id="total-tax-amount">₹0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calculation Summary -->
+    <div class="bg-blue-50 rounded p-6">
+        <h4 class="text-md font-semibold text-gray-800 mb-4">Invoice Calculation</h4>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-gray-700">Line Items Subtotal:</span>
+                <span class="font-medium" id="calc-subtotal">₹0.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Additional Charges:</span>
+                <span class="font-medium text-green-600" id="calc-charges">+₹0.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Discount:</span>
+                <span class="font-medium text-red-600" id="calc-discount">-₹0.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Taxable Amount:</span>
+                <span class="font-medium" id="calc-taxable">₹0.00</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-700">Total Tax:</span>
+                <span class="font-medium text-blue-600" id="calc-tax">+₹0.00</span>
+            </div>
+            <div class="flex justify-between pt-2 border-t border-blue-200">
+                <span class="text-gray-900 font-semibold">Grand Total:</span>
+                <span class="text-xl font-bold text-blue-600" id="calc-grand-total">₹0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Text -->
+    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 mr-2 mt-1"></i>
+            <div class="text-sm text-blue-800">
+                <p class="font-medium mb-1">Tax Calculation:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Use CGST + SGST for intra-state transactions (within same state)</li>
+                    <li>Use IGST for inter-state transactions (between different states)</li>
+                    <li>Tax is calculated on: Subtotal + Charges - Discount</li>
+                    <li>All amounts will be calculated automatically as you enter values</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle tax fields based on selection
+    function toggleTaxFields(taxType) {
+        const cgstField = document.getElementById('cgst-field');
+        const sgstField = document.getElementById('sgst-field');
+        const igstField = document.getElementById('igst-field');
+        
+        const cgstInput = document.getElementById('id_cgst_rate');
+        const sgstInput = document.getElementById('id_sgst_rate');
+        const igstInput = document.getElementById('id_igst_rate');
+        
+        if (taxType === 'cgst_sgst') {
+            cgstField.classList.remove('hidden');
+            sgstField.classList.remove('hidden');
+            igstField.classList.add('hidden');
+            
+            cgstInput.disabled = false;
+            sgstInput.disabled = false;
+            igstInput.disabled = true;
+            igstInput.value = '0';
+        } else {
+            cgstField.classList.add('hidden');
+            sgstField.classList.add('hidden');
+            igstField.classList.remove('hidden');
+            
+            cgstInput.disabled = true;
+            sgstInput.disabled = true;
+            igstInput.disabled = false;
+            cgstInput.value = '0';
+            sgstInput.value = '0';
+        }
+        
+        calculateTotals();
+    }
+    
+    // Calculate totals
+    function calculateTotals() {
+        // Get subtotal from line items
+        const subtotalText = document.getElementById('line-items-subtotal')?.textContent || '₹0.00';
+        const subtotal = parseFloat(subtotalText.replace('₹', '').replace(',', '')) || 0;
+        
+        // Get charges
+        const freight = parseFloat(document.getElementById('id_freight_charges')?.value) || 0;
+        const packing = parseFloat(document.getElementById('id_packing_charges')?.value) || 0;
+        const insurance = parseFloat(document.getElementById('id_insurance_charges')?.value) || 0;
+        const other = parseFloat(document.getElementById('id_other_charges')?.value) || 0;
+        const discount = parseFloat(document.getElementById('id_discount_amount')?.value) || 0;
+        
+        const totalCharges = freight + packing + insurance + other;
+        
+        // Calculate taxable amount
+        const taxableAmount = subtotal + totalCharges - discount;
+        
+        // Get tax rates
+        const cgstRate = parseFloat(document.getElementById('id_cgst_rate')?.value) || 0;
+        const sgstRate = parseFloat(document.getElementById('id_sgst_rate')?.value) || 0;
+        const igstRate = parseFloat(document.getElementById('id_igst_rate')?.value) || 0;
+        
+        // Calculate tax amounts
+        const cgstAmount = (taxableAmount * cgstRate) / 100;
+        const sgstAmount = (taxableAmount * sgstRate) / 100;
+        const igstAmount = (taxableAmount * igstRate) / 100;
+        
+        const totalTax = cgstAmount + sgstAmount + igstAmount;
+        
+        // Calculate grand total
+        const grandTotal = taxableAmount + totalTax;
+        
+        // Update displays
+        document.getElementById('cgst-amount').textContent = '₹' + cgstAmount.toFixed(2);
+        document.getElementById('sgst-amount').textContent = '₹' + sgstAmount.toFixed(2);
+        document.getElementById('igst-amount').textContent = '₹' + igstAmount.toFixed(2);
+        document.getElementById('total-tax-amount').textContent = '₹' + totalTax.toFixed(2);
+        
+        document.getElementById('calc-subtotal').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('calc-charges').textContent = '+₹' + totalCharges.toFixed(2);
+        document.getElementById('calc-discount').textContent = '-₹' + discount.toFixed(2);
+        document.getElementById('calc-taxable').textContent = '₹' + taxableAmount.toFixed(2);
+        document.getElementById('calc-tax').textContent = '+₹' + totalTax.toFixed(2);
+        document.getElementById('calc-grand-total').textContent = '₹' + grandTotal.toFixed(2);
+        
+        // Update summary displays
+        document.getElementById('freight-display').textContent = '₹' + freight.toFixed(2);
+        document.getElementById('packing-display').textContent = '₹' + packing.toFixed(2);
+        document.getElementById('insurance-display').textContent = '₹' + insurance.toFixed(2);
+        document.getElementById('other-display').textContent = '₹' + other.toFixed(2);
+        document.getElementById('discount-display').textContent = '-₹' + discount.toFixed(2);
+        document.getElementById('cgst-display').textContent = '₹' + cgstAmount.toFixed(2);
+        document.getElementById('sgst-display').textContent = '₹' + sgstAmount.toFixed(2);
+        document.getElementById('igst-display').textContent = '₹' + igstAmount.toFixed(2);
+        document.getElementById('total-display').textContent = '₹' + grandTotal.toFixed(2);
+    }
+    
+    // Add event listeners for real-time calculation
+    document.addEventListener('DOMContentLoaded', function() {
+        const chargeFields = [
+            'id_freight_charges', 'id_packing_charges', 'id_insurance_charges',
+            'id_other_charges', 'id_discount_amount',
+            'id_cgst_rate', 'id_sgst_rate', 'id_igst_rate'
+        ];
+        
+        chargeFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('input', calculateTotals);
+                field.addEventListener('change', calculateTotals);
+            }
+        });
+        
+        // Initial calculation
+        calculateTotals();
+    });
+</script>
+
+
+
+
+
+
+
+

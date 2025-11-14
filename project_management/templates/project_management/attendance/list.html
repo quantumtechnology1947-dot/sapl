@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block title %}OnSite Attendance{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between"><div><h2 class="text-sm font-bold">OnSite Attendance</h2></div>
+<a href="{% url 'project_management:attendance-create' %}" class="bg-orange-600 text-white px-4 py-2 rounded">+ Record Attendance</a></div>
+<div class="bg-white rounded border border-gray-200 overflow-hidden">
+<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50">
+<tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Shift</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr></thead>
+<tbody class="bg-white divide-y divide-gray-200">
+{% for att in attendances %}<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">{{ att.empid }}</td>
+<td class="px-6 py-4 whitespace-nowrap">{{ att.onsitedate }}</td>
+<td class="px-6 py-4 whitespace-nowrap">{{ att.shift_display }}</td>
+<td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full {% if att.status == 1 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ att.status_display }}</span></td>
+<td class="px-6 py-4 space-x-2"><a href="{% url 'project_management:attendance-detail' att.id %}" class="text-orange-600">View</a>
+<a href="{% url 'project_management:attendance-update' att.id %}" class="text-blue-600">Edit</a></td></tr>
+{% empty %}<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No attendance records</td></tr>
+{% endfor %}</tbody></table></div>
+{% endblock %}
+
+
+
+
+
+
+
+

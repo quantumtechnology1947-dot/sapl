@@ -1,0 +1,31 @@
+﻿Id,Name_Proj,Wo_No,No_Fix_Rqu,Des_Lea,Des_Mem,Sr_No,Name_Act,Rev_No,No_Days,As_Plan_From,As_Plan_To,Ac_From
+1,s,s,s,s,s,A,DAP DATE WITH CUSTOMER,s,s,s,s,s
+2,c,c,c,c,cc,1,Fixature /Equipments 1,d,d,d,d,d
+3,d,d,d,d,d,2,Fixature /Equipments 2,v,v,v,v,v
+4,v,v,v,v,v,3,Fixature /Equipments 3,v,v,v,v,v
+5,g,g,g,g,g,4,Fixature /Equipments 4,n,n,n,n,n
+6,g,g,g,g,g,5,Fixature /Equipments 5,b,b,b,b,b
+7,d,d,d,d,d,6,Fixature /Equipments 6,g,g,g,g,g
+8,b,b,b,b,b,B,DESIGN FINALLISATION,j,j,j,j,j
+9,k,k,k,k,k,1,Fixature /Equipments 1,b,b,b,b,b
+10,f,f,f,f,f,2,Fixature /Equipments 2,c,c,c,c,c
+11,t,t,t,t,t,3,Fixature /Equipments 3,h,h,h,h,h
+12,g,g,g,g,g,4,Fixature /Equipments 4,h,h,h,h,h
+13,h,h,h,h,h,5,Fixature /Equipments 5,s,s,s,s,s
+14,gg,g,g,g,g,6,Fixature /Equipments 6,d,d,d,d,d
+15,l,l,l,l,l,C,DETAILINF/BOM/FC/GA,g,g,g,g,g
+16,n,n,n,n,n,1,Fixature /Equipments 1,h,h,h,h,h
+17,b,c,c,c,c,a,ASSEMBLY 1,v,v,v,v,v
+18,v,v,v,v,v,b,ASSEMBLY 2,b,b,b,b,b
+19,n,n,n,n,n,c,ASSEMBLY 3,a,a,a,a,a
+20,d,d,d,d,d,d,ASSEMBLY 4,d,d,d,d,d
+21,n,n,n,n,n,2,Fixature /Equipments 2,k,k,k,k,k
+22,s,s,s,ss,s,a,ASSEMBLY 1,j,j,j,j,j
+23,g,g,g,g,g,b,ASSEMBLY 2,j,j,j,j,j
+24,d,d,d,d,dd,c,ASSEMBLY 3,g,g,g,g,g
+25,gh,h,h,h,h,d,ASSEMBLY 4,g,g,g,g,g
+26,r,r,r,r,rr,3,Fixature /Equipments 3,r,r,r,r,r
+27,d,d,d,d,d,a,ASSEMBLY 1,d,d,d,d,d
+28,b,b,b,b,b,b,ASSEMBLY 2,h,h,h,h,h
+29,k,k,k,k,k,c,ASSEMBLY 3,h,h,h,h,h
+30,f,f,f,f,f,d,ASSEMBLY 4,f,f,f,f,f

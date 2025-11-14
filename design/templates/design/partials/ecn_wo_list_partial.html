@@ -1,0 +1,107 @@
+<div class="overflow-x-auto">
+    <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="w-[5%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Fin Yrs</th>
+                <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">WO No</th>
+                <th class="w-[22%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Customer Name</th>
+                <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Code</th>
+                <th class="w-[27%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Project Title</th>
+                <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Gen. Date</th>
+                <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Gen. By</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for wo in work_orders %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">{{ forloop.counter }}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">{{ wo.FinYear|default:"-" }}</td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                    <a href="{% url 'design:ecn-unlock-detail' wo.WONo %}"
+                       class="text-blue-600 hover:text-blue-900 hover:underline font-medium">
+                        {{ wo.WONo }}
+                    </a>
+                </td>
+                <td class="px-2 py-2 text-[11px] truncate" title="{{ wo.CustomerName }}">
+                    <span class="text-gray-900">{{ wo.CustomerName|default:"-" }}</span>
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">{{ wo.CustomerId|default:"-" }}</td>
+                <td class="px-2 py-2 text-[11px] truncate" title="{{ wo.TaskProjectTitle }}">
+                    <span class="text-gray-900">{{ wo.TaskProjectTitle|default:"-" }}</span>
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">{{ wo.SysDate|default:"-" }}</td>
+                <td class="px-2 py-2 text-[11px] truncate" title="{{ wo.EmployeeName }}">
+                    <span class="text-gray-600">{{ wo.EmployeeName|default:"-" }}</span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-6 py-16 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No work orders found</h3>
+                    <p class="mt-1 text-sm text-gray-500">No work orders with pending ECN to display.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+    <div class="flex-1 flex justify-between sm:hidden">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+        </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+        </a>
+        {% endif %}
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-gray-700">
+                Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{ page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+            </p>
+        </div>
+        <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    Previous
+                </a>
+                {% endif %}
+
+                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    Next
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+
+

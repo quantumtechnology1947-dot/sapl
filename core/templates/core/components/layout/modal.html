@@ -1,0 +1,97 @@
+{% comment %}
+Component: Modal
+Purpose: Reusable modal dialog with multiple size options and HTMX integration
+Parameters:
+  - id (required): Unique identifier for the modal
+  - title (optional): Modal title text
+  - size (optional): Modal size - 'sm', 'md' (default), 'lg', 'xl'
+  - show_footer (optional): Boolean to show/hide footer (default: false)
+  - htmx_target (optional): HTMX target selector for dynamic content
+Usage:
+  {% include 'core/components/layout/modal.html' with
+    id="myModal"
+    title="Modal Title"
+    size="lg"
+    show_footer=True
+  %}
+Requirements: 5.4, 11.1, 11.2
+{% endcomment %}
+
+{% load static %}
+
+<div id="{{ id|default:'modal' }}" 
+     class="fixed inset-0 z-50 hidden overflow-y-auto"
+     x-data="{ open: false }"
+     x-show="open"
+     x-cloak
+     @keydown.escape.window="open = false"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="{{ id|default:'modal' }}-title">
+    
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity"
+         @click="open = false"
+         aria-hidden="true"></div>
+    
+    <!-- Modal Panel -->
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative bg-white rounded shadow-xl 
+                    {% if size == 'sm' %}max-w-md
+                    {% elif size == 'lg' %}max-w-2xl
+                    {% elif size == 'xl' %}max-w-4xl
+                    {% else %}max-w-lg{% endif %} 
+                    w-full transform transition-all"
+             @click.away="open = false">
+            
+            <!-- Header - Compact h-12 -->
+            <div class="flex items-center justify-between px-4 h-12 border-b border-gray-200">
+                <h3 id="{{ id|default:'modal' }}-title" class="text-sm font-semibold text-gray-900">{{ title|default:"Modal" }}</h3>
+                <button type="button" 
+                        @click="open = false"
+                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-sap-blue/30"
+                        aria-label="Close modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="px-4 py-4 {% if htmx_target %}{{ htmx_target }}{% endif %}">
+                {% block modal_content %}
+                    {{ content|default:"" }}
+                {% endblock %}
+            </div>
+            
+            <!-- Footer - Compact h-12 -->
+            {% if show_footer %}
+            <div class="flex items-center justify-end gap-2 px-4 h-12 border-t border-gray-200 bg-gray-50">
+                {% block modal_footer %}
+                <button type="button" 
+                        @click="open = false"
+                        class="inline-flex items-center h-8 px-3 text-xs font-medium rounded 
+                               border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors
+                               focus:outline-none focus:ring-2 focus:ring-sap-blue/30">
+                    Cancel
+                </button>
+                <button type="button"
+                        class="inline-flex items-center h-8 px-3 text-xs font-medium rounded 
+                               bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors
+                               focus:outline-none focus:ring-2 focus:ring-sap-blue/30">
+                    Confirm
+                </button>
+                {% endblock %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+

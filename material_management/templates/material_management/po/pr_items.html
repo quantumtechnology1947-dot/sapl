@@ -1,0 +1,829 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}PO - For PR Items{% endblock %}
+
+{% block content %}
+<style>
+    /* ASP.NET Exact Styling */
+    .po-container {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .header-bar {
+        background: url('/static/images/hdbg.JPG') repeat-x, #4A90E2;
+        color: white;
+        padding: 5px 10px;
+        font-weight: bold;
+        font-size: 11pt;
+        height: 20px;
+        line-height: 20px;
+    }
+    
+    /* Main Form Table */
+    .main-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .form-row {
+        height: 30px;
+    }
+    
+    .form-label {
+        font-weight: bold;
+        padding-right: 10px;
+        white-space: nowrap;
+    }
+    
+    .box3 {
+        border: 1px solid #C5C5C5;
+        padding: 3px 5px;
+        font-size: 11pt;
+        font-family: Arial, sans-serif;
+    }
+    
+    .supplier-textbox {
+        width: 350px;
+    }
+    
+    .ref-dropdown {
+        width: 200px;
+    }
+    
+    .date-input {
+        width: 86px;
+    }
+    
+    .ref-desc-input {
+        width: 105px;
+    }
+    
+    /* ASP.NET AjaxControlToolkit Tab Container */
+    .ajax-tab-container {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .ajax-tab-strip {
+        background: #f0f0f0;
+        border-bottom: 1px solid #ccc;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .ajax-tab {
+        display: inline-block;
+        padding: 6px 15px;
+        background: #e0e0e0;
+        border: 1px solid #ccc;
+        border-bottom: none;
+        cursor: pointer;
+        font-size: 11pt;
+        margin-right: 2px;
+        color: #333;
+    }
+    
+    .ajax-tab.active {
+        background: white;
+        font-weight: bold;
+        border-bottom: 1px solid white;
+        position: relative;
+        top: 1px;
+    }
+    
+    .ajax-tab-body {
+        background: white;
+        border: 1px solid #ccc;
+        border-top: none;
+        padding: 10px;
+        min-height: 340px;
+    }
+    
+    .ajax-tab-panel {
+        display: none !important;
+    }
+
+    .ajax-tab-panel.active {
+        display: block !important;
+    }
+    
+    /* PR Items Tab - Iframe style */
+    .pr-items-iframe {
+        width: 100%;
+        height: 340px;
+        border: none;
+        background: white;
+    }
+    
+    /* Selected Items Tab - Scrollable Panel */
+    .selected-items-panel {
+        width: 100%;
+        height: 340px;
+        overflow: auto;
+        border: 1px solid #ccc;
+        background: white;
+    }
+    
+    .selected-items-grid {
+        width: 150%; /* Wide grid with horizontal scroll */
+        border-collapse: collapse;
+    }
+    
+    .selected-items-grid th {
+        background: #D8D8D8;
+        border: 1px solid #7F7F7F;
+        padding: 4px 6px;
+        font-size: 9pt;
+        font-weight: bold;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    .selected-items-grid td {
+        border: 1px solid #CBCBCB;
+        padding: 3px 5px;
+        font-size: 9pt;
+        white-space: nowrap;
+    }
+    
+    .selected-items-grid tbody tr:nth-child(even) {
+        background: #F0F0F0;
+    }
+    
+    .selected-items-grid a {
+        color: #0000FF;
+        text-decoration: none;
+    }
+    
+    /* Terms & Conditions Tab */
+    .terms-container {
+        width: 100%;
+        height: 340px;
+    }
+    
+    .terms-left {
+        width: 48%;
+        float: left;
+        padding-right: 2%;
+    }
+    
+    .terms-right {
+        width: 48%;
+        float: right;
+        padding-left: 2%;
+    }
+    
+    .terms-row {
+        margin-bottom: 8px;
+    }
+    
+    .terms-label {
+        display: inline-block;
+        width: 120px;
+        font-weight: bold;
+        vertical-align: top;
+    }
+    
+    .terms-dropdown, .terms-textbox {
+        width: 250px;
+    }
+    
+    .terms-textarea {
+        width: 374px;
+        height: 100px;
+        resize: vertical;
+    }
+    
+    /* Footer Buttons */
+    .footer-section {
+        margin-top: 20px;
+        text-align: right;
+        padding: 15px;
+    }
+    
+    .error-indicator {
+        color: red;
+        font-size: 10pt;
+        margin-right: 20px;
+    }
+    
+    .redbox {
+        background: #dc3545;
+        color: white;
+        border: 1px solid #c82333;
+        padding: 6px 20px;
+        cursor: pointer;
+        font-size: 11pt;
+        margin: 0 5px;
+    }
+    
+    .redbox:hover {
+        background: #c82333;
+    }
+    
+    /* Modal for Add Item */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+    
+    .modal-dialog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 2px solid #333;
+        width: 700px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        background: #4A90E2;
+        color: white;
+        padding: 8px 15px;
+        font-weight: bold;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-form-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .modal-form-table td {
+        padding: 5px;
+        vertical-align: top;
+    }
+    
+    .modal-column {
+        width: 33.33%;
+        vertical-align: top;
+    }
+    
+    .modal-label {
+        font-weight: bold;
+        margin-bottom: 3px;
+        display: block;
+    }
+    
+    .modal-input {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .modal-footer {
+        text-align: center;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+    }
+</style>
+
+<table align="left" cellpadding="0" cellspacing="0" style="width: 100%;">
+    <tr>
+        <td align="left" class="header-bar" valign="middle">
+            &nbsp;<b>PO - For PR Items</b>
+        </td>
+    </tr>
+    <tr>
+        <td align="left">
+            <!-- Main Form -->
+            <table class="main-table" cellpadding="3" cellspacing="0">
+                <tr class="form-row">
+                    <td width="10%" class="form-label">Supplier Name</td>
+                    <td width="40%">
+                        <input type="text" id="supplier-name" class="box3 supplier-textbox" 
+                               value="{{ supplier.supplier_name }}" readonly />
+                    </td>
+                    <td width="8%" class="form-label">Reference</td>
+                    <td width="25%">
+                        <select id="reference" class="box3 ref-dropdown">
+                            {% for ref in references %}
+                            <option value="{{ ref.id }}">{{ ref.desc }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td width="17%">
+                        <span class="form-label">Ref. Date</span>
+                        <input type="date" id="ref-date" class="box3 date-input" required />
+                        <span class="error-indicator">*</span>
+                        <input type="text" id="ref-desc" class="box3 ref-desc-input" placeholder="Ref. Desc" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Address</td>
+                    <td colspan="4">
+                        <label>{{ supplier_address }}</label>
+                    </td>
+                </tr>
+            </table>
+            
+            <!-- Tab Container -->
+            <div class="ajax-tab-container">
+                <div class="ajax-tab-strip">
+                    <span class="ajax-tab active" onclick="switchTab('pr-items', this)">PR Items</span>
+                    <span class="ajax-tab" onclick="switchTab('selected-items', this)">Selected Items</span>
+                    <span class="ajax-tab" onclick="switchTab('terms-conditions', this)">Terms & Conditions</span>
+                </div>
+                
+                <div class="ajax-tab-body">
+                    <!-- PR Items Tab -->
+                    <div id="tab-pr-items" class="ajax-tab-panel active">
+                        <iframe id="pr-items-frame" class="pr-items-iframe" 
+                                src="/material-management/po/pr-items-grid/?supplier={{ supplier_code }}"></iframe>
+                    </div>
+                    
+                    <!-- Selected Items Tab -->
+                    <div id="tab-selected-items" class="ajax-tab-panel">
+                        <div class="selected-items-panel">
+                            <table id="selected-items-table" class="selected-items-grid">
+                                <thead>
+                                    <tr>
+                                        <th>Delete</th>
+                                        <th>PR No</th>
+                                        <th>WO No</th>
+                                        <th>Item Code</th>
+                                        <th>Description</th>
+                                        <th>UOM</th>
+                                        <th>Qty</th>
+                                        <th>Rate</th>
+                                        <th>Basic Amt</th>
+                                        <th>Dis %</th>
+                                        <th>Dis Amt</th>
+                                        <th>PF</th>
+                                        <th>Ex/Ser Tax</th>
+                                        <th>VAT</th>
+                                        <th>Taxble Amt</th>
+                                        <th>Total Amt</th>
+                                        <th>Add Desc.</th>
+                                        <th>A/c Head</th>
+                                        <th>Deli Date</th>
+                                        <th>Id</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="selected-items-body">
+                                    <!-- Selected items will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms & Conditions Tab -->
+                    <div id="tab-terms-conditions" class="ajax-tab-panel">
+                        <div class="terms-container">
+                            <div class="terms-left">
+                                <div class="terms-row">
+                                    <span class="terms-label">Payment Terms</span>
+                                    <select id="payment-terms" class="box3 terms-dropdown">
+                                        <option value="">Select...</option>
+                                        {% for term in payment_terms %}
+                                        <option value="{{ term.id }}">{{ term.terms|truncatechars:60 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Freight</span>
+                                    <select id="freight" class="box3 terms-dropdown">
+                                        <option value="">Select...</option>
+                                        {% for term in freight_terms %}
+                                        <option value="{{ term.id }}">{{ term.terms }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Octroi</span>
+                                    <select id="octroi" class="box3 terms-dropdown">
+                                        <option value="">Select...</option>
+                                        {% for term in octroi_terms %}
+                                        <option value="{{ term.id }}">{{ term.terms }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Warrenty</span>
+                                    <select id="warrenty" class="box3 terms-dropdown">
+                                        <option value="">Select...</option>
+                                        {% for term in warrenty_terms %}
+                                        <option value="{{ term.id }}">{{ term.terms }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Insurance</span>
+                                    <input type="text" id="insurance" class="box3 terms-textbox" />
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Remarks</span><br>
+                                    <textarea id="remarks" class="box3" style="width: 381px; height: 50px;"></textarea>
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Terms Text</span><br>
+                                    <textarea id="terms-text" class="box3" style="width: 100%; height: 120px;">{{ default_tc }}</textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="terms-right">
+                                <div class="terms-row">
+                                    <span class="terms-label">Ship To</span><br>
+                                    <textarea id="ship-to" class="box3 terms-textarea">{{ company_address }}</textarea>
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Mode of Dispatch</span>
+                                    <input type="text" id="mode-dispatch" class="box3" style="width: 295px;" />
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Inspection</span>
+                                    <input type="text" id="inspection" class="box3" style="width: 294px;" />
+                                </div>
+                                <div class="terms-row">
+                                    <span class="terms-label">Annexture</span>
+                                    <input type="file" id="annexture" class="box3" />
+                                </div>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer-section">
+                <span class="error-indicator">* for data entry error.</span>
+                <button class="redbox" onclick="generatePO()">Generate PO</button>
+                <button class="redbox" onclick="cancelPO()">Cancel</button>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- Add Item Modal -->
+<div id="add-item-modal" class="modal-overlay">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            Add Item to PO
+        </div>
+        <div class="modal-body">
+            <table class="modal-form-table">
+                <tr>
+                    <td class="modal-column">
+                        <label class="modal-label">PR No</label>
+                        <input type="text" id="modal-pr-no" class="box3 modal-input" readonly />
+                        
+                        <label class="modal-label">PR Qty</label>
+                        <input type="text" id="modal-pr-qty" class="box3 modal-input" readonly />
+                        
+                        <label class="modal-label">WO No</label>
+                        <input type="text" id="modal-wo-no" class="box3 modal-input" readonly />
+                        
+                        <label class="modal-label">Item Code</label>
+                        <input type="text" id="modal-item-code" class="box3 modal-input" readonly />
+                        
+                        <label class="modal-label">Item Description</label>
+                        <textarea id="modal-item-desc" class="box3 modal-input" rows="3"></textarea>
+                    </td>
+                    <td class="modal-column">
+                        <label class="modal-label">Ac Head</label>
+                        <input type="text" id="modal-ac-head" class="box3 modal-input" readonly />
+                        
+                        <label class="modal-label">PO Qty</label>
+                        <input type="number" id="modal-po-qty" class="box3 modal-input" step="0.01" />
+                        
+                        <label class="modal-label">UOM Purch</label>
+                        <input type="text" id="modal-uom" class="box3 modal-input" readonly />
+                        
+                        <label class="modal-label">Rate <a href="#" onclick="showRateRegister(); return false;">Rate Register</a></label>
+                        <input type="number" id="modal-rate" class="box3 modal-input" step="0.01" />
+                        
+                        <label class="modal-label">Discount (%)</label>
+                        <input type="number" id="modal-discount" class="box3 modal-input" step="0.01" value="0" />
+                        
+                        <label class="modal-label">Budget Code</label>
+                        <select id="modal-budget-code" class="box3 modal-input">
+                            <option value="MS0208">MS0208</option>
+                            <option value="MBS0208">MBS0208</option>
+                        </select>
+                        
+                        <label class="modal-label">Additional Desc</label>
+                        <input type="text" id="modal-add-desc" class="box3 modal-input" />
+                    </td>
+                    <td class="modal-column">
+                        <label class="modal-label">P & F</label>
+                        <select id="modal-pf" class="box3 modal-input">
+                            <option value="">NA</option>
+                            <option value="At Actual">At Actual</option>
+                            <option value="Inclusive">Inclusive</option>
+                            <option value="1">1%</option>
+                            <option value="2">2%</option>
+                            <option value="3">3%</option>
+                            <option value="5">5%</option>
+                            <option value="9">9%</option>
+                            <option value="14">14%</option>
+                            <option value="18">18%</option>
+                            <option value="28">28%</option>
+                            <option value="0.5">0.5%</option>
+                            <option value="2.5">2.5%</option>
+                        </select>
+                        
+                        <label class="modal-label">CGST/IGST</label>
+                        <select id="modal-cgst" class="box3 modal-input">
+                            <option value="">NA</option>
+                            <option value="CGST@4%">CGST@4%</option>
+                            <option value="CGST@9%">CGST@9%</option>
+                            <option value="CGST@14%">CGST@14%</option>
+                            <option value="IGST@18%">IGST@18%</option>
+                            <option value="IGST@28%">IGST@28%</option>
+                            <option value="CGST@2.5%">CGST@2.5%</option>
+                            <option value="CGST@6%">CGST@6%</option>
+                            <option value="CGST@1.5%">CGST@1.5%</option>
+                        </select>
+                        
+                        <label class="modal-label">SGST</label>
+                        <select id="modal-sgst" class="box3 modal-input">
+                            <option value="">NA</option>
+                            <option value="0%">0%</option>
+                            <option value="SGST@4%">SGST@4%</option>
+                            <option value="SGST@9%">SGST@9%</option>
+                            <option value="SGST@14%">SGST@14%</option>
+                            <option value="SGST@2.5%">SGST@2.5%</option>
+                            <option value="SGST@6%">SGST@6%</option>
+                            <option value="SGST@1.5%">SGST@1.5%</option>
+                        </select>
+                        
+                        <label class="modal-label">Del. Date</label>
+                        <input type="date" id="modal-del-date" class="box3 modal-input" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="redbox" onclick="addItemToPO()">Add</button>
+            <button class="redbox" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+let currentTab = 'pr-items';
+let selectedItems = [];
+let currentItemData = null;
+
+function switchTab(tab, element) {
+    currentTab = tab;
+
+    // Update tab buttons
+    document.querySelectorAll('.ajax-tab').forEach(t => t.classList.remove('active'));
+    if (element) {
+        element.classList.add('active');
+    }
+
+    // Update tab panels
+    document.querySelectorAll('.ajax-tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+
+    // Load data if needed
+    if (tab === 'selected-items') {
+        loadSelectedItems();
+    }
+}
+
+function showAddItemModal(itemData) {
+    currentItemData = itemData;
+    
+    // Populate modal fields
+    document.getElementById('modal-pr-no').value = itemData.PRNo;
+    document.getElementById('modal-pr-qty').value = itemData.PRQty;
+    document.getElementById('modal-wo-no').value = itemData.WONo || '';
+    document.getElementById('modal-item-code').value = itemData.ItemCode;
+    document.getElementById('modal-item-desc').value = itemData.Description;
+    document.getElementById('modal-ac-head').value = itemData.AcHead || '';
+    document.getElementById('modal-po-qty').value = itemData.RemainQty;
+    document.getElementById('modal-uom').value = itemData.UOM;
+    document.getElementById('modal-rate').value = itemData.Rate || '';
+    document.getElementById('modal-discount').value = '0';
+    document.getElementById('modal-del-date').value = itemData.DelDate || '';
+    
+    document.getElementById('add-item-modal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('add-item-modal').style.display = 'none';
+}
+
+
+function addItemToPO() {
+    if (!confirm('Are you sure you want to Add new record?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('pr_id', currentItemData.Id);
+    formData.append('pr_no', currentItemData.PRNo);
+    formData.append('qty', document.getElementById('modal-po-qty').value);
+    formData.append('rate', document.getElementById('modal-rate').value);
+    formData.append('discount', document.getElementById('modal-discount').value);
+    formData.append('budget_code', document.getElementById('modal-budget-code').value);
+    formData.append('pf', document.getElementById('modal-pf').value);
+    formData.append('ex_st', document.getElementById('modal-cgst').value);
+    formData.append('vat', document.getElementById('modal-sgst').value);
+    formData.append('del_date', document.getElementById('modal-del-date').value);
+    formData.append('add_desc', document.getElementById('modal-add-desc').value);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+    
+    fetch('/material-management/api/po/add-pr-item/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeModal();
+            // Refresh iframe and selected items
+            document.getElementById('pr-items-frame').src = document.getElementById('pr-items-frame').src;
+            alert('Item added successfully!');
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding item');
+    });
+}
+
+
+function loadSelectedItems() {
+    fetch('/material-management/api/po/selected-pr-items/?supplier={{ supplier_code }}')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('selected-items-body');
+            tbody.innerHTML = '';
+            
+            if (!data.items || data.items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="20" style="text-align: center; padding: 20px;">No items selected</td></tr>';
+                return;
+            }
+            
+            data.items.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td style="text-align: center;"><a href="#" onclick="removeItem(${item.Id}, 'pr'); return false;">Delete</a></td>
+                    <td style="text-align: center;">${item.PRNo || ''}</td>
+                    <td style="text-align: center;">${item.WONo || ''}</td>
+                    <td style="text-align: center;">${item.ItemCode || ''}</td>
+                    <td>${item.PurchDesc || ''}</td>
+                    <td style="text-align: center;">${item.UOMPurch || ''}</td>
+                    <td style="text-align: right;">${formatNumber(item.Qty, 2)}</td>
+                    <td style="text-align: right;">${formatNumber(item.Rate, 2)}</td>
+                    <td style="text-align: right;">${formatNumber(item.BasicAmt, 2)}</td>
+                    <td style="text-align: right;">${formatNumber(item.Discount, 2)}</td>
+                    <td style="text-align: right;">${formatNumber(item.DiscAmt, 2)}</td>
+                    <td>${item.PF || ''}</td>
+                    <td>${item.ExST || ''}</td>
+                    <td>${item.VAT || ''}</td>
+                    <td style="text-align: right;">${formatNumber(item.TaxAmt, 2)}</td>
+                    <td style="text-align: right;">${formatNumber(item.TotalAmt, 2)}</td>
+                    <td>${item.AddDesc || ''}</td>
+                    <td>${item.AcHead || ''}</td>
+                    <td style="text-align: center;">${formatDate(item.SheduleDate)}</td>
+                    <td style="text-align: center;">${item.Id}</td>
+                `;
+            });
+        })
+        .catch(error => console.error('Error loading selected items:', error));
+}
+
+
+function removeItem(itemId, itemType) {
+    if (!confirm('Are you sure you want to remove this item?')) {
+        return;
+    }
+    
+    fetch(`/material-management/api/po/remove-item/${itemId}/${itemType}/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadSelectedItems();
+            // Refresh iframe
+            document.getElementById('pr-items-frame').src = document.getElementById('pr-items-frame').src;
+        } else {
+            alert('Error removing item');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error removing item');
+    });
+}
+
+function generatePO() {
+    if (!confirm('Are you sure you want to generate PO?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('supplier_code', '{{ supplier_code }}');
+    formData.append('pr_spr_flag', '0'); // 0 for PR
+    formData.append('reference', document.getElementById('reference').value);
+    formData.append('reference_date', document.getElementById('ref-date').value);
+    formData.append('reference_desc', document.getElementById('ref-desc').value);
+    formData.append('payment_terms', document.getElementById('payment-terms').value);
+    formData.append('freight', document.getElementById('freight').value);
+    formData.append('octroi', document.getElementById('octroi').value);
+    formData.append('warrenty', document.getElementById('warrenty').value);
+    formData.append('insurance', document.getElementById('insurance').value);
+    formData.append('remarks', document.getElementById('remarks').value);
+    formData.append('tc', document.getElementById('terms-text').value);
+    formData.append('ship_to', document.getElementById('ship-to').value);
+    formData.append('mode_of_dispatch', document.getElementById('mode-dispatch').value);
+    formData.append('inspection', document.getElementById('inspection').value);
+    formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+    
+    const annexture = document.getElementById('annexture').files[0];
+    if (annexture) {
+        formData.append('annexure', annexture);
+    }
+    
+    fetch('/material-management/po/generate/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('PO generated successfully! PO No: ' + data.po_no);
+            window.location.href = '/material-management/po/';
+        } else {
+            alert('Error: ' + (data.error || data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating PO');
+    });
+}
+
+function cancelPO() {
+    if (confirm('Are you sure you want to cancel?')) {
+        window.location.href = '/material-management/po/new/';
+    }
+}
+
+function showRateRegister() {
+    alert('Rate register functionality to be implemented');
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function formatNumber(num, decimals = 0) {
+    if (num === null || num === undefined) return '0';
+    return parseFloat(num).toFixed(decimals);
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
+
+// Set default ref date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('ref-date').value = today;
+});
+</script>
+{% endblock %}

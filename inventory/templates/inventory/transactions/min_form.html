@@ -1,0 +1,135 @@
+{% extends "core/base.html" %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} MIN - Cortex ERP{% endblock %}
+{% block page_title %}Material Issue Note{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-6xl">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} Material Issue Note</h1>
+                <p class="text-sm text-gray-600 mt-1">Issue materials from inventory based on MRS</p>
+            </div>
+            <a href="{% url 'inventory:min-list' %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors">
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="bg-orange-50 border-l-4 border-orange-400 p-4 mb-6 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-orange-700">
+                    <strong>Note:</strong> MIN issues materials from stock. Select a pending MRS to create MIN and reduce stock levels.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- MIN Information -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">MIN Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="id_minno" class="block text-sm font-medium text-gray-700 mb-2">
+                        MIN Number <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.minno }}
+                    {% if auto_min_number %}
+                    <p class="text-xs text-gray-500 mt-1">Auto-generated: {{ auto_min_number }}</p>
+                    {% endif %}
+                    {% if form.minno.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.minno.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label for="id_mrsno" class="block text-sm font-medium text-gray-700 mb-2">
+                        MRS Number <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.mrsno }}
+                    <p class="text-xs text-gray-500 mt-1">Select from pending MRS list</p>
+                    {% if form.mrsno.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.mrsno.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending MRS Link -->
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+            <div class="flex items-center justify-between">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            Need to select an MRS? View the pending MRS list to find requisitions awaiting material issue.
+                        </p>
+                    </div>
+                </div>
+                <a href="{% url 'inventory:mrs-pending-list' %}" 
+                   target="_blank"
+                   class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">
+                    View Pending MRS
+                </a>
+            </div>
+        </div>
+
+        <!-- Form Errors -->
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">{{ form.non_field_errors.0 }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Submit Buttons -->
+        <div class="flex gap-3 justify-end bg-white rounded border border-gray-200 p-6">
+            <a href="{% url 'inventory:min-list' %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {% if object %}Update{% else %}Create{% endif %} MIN
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

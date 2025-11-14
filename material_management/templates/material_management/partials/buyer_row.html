@@ -1,0 +1,43 @@
+<tr id="row-{{ buyer.id }}" class="hover:bg-gray-50">
+    <td class="border border-gray-300 px-2 py-2 text-center w-12">
+        <a href="{% url 'material_management:buyer-update' buyer.id %}"
+           class="text-blue-600 hover:text-blue-800 text-sm underline">
+            Edit
+        </a>
+    </td>
+    <td class="border border-gray-300 px-2 py-2 text-center w-12">
+        <button type="button"
+                hx-delete="{% url 'material_management:buyer-delete' buyer.id %}"
+                hx-target="#row-{{ buyer.id }}"
+                hx-swap="outerHTML"
+                onclick="return confirmationDelete();"
+                hx-on::after-request="if(event.detail.successful) showMessage('Record Deleted', 'success');"
+                class="text-red-600 hover:text-red-800 text-sm underline">
+            Delete
+        </button>
+    </td>
+    <td class="border border-gray-300 px-2 py-2 text-right text-sm w-16">
+        {{ forloop.counter }}
+    </td>
+    <td class="border border-gray-300 px-2 py-2 text-sm w-24">
+        {{ buyer.category }}
+    </td>
+    <td class="border border-gray-300 px-2 py-2 text-sm w-32">
+        {{ buyer.nos }}
+    </td>
+    <td class="border border-gray-300 px-2 py-2 text-sm">
+        {% if buyer.emp %}
+            {{ buyer.emp.employeename }} ({{ buyer.emp.empid }})
+        {% else %}
+            -
+        {% endif %}
+    </td>
+</tr>
+
+
+
+
+
+
+
+

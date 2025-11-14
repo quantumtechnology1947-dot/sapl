@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Details - {{ customer.customername }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white p-6">
+            <h1 class="text-base font-bold">Customer Details</h1>
+            <p class="text-blue-100 mt-1">Complete customer information</p>
+        </div>
+
+        <!-- Print Button -->
+        <div class="p-6 border-b no-print">
+            <button onclick="window.print()" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
+                Print
+            </button>
+            <button onclick="window.close()" 
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md transition-colors ml-2">
+                Close
+            </button>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="p-6 border-b">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Basic Information</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Customer ID</p>
+                    <p class="font-semibold text-gray-900">{{ customer.customerid|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Customer Name</p>
+                    <p class="font-semibold text-gray-900">{{ customer.customername|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Contact Person</p>
+                    <p class="font-semibold text-gray-900">{{ customer.contactperson|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Email</p>
+                    <p class="font-semibold text-gray-900">{{ customer.email|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Contact No</p>
+                    <p class="font-semibold text-gray-900">{{ customer.contactno|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Mobile No</p>
+                    <p class="font-semibold text-gray-900">{{ customer.mobileno|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Fax No</p>
+                    <p class="font-semibold text-gray-900">{{ customer.faxno|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Website</p>
+                    <p class="font-semibold text-gray-900">{{ customer.website|default:"-" }}</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm text-gray-600">GST No</p>
+                    <p class="font-semibold text-gray-900">{{ customer.tincstno|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registered Address -->
+        <div class="p-6 border-b">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Registered Address</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Country</p>
+                    <p class="font-semibold text-gray-900">{{ regd_country_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">State</p>
+                    <p class="font-semibold text-gray-900">{{ regd_state_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">City</p>
+                    <p class="font-semibold text-gray-900">{{ regd_city_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Pin Code</p>
+                    <p class="font-semibold text-gray-900">{{ customer.regdpincode|default:"-" }}</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm text-gray-600">Address</p>
+                    <p class="font-semibold text-gray-900">{{ customer.regdaddress|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Works Address -->
+        <div class="p-6 border-b">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Works Address</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Country</p>
+                    <p class="font-semibold text-gray-900">{{ work_country_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">State</p>
+                    <p class="font-semibold text-gray-900">{{ work_state_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">City</p>
+                    <p class="font-semibold text-gray-900">{{ work_city_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Pin Code</p>
+                    <p class="font-semibold text-gray-900">{{ customer.workpincode|default:"-" }}</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm text-gray-600">Address</p>
+                    <p class="font-semibold text-gray-900">{{ customer.workaddress|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Material Delivery Address -->
+        <div class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Material Delivery Address</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-600">Country</p>
+                    <p class="font-semibold text-gray-900">{{ materialdel_country_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">State</p>
+                    <p class="font-semibold text-gray-900">{{ materialdel_state_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">City</p>
+                    <p class="font-semibold text-gray-900">{{ materialdel_city_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Pin Code</p>
+                    <p class="font-semibold text-gray-900">{{ customer.materialdelpincode|default:"-" }}</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm text-gray-600">Address</p>
+                    <p class="font-semibold text-gray-900">{{ customer.materialdeladdress|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-6 text-center text-sm text-gray-600">
+            <p>Generated on {{ now|date:"d-m-Y H:i:s" }}</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

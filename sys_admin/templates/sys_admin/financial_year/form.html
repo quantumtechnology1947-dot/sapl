@@ -1,0 +1,46 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}Add Financial Year - Cortex ERP{% endblock %}
+{% block page_header %}Add Financial Year{% endblock %}
+{% block form_action %}{% url 'sys_admin:financial-year-create' %}{% endblock %}
+{% block cancel_url %}{% url 'sys_admin:financial-year-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/form_section.html' with title='Year Information' %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include 'core/components/forms/text_input.html' with 
+                name="finyear"
+                label="Financial Year"
+                required=True
+                placeholder="e.g., 2025-2026"
+            %}
+            
+            {% include 'core/components/forms/select_input.html' with 
+                name="status"
+                label="Status"
+                required=True
+                options='<option value="Active">Active</option><option value="Closed">Closed</option>'
+            %}
+            
+            {% include 'core/components/forms/date_input.html' with 
+                name="fromdate"
+                label="From Date"
+                required=True
+            %}
+            
+            {% include 'core/components/forms/date_input.html' with 
+                name="todate"
+                label="To Date"
+                required=True
+            %}
+        </div>
+    {% endinclude %}
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,153 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Work Order Shortage Report - Inventory{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Work Order Shortage Report</h1>
+                <p class="text-sm text-gray-600 mt-1">Material shortages for work orders</p>
+            </div>
+            {% if shortages_data %}
+            <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors">
+                Print Report
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Work Order Selection -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Select Work Order</h2>
+        <form method="get">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Work Order <span class="text-red-500">*</span>
+                    </label>
+                    <select name="work_order_id" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Work Order</option>
+                        {% for wo in work_orders %}
+                        <option value="{{ wo.woid }}" {% if selected_work_order_id == wo.woid %}selected{% endif %}>
+                            {{ wo.wono }} - {{ wo.itemid.itemname|default:"N/A" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if work_order %}
+    <!-- Work Order Details -->
+    <div class="bg-blue-50 rounded p-6 mb-6 border-l-4 border-blue-500">
+        <h3 class="text-lg font-semibold text-blue-900 mb-3">Work Order Details</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <p class="text-sm text-blue-600">WO Number</p>
+                <p class="font-semibold text-blue-900">{{ work_order.wono }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-blue-600">Item</p>
+                <p class="font-semibold text-blue-900">{{ work_order.itemid.itemname|default:"N/A" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-blue-600">Quantity</p>
+                <p class="font-semibold text-blue-900">{{ work_order.qty|floatformat:3 }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-blue-600">Status</p>
+                <p class="font-semibold text-blue-900">{{ work_order.status|default:"Active" }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if shortages_data %}
+    <!-- Shortages Table -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 bg-red-50 border-b border-red-100">
+            <h3 class="text-lg font-semibold text-red-800">Material Shortages ({{ shortages_data|length }} items)</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Required</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Issued</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Shortage</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% Shortage</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Current Stock</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Can Fulfill</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for shortage in shortages_data %}
+                    <tr class="hover:bg-gray-50 {% if shortage.shortage_percentage > 50 %}bg-red-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ shortage.item.itemcode|default:"-" }}
+                            {% if shortage.shortage_percentage > 50 %}
+                            <span class="ml-2 text-red-500" title="Critical shortage">⚠️</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ shortage.item.itemname }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ shortage.required_qty|floatformat:3 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-green-600">{{ shortage.issued_qty|floatformat:3 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-red-600 font-bold">{{ shortage.shortage_qty|floatformat:3 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold 
+                            {% if shortage.shortage_percentage > 50 %}text-red-700{% else %}text-yellow-700{% endif %}">
+                            {{ shortage.shortage_percentage|floatformat:1 }}%
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ shortage.current_stock|floatformat:3 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            {% if shortage.can_fulfill %}
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                                Yes
+                            </span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                                No
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% elif selected_work_order_id %}
+    <div class="bg-green-50 border-l-4 border-green-400 p-6 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-lg font-medium text-green-800">All Materials Issued Completely</h3>
+                <p class="mt-2 text-sm text-green-700">
+                    This work order has no material shortages. All required materials have been issued.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+

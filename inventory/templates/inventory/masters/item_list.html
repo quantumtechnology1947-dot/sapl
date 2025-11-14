@@ -1,0 +1,111 @@
+{% extends "core/base.html" %}
+
+{% block title %}Item Master - Cortex ERP{% endblock %}
+{% block page_title %}Item Master{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Item Master</h2>
+                <p class="text-sm text-gray-600 mt-1">Manage inventory items and materials</p>
+            </div>
+            <a href="{% url 'inventory:item-create' %}"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md inline-flex items-center transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add Item
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <!-- Search Bar Component -->
+{% include 'core/components/search_bar.html' with placeholder='Search by code or name...' %}
+
+    <!-- Items Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Item Code</th>
+                        <th class="w-48 px-3 py-2 text-left text-xs font-semibold text-gray-700">Item Name</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Category</th>
+                        <th class="w-20 px-3 py-2 text-left text-xs font-semibold text-gray-700">Unit</th>
+                        <th class="w-24 px-3 py-2 text-right text-xs font-semibold text-gray-700">Stock Qty</th>
+                        <th class="w-24 px-3 py-2 text-right text-xs font-semibold text-gray-700">Reorder Level</th>
+                        <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Status</th>
+                        <th class="w-32 px-3 py-2 text-center text-xs font-semibold text-gray-700">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for item in items %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+                        <td class="w-24 px-3 py-2 text-xs font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ item.itemcode }}">
+                            {{ item.itemcode }}
+                        </td>
+                        <td class="w-48 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ item.itemname }}">
+                            {{ item.itemname }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ item.category.name|default:'' }}">
+                            {{ item.category.name|default:"-" }}
+                        </td>
+                        <td class="w-20 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ item.unit.name|default:"-" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-right text-gray-700">
+                            {{ item.stock_quantity|floatformat:2|default:"0.00" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-right text-gray-700">
+                            {{ item.reorder_level|floatformat:2|default:"0.00" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-center text-xs">
+                            {% if item.is_active %}
+                            <span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                            {% else %}
+                            <span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-800">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-center text-xs">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{% url 'inventory:item-detail' item.id %}"
+                                   class="text-sap-blue hover:underline"
+                                   title="View Details">View</a>
+                                <a href="{% url 'inventory:item-edit' item.id %}"
+                                   class="text-sap-green hover:underline"
+                                   title="Edit Item">Edit</a>
+                                <a href="{% url 'inventory:item-stock-ledger' item.id %}"
+                                   class="text-sap-blue hover:underline"
+                                   title="Stock Ledger">Ledger</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=8 title="No items found" message="Get started by creating a new item." %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        {% include "core/components/tables/pagination.html" with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

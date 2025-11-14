@@ -1,0 +1,865 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}New SPR - {{ dept_name|default:'Work Order' }} - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-gradient-to-r from-purple-800 to-purple-900 shadow-lg">
+        <div class="max-w-full px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-white font-bold text-xl">ERP Material Management</h1>
+                </div>
+                <div class="flex gap-4">
+                    <a href="{% url 'material_management:spr-list' %}"
+                       class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">Dashboard</a>
+                    <a href="{% url 'material_management:spr-new' %}"
+                       class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">New SPR</a>
+                    <a href="{% url 'material_management:spr-list' %}"
+                       class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">Edit SPR</a>
+                    <a href="#"
+                       class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">Delete SPR</a>
+                    <a href="#"
+                       class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">Print SPR</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b px-6 py-3">
+        <div class="text-sm text-gray-600">
+            <a href="{% url 'material_management:spr-list' %}" class="hover:text-purple-600">Dashboard</a>
+            <span class="mx-2">/</span>
+            <a href="{% url 'material_management:spr-new' %}" class="hover:text-purple-600">New SPR</a>
+            <span class="mx-2">/</span>
+            <span class="text-gray-900">AI Suggestions</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-full px-6 py-6">
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <!-- SPR Header -->
+            <div class="mb-6">
+                <h2 class="text-sm font-bold text-gray-900 mb-2">New Special Purpose Requisition</h2>
+                <div class="flex items-center gap-6 text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-600">SPR No:</span>
+                        <span class="font-semibold text-purple-600">NEW</span>
+                    </div>
+                    {% if dept_name %}
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-600">Department:</span>
+                        <span class="font-semibold text-gray-900">{{ dept_name }}</span>
+                    </div>
+                    {% endif %}
+                    {% if wo_no %}
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-600">Work Order:</span>
+                        <span class="font-semibold text-gray-900">{{ wo_no }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-600">Account Category:</span>
+                        <span class="font-semibold text-gray-900">{{ ah_category }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI-Powered Intelligence Banner -->
+            {% if items %}
+            <div class="mb-4 {% if ai_enabled %}bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-500{% else %}bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500{% endif %} p-4 rounded-r">
+                <div class="flex items-start gap-3">
+                    {% if ai_enabled %}
+                    <svg class="w-6 h-6 text-purple-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13 7H7v6h6V7z" />
+                        <path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd"/>
+                    </svg>
+                    {% else %}
+                    <svg class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    {% endif %}
+                    <div class="flex-1">
+                        <h3 class="text-sm font-semibold {% if ai_enabled %}text-purple-900{% else %}text-gray-900{% endif %} mb-1">
+                            {% if ai_enabled %}
+                            🤖 AI-Powered SPR Creation (Gemini 2.5 Pro)
+                            {% else %}
+                            Intelligent SPR Creation
+                            {% endif %}
+                        </h3>
+                        <p class="text-xs {% if ai_enabled %}text-purple-800{% else %}text-gray-700{% endif %} mb-2">
+                            {% if ai_enabled %}
+                            AI analyzed historical SPR data for this department and account category to suggest commonly used items and suppliers.
+                            {% else %}
+                            Showing items based on department history and account head category.
+                            {% endif %}
+                        </p>
+                        <ul class="text-xs text-gray-700 space-y-1">
+                            {% if ai_enabled %}
+                            <li><strong>AI-Analyzed Items:</strong> Gemini AI analyzed historical SPR patterns for {{ dept_name|default:'this department' }} and {{ ah_category }} category</li>
+                            <li><strong>Smart Supplier Selection:</strong> AI recommends suppliers based on past departmental usage and performance</li>
+                            <li><strong>Intelligent Pricing:</strong> Rates auto-filled from historical department spending patterns</li>
+                            <li><strong>Confidence Scores:</strong> Each suggestion includes AI confidence level (hover item code to see reasoning)</li>
+                            <li><strong>Fully Automated:</strong> Everything pre-filled - just review, select account heads, and click Generate SPR!</li>
+                            {% else %}
+                            <li><strong>Department-Based Items:</strong> Items commonly used by this department for {{ ah_category }} purposes</li>
+                            <li><strong>Historical Supplier:</strong> Pre-filled with most frequently used supplier</li>
+                            <li><strong>Rate History:</strong> Auto-filled from past SPR or Rate Register</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- AI Insights Panel -->
+            {% if ai_insights %}
+            <div class="mb-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-500 p-4 rounded-r">
+                <h4 class="text-sm font-semibold text-gray-900 mb-2">💡 AI Procurement Analysis</h4>
+                <div class="text-xs text-gray-700 whitespace-pre-line">{{ ai_insights }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-4 mb-6">
+                <a href="{% url 'material_management:spr-new' %}"
+                   class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition">
+                    Cancel
+                </a>
+                <button type="button"
+                        onclick="submitAllItems()"
+                        class="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition font-semibold">
+                    Generate SPR
+                </button>
+            </div>
+
+            <!-- Items Table -->
+            {% if items %}
+            <form method="post" id="spr-items-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="generate_spr_bulk">
+                <input type="hidden" name="dept_id" value="{{ dept_id }}">
+                <input type="hidden" name="ah_category" value="{{ ah_category }}">
+                <input type="hidden" name="wo_no" value="{{ wo_no }}">
+
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-purple-100">
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">ITEM CODE</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">DESCRIPTION</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">UOM</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold text-gray-700">SUGGESTED QTY</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold text-gray-700">QTY</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">SUPPLIER</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold text-gray-700">RATE</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold text-gray-700">DISCOUNT (%)</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">DELIVERY DATE</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">ACCOUNT HEAD</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">REMARKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr class="hover:bg-purple-50 {% if item.AIConfidence >= 80 %}bg-purple-50{% elif item.AIConfidence >= 60 %}bg-blue-50{% endif %}"
+                                data-item-id="{{ item.ItemId }}"
+                                data-suggested-supplier="{{ item.SuggestedSupplier|default:'' }}"
+                                data-suggested-rate="{{ item.SuggestedRate|default:0 }}"
+                                data-suggested-discount="{{ item.SuggestedDiscount|default:0 }}"
+                                data-ai-confidence="{{ item.AIConfidence|default:0 }}"
+                                data-ai-reasoning="{{ item.AIReasoning|default:'' }}">
+                                <!-- Item Code -->
+                                <td class="border border-gray-300 px-3 py-2 text-sm"
+                                    {% if item.AIReasoning %}
+                                    title="AI Confidence: {{ item.AIConfidence }}% - {{ item.AIReasoning }}"
+                                    {% endif %}>
+                                    {{ item.ItemCode }}
+                                    {% if item.AIConfidence >= 80 %}
+                                    <span class="ml-1 text-xs text-purple-600 font-bold" title="High AI Confidence: {{ item.AIConfidence }}%">★</span>
+                                    {% elif item.AIConfidence >= 60 %}
+                                    <span class="ml-1 text-xs text-blue-600" title="Medium AI Confidence: {{ item.AIConfidence }}%">★</span>
+                                    {% endif %}
+                                </td>
+                                <!-- Description -->
+                                <td class="border border-gray-300 px-3 py-2 text-sm">{{ item.ManfDesc|truncatewords:8 }}</td>
+                                <!-- UOM -->
+                                <td class="border border-gray-300 px-3 py-2 text-sm text-center">{{ item.UOM|default:'PCS' }}</td>
+                                <!-- Suggested Qty (Read-only display) -->
+                                <td class="border border-gray-300 px-3 py-2 text-sm text-right text-gray-500">{{ item.SuggestedQty|floatformat:0 }}</td>
+
+                                <!-- Quantity Input -->
+                                <td class="border border-gray-300 px-2 py-2">
+                                    <input type="number"
+                                           name="qty_{{ item.ItemId }}"
+                                           id="qty_{{ item.ItemId }}"
+                                           placeholder="{{ item.SuggestedQty|floatformat:0 }}"
+                                           value="{{ item.SuggestedQty|floatformat:0 }}"
+                                           step="1"
+                                           min="1"
+                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded text-right focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                </td>
+
+                                <!-- Supplier Input (INTELLIGENT AUTO-SUGGEST) -->
+                                <td class="border border-gray-300 px-2 py-2">
+                                    <input type="text"
+                                           name="supplier_{{ item.ItemId }}"
+                                           id="supplier_{{ item.ItemId }}"
+                                           list="supplier-list"
+                                           value="{{ item.SuggestedSupplier|default:'' }}"
+                                           placeholder="{% if item.SuggestedSupplier %}{{ item.SuggestedSupplier }}{% else %}Select supplier...{% endif %}"
+                                           title="{% if item.SuggestedSupplier %}Recommended: {{ item.SuggestedSupplier }} (Used {{ item.UsageCount|default:0 }} times){% endif %}"
+                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 {% if item.SuggestedSupplier %}bg-purple-50{% endif %}"
+                                           onchange="loadSupplierRate({{ item.ItemId }}, '{{ item.ItemCode }}')">
+                                </td>
+
+                                <!-- Rate Input (INTELLIGENT AUTO-FILL) -->
+                                <td class="border border-gray-300 px-2 py-2">
+                                    <input type="number"
+                                           name="rate_{{ item.ItemId }}"
+                                           id="rate_{{ item.ItemId }}"
+                                           placeholder="0"
+                                           step="0.01"
+                                           min="0"
+                                           value="{{ item.SuggestedRate|default:0 }}"
+                                           title="{% if item.SuggestedRate %}AI Suggested Rate{% endif %}"
+                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded text-right focus:outline-none focus:ring-2 focus:ring-purple-500 {% if item.SuggestedRate > 0 %}bg-green-50{% endif %}">
+                                </td>
+
+                                <!-- Discount Input (INTELLIGENT AUTO-FILL) -->
+                                <td class="border border-gray-300 px-2 py-2">
+                                    <input type="number"
+                                           name="discount_{{ item.ItemId }}"
+                                           id="discount_{{ item.ItemId }}"
+                                           placeholder="0"
+                                           step="0.01"
+                                           min="0"
+                                           max="100"
+                                           value="{{ item.SuggestedDiscount|default:0 }}"
+                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded text-right focus:outline-none focus:ring-2 focus:ring-purple-500 {% if item.SuggestedDiscount > 0 %}bg-green-50{% endif %}">
+                                </td>
+
+                                <!-- Delivery Date Input -->
+                                <td class="border border-gray-300 px-2 py-2">
+                                    <input type="date"
+                                           name="delivery_date_{{ item.ItemId }}"
+                                           id="delivery_date_{{ item.ItemId }}"
+                                           value="{{ default_delivery_date|date:'Y-m-d' }}"
+                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                </td>
+
+                                <!-- Account Head Selection (CRITICAL FOR SPR) -->
+                                <td class="border border-gray-300 px-2 py-2">
+                                    <select name="ah_id_{{ item.ItemId }}"
+                                            id="ah_id_{{ item.ItemId }}"
+                                            class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                            required>
+                                        <option value="">Select Account Head</option>
+                                        {% for ah in account_heads %}
+                                        <option value="{{ ah.id }}">{{ ah.symbol }} - {{ ah.description }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+
+                                <!-- Remarks Input -->
+                                <td class="border border-gray-300 px-2 py-2">
+                                    <input type="text"
+                                           name="remarks_{{ item.ItemId }}"
+                                           id="remarks_{{ item.ItemId }}"
+                                           placeholder="Optional remarks..."
+                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Supplier Datalist -->
+                <datalist id="supplier-list">
+                    {% for supplier in suppliers %}
+                    <option value="{{ supplier.supplier_name }}">{{ supplier.supplier_id }} - {{ supplier.supplier_name }}</option>
+                    {% endfor %}
+                </datalist>
+            </form>
+            {% else %}
+            <!-- Manual Item Selection -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r mb-6">
+                <div class="flex items-start gap-3">
+                    <svg class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-semibold text-gray-900 mb-1">No Historical Data Found</h3>
+                        <p class="text-xs text-gray-700">
+                            No previous SPR records found for {{ dept_name|default:'this selection' }} with {{ ah_category }} category.
+                            You can manually search and add items below.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Search and Add Form -->
+            <div class="bg-white border-2 border-gray-300 rounded p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Search and Add Items</h3>
+
+                <form id="item-search-form" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Item Search -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Search Item by Code or Description</label>
+                            <input type="text"
+                                   id="item_search"
+                                   name="item_search"
+                                   placeholder="Type item code or description..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                   autocomplete="off">
+                            <div id="item-search-results" class="mt-2 border border-gray-300 rounded-md max-h-60 overflow-y-auto hidden"></div>
+                        </div>
+
+                        <!-- Selected Item Display -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Selected Item</label>
+                            <input type="text"
+                                   id="selected_item_display"
+                                   readonly
+                                   placeholder="Click on a search result to select"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600">
+                            <input type="hidden" id="selected_item_id" name="item_id">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Quantity -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                            <input type="number"
+                                   id="add_qty"
+                                   name="qty"
+                                   placeholder="0"
+                                   step="1"
+                                   min="1"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+
+                        <!-- Rate -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Rate</label>
+                            <input type="number"
+                                   id="add_rate"
+                                   name="rate"
+                                   placeholder="0.00"
+                                   step="0.01"
+                                   min="0"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+
+                        <!-- Discount -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Discount (%)</label>
+                            <input type="number"
+                                   id="add_discount"
+                                   name="discount"
+                                   placeholder="0.00"
+                                   step="0.01"
+                                   min="0"
+                                   max="100"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Supplier -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                            <input type="text"
+                                   id="add_supplier"
+                                   name="supplier"
+                                   list="supplier-list"
+                                   placeholder="Select or type supplier name..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+
+                        <!-- Delivery Date -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Delivery Date</label>
+                            <input type="date"
+                                   id="add_delivery_date"
+                                   name="delivery_date"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Account Head -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Account Head *</label>
+                            <select id="add_ah_id"
+                                    name="ah_id"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    required>
+                                <option value="">Select Account Head</option>
+                                {% for ah in account_heads %}
+                                <option value="{{ ah.id }}">{{ ah.symbol }} - {{ ah.description }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
+                            <input type="text"
+                                   id="add_remarks"
+                                   name="remarks"
+                                   placeholder="Optional remarks..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="button"
+                                onclick="addItemToCart()"
+                                class="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition font-semibold">
+                            Add Item to Cart
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Supplier Datalist for Manual Mode -->
+                <datalist id="supplier-list">
+                    {% for supplier in suppliers %}
+                    <option value="{{ supplier.supplier_name }}">{{ supplier.supplier_id }} - {{ supplier.supplier_name }}</option>
+                    {% endfor %}
+                </datalist>
+            </div>
+
+            <!-- Cart Items Table -->
+            <div id="cart-items-section" class="hidden">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Items in Cart</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300" id="cart-items-table">
+                        <thead>
+                            <tr class="bg-purple-100">
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">ITEM CODE</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">DESCRIPTION</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold text-gray-700">QTY</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">SUPPLIER</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold text-gray-700">RATE</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold text-gray-700">DISCOUNT</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">ACCOUNT HEAD</th>
+                                <th class="border border-gray-300 px-3 py-2 text-center text-sm font-semibold text-gray-700">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <a href="{% url 'material_management:spr-new' %}"
+                       class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition">
+                        Cancel
+                    </a>
+                    <button type="button"
+                            onclick="submitCartItems()"
+                            class="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition font-semibold">
+                        Generate SPR
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Cart storage (for manual item selection mode)
+let cartItems = [];
+
+// Item search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const itemSearchInput = document.getElementById('item_search');
+    if (itemSearchInput) {
+        itemSearchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            if (query.length >= 2) {
+                searchItems(query);
+            } else {
+                document.getElementById('item-search-results').classList.add('hidden');
+            }
+        });
+    }
+
+    // Auto-populate delivery date (today + 7 days)
+    const addDeliveryDate = document.getElementById('add_delivery_date');
+    if (addDeliveryDate) {
+        const today = new Date();
+        const defaultDate = new Date(today.setDate(today.getDate() + 7));
+        addDeliveryDate.value = defaultDate.toISOString().split('T')[0];
+    }
+});
+
+// Search for items via AJAX
+function searchItems(query) {
+    fetch(`/material-management/api/search-items/?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultsDiv = document.getElementById('item-search-results');
+            if (data.items && data.items.length > 0) {
+                let html = '<div class="divide-y divide-gray-200">';
+                data.items.forEach(item => {
+                    html += `
+                        <div class="p-3 hover:bg-purple-50 cursor-pointer" onclick="selectItem(${item.itemid}, '${item.itemcode}', '${item.manfdesc}', '${item.uombasic || 'PCS'}')">
+                            <div class="font-semibold text-sm text-gray-900">${item.itemcode}</div>
+                            <div class="text-xs text-gray-600">${item.manfdesc}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+                resultsDiv.classList.remove('hidden');
+            } else {
+                resultsDiv.innerHTML = '<div class="p-3 text-sm text-gray-500">No items found</div>';
+                resultsDiv.classList.remove('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error searching items:', error);
+        });
+}
+
+// Select item from search results
+function selectItem(itemId, itemCode, itemDesc, uom) {
+    document.getElementById('selected_item_id').value = itemId;
+    document.getElementById('selected_item_display').value = `${itemCode} - ${itemDesc}`;
+    document.getElementById('item-search-results').classList.add('hidden');
+
+    // Store UOM for later use
+    document.getElementById('selected_item_id').setAttribute('data-uom', uom);
+    document.getElementById('selected_item_id').setAttribute('data-code', itemCode);
+    document.getElementById('selected_item_id').setAttribute('data-desc', itemDesc);
+}
+
+// Add item to cart
+function addItemToCart() {
+    const itemId = document.getElementById('selected_item_id').value;
+    const itemCode = document.getElementById('selected_item_id').getAttribute('data-code');
+    const itemDesc = document.getElementById('selected_item_id').getAttribute('data-desc');
+    const uom = document.getElementById('selected_item_id').getAttribute('data-uom');
+    const qty = document.getElementById('add_qty').value;
+    const rate = document.getElementById('add_rate').value;
+    const discount = document.getElementById('add_discount').value || 0;
+    const supplier = document.getElementById('add_supplier').value;
+    const deliveryDate = document.getElementById('add_delivery_date').value;
+    const ahId = document.getElementById('add_ah_id').value;
+    const ahText = document.getElementById('add_ah_id').selectedOptions[0]?.text || '';
+    const remarks = document.getElementById('add_remarks').value;
+
+    // Validation
+    if (!itemId) {
+        alert('Please select an item from search results');
+        return;
+    }
+    if (!qty || parseFloat(qty) <= 0) {
+        alert('Please enter a valid quantity');
+        return;
+    }
+    if (!rate || parseFloat(rate) <= 0) {
+        alert('Please enter a valid rate');
+        return;
+    }
+    if (!supplier) {
+        alert('Please enter a supplier');
+        return;
+    }
+    if (!ahId) {
+        alert('Please select an account head');
+        return;
+    }
+    if (!deliveryDate) {
+        alert('Please select a delivery date');
+        return;
+    }
+
+    // Check if item already in cart
+    const existingIndex = cartItems.findIndex(item => item.itemId === itemId);
+    if (existingIndex >= 0) {
+        if (!confirm('This item is already in the cart. Do you want to replace it?')) {
+            return;
+        }
+        cartItems[existingIndex] = {
+            itemId, itemCode, itemDesc, uom, qty, rate, discount, supplier, deliveryDate, ahId, ahText, remarks
+        };
+    } else {
+        cartItems.push({
+            itemId, itemCode, itemDesc, uom, qty, rate, discount, supplier, deliveryDate, ahId, ahText, remarks
+        });
+    }
+
+    // Update cart display
+    updateCartDisplay();
+
+    // Clear form
+    document.getElementById('item_search').value = '';
+    document.getElementById('selected_item_display').value = '';
+    document.getElementById('selected_item_id').value = '';
+    document.getElementById('add_qty').value = '';
+    document.getElementById('add_rate').value = '';
+    document.getElementById('add_discount').value = '';
+    document.getElementById('add_supplier').value = '';
+    document.getElementById('add_remarks').value = '';
+    document.getElementById('add_ah_id').selectedIndex = 0;
+
+    // Reset delivery date to default
+    const today = new Date();
+    const defaultDate = new Date(today.setDate(today.getDate() + 7));
+    document.getElementById('add_delivery_date').value = defaultDate.toISOString().split('T')[0];
+}
+
+// Update cart display
+function updateCartDisplay() {
+    const cartSection = document.getElementById('cart-items-section');
+    const cartTbody = document.getElementById('cart-tbody');
+
+    if (cartItems.length === 0) {
+        cartSection.classList.add('hidden');
+        return;
+    }
+
+    cartSection.classList.remove('hidden');
+
+    let html = '';
+    cartItems.forEach((item, index) => {
+        html += `
+            <tr class="hover:bg-purple-50">
+                <td class="border border-gray-300 px-3 py-2 text-sm">${item.itemCode}</td>
+                <td class="border border-gray-300 px-3 py-2 text-sm">${item.itemDesc}</td>
+                <td class="border border-gray-300 px-3 py-2 text-sm text-right">${item.qty}</td>
+                <td class="border border-gray-300 px-3 py-2 text-sm">${item.supplier}</td>
+                <td class="border border-gray-300 px-3 py-2 text-sm text-right">${parseFloat(item.rate).toFixed(2)}</td>
+                <td class="border border-gray-300 px-3 py-2 text-sm text-right">${parseFloat(item.discount).toFixed(2)}%</td>
+                <td class="border border-gray-300 px-3 py-2 text-sm">${item.ahText}</td>
+                <td class="border border-gray-300 px-3 py-2 text-center">
+                    <button type="button" onclick="removeFromCart(${index})" class="text-red-600 hover:text-red-800 font-semibold">Remove</button>
+                </td>
+            </tr>
+        `;
+    });
+    cartTbody.innerHTML = html;
+}
+
+// Remove item from cart
+function removeFromCart(index) {
+    if (confirm('Remove this item from cart?')) {
+        cartItems.splice(index, 1);
+        updateCartDisplay();
+    }
+}
+
+// Submit cart items to create SPR
+function submitCartItems() {
+    if (cartItems.length === 0) {
+        alert('Please add at least one item to the cart');
+        return;
+    }
+
+    if (!confirm(`Generate Special Purpose Requisition with ${cartItems.length} item(s)?`)) {
+        return;
+    }
+
+    // Prepare data - convert camelCase to snake_case for backend
+    const itemsForBackend = cartItems.map(item => ({
+        item_id: item.itemId,
+        qty: item.qty,
+        supplier: item.supplier,
+        rate: item.rate,
+        discount: item.discount,
+        delivery_date: item.deliveryDate,
+        ah_id: item.ahId,
+        remarks: item.remarks
+    }));
+
+    const formData = new FormData();
+    formData.append('action', 'generate_spr_bulk');
+    formData.append('items_data', JSON.stringify(itemsForBackend));
+
+    // Submit
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            return response.text();
+        }
+    })
+    .then(html => {
+        if (html) {
+            document.body.innerHTML = html;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while generating the SPR. Please try again.');
+    });
+}
+
+// Load supplier rate when supplier is selected
+function loadSupplierRate(itemId, itemCode) {
+    const supplierInput = document.getElementById(`supplier_${itemId}`);
+    const rateInput = document.getElementById(`rate_${itemId}`);
+    const discountInput = document.getElementById(`discount_${itemId}`);
+
+    const supplierName = supplierInput.value;
+
+    if (!supplierName) {
+        return;
+    }
+
+    // Extract supplier ID from datalist
+    let supplierId = '';
+    const datalistOptions = document.querySelectorAll('#supplier-list option');
+
+    for (let option of datalistOptions) {
+        if (option.value === supplierName) {
+            const text = option.textContent;
+            supplierId = text.split(' - ')[0];
+            break;
+        }
+    }
+
+    if (!supplierId) {
+        console.log('Supplier ID not found for:', supplierName);
+        return;
+    }
+
+    // Fetch rate from Rate Register via AJAX
+    fetch(`/material-management/api/get-supplier-rate/?item_id=${itemId}&supplier_id=${supplierId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.rate !== undefined) {
+                rateInput.value = data.rate;
+                discountInput.value = data.discount || 0;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching supplier rate:', error);
+        });
+}
+
+// Submit all items to create SPR
+function submitAllItems() {
+    const form = document.getElementById('spr-items-form');
+    const rows = form.querySelectorAll('tbody tr');
+
+    let hasData = false;
+    let itemsData = [];
+
+    // Collect all filled rows
+    rows.forEach(row => {
+        const itemId = row.getAttribute('data-item-id');
+        const qty = document.getElementById(`qty_${itemId}`).value;
+        const supplier = document.getElementById(`supplier_${itemId}`).value;
+        const rate = document.getElementById(`rate_${itemId}`).value;
+        const discount = document.getElementById(`discount_${itemId}`).value;
+        const deliveryDate = document.getElementById(`delivery_date_${itemId}`).value;
+        const ahId = document.getElementById(`ah_id_${itemId}`).value;
+        const remarks = document.getElementById(`remarks_${itemId}`).value;
+
+        // Only include rows where supplier, rate, and account head are filled
+        if (supplier && rate && parseFloat(rate) > 0 && ahId) {
+            hasData = true;
+            itemsData.push({
+                item_id: itemId,
+                qty: qty || 1,
+                supplier: supplier,
+                rate: rate,
+                discount: discount || 0,
+                delivery_date: deliveryDate,
+                ah_id: ahId,
+                remarks: remarks || ''
+            });
+        }
+    });
+
+    if (!hasData) {
+        alert('Please fill in at least one item with supplier, rate, and account head information.');
+        return;
+    }
+
+    // Check for missing account heads
+    const missingAH = itemsData.length < rows.length;
+    if (missingAH) {
+        const filledCount = itemsData.length;
+        const totalCount = rows.length;
+        if (!confirm(`You have filled ${filledCount} out of ${totalCount} items. Continue with only filled items?`)) {
+            return;
+        }
+    }
+
+    if (!confirm(`Generate Special Purpose Requisition with ${itemsData.length} item(s)?`)) {
+        return;
+    }
+
+    // Submit via POST
+    const formData = new FormData();
+    formData.append('action', 'generate_spr_bulk');
+    formData.append('items_data', JSON.stringify(itemsData));
+
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            return response.text();
+        }
+    })
+    .then(html => {
+        if (html) {
+            document.body.innerHTML = html;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while generating the SPR. Please try again.');
+    });
+}
+
+// Auto-populate delivery date (default to today + 7 days)
+document.addEventListener('DOMContentLoaded', function() {
+    const deliveryInputs = document.querySelectorAll('[id^="delivery_date_"]');
+    const today = new Date();
+    const defaultDate = new Date(today.setDate(today.getDate() + 7));
+    const dateString = defaultDate.toISOString().split('T')[0];
+
+    deliveryInputs.forEach(input => {
+        if (!input.value) {
+            input.value = dateString;
+        }
+    });
+});
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+

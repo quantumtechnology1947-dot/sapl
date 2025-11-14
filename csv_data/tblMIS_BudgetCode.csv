@@ -1,0 +1,11 @@
+﻿Id,Description,Symbol
+1,Mechanical Manufacturing,M
+2,Mechanical Boughtout,MB
+3,Electrical Manufacturing,E
+4,Electrical Boughtout,EB
+5,Labour Charges,L
+6,Transportation,T
+7,Conveyance,C
+8,Site Expences,S
+9,Others,O
+10,Consultancy,CO

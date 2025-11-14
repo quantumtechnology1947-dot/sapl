@@ -1,0 +1,60 @@
+{% extends "core/base.html" %}
+
+{% block title %}Work Order Dispatch - Cortex ERP{% endblock %}
+{% block page_title %}Work Order Dispatch{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Work Order Dispatch</h2>
+                <p class="text-sm text-gray-600 mt-1">Dispatch released work orders</p>
+            </div>
+            <a href="{% url 'sales_distribution:dispatch-create' %}"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm transition-colors">
+                New Dispatch
+            </a>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">WR Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">WO Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issued Qty</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for release in releases %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ release.wrno }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ release.wono }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ release.itemid }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ release.issuedqty }}</td>
+                    <td class="px-6 py-4 text-right text-sm">
+                        <a href="{% url 'sales_distribution:dispatch-create' %}" class="text-blue-600 hover:text-blue-900">Dispatch</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-16 text-center text-gray-500">No releases available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

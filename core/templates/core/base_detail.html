@@ -1,0 +1,198 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{% block detail_title %}{{ model_name }} Details{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    {# Breadcrumbs #}
+    {% if show_breadcrumbs|default:True %}
+    <div class="mb-4">
+        {% if breadcrumbs %}
+            {% include 'core/components/breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+        {% else %}
+            {% include 'core/components/breadcrumbs.html' with breadcrumbs=default_breadcrumbs %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# Header Section #}
+    <div class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-base font-bold text-gray-900">
+                    {% block page_header %}{{ model_name }} Details{% endblock %}
+                </h1>
+                {% block page_description %}
+                <p class="mt-2 text-sm text-gray-700">
+                    View detailed information for this {{ model_name|lower }}
+                </p>
+                {% endblock %}
+            </div>
+
+            {# Action Buttons #}
+            <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+                {% block header_actions %}
+                {% if list_url %}
+                <a href="{% url list_url %}"
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sap-blue">
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M7 6h10M7 18h10"/>
+                    </svg>
+                    Back to List
+                </a>
+                {% endif %}
+
+                {% if edit_url %}
+                <a href="{% url edit_url object.pk %}"
+                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sap-blue hover:bg-sap-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sap-blue">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Edit
+                </a>
+                {% endif %}
+
+                {% if delete_url %}
+                <button type="button"
+                        x-data="{ showDeleteModal: false }"
+                        @click="showDeleteModal = true"
+                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Delete
+                </button>
+
+                {# Delete Confirmation Modal #}
+                <div x-data="{ open: false }" @delete-modal.window="open = true">
+                    {% include 'core/components/modal.html' with modal_type='danger' modal_icon=True modal_title='Confirm Deletion' modal_content='Are you sure you want to delete this record? This action cannot be undone.' modal_confirm_text='Delete' modal_confirm_action='deleteRecord()' %}
+                </div>
+                {% endif %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    {# Messages/Alerts #}
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+            {% include 'core/components/alert.html' with alert_type=message.tags alert_message=message %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Detail Content #}
+    <div class="bg-white shadow rounded">
+        {% block detail_content %}
+        {# Detail Sections #}
+        {% if detail_sections %}
+            {% for section in detail_sections %}
+            <div class="{% if not forloop.first %}border-t border-gray-200{% endif %} px-6 py-5">
+                {% if section.title %}
+                <div class="mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">{{ section.title }}</h2>
+                    {% if section.description %}
+                    <p class="text-sm text-gray-600 mt-1">{{ section.description }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <dl class="grid grid-cols-1 {% if section.columns == 2 %}sm:grid-cols-2{% elif section.columns == 3 %}sm:grid-cols-3{% elif section.columns == 4 %}sm:grid-cols-4{% endif %} gap-x-6 gap-y-4">
+                    {% for field in section.fields %}
+                    <div class="{% if field.full_width %}col-span-full{% endif %}">
+                        <dt class="text-sm font-medium text-gray-500">{{ field.label }}</dt>
+                        <dd class="mt-1 text-sm text-gray-900">
+                            {% if field.template %}
+                                {% include field.template with value=field.value object=object %}
+                            {% elif field.value %}
+                                {{ field.value }}
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </dd>
+                    </div>
+                    {% endfor %}
+                </dl>
+            </div>
+            {% endfor %}
+        {% else %}
+            {# Default: Display all model fields #}
+            <div class="px-6 py-5">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                    {% block default_fields %}
+                    {# Override this block to specify which fields to display #}
+                    {% endblock %}
+                </dl>
+            </div>
+        {% endif %}
+        {% endblock %}
+
+        {# Audit Information (if available) #}
+        {% if show_audit_info|default:True %}
+        {% if object.sysdate or object.systime or object.sessionid %}
+        <div class="border-t border-gray-200 bg-gray-50 px-6 py-4">
+            <h3 class="text-sm font-medium text-gray-500 mb-3">Audit Information</h3>
+            <dl class="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-2">
+                {% if object.sysdate %}
+                <div>
+                    <dt class="text-xs font-medium text-gray-500">Created Date</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ object.sysdate }}</dd>
+                </div>
+                {% endif %}
+                {% if object.systime %}
+                <div>
+                    <dt class="text-xs font-medium text-gray-500">Created Time</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ object.systime }}</dd>
+                </div>
+                {% endif %}
+                {% if object.sessionid %}
+                <div>
+                    <dt class="text-xs font-medium text-gray-500">Created By</dt>
+                    <dd class="mt-1 text-sm text-gray-900">User #{{ object.sessionid }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    {# Related Data / Child Records #}
+    {% block related_content %}
+    {% endblock %}
+
+    {# Extra Content Section #}
+    {% block extra_content %}
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if delete_url %}
+<script>
+function deleteRecord() {
+    // HTMX-based deletion
+    htmx.ajax('DELETE', '{% url delete_url object.pk %}', {
+        target: 'body',
+        swap: 'none',
+        confirm: null  // Already confirmed via modal
+    }).then(function() {
+        window.location.href = '{% if list_url %}{% url list_url %}{% else %}/{% endif %}';
+    });
+}
+</script>
+{% endif %}
+
+{% block detail_extra_js %}
+{% endblock %}
+{% endblock %}
+
+
+
+
+
+
+
+

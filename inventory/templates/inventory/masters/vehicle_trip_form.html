@@ -1,0 +1,84 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Record Trip - {{ vehicle.vehicleno }} - Inventory{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-3xl">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Record Trip</h1>
+                <p class="text-sm text-gray-600 mt-1">Vehicle: {{ vehicle.vehicleno }}</p>
+            </div>
+            <a href="{% url 'inventory:vehicle-detail' vehicle.vehicleid %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">Back</a>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Trip Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Trip Date <span class="text-red-500">*</span></label>
+                    {{ form.tripdate }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Driver Name</label>
+                    {{ form.drivername }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Starting KM <span class="text-red-500">*</span></label>
+                    {{ form.startingkm }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ending KM <span class="text-red-500">*</span></label>
+                    {{ form.endingkm }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Distance (Auto-calculated)</label>
+                    {{ form.distance }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fuel Consumed (Liters)</label>
+                    {{ form.fuelconsumed }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fuel Efficiency (Auto-calculated)</label>
+                    {{ form.fuelefficiency }}
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Purpose</label>
+                {{ form.purpose }}
+            </div>
+            
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                {{ form.remarks }}
+            </div>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+            <a href="{% url 'inventory:vehicle-detail' vehicle.vehicleid %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">Cancel</a>
+            <button type="submit" 
+                    class="bg-amber-700 hover:bg-amber-800 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                Record Trip
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

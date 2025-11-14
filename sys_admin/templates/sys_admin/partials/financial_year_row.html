@@ -1,0 +1,40 @@
+<tr id="financial-year-{{ financial_year.finyearid }}" class="hover:bg-gray-50 transition-colors">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {{ forloop.counter }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {{ financial_year.company_name|default:"Unknown Company" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {{ financial_year.finyear|default:"-" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {{ financial_year.finyearfrom|default:"-" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {{ financial_year.finyearto|default:"-" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button hx-get="{% url 'sys_admin:financial-year-edit' financial_year.finyearid %}"
+                hx-target="#financial-year-{{ financial_year.finyearid }}"
+                hx-swap="outerHTML"
+                class="text-blue-600 hover:text-blue-900 mr-3 transition">
+            Edit
+        </button>
+        <button hx-delete="{% url 'sys_admin:financial-year-delete' financial_year.finyearid %}"
+                hx-target="#financial-year-{{ financial_year.finyearid }}"
+                hx-swap="outerHTML swap:1s"
+                hx-confirm="Are you sure you want to delete financial year {{ financial_year.finyear }} for {{ financial_year.company_name }}?"
+                class="text-red-600 hover:text-red-900 transition">
+            Delete
+        </button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

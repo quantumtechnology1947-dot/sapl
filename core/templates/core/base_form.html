@@ -1,0 +1,188 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{% block form_title %}{{ action|title }} {{ model_name }}{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    {# Breadcrumbs #}
+    {% if show_breadcrumbs|default:True %}
+    <div class="mb-4">
+        {% if breadcrumbs %}
+            {% include 'core/components/breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+        {% else %}
+            {% include 'core/components/breadcrumbs.html' with breadcrumbs=default_breadcrumbs %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# Header Section #}
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-base font-bold text-gray-900">
+                    {% block page_header %}{{ action|title }} {{ model_name }}{% endblock %}
+                </h1>
+                {% block page_description %}
+                <p class="mt-2 text-sm text-gray-700">
+                    {% if action == 'create' %}
+                    Fill in the form below to create a new {{ model_name|lower }}
+                    {% elif action == 'edit' %}
+                    Update the {{ model_name|lower }} information below
+                    {% else %}
+                    {{ description }}
+                    {% endif %}
+                </p>
+                {% endblock %}
+            </div>
+            {% block header_actions %}
+            {% endblock %}
+        </div>
+    </div>
+
+    {# Messages/Alerts #}
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+            {% include 'core/components/alert.html' with alert_type=message.tags alert_message=message %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Form Errors (Non-field errors) #}
+    {% if form.non_field_errors %}
+    <div class="mb-4">
+        {% include 'core/components/alert.html' with alert_type='error' alert_message=form.non_field_errors|join:', ' %}
+    </div>
+    {% endif %}
+
+    {# Form Container #}
+    <div class="bg-white shadow rounded">
+        <form method="post"
+              {% if multipart|default:False %}enctype="multipart/form-data"{% endif %}
+              {% if hx_post %}hx-post="{{ hx_post }}"{% endif %}
+              {% if hx_target %}hx-target="{{ hx_target }}"{% endif %}
+              {% if hx_swap %}hx-swap="{{ hx_swap }}"{% endif %}
+              class="space-y-6 p-6">
+            {% csrf_token %}
+
+            {% block form_content %}
+            {# Form Sections #}
+            {% if form_sections %}
+                {% for section in form_sections %}
+                <div class="{% if not forloop.first %}border-t border-gray-200 pt-6 mt-6{% endif %}">
+                    {% if section.title %}
+                    <div class="mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900">{{ section.title }}</h2>
+                        {% if section.description %}
+                        <p class="text-sm text-gray-600 mt-1">{{ section.description }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 gap-6 {% if section.columns == 2 %}md:grid-cols-2{% elif section.columns == 3 %}md:grid-cols-3{% elif section.columns == 4 %}md:grid-cols-4{% endif %}">
+                        {% for field_name in section.fields %}
+                            {% with field=form|attr:field_name %}
+                            <div class="{% if field.field.widget.attrs.full_width %}col-span-full{% endif %}">
+                                {% include 'core/components/form_field.html' with field=field %}
+                            </div>
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                {# Default: Render all fields in 2-column grid #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for field in form.visible_fields %}
+                    <div class="{% if field.field.widget.attrs.full_width %}col-span-full{% endif %}">
+                        {% include 'core/components/form_field.html' with field=field %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {# Hidden fields #}
+                {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+            {% endif %}
+            {% endblock %}
+
+            {# Form Actions #}
+            <div class="border-t border-gray-200 pt-6 mt-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        {% block form_actions_left %}
+                        {% if cancel_url %}
+                        <a href="{% if cancel_url %}{% url cancel_url %}{% else %}javascript:history.back(){% endif %}"
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sap-blue">
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Cancel
+                        </a>
+                        {% endif %}
+                        {% endblock %}
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        {% block form_actions_right %}
+                        {% if show_save_and_new|default:False %}
+                        <button type="submit"
+                                name="save_and_new"
+                                value="1"
+                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sap-orange hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sap-orange">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Save & Add New
+                        </button>
+                        {% endif %}
+
+                        <button type="submit"
+                                class="inline-flex items-center px-6 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sap-blue hover:bg-sap-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sap-blue">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            {% block submit_button_text %}
+                            {% if action == 'create' %}Create{% elif action == 'edit' %}Update{% else %}Save{% endif %} {{ model_name }}
+                            {% endblock %}
+                        </button>
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {# Extra Content Section #}
+    {% block extra_content %}
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% block form_extra_js %}
+{# Auto-focus first field with error or first field #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const firstError = document.querySelector('.border-red-500');
+    const firstInput = document.querySelector('input:not([type="hidden"]), textarea, select');
+
+    if (firstError) {
+        firstError.focus();
+    } else if (firstInput) {
+        firstInput.focus();
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}
+
+
+
+
+
+
+
+

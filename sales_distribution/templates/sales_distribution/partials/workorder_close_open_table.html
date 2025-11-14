@@ -1,0 +1,107 @@
+<div class="overflow-x-auto">
+    <table class="w-full border-collapse text-xs">
+        <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+                <th class="px-1 py-1.5 text-center font-semibold text-gray-700 whitespace-nowrap">SN</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">Fin Yrs</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">Customer Name</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">Code</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">Enq No</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">PO No</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">WO No</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">Date</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">By</th>
+                <th class="px-1 py-1.5 text-center font-semibold text-gray-700 whitespace-nowrap">Status</th>
+                <th class="px-1 py-1.5 text-left font-semibold text-gray-700 whitespace-nowrap">Remarks</th>
+                <th class="px-1 py-1.5 text-center font-semibold text-gray-700 whitespace-nowrap">Action</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for wo in workorders %}
+            <tr class="border-b border-gray-200 hover:bg-blue-50/30 transition-colors">
+                <td class="px-1 py-1 text-center text-gray-900 whitespace-nowrap">{{ forloop.counter }}</td>
+                <td class="px-1 py-1 text-gray-700 whitespace-nowrap">{{ wo.finyear_name }}</td>
+                <td class="px-1 py-1 text-gray-700 max-w-[140px] truncate" title="{{ wo.customer_name }}">{{ wo.customer_name }}</td>
+                <td class="px-1 py-1 text-gray-700 whitespace-nowrap">{{ wo.customerid }}</td>
+                <td class="px-1 py-1 text-gray-700 whitespace-nowrap">{{ wo.enqid|default:"-" }}</td>
+                <td class="px-1 py-1 text-gray-700 max-w-[90px] truncate" title="{{ wo.pono }}">{{ wo.pono|default:"-" }}</td>
+                <td class="px-1 py-1 text-gray-700 whitespace-nowrap">
+                    <a href="{% url 'sales_distribution:workorder-detail' wo.id %}"
+                       class="text-blue-600 hover:text-blue-800 hover:underline">
+                        {{ wo.wono }}
+                    </a>
+                </td>
+                <td class="px-1 py-1 text-gray-700 whitespace-nowrap">{{ wo.sysdate|default:"-" }}</td>
+                <td class="px-1 py-1 text-gray-700 whitespace-nowrap max-w-[70px] truncate" title="{{ wo.generated_by }}">{{ wo.generated_by }}</td>
+                <td class="px-1 py-1 text-center whitespace-nowrap">
+                    {% if wo.closeopen == 0 %}
+                    <span class="inline-flex px-1 py-0.5 rounded text-[10px] bg-green-100 text-green-800 font-medium">Open</span>
+                    {% else %}
+                    <span class="inline-flex px-1 py-0.5 rounded text-[10px] bg-gray-100 text-gray-800 font-medium">Closed</span>
+                    {% endif %}
+                </td>
+                <td class="px-1 py-1 whitespace-nowrap">
+                    <input type="text"
+                        id="remarks_{{ wo.id }}"
+                        class="w-24 px-1 py-0.5 text-[10px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Remarks">
+                </td>
+                <td class="px-1 py-1 text-center whitespace-nowrap">
+                    {% if wo.closeopen == 0 %}
+                    <form method="post"
+                          action="{% url 'sales_distribution:workorder-close' wo.id %}"
+                          class="inline"
+                          onsubmit="return handleCloseOpen(event, {{ wo.id }}, 'close')">
+                        {% csrf_token %}
+                        <input type="hidden" name="remarks" id="remarks_input_close_{{ wo.id }}">
+                        <input type="hidden" name="from_list" value="1">
+                        <button type="submit"
+                            class="px-1.5 py-0.5 text-[10px] text-white bg-red-600 hover:bg-red-700 rounded font-medium">
+                            Close
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="post"
+                          action="{% url 'sales_distribution:workorder-open' wo.id %}"
+                          class="inline"
+                          onsubmit="return handleCloseOpen(event, {{ wo.id }}, 'open')">
+                        {% csrf_token %}
+                        <input type="hidden" name="remarks" id="remarks_input_open_{{ wo.id }}">
+                        <input type="hidden" name="from_list" value="1">
+                        <button type="submit"
+                            class="px-1.5 py-0.5 text-[10px] text-white bg-green-600 hover:bg-green-700 rounded font-medium">
+                            Open
+                        </button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="12" class="px-6 py-12 text-center">
+                    <p class="text-xs text-gray-500">No work orders found</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function handleCloseOpen(event, woId, action) {
+    const remarks = document.getElementById('remarks_' + woId).value;
+    const hiddenInput = document.getElementById('remarks_input_' + action + '_' + woId);
+    hiddenInput.value = remarks;
+
+    const actionText = action === 'close' ? 'close' : 're-open';
+    return confirm('Are you sure you want to ' + actionText + ' this work order?');
+}
+</script>
+
+
+
+
+
+
+
+

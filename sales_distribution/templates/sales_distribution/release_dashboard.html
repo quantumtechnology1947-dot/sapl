@@ -1,0 +1,62 @@
+{% extends "core/base.html" %}
+
+{% block title %}Work Order Release - Cortex ERP{% endblock %}
+{% block page_title %}Work Order Release{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Work Order Release</h2>
+                <p class="text-sm text-gray-600 mt-1">Release work orders for production</p>
+            </div>
+            <a href="{% url 'sales_distribution:release-create' %}"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow-sm transition-colors">
+                New Release
+            </a>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">WO Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">PO Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for wo in workorders %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ wo.wono }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ wo.customerid }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ wo.pono }}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Open</span>
+                    </td>
+                    <td class="px-6 py-4 text-right text-sm">
+                        <a href="{% url 'sales_distribution:release-create' %}" class="text-blue-600 hover:text-blue-900">Release</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-16 text-center text-gray-500">No open work orders</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

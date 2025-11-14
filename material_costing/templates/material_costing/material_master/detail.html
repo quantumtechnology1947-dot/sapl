@@ -1,0 +1,55 @@
+{% extends 'material_costing/base.html' %}
+{% block title %}Material Master - {{ master.materialcostmasterno }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-sm font-bold text-gray-900">Material Master Details</h2>
+        <p class="mt-1 text-sm text-gray-600">Master: {{ master.materialcostmasterno }}</p>
+    </div>
+    <div class="space-x-2">
+        <a href="{% url 'material_costing:material-master-update' master.id %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Edit</a>
+        <a href="{% url 'material_costing:material-master-list' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Back to List</a>
+    </div>
+</div>
+<div class="bg-white rounded border border-gray-200 p-6 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Master Information</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><p class="text-sm text-gray-600">Master Number</p><p class="font-medium">{{ master.materialcostmasterno }}</p></div>
+        <div><p class="text-sm text-gray-600">Date</p><p class="font-medium">{{ master.sysdate }}</p></div>
+        <div class="md:col-span-2"><p class="text-sm text-gray-600">Description</p><p class="font-medium">{{ master.description|default:'N/A' }}</p></div>
+        <div><p class="text-sm text-gray-600">Company ID</p><p class="font-medium">{{ master.compid }}</p></div>
+        <div><p class="text-sm text-gray-600">Financial Year</p><p class="font-medium">{{ master.finyearid }}</p></div>
+    </div>
+</div>
+<div class="bg-white rounded border border-gray-200 p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Associated Details</h3>
+    {% if details %}
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Detail ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Information</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for detail in details %}
+            <tr>
+                <td class="px-6 py-4 text-sm">{{ detail.id }}</td>
+                <td class="px-6 py-4 text-sm">{{ detail }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-gray-500">No details available</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

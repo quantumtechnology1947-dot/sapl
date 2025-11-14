@@ -1,0 +1,170 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Goods Inward Note (GIN) - List{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Goods Inward Note (GIN)</h1>
+                <p class="text-sm text-gray-600 mt-1">Record incoming materials from suppliers</p>
+            </div>
+            <a href="{% url 'inventory:gin-create' %}" 
+               class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                New GIN
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter - SAP Fiori Style with Dropdown -->
+    <div class="bg-white border border-gray-200 rounded mb-2">
+        <div class="px-4 py-2 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-xs font-semibold text-gray-700">Material Inward - Edit</h2>
+        </div>
+        <div class="p-3">
+            <form method="get" class="flex gap-2 items-center">
+                <select name="search_field"
+                        class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                    <option value="">Select</option>
+                    <option value="supplier" {% if request.GET.search_field == 'supplier' %}selected{% endif %}>Supplier Name</option>
+                    <option value="pono" {% if request.GET.search_field == 'pono' %}selected{% endif %}>PO No</option>
+                    <option value="ginno" {% if request.GET.search_field == 'ginno' %}selected{% endif %}>GIN No</option>
+                </select>
+                <input type="text"
+                       name="search_value"
+                       value="{{ request.GET.search_value }}"
+                       placeholder="Enter search value..."
+                       class="h-8 flex-1 min-w-[250px] px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                <button type="submit"
+                        class="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+                {% if request.GET.search_value %}
+                <a href="{% url 'inventory:gin-list' %}"
+                   class="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    Clear
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- GIN List -->
+    {% if gin_list %}
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-12 px-3 py-2 text-left text-xs font-semibold text-gray-700">SN</th>
+                        <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Status</th>
+                        <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Action</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Fin Year</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">PO No</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">GIN No</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Date</th>
+                        <th class="w-48 px-3 py-2 text-left text-xs font-semibold text-gray-700">Name of Supplier</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Challan No</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Challan Date</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for gin in gin_list %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+                        <td class="w-12 px-3 py-2 text-xs text-gray-600">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-center text-xs">
+                            {% if gin.has_grr %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                GRR
+                            </span>
+                            {% endif %}
+                            {% if gin.has_gsn %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                GSN
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-center text-xs">
+                            <a href="{% url 'inventory:gin-detail' gin.id %}"
+                               class="text-sap-blue hover:underline text-xs">
+                                Select
+                            </a>
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ gin.finyear_name|default:"-" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ gin.pono|default:"-" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs font-medium text-sap-blue whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ gin.ginno }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ gin.gin_date|default:"-" }}
+                        </td>
+                        <td class="w-48 px-3 py-2 text-xs whitespace-nowrap overflow-hidden text-ellipsis" title="{{ gin.supplier_name }}">
+                            {{ gin.supplier_name|default:"-" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ gin.challanno|default:"-" }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ gin.challandate|default:"-" }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SAP Fiori Pagination -->
+    {% if is_paginated %}
+    {% include 'core/components/tables/pagination.html' with page_obj=page_obj %}
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded border border-gray-200 p-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No GIN found</h3>
+        <p class="mt-1 text-sm text-gray-500">
+            {% if search_query %}
+                No GIN match your search criteria.
+            {% else %}
+                Get started by creating a new Goods Inward Note.
+            {% endif %}
+        </p>
+        <div class="mt-6">
+            <a href="{% url 'inventory:gin-create' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                New GIN
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

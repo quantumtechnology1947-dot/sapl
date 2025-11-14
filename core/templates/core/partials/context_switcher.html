@@ -1,0 +1,98 @@
+{% load static %}
+
+<!-- Financial Year Context Switcher -->
+<div class="flex items-center space-x-4 text-sm">
+    {% if request.context_data %}
+    <!-- Company Selector -->
+    <div class="relative" x-data="{ open: false }">
+        <button 
+            @click="open = !open"
+            @click.away="open = false"
+            class="flex items-center space-x-2 px-3 py-2 rounded bg-gray-100 hover:bg-gray-200 transition-colors"
+        >
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span class="font-medium text-gray-700">{{ request.context_data.company_name|default:"Select Company" }}</span>
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+        
+        <!-- Dropdown -->
+        <div 
+            x-show="open"
+            x-transition
+            class="absolute right-0 mt-2 w-64 bg-white rounded border border-gray-200 border border-gray-200 z-50"
+        >
+            <div class="p-2">
+                <div class="text-xs font-semibold text-gray-500 uppercase px-3 py-2">Select Company</div>
+                <div 
+                    hx-get="{% url 'core:company-list' %}"
+                    hx-trigger="load"
+                    hx-target="this"
+                    hx-swap="innerHTML"
+                >
+                    <div class="px-3 py-2 text-sm text-gray-500">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Financial Year Selector -->
+    <div class="relative" x-data="{ open: false }">
+        <button 
+            @click="open = !open"
+            @click.away="open = false"
+            class="flex items-center space-x-2 px-3 py-2 rounded bg-blue-50 hover:bg-blue-100 transition-colors"
+        >
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span class="font-medium text-blue-700">FY: {{ request.context_data.finyear_name|default:"Select Year" }}</span>
+            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+        
+        <!-- Dropdown -->
+        <div 
+            x-show="open"
+            x-transition
+            class="absolute right-0 mt-2 w-64 bg-white rounded border border-gray-200 border border-gray-200 z-50"
+        >
+            <div class="p-2">
+                <div class="text-xs font-semibold text-gray-500 uppercase px-3 py-2">Select Financial Year</div>
+                <div 
+                    hx-get="{% url 'core:finyear-list' %}?company_id={{ request.context_data.company_id }}"
+                    hx-trigger="load"
+                    hx-target="this"
+                    hx-swap="innerHTML"
+                >
+                    <div class="px-3 py-2 text-sm text-gray-500">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- No Context Available -->
+    <div class="flex items-center space-x-2 px-3 py-2 rounded bg-yellow-50 border border-yellow-200">
+        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <span class="text-sm text-yellow-700">No context set</span>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Alpine.js for dropdowns (if not already included) -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+
+
+
+
+
+
+

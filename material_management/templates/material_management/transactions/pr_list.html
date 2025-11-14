@@ -1,0 +1,118 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Purchase Requisition (PR) - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="h-full flex flex-col">
+    <!-- Header - Compact SAP Fiori Style -->
+    <div class="bg-white border-b border-gray-200 px-3 py-2 flex justify-between items-center">
+        <h1 class="text-sm font-semibold text-gray-900">Purchase Requisition (PR)</h1>
+        <a href="{% url 'material_management:pr-new-search' %}" 
+           class="h-8 px-3 text-xs bg-sap-blue text-white rounded hover:bg-sap-blue-hover transition-colors flex items-center">
+            + New PR
+        </a>
+    </div>
+
+    <!-- Search Form - Horizontal Compact -->
+    <div class="bg-white border-b border-gray-200 px-3 py-2">
+        <form method="get" class="flex items-center gap-2">
+            <input type="text" name="search" value="{{ search_query }}"
+                   placeholder="PR number or work order..."
+                   class="h-8 px-3 text-xs border border-gray-300 rounded focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-64">
+            <select name="status" 
+                    class="h-8 px-3 text-xs border border-gray-300 rounded focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                <option value="">All Status</option>
+                <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Checked" {% if status_filter == 'Checked' %}selected{% endif %}>Checked</option>
+                <option value="Approved" {% if status_filter == 'Approved' %}selected{% endif %}>Approved</option>
+                <option value="Authorized" {% if status_filter == 'Authorized' %}selected{% endif %}>Authorized</option>
+                <option value="Rejected" {% if status_filter == 'Rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+            <button type="submit" 
+                    class="h-8 px-3 text-xs bg-sap-blue text-white rounded hover:bg-sap-blue-hover transition-colors">
+                Search
+            </button>
+            {% if search_query or status_filter %}
+            <a href="{% url 'material_management:pr-list' %}" 
+               class="h-8 px-3 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors flex items-center">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Table - Full Height with Sticky Header -->
+    <div class="flex-1 bg-white overflow-auto">
+        <table class="min-w-full">
+            <thead class="bg-gray-50 sticky top-0">
+                <tr class="border-b border-gray-200">
+                    <th class="px-2 py-2 text-right text-xs font-medium text-gray-700 w-[50px]">SN</th>
+                    <th class="px-2 py-2 text-center text-xs font-medium text-gray-700 w-[100px]">Fin Year</th>
+                    <th class="px-2 py-2 text-center text-xs font-medium text-gray-700 w-20">Select</th>
+                    <th class="px-2 py-2 text-center text-xs font-medium text-gray-700 w-20">PRNo</th>
+                    <th class="px-2 py-2 text-center text-xs font-medium text-gray-700 w-[100px]">WONo</th>
+                    <th class="px-2 py-2 text-center text-xs font-medium text-gray-700 w-[120px]">Date</th>
+                    <th class="px-2 py-2 text-center text-xs font-medium text-gray-700 w-[100px]">Time</th>
+                    <th class="px-2 py-2 text-left text-xs font-medium text-gray-700">Gen By</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                {% for pr in prs %}
+                <tr class="border-b border-gray-100 hover:bg-blue-50/30">
+                    <td class="px-2 py-1 text-xs text-right">{{ forloop.counter }}</td>
+                    <td class="px-2 py-1 text-xs text-center">{{ pr.fin_year|default:"-" }}</td>
+                    <td class="px-2 py-1 text-xs text-center">
+                        <a href="{% url 'material_management:pr-detail' pr.pr_id %}" 
+                           class="text-sap-blue hover:text-sap-blue-hover font-medium">
+                            Select
+                        </a>
+                    </td>
+                    <td class="px-2 py-1 text-xs text-center">{{ pr.pr_no }}</td>
+                    <td class="px-2 py-1 text-xs text-center">{{ pr.wo_no|default:"-" }}</td>
+                    <td class="px-2 py-1 text-xs text-center">{{ pr.sys_date|default:"-" }}</td>
+                    <td class="px-2 py-1 text-xs text-center">{{ pr.sys_time|default:"-" }}</td>
+                    <td class="px-2 py-1 text-xs">{% if pr.emp_name and pr.emp_name != "None" %}{{ pr.emp_name }}{% else %}-{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="px-3 py-8 text-center text-xs text-gray-500">
+                        No purchase requisitions found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination - Compact -->
+    {% if is_paginated %}
+    <div class="bg-white border-t border-gray-200 px-3 py-2 flex items-center justify-between">
+        <p class="text-xs text-gray-700">
+            Showing <span class="font-medium">{{ page_obj.start_index }}</span> to 
+            <span class="font-medium">{{ page_obj.end_index }}</span> of 
+            <span class="font-medium">{{ page_obj.paginator.count }}</span> entries
+        </p>
+        <nav class="flex items-center gap-1">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
+               class="h-8 px-3 text-xs border border-gray-300 bg-white rounded hover:bg-gray-50 flex items-center">
+                Previous
+            </a>
+            {% endif %}
+            
+            <span class="h-8 px-3 text-xs bg-sap-blue text-white rounded flex items-center">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" 
+               class="h-8 px-3 text-xs border border-gray-300 bg-white rounded hover:bg-gray-50 flex items-center">
+                Next
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

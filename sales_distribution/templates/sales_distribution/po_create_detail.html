@@ -1,0 +1,349 @@
+{% extends "core/base.html" %}
+{% block title %}Customer PO - New{% endblock %}
+{% block page_title %}Customer PO - New{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2 py-1" x-data="{ currentTab: 1 }">
+    <!-- Page Heading Outside Form -->
+    <div class="flex justify-between items-center mb-2">
+        <h1 class="text-sm font-semibold text-gray-800">Customer PO - New</h1>
+        <button type="submit" form="po-form" class="bg-red-600 hover:bg-red-700 text-white text-sm px-5 py-1 rounded shadow">
+            Submit
+        </button>
+    </div>
+
+    {% if not enquiry %}
+    <div class="bg-red-50 border border-red-300 p-2 mb-2">
+        <p class="text-xs text-red-700">Enquiry not found. Please go back and select a valid enquiry.</p>
+    </div>
+    {% else %}
+
+    <!-- Context Information Row -->
+    <div class="bg-white border border-gray-300 mb-2">
+        <table class="w-full text-xs">
+            <tr>
+                <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[15%]">Name of Customer</td>
+                <td class="px-2 py-1" class="w-[35%]">{{ enquiry.customername }}</td>
+                <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[10%]">Enquiry No</td>
+                <td class="px-2 py-1" class="w-[15%]">{{ enquiry.enqid }}</td>
+                <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[10%]">Code</td>
+                <td class="px-2 py-1" class="w-[15%]">{{ enquiry.customerid|default:"-" }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="po-form">
+        {% csrf_token %}
+        <input type="hidden" name="enqid" value="{{ enquiry.enqid }}">
+        <input type="hidden" name="customerid" value="{{ enquiry.customerid }}">
+
+        <!-- Tab Navigation Bar -->
+        <div class="bg-white border border-gray-300 mb-2">
+            <div class="flex">
+                <button type="button"
+                        @click="currentTab = 1"
+                        :class="currentTab === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                        class="flex-1 px-3 py-1 text-xs font-medium border-r border-gray-300">
+                    Customer Details
+                </button>
+                <button type="button"
+                        @click="currentTab = 2"
+                        :class="currentTab === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                        class="flex-1 px-3 py-1 text-xs font-medium border-r border-gray-300">
+                    Goods Details
+                </button>
+                <button type="button"
+                        @click="currentTab = 3"
+                        :class="currentTab === 3 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+                        class="flex-1 px-3 py-1 text-xs font-medium">
+                    Terms & Conditions
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 1: Customer Details -->
+        <div x-show="currentTab === 1">
+            <!-- Registered Office Address -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[15%]">Regd. Office Address</td>
+                        <td class="px-2 py-1" colspan="5">{{ enquiry.regdaddress|default:"-" }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Quotation and PO Details -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[15%]">Quotation No.</td>
+                        <td class="px-2 py-1" class="w-[35%]">
+                            <select name="quotation" class="w-full px-2 py-1 border border-gray-300 rounded text-xs">
+                                <option value="">Select</option>
+                                {% for quot in quotations %}
+                                <option value="{{ quot.id }}">{{ quot.quotationno }} - {{ quot.sysdate }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[10%]">PO No <span class="text-red-500">*</span></td>
+                        <td class="px-2 py-1" class="w-[40%]">
+                            {{ form.pono }}
+                            {% if form.pono.errors %}<span class="text-red-500">*</span>{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50">PO Date <span class="text-red-500">*</span></td>
+                        <td class="px-2 py-1">
+                            {{ form.podate }}
+                            {% if form.podate.errors %}<span class="text-red-500">*</span>{% endif %}
+                        </td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50">PO Received Date <span class="text-red-500">*</span></td>
+                        <td class="px-2 py-1">
+                            {{ form.poreceiveddate }}
+                            {% if form.poreceiveddate.errors %}<span class="text-red-500">*</span>{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50">Our Vendor Code <span class="text-red-500">*</span></td>
+                        <td class="px-2 py-1" colspan="3">
+                            {{ form.vendorcode }}
+                            {% if form.vendorcode.errors %}<span class="text-red-500">*</span>{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1" colspan="2"></td>
+                        <td class="px-2 py-1" colspan="2" align="right">
+                            <button type="button" @click="currentTab = 2" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded">
+                                Next
+                            </button>
+                            &nbsp;
+                            <a href="{% url 'sales_distribution:po-search' %}" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded inline-block">
+                                Cancel
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Goods Details -->
+        <div x-show="currentTab === 2">
+            <!-- Add Line Item Form -->
+            <div class="bg-white border border-gray-300 mb-2 p-2">
+                <div class="font-semibold text-gray-700 mb-2">Description & Specification of goods</div>
+                <div id="line-item-form">
+                    {% csrf_token %}
+                    <table class="w-full text-xs">
+                        <tr>
+                            <td class="py-1 pr-1 font-medium text-gray-700" class="w-[25%]">Description & Specification of goods</td>
+                            <td class="py-1 pr-1 font-medium text-gray-700" class="w-[12%]">Total Qty of goods</td>
+                            <td class="py-1 pr-1 font-medium text-gray-700" class="w-[12%]">Rate per unit</td>
+                            <td class="py-1 pr-1 font-medium text-gray-700" class="w-[10%]">Discount</td>
+                            <td class="py-1 pr-1 font-medium text-gray-700" class="w-[10%]">Unit</td>
+                            <td class="py-1" class="w-[31%]"></td>
+                        </tr>
+                        <tr>
+                            <td class="pb-2 pr-1">
+                                <textarea name="itemdesc" rows="2"
+                                          class="w-full px-2 py-1 border border-gray-300 rounded text-xs"></textarea>
+                            </td>
+                            <td class="pb-2 pr-1">
+                                <input type="number" name="totalqty" step="0.001" min="0"
+                                       class="w-full px-2 py-1 border border-gray-300 rounded text-xs">
+                            </td>
+                            <td class="pb-2 pr-1">
+                                <input type="number" name="rate" step="0.001" min="0"
+                                       class="w-full px-2 py-1 border border-gray-300 rounded text-xs">
+                            </td>
+                            <td class="pb-2 pr-1">
+                                <input type="number" name="discount" step="0.001" min="0" value="0"
+                                       class="w-full px-2 py-1 border border-gray-300 rounded text-xs">
+                            </td>
+                            <td class="pb-2 pr-1">
+                                <select name="unit" class="w-full px-2 py-1 border border-gray-300 rounded text-xs">
+                                    <option value="">Select</option>
+                                    {% for unit in units %}
+                                    <option value="{{ unit.id }}">{{ unit.symbol }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="pb-2" align="right">
+                                <button type="button"
+                                        hx-post="{% url 'sales_distribution:po-line-create' enquiry.enqid %}"
+                                        hx-include="#line-item-form"
+                                        hx-target="#line-items-tbody"
+                                        hx-swap="beforeend"
+                                        class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded">
+                                    Submit
+                                </button>
+                                &nbsp;
+                                <button type="button" @click="currentTab = 3" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded">
+                                    Next
+                                </button>
+                                &nbsp;
+                                <a href="{% url 'sales_distribution:po-search' %}" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded inline-block">
+                                    Cancel
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <div class="bg-white border border-gray-300 mb-2 p-2">
+                <div class="font-semibold text-gray-700 mb-2">
+                    <span id="line-item-count">{{ line_items|length }} item(s) added</span>
+                </div>
+
+                <!-- Hidden fields to submit line item data -->
+                {% if line_items %}
+                {% for item in line_items %}
+                <input type="hidden" name="detail_itemdesc_{{ forloop.counter }}" value="{{ item.itemdesc }}">
+                <input type="hidden" name="detail_totalqty_{{ forloop.counter }}" value="{{ item.totalqty }}">
+                <input type="hidden" name="detail_rate_{{ forloop.counter }}" value="{{ item.rate }}">
+                <input type="hidden" name="detail_discount_{{ forloop.counter }}" value="{{ item.discount }}">
+                <input type="hidden" name="detail_unit_{{ forloop.counter }}" value="{{ item.unit_id }}">
+                {% endfor %}
+                {% endif %}
+
+                <div class="max-h-[400px] overflow-y-auto">
+                    <table class="w-full text-xs border-collapse" class="table-fixed">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[5%]">SN</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[6%]">Edit</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[7%]">Delete</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[35%]">Description</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[8%]">Unit</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[10%]">Qty</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[10%]">Rate</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[9%]">Discount(%)</th>
+                                <th class="border border-gray-300 px-1 py-1 text-xs font-semibold text-gray-700" class="w-[10%]">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="line-items-tbody">
+                            {% if line_items %}
+                            {% for item in line_items %}
+                            <tr>
+                                <td class="border border-gray-300 px-1 py-1 text-center text-xs" class="w-[5%]">{{ forloop.counter }}</td>
+                                <td class="border border-gray-300 px-1 py-1 text-center text-xs" class="w-[6%]">
+                                    <button type="button" class="text-blue-600 hover:text-blue-900 text-xs underline"
+                                            hx-get="{% url 'sales_distribution:po-line-edit-form' enquiry.enqid item.id %}"
+                                            hx-target="#edit-modal"
+                                            hx-swap="innerHTML">
+                                        Edit
+                                    </button>
+                                </td>
+                                <td class="border border-gray-300 px-1 py-1 text-center text-xs" class="w-[7%]">
+                                    <button type="button" class="text-red-600 hover:text-red-900 text-xs underline"
+                                            hx-delete="{% url 'sales_distribution:po-line-delete' enquiry.enqid item.id %}"
+                                            hx-target="closest tr"
+                                            hx-swap="outerHTML swap:1s"
+                                            hx-confirm="Are you sure you want to delete this item?"
+                                            @htmx:after-request="document.getElementById('line-item-count').textContent = (document.querySelectorAll('#line-items-tbody tr:not(.empty-row)').length) + ' item(s) added';">
+                                        Delete
+                                    </button>
+                                </td>
+                                <td class="border border-gray-300 px-1 py-1 text-left text-xs" class="w-[35%]">{{ item.itemdesc }}</td>
+                                <td class="border border-gray-300 px-1 py-1 text-center text-xs" class="w-[8%]">{{ item.unit_symbol }}</td>
+                                <td class="border border-gray-300 px-1 py-1 text-right text-xs" class="w-[10%]">{{ item.totalqty|floatformat:3 }}</td>
+                                <td class="border border-gray-300 px-1 py-1 text-right text-xs" class="w-[10%]">{{ item.rate|floatformat:2 }}</td>
+                                <td class="border border-gray-300 px-1 py-1 text-right text-xs" class="w-[9%]">{{ item.discount|floatformat:2 }}</td>
+                                <td class="border border-gray-300 px-1 py-1 text-right text-xs" class="w-[10%]">{{ item.amount|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr id="empty-row" class="empty-row">
+                                <td colspan="9" class="border border-gray-300 px-2 py-4 text-center text-gray-500">
+                                    No data to display !
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Terms & Conditions -->
+        <div x-show="currentTab === 3">
+            <!-- Payment Terms and GST -->
+            <div class="bg-white border border-gray-300 mb-2">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[15%]">Payment Terms</td>
+                        <td class="px-2 py-1" class="w-[35%]">
+                            : {{ form.paymentterms }}
+                        </td>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="w-[15%]">GST</td>
+                        <td class="px-2 py-1" class="w-[35%]">
+                            : {{ form.excise }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50">Attachment</td>
+                        <td class="px-2 py-1" colspan="3">
+                            : <input type="file" name="attachment" accept=".pdf,.jpg,.jpeg,.png"
+                                   class="text-xs border border-gray-300 rounded px-2 py-1">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1 font-medium text-gray-700 bg-gray-50" class="align-top">Remarks</td>
+                        <td class="px-2 py-1" colspan="3">
+                            : {{ form.remarks }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-1" colspan="2"></td>
+                        <td class="px-2 py-1" colspan="2" align="right">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded"
+                                    onclick="return confirm('Are you sure you want to submit this PO?');">
+                                Submit
+                            </button>
+                            &nbsp;
+                            <a href="{% url 'sales_distribution:po-search' %}" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1 rounded inline-block">
+                                Cancel
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </form>
+
+    {% endif %}
+</div>
+
+<!-- Edit Modal Placeholder -->
+<div id="edit-modal"></div>
+
+<script>
+// Validation before submit
+document.getElementById('po-form').addEventListener('submit', function(e) {
+    const tbody = document.getElementById('line-items-tbody');
+    const rows = tbody.querySelectorAll('tr:not(.empty-row)');
+
+    if (rows.length === 0) {
+        e.preventDefault();
+        alert('Please add at least one line item before submitting the PO.');
+        // Switch to goods tab
+        const container = document.querySelector('[x-data]');
+        if (container && container.__x) {
+            container.__x.$data.currentTab = 2;
+        }
+        return false;
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+

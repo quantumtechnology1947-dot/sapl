@@ -1,0 +1,111 @@
+{% extends "core/base.html" %}
+
+{% block title %}Customer PO List - Cortex ERP{% endblock %}
+{% block page_title %}Customer PO List{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between mb-2">
+        <!-- Search Input -->
+        <div class="relative">
+            <input type="text" name="search" value="{{ request.GET.search }}"
+                placeholder="Search..."
+                hx-get="{% url 'sales_distribution:po-list' %}"
+                hx-trigger="input changed delay:500ms, search"
+                hx-target="#po-table"
+                hx-include="[name='search']"
+                class="h-8 w-56 pl-8 pr-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue" />
+            <svg class="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+
+        <!-- Create Button -->
+        <a href="{% url 'sales_distribution:po-create' %}"
+            class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-dark focus:outline-none focus:ring-2 focus:ring-sap-blue/30 transition-colors">
+            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Create
+        </a>
+    </div>
+
+    <!-- SAP Fiori Table -->
+    <div id="po-table" class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-20 px-3 py-2 text-left text-xs font-semibold text-gray-700">PO ID</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">PO No</th>
+                        <th class="w-48 px-3 py-2 text-left text-xs font-semibold text-gray-700">Customer</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">PO Date</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Vendor Code</th>
+                        <th class="w-32 px-3 py-2 text-center text-xs font-semibold text-gray-700">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for po in pos %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors cursor-pointer group">
+                        <td class="w-20 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">{{ po.poid }}</td>
+                        <td class="w-32 px-3 py-2 text-xs whitespace-nowrap overflow-hidden text-ellipsis">
+                            <a href="{% url 'sales_distribution:po-edit' po.poid %}" class="text-sap-blue hover:text-sap-blue-dark hover:underline font-medium transition-colors">{{ po.pono }}</a>
+                        </td>
+                        <td class="w-48 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ po.customer_name }}">{{ po.customer_name }}</td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">{{ po.podate|default:'-' }}</td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">{{ po.vendorcode|default:'-' }}</td>
+                        <td class="w-32 px-3 py-2 text-center text-xs">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{% url 'sales_distribution:po-edit' po.poid %}" 
+                                   class="text-sap-blue hover:text-sap-blue-dark hover:underline font-medium inline-flex items-center transition-colors"
+                                   title="Edit">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Edit
+                                </a>
+                                <form method="post" action="{% url 'sales_distribution:po-delete' po.poid %}" 
+                                      class="inline"
+                                      onsubmit="return confirm('Are you sure you want to delete this PO?');">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="text-sap-red hover:text-sap-red-dark hover:underline font-medium inline-flex items-center transition-colors"
+                                            title="Delete">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    {% include 'core/components/empty_state.html' with
+                        in_table=True
+                        colspan=6
+                        icon_path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        title="No POs found"
+                        message="Get started by creating a new purchase order"
+                        action_url='sales_distribution:po-create'
+                        action_text="Create PO"
+                    %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'core/components/tables/pagination.html' with page_obj=page_obj is_paginated=is_paginated htmx_enabled=True htmx_target="#po-table" %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

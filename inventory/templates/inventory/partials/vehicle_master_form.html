@@ -1,0 +1,40 @@
+<div class="bg-white rounded border border-gray-200 p-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Vehicle</h3>
+    <form hx-post="{% url 'inventory:vehicle-master-create' %}"
+          hx-target="#vehicle-table tbody"
+          hx-swap="beforeend"
+          hx-on::after-request="this.reset(); recalculateRowNumbers()"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% csrf_token %}
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Name of Vehicle *</label>
+            {{ form.vehicalname }}
+            {% if form.vehicalname.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.vehicalname.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Number *</label>
+            {{ form.vehicalno }}
+            {% if form.vehicalno.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ form.vehicalno.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="md:col-span-2 flex gap-2">
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition">
+                Save Vehicle
+            </button>
+            <button type="button"
+                    hx-get="/empty/"
+                    hx-target="#vehicle-form"
+                    hx-swap="innerHTML"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md font-medium transition">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>

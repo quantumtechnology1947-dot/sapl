@@ -1,0 +1,83 @@
+<tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors" id="plan-row-{{ plan.id }}">
+    <td class="w-12 px-3 py-2 text-xs text-gray-600">
+        {{ forloop.counter }}
+    </td>
+    <td class="w-24 px-3 py-2 text-center text-xs">
+        {% if plan.in_pr %}
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+            PR
+        </span>
+        {% else %}
+        <button type="button" 
+                class="text-sap-blue hover:underline text-xs edit-btn"
+                onclick="enableEdit({{ plan.id }})">
+            Edit
+        </button>
+        <a href="{% url 'material_planning:plan-detail' plan.id %}"
+           class="text-sap-blue hover:underline text-xs ml-2">
+            Select
+        </a>
+        {% endif %}
+    </td>
+    <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ plan.finyear_name|default:"-" }}
+    </td>
+    <td class="w-24 px-3 py-2 text-xs font-medium text-sap-blue whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ plan.plno }}
+    </td>
+    <td class="w-24 px-3 py-2 text-xs text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+        {{ plan.wono }}
+    </td>
+    <td class="w-48 px-3 py-2 text-xs" id="supplier-cell-{{ plan.id }}">
+        <span class="view-mode-{{ plan.id }} block whitespace-nowrap overflow-hidden text-ellipsis" 
+              title="{{ plan.supplier_name|default:'' }}">
+            {{ plan.supplier_name|default:"-" }}
+        </span>
+        <input type="text" 
+               class="edit-mode-{{ plan.id }} hidden w-full px-2 py-1 text-xs border border-gray-300 rounded h-7"
+               id="supplier-input-{{ plan.id }}"
+               value="{{ plan.supplier_name }}"
+               placeholder="Supplier Name [ID]">
+    </td>
+    <td class="w-32 px-3 py-2 text-xs" id="compdate-cell-{{ plan.id }}">
+        <span class="view-mode-{{ plan.id }} block whitespace-nowrap overflow-hidden text-ellipsis">
+            {{ plan.compdate_display|default:"-" }}
+        </span>
+        <input type="text" 
+               class="edit-mode-{{ plan.id }} flatpickr hidden w-full px-2 py-1 text-xs border border-gray-300 rounded h-7"
+               id="compdate-input-{{ plan.id }}"
+               value="{{ plan.compdate_display }}"
+               placeholder="DD-MM-YYYY">
+    </td>
+    <td class="w-24 px-3 py-2 text-center text-xs">
+        {% if plan.in_pr %}
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+            PR
+        </span>
+        {% else %}
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+            OPEN
+        </span>
+        {% endif %}
+    </td>
+    <td class="w-32 px-3 py-2 text-center text-xs">
+        <button type="button"
+                class="edit-mode-{{ plan.id }} hidden px-2 py-1 bg-sap-green text-white rounded text-xs hover:bg-sap-green-dark h-7"
+                onclick="saveEdit({{ plan.id }})">
+            Save
+        </button>
+        <button type="button"
+                class="edit-mode-{{ plan.id }} hidden px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600 ml-1 h-7"
+                onclick="cancelEdit({{ plan.id }})">
+            Cancel
+        </button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

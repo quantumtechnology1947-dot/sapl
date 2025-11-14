@@ -1,0 +1,309 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Invoice{% else %}Create Invoice{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-base font-bold text-gray-900">
+                {% if object %}Edit Invoice{% else %}Create Sales Invoice{% endif %}
+            </h1>
+            <p class="text-gray-600 mt-2">
+                {% if object %}
+                    Modify invoice details and line items
+                {% else %}
+                    Create a new invoice from purchase order
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'accounts:invoice-dashboard' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+
+    {% if not has_line_items %}
+    <div class="bg-yellow-50 border border-yellow-200 rounded p-4 mb-6">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+            <p class="text-yellow-800">
+                No line items available for invoicing. All items may have been fully invoiced.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Invoice Form -->
+    <form method="POST" id="invoice-form" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Read-only Header Information -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Invoice Information</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Invoice Number (Read-only) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Invoice Number</label>
+                    <input type="text" 
+                           name="invoice_no" 
+                           value="{{ form.invoice_no.value }}"
+                           readonly
+                           class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue bg-gray-50 cursor-not-allowed">
+                </div>
+
+                <!-- PO Number (Read-only) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">PO Number</label>
+                    <input type="text" 
+                           name="po_no" 
+                           value="{{ form.po_no.value }}"
+                           readonly
+                           class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue bg-gray-50 cursor-not-allowed">
+                </div>
+
+                <!-- Invoice Type (Read-only) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Invoice Type</label>
+                    <input type="text" 
+                           name="invoice_type" 
+                           value="{{ form.invoice_type.value|title }}"
+                           readonly
+                           class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue bg-gray-50 cursor-not-allowed">
+                </div>
+
+                <!-- Invoice Date -->
+                <div>
+                    <label for="id_invoice_date" class="block text-sm font-medium text-gray-700 mb-1">
+                        Invoice Date <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.invoice_date }}
+                    {% if form.invoice_date.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.invoice_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Removal Date -->
+                <div>
+                    <label for="id_removal_date" class="block text-sm font-medium text-gray-700 mb-1">
+                        Removal Date
+                    </label>
+                    {{ form.removal_date }}
+                    {% if form.removal_date.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.removal_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Removal Time -->
+                <div>
+                    <label for="id_removal_time" class="block text-sm font-medium text-gray-700 mb-1">
+                        Removal Time
+                    </label>
+                    {{ form.removal_time }}
+                </div>
+            </div>
+
+            <!-- Work Order Selection -->
+            {% if work_orders %}
+            <div class="mt-4">
+                <label for="id_wo_no" class="block text-sm font-medium text-gray-700 mb-1">
+                    Work Order
+                </label>
+                <select name="wo_no" id="id_wo_no" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full md:w-1/3">
+                    <option value="">Select Work Order (Optional)</option>
+                    {% for wo in work_orders %}
+                        <option value="{{ wo.wono }}">{{ wo.wono }} - {{ wo.wodate|date:"d/m/Y" }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Tabbed Interface -->
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <!-- Tab Headers -->
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px">
+                    <button type="button" 
+                            class="tab-button active px-6 py-3 text-sm font-medium border-b-2 border-blue-500 text-blue-600"
+                            data-tab="line-items">
+                        <i class="fas fa-list mr-2"></i>
+                        Line Items
+                        <span class="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                            {{ line_items|length }}
+                        </span>
+                    </button>
+                    <button type="button" 
+                            class="tab-button px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            data-tab="buyer-info">
+                        <i class="fas fa-user mr-2"></i>
+                        Buyer Information
+                    </button>
+                    <button type="button" 
+                            class="tab-button px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            data-tab="consignee-info">
+                        <i class="fas fa-shipping-fast mr-2"></i>
+                        Consignee Information
+                    </button>
+                    <button type="button" 
+                            class="tab-button px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            data-tab="tax-charges">
+                        <i class="fas fa-calculator mr-2"></i>
+                        Tax & Charges
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6">
+                <!-- Line Items Tab -->
+                <div id="line-items-tab" class="tab-content">
+                    {% include 'accounts/invoices/partials/line_items_tab.html' %}
+                </div>
+
+                <!-- Buyer Information Tab -->
+                <div id="buyer-info-tab" class="tab-content hidden">
+                    {% include 'accounts/invoices/partials/buyer_info_tab.html' %}
+                </div>
+
+                <!-- Consignee Information Tab -->
+                <div id="consignee-info-tab" class="tab-content hidden">
+                    {% include 'accounts/invoices/partials/consignee_info_tab.html' %}
+                </div>
+
+                <!-- Tax & Charges Tab -->
+                <div id="tax-charges-tab" class="tab-content hidden">
+                    {% include 'accounts/invoices/partials/tax_charges_tab.html' %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Totals Summary -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Invoice Summary</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Subtotal:</span>
+                        <span class="font-medium" id="subtotal-display">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Freight Charges:</span>
+                        <span class="font-medium" id="freight-display">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Packing Charges:</span>
+                        <span class="font-medium" id="packing-display">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Insurance:</span>
+                        <span class="font-medium" id="insurance-display">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Other Charges:</span>
+                        <span class="font-medium" id="other-display">₹0.00</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Discount:</span>
+                        <span class="font-medium text-red-600" id="discount-display">-₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">CGST:</span>
+                        <span class="font-medium" id="cgst-display">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">SGST:</span>
+                        <span class="font-medium" id="sgst-display">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">IGST:</span>
+                        <span class="font-medium" id="igst-display">₹0.00</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold border-t pt-2 mt-2">
+                        <span class="text-gray-900">Total Amount:</span>
+                        <span class="text-blue-600" id="total-display">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-between items-center">
+            <a href="{% url 'accounts:invoice-dashboard' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+            </a>
+            
+            <div class="space-x-4">
+                <button type="button" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors" onclick="saveDraft()">
+                    <i class="fas fa-save mr-2"></i>
+                    Save as Draft
+                </button>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors" id="submit-btn">
+                    <i class="fas fa-check mr-2"></i>
+                    {% if object %}Update Invoice{% else %}Create Invoice{% endif %}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Hidden fields for calculations -->
+<input type="hidden" id="selected-items-data" value="">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/invoice_form.js' %}"></script>
+<script>
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                
+                // Add active class to clicked button
+                this.classList.add('active', 'border-blue-500', 'text-blue-600');
+                this.classList.remove('border-transparent', 'text-gray-500');
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Show selected tab content
+                document.getElementById(tabName + '-tab').classList.remove('hidden');
+            });
+        });
+    });
+    
+    // Save draft functionality
+    function saveDraft() {
+        // TODO: Implement save draft functionality
+        alert('Save draft functionality will be implemented in a future task');
+    }
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

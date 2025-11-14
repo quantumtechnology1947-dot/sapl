@@ -1,0 +1,83 @@
+{# Primary Action Button - SAP Fiori Style #}
+{% comment %}
+Usage:
+{% include 'core/components/buttons/primary.html' with text="Save" icon="check" url="#" type="submit" size="compact" %}
+
+Parameters:
+- text: Button text (required)
+- icon: Icon name (optional) - uses heroicons
+- url: Link URL (optional, creates <a> instead of <button>)
+- type: Button type (default: "button")
+- size: "compact" or "default" (default: "default")
+  - compact: h-8 px-3 text-xs (32px height)
+  - default: h-9 px-4 text-sm (36px height)
+- disabled: Boolean (default: false)
+- htmx_get/post: HTMX attributes (optional)
+- htmx_target: HTMX target selector (optional)
+- htmx_swap: HTMX swap strategy (optional)
+- htmx_confirm: HTMX confirmation message (optional)
+- extra_classes: Additional CSS classes (optional)
+- id: Button ID attribute (optional)
+- name: Button name attribute (optional)
+- value: Button value attribute (optional)
+{% endcomment %}
+
+{% if url %}
+<a href="{{ url }}" 
+   {% if id %}id="{{ id }}"{% endif %}
+   class="inline-flex items-center justify-center gap-2 bg-sap-blue hover:bg-sap-blue-hover text-white font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-sap-blue/30 disabled:opacity-50 disabled:cursor-not-allowed
+   {% if size == 'compact' %}h-8 px-3 text-xs{% else %}h-9 px-4 text-sm{% endif %}
+   {{ extra_classes }}"
+   {% if disabled %}aria-disabled="true"{% endif %}
+   {% if htmx_get %}hx-get="{{ htmx_get }}"{% endif %}
+   {% if htmx_post %}hx-post="{{ htmx_post }}"{% endif %}
+   {% if htmx_target %}hx-target="{{ htmx_target }}"{% endif %}
+   {% if htmx_swap %}hx-swap="{{ htmx_swap }}"{% endif %}
+   {% if htmx_confirm %}hx-confirm="{{ htmx_confirm }}"{% endif %}>
+    {% if icon %}
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {% if icon == "plus" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        {% elif icon == "check" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        {% elif icon == "save" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+        {% elif icon == "search" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        {% elif icon == "edit" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        {% endif %}
+    </svg>
+    {% endif %}
+    {{ text }}
+</a>
+{% else %}
+<button type="{{ type|default:'button' }}" 
+        {% if id %}id="{{ id }}"{% endif %}
+        {% if name %}name="{{ name }}"{% endif %}
+        {% if value %}value="{{ value }}"{% endif %}
+        class="inline-flex items-center justify-center gap-2 bg-sap-blue hover:bg-sap-blue-hover text-white font-medium rounded transition-colors focus:outline-none focus:ring-2 focus:ring-sap-blue/30 disabled:opacity-50 disabled:cursor-not-allowed
+        {% if size == 'compact' %}h-8 px-3 text-xs{% else %}h-9 px-4 text-sm{% endif %}
+        {{ extra_classes }}"
+        {% if disabled %}disabled{% endif %}
+        {% if htmx_get %}hx-get="{{ htmx_get }}"{% endif %}
+        {% if htmx_post %}hx-post="{{ htmx_post }}"{% endif %}
+        {% if htmx_target %}hx-target="{{ htmx_target }}"{% endif %}
+        {% if htmx_swap %}hx-swap="{{ htmx_swap }}"{% endif %}
+        {% if htmx_confirm %}hx-confirm="{{ htmx_confirm }}"{% endif %}>
+    {% if icon %}
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {% if icon == "plus" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        {% elif icon == "check" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        {% elif icon == "save" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+        {% elif icon == "search" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        {% elif icon == "edit" %}<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        {% endif %}
+    </svg>
+    {% endif %}
+    {{ text }}
+</button>
+{% endif %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+{% extends "daily_report_system/base.html" %}
+{% block content %}
+<div class="bg-white rounded shadow p-6">
+    <h1 class="text-sm font-bold mb-4">Confirm Delete</h1>
+    <p class="mb-4">Are you sure you want to delete design plan "{{ object.wono }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+        <a href="{% url 'daily_report_system:vendor-plan-list' %}" class="bg-gray-500 text-white px-4 py-2 rounded ml-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

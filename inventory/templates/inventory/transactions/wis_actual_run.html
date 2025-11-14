@@ -1,0 +1,94 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Record Actual Run - WIS {{ wis.wisno }} - Inventory{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Record Actual Run</h1>
+                <p class="text-sm text-gray-600 mt-1">WIS: {{ wis.wisno }}</p>
+            </div>
+            <a href="{% url 'inventory:wis-detail' wis.wisid %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">Back</a>
+        </div>
+    </div>
+
+    <div class="bg-pink-50 border-l-4 border-pink-400 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-pink-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-pink-700">
+                    <strong>WIS:</strong> {{ wis.wisno }} | 
+                    <strong>WO:</strong> {{ wis.wonumber|default:"-" }} | 
+                    <strong>Production Qty:</strong> {{ wis.productionqty|floatformat:3 }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 bg-pink-50 border-b border-pink-100">
+                <h2 class="text-lg font-semibold text-pink-900">Enter Actual Material Consumption</h2>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Required Qty</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actual Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for detail in details %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm text-gray-900">
+                                {{ detail.itemid.itemname|default:"N/A" }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 text-right">
+                                {{ detail.requiredqty|floatformat:3 }}
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <input type="number" 
+                                       name="actual_qty_{{ detail.wisdetailid }}"
+                                       step="0.001"
+                                       placeholder="0.000"
+                                       class="w-32 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500">
+                                <input type="hidden" name="item_id_{{ detail.wisdetailid }}" value="{{ detail.itemid.itemid }}">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex gap-3 justify-end mt-6">
+            <a href="{% url 'inventory:wis-detail' wis.wisid %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">Cancel</a>
+            <button type="submit" 
+                    class="bg-pink-600 hover:bg-pink-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                Record Actual Run
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

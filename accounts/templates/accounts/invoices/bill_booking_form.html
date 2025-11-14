@@ -1,0 +1,152 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Bill Booking{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+        <div class="px-4 py-4">
+            <h1 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} Bill Booking</h1>
+        </div>
+    </div>
+    
+    <div class="max-w-6xl mx-auto bg-white rounded border border-gray-200 p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Bill Details Section -->
+            <div class="border-b pb-4">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Bill Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">PV/EV Number</label>
+                        {{ form.pvevno }}
+                        {% if form.pvevno.errors %}<p class="text-red-500 text-sm">{{ form.pvevno.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Supplier ID <span class="text-red-500">*</span></label>
+                        {{ form.supplierid }}
+                        {% if form.supplierid.errors %}<p class="text-red-500 text-sm">{{ form.supplierid.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">PO ID</label>
+                        {{ form.poid }}
+                        {% if form.poid.errors %}<p class="text-red-500 text-sm">{{ form.poid.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Bill Number</label>
+                        {{ form.billno }}
+                        {% if form.billno.errors %}<p class="text-red-500 text-sm">{{ form.billno.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Bill Date</label>
+                        {{ form.billdate }}
+                        {% if form.billdate.errors %}<p class="text-red-500 text-sm">{{ form.billdate.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Account Head <span class="text-red-500">*</span></label>
+                        {{ form.ahid }}
+                        {% if form.ahid.errors %}<p class="text-red-500 text-sm">{{ form.ahid.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Line Items Section -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Bill Items</h2>
+                {{ detail_formset.management_form }}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Item ID</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Amount</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">VAT</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">CST</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Freight</th>
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for form in detail_formset %}
+                            <tr>
+                                <td class="px-2 py-2">{{ form.itemid }}</td>
+                                <td class="px-2 py-2">{{ form.debitvalue }}</td>
+                                <td class="px-2 py-2">{{ form.vat }}</td>
+                                <td class="px-2 py-2">{{ form.cst }}</td>
+                                <td class="px-2 py-2">{{ form.freight }}</td>
+                                <td class="px-2 py-2">{{ form.DELETE }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Additional Information Section -->
+            <div class="border-t pt-4">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Additional Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Debit Amount</label>
+                        {{ form.debitamt }}
+                        {% if form.debitamt.errors %}<p class="text-red-500 text-sm">{{ form.debitamt.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Discount</label>
+                        {{ form.discount }}
+                        {% if form.discount.errors %}<p class="text-red-500 text-sm">{{ form.discount.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Other Charges</label>
+                        {{ form.othercharges }}
+                        {% if form.othercharges.errors %}<p class="text-red-500 text-sm">{{ form.othercharges.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Other Charges Description</label>
+                        {{ form.otherchadesc }}
+                        {% if form.otherchadesc.errors %}<p class="text-red-500 text-sm">{{ form.otherchadesc.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">TDS Code</label>
+                        {{ form.tdscode }}
+                        {% if form.tdscode.errors %}<p class="text-red-500 text-sm">{{ form.tdscode.errors.0 }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Narration</label>
+                        {{ form.narration }}
+                        {% if form.narration.errors %}<p class="text-red-500 text-sm">{{ form.narration.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Buttons -->
+            <div class="flex gap-2">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
+                    {% if object %}Update{% else %}Create{% endif %}
+                </button>
+                <a href="{% url 'accounts:bill-booking-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

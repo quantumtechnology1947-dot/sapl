@@ -1,0 +1,124 @@
+{% extends "core/base.html" %}
+
+{% block title %}Unit Master - Cortex ERP{% endblock %}
+{% block page_title %}Unit Master{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- SAP Fiori Toolbar -->
+    <div class="flex items-center justify-between mb-2">
+        <a href="{% url 'design:category-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Masters
+        </a>
+    </div>
+
+    <!-- SAP Fiori Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                    <th class="px-3 py-1 text-center text-xs font-semibold text-gray-700">SN</th>
+                    <th class="px-3 py-1 text-center text-xs font-semibold text-gray-700">Edit</th>
+                    <th class="px-3 py-1 text-center text-xs font-semibold text-gray-700">Delete</th>
+                    <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">Unit Name</th>
+                    <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">Symbol</th>
+                    <th class="px-3 py-1 text-center text-xs font-semibold text-gray-700">Effect On Invoice</th>
+                </tr>
+            </thead>
+            <tbody id="units-tbody" class="divide-y divide-gray-100">
+                {% for unit in units %}
+                <tr id="unit-row-{{ unit.id }}" class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+                    <td class="px-3 py-1 text-center text-xs text-gray-700">{{ forloop.counter }}</td>
+                    <td class="px-3 py-1 text-center">
+                        <button hx-get="{% url 'design:unit-master-edit' unit.id %}"
+                                hx-target="#unit-row-{{ unit.id }}"
+                                hx-swap="outerHTML"
+                                class="text-sap-blue hover:text-sap-blue-dark text-xs">
+                            Edit
+                        </button>
+                    </td>
+                    <td class="px-3 py-1 text-center">
+                        <button hx-delete="{% url 'design:unit-master-delete' unit.id %}"
+                                hx-target="#unit-row-{{ unit.id }}"
+                                hx-swap="outerHTML swap:1s"
+                                hx-confirm="Are you sure you want to delete this unit?"
+                                class="text-red-600 hover:text-red-800 text-xs">
+                            Delete
+                        </button>
+                    </td>
+                    <td class="px-3 py-1 text-xs text-gray-900">{{ unit.unitname }}</td>
+                    <td class="px-3 py-1 text-xs text-gray-700">{{ unit.symbol }}</td>
+                    <td class="px-3 py-1 text-center text-xs">
+                        {% if unit.effectoninvoice %}
+                            <span class="inline-flex items-center justify-center w-4 h-4 bg-green-100 text-green-600 rounded text-xs">✓</span>
+                        {% else %}
+                            <span class="inline-flex items-center justify-center w-4 h-4 bg-gray-100 text-gray-400 rounded text-xs">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr id="empty-row">
+                    <td colspan="6" class="px-6 py-16 text-center">
+                        <div class="flex flex-col items-center">
+                            <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-900 mb-1">No units found</p>
+                            <p class="text-xs text-gray-500">Add one using the form below</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-gray-50 border-t border-gray-200">
+                <tr id="add-row">
+                    <td colspan="6" class="px-3 py-2">
+                        <form hx-post="{% url 'design:unit-master-create' %}"
+                              hx-target="#units-tbody"
+                              hx-swap="innerHTML"
+                              class="flex gap-2 items-start">
+                            {% csrf_token %}
+                            <div class="flex-1">
+                                <input type="text" name="unitname" required
+                                       placeholder="Unit Name"
+                                       class="w-full h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                            </div>
+                            <div class="flex-1">
+                                <input type="text" name="symbol" required
+                                       placeholder="Symbol"
+                                       class="w-full h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <input type="checkbox" name="effectoninvoice" value="1"
+                                       id="effectoninvoice-add"
+                                       class="w-3.5 h-3.5 text-sap-blue border-gray-300 rounded focus:ring-2 focus:ring-sap-blue">
+                                <label for="effectoninvoice-add" class="text-xs text-gray-700 whitespace-nowrap">Effect On Invoice</label>
+                            </div>
+                            <button type="submit"
+                                    class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors whitespace-nowrap">
+                                Insert
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        {% include 'core/components/tables/pagination.html' with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

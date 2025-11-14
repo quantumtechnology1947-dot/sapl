@@ -1,0 +1,28 @@
+﻿Id,Description,Symbol
+0,Not Applicable,NA
+1,Information Technology,IT
+2,Stores,STR
+3,Admin,ADM
+4,Marketing,MKT
+5,Design,DGN
+6,Purchase,PUR
+7,Vendor,VEN
+8,Machine Shop,MCH
+9,Quality Assurance,QA
+10,Finance,FIN
+11,Project,PRJT
+12,Electrical,ELT
+13,Programming,PLC-PRGM
+14,Fabrication,MCH
+15,Assembly Shop,ASH
+16,Painting,MCH
+17,Robotics,NA
+18,Business Development,BD
+19,Maintenance,Maint
+20,Production,PR
+21,Automation,AUT
+22,HR,HR
+23,Reception,RECP
+24,Accounts,A/C
+25,Canteen,Canteen
+26,Security,sec

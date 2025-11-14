@@ -1,0 +1,60 @@
+{% comment %}
+Component: Badge
+Purpose: Display compact status indicators with SAP Fiori color variants
+Requirements: 5.5
+
+Parameters:
+  - status (required): Badge variant - 'success', 'error', 'warning', 'info', 'neutral'
+                       Also supports semantic aliases: 'active', 'approved', 'pending', 'rejected', 'inactive', 'draft'
+  - text (optional): Badge text (defaults to status value)
+  - show_dot (optional): Boolean - show colored dot indicator
+  - class (optional): Additional CSS classes
+
+Usage:
+  {% include 'core/components/feedback/badge.html' with
+    status='success'
+    text='Active'
+  %}
+
+  {% include 'core/components/feedback/badge.html' with
+    status='pending'
+    show_dot=True
+  %}
+
+  {% include 'core/components/feedback/badge.html' with
+    status='error'
+    text='Rejected'
+  %}
+{% endcomment %}
+
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium
+    {% if status == 'success' or status == 'active' or status == 'approved' %}
+        bg-green-50 text-sap-green border border-sap-green/20
+    {% elif status == 'warning' or status == 'pending' %}
+        bg-orange-50 text-sap-orange border border-sap-orange/20
+    {% elif status == 'error' or status == 'rejected' or status == 'inactive' %}
+        bg-red-50 text-sap-red border border-sap-red/20
+    {% elif status == 'info' or status == 'draft' %}
+        bg-blue-50 text-sap-blue border border-sap-blue/20
+    {% else %}
+        bg-gray-50 text-gray-700 border border-gray-200
+    {% endif %} {{ class|default:'' }}">
+    {% if show_dot %}
+    <span class="w-1.5 h-1.5 rounded-full
+        {% if status == 'success' or status == 'active' or status == 'approved' %}bg-sap-green
+        {% elif status == 'warning' or status == 'pending' %}bg-sap-orange
+        {% elif status == 'error' or status == 'rejected' or status == 'inactive' %}bg-sap-red
+        {% elif status == 'info' or status == 'draft' %}bg-sap-blue
+        {% else %}bg-gray-400
+        {% endif %}" aria-hidden="true"></span>
+    {% endif %}
+    {{ text|default:status|title }}
+</span>
+
+
+
+
+
+
+
+

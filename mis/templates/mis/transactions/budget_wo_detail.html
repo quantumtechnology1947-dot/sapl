@@ -1,0 +1,195 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Budget - {{ wo_no }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-4">
+    <!-- Page Header -->
+    <div class="mb-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-semibold text-gray-900">Budget - Work Order: {{ wo_no }}</h1>
+            <p class="text-sm text-gray-600 mt-1">{{ work_order.customer_name }} - {{ work_order.project_title }}</p>
+        </div>
+        <a href="{% url 'mis:wo_search' %}" class="text-sm text-blue-600 hover:text-blue-800">
+            ← Back to Work Orders
+        </a>
+    </div>
+
+    <!-- Budget Codes Table -->
+    <form method="post" id="budgetForm">
+        {% csrf_token %}
+        
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-12">SN</th>
+                            <th class="px-3 py-2 text-center text-xs font-semibold text-gray-700 w-12">
+                                <input type="checkbox" id="selectAll" class="rounded border-gray-300">
+                            </th>
+                            <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Description</th>
+                            <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-24">Symbol</th>
+                            <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-32">Budget Code</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">Budget Amount</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">PO</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">Cash Pay</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">Cash Rec</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">Tax</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">Bal Budget</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">Invoice</th>
+                            <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-32">Actual Amount</th>
+                            <th class="px-3 py-2 text-center text-xs font-semibold text-gray-700 w-20">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for code in budget_codes %}
+                        <tr class="hover:bg-blue-50/30 transition-colors">
+                            <td class="px-3 py-2 text-xs text-gray-600">{{ forloop.counter }}</td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="checkbox" name="selected_codes" value="{{ code.id }}" class="code-checkbox rounded border-gray-300">
+                            </td>
+                            <td class="px-3 py-2 text-xs font-medium text-gray-900">{{ code.description }}</td>
+                            <td class="px-3 py-2 text-xs text-gray-700">{{ code.symbol|default:"-" }}</td>
+                            <td class="px-3 py-2 text-xs text-gray-700 font-mono">{{ code.budget_code }}</td>
+                            <td class="px-3 py-2 text-xs text-right font-medium text-gray-900">
+                                <span class="amount-display">{{ code.budget_amount|floatformat:2 }}</span>
+                                <input type="number" step="0.01" name="amount_{{ code.id }}" 
+                                       value="{{ code.budget_amount }}" 
+                                       class="amount-input hidden w-full px-2 py-1 text-right border border-gray-300 rounded">
+                            </td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-700">{{ code.po_total|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-700">{{ code.cash_pay|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-700">{{ code.cash_rec|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-700">{{ code.tax|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right font-semibold {% if code.balance < 0 %}text-red-600{% else %}text-green-600{% endif %}">
+                                {{ code.balance|floatformat:2 }}
+                            </td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-700">{{ code.invoice|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-700">{{ code.actual_amount|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-center">
+                                {% if code.budget_amount > 0 %}
+                                <a href="#" class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                    Select
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="14" class="px-6 py-12 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900">No budget codes found</h3>
+                                <p class="mt-1 text-sm text-gray-500">Budget codes will appear here once configured.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                        <!-- Totals Row -->
+                        {% if budget_codes %}
+                        <tr class="bg-gray-100 font-semibold">
+                            <td colspan="5" class="px-3 py-2 text-xs text-gray-900">Total</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-900">{{ totals.budget_amount|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-900">{{ totals.po_total|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-900">{{ totals.cash_pay|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-900">{{ totals.cash_rec|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-900">{{ totals.tax|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right {% if totals.balance < 0 %}text-red-600{% else %}text-green-600{% endif %}">
+                                {{ totals.balance|floatformat:2 }}
+                            </td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-900">{{ totals.invoice|floatformat:2 }}</td>
+                            <td class="px-3 py-2 text-xs text-right text-gray-900">{{ totals.actual_amount|floatformat:2 }}</td>
+                            <td></td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        {% if budget_codes %}
+        <div class="mt-4 flex justify-end gap-3">
+            <button type="button" onclick="window.location.href='{% url 'mis:wo_search' %}'" 
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Cancel
+            </button>
+            <button type="button" onclick="exportToExcel()" 
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export
+            </button>
+            <button type="submit" 
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Insert
+            </button>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+// Select all checkbox functionality
+document.getElementById('selectAll')?.addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.code-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = this.checked;
+        toggleAmountInput(cb);
+    });
+});
+
+// Toggle amount input when checkbox is checked
+document.querySelectorAll('.code-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        toggleAmountInput(this);
+    });
+});
+
+function toggleAmountInput(checkbox) {
+    const row = checkbox.closest('tr');
+    const display = row.querySelector('.amount-display');
+    const input = row.querySelector('.amount-input');
+    
+    if (checkbox.checked) {
+        display.classList.add('hidden');
+        input.classList.remove('hidden');
+    } else {
+        display.classList.remove('hidden');
+        input.classList.add('hidden');
+    }
+}
+
+// Export to Excel functionality
+function exportToExcel() {
+    const table = document.querySelector('table');
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        const csvRow = [];
+        cols.forEach(col => csvRow.push(col.innerText));
+        csv.push(csvRow.join(','));
+    });
+    
+    const csvContent = csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'budget_wo_{{ wo_no }}.csv';
+    a.click();
+}
+</script>
+{% endblock %}

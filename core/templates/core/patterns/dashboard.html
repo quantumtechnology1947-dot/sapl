@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% block dashboard_title %}Dashboard{% endblock %}{% endblock %}
+{% block page_title %}{% block dashboard_page_title %}Dashboard{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Stats Grid -->
+    {% block stats %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {% block stat_cards %}{% endblock %}
+    </div>
+    {% endblock %}
+    
+    <!-- Charts and Widgets -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        {% block charts %}{% endblock %}
+    </div>
+    
+    <!-- Recent Activity / Tables -->
+    <div class="grid grid-cols-1 gap-4">
+        {% block recent_activity %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MIS{% endblock %} - Cortex ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white border border-gray-200 mb-6">
+        <div class="max-w-full mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-sm font-bold text-gray-800">MIS - Management Information System</h1>
+                <div class="space-x-4">
+                    <a href="{% url 'mis:transaction_menu' %}" class="text-blue-600 hover:text-blue-800">Transactions</a>
+                    <a href="{% url 'mis:budget_code_list' %}" class="text-blue-600 hover:text-blue-800">Budget Codes</a>
+                    <a href="/dashboard/" class="text-gray-600 hover:text-gray-800">Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-full mx-auto px-6 py-12">
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-100 border px-4 py-3 rounded mb-2">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+

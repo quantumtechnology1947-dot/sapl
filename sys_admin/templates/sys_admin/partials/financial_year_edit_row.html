@@ -1,0 +1,67 @@
+<tr id="financial-year-{{ financial_year.finyearid }}" class="bg-blue-50">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        -
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {{ company_name }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {{ financial_year.finyear }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        {{ form.finyearfrom }}
+        {% if form.finyearfrom.errors %}
+        <p class="text-red-500 text-xs mt-1">{{ form.finyearfrom.errors.0 }}</p>
+        {% endif %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        {{ form.finyearto }}
+        {% if form.finyearto.errors %}
+        <p class="text-red-500 text-xs mt-1">{{ form.finyearto.errors.0 }}</p>
+        {% endif %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button hx-put="{% url 'sys_admin:financial-year-edit' financial_year.finyearid %}"
+                hx-target="#financial-year-{{ financial_year.finyearid }}"
+                hx-swap="outerHTML"
+                hx-include="closest tr"
+                class="text-green-600 hover:text-green-900 mr-3 transition">
+            Save
+        </button>
+        <button hx-get="{% url 'sys_admin:financial-year-row' financial_year.finyearid %}"
+                hx-target="#financial-year-{{ financial_year.finyearid }}"
+                hx-swap="outerHTML"
+                class="text-gray-600 hover:text-gray-900 transition">
+            Cancel
+        </button>
+    </td>
+</tr>
+
+{% if form.non_field_errors %}
+<tr>
+    <td colspan="6" class="px-6 py-2">
+        <div class="bg-red-50 border-l-4 border-red-400 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">
+                        {{ form.non_field_errors.0 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>
+{% endif %}
+
+
+
+
+
+
+
+

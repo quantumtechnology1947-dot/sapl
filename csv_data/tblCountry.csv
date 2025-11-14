@@ -1,0 +1,11 @@
+﻿CId,CountryName,Currency,Symbol,KeyShortcut
+1,India Verified,Rupee,`,U+10B9
+2,USA,Doller,$,Shift+4
+3,UK,Pound,£,Alt+156
+4,Italy,Euro,€,Alt+0128
+5,Japan,Yen,¥,Alt+157
+6,Germany,Euro,€,
+7,China,Yen,¥,
+8,Spain,Euro,€,
+9,Django NewCountry2025,Django NewCurrency,DN$,
+10,Test Fixed,Test Curr,TF$,

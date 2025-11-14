@@ -1,0 +1,57 @@
+{% extends 'core/base.html' %}
+{% block title %}MRQN {{ mrqn.mrqnno }}{% endblock %}
+{% block page_title %}MRQN Details{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header with Actions -->
+    {% include 'core/components/layout/page_header.html' with title=page_title subtitle=mrqn.mrqnno breadcrumbs=breadcrumbs %}
+    
+    <div class="flex justify-end gap-2 mb-4">
+        {% include 'core/components/buttons/success.html' with text="Edit" href=edit_url icon="edit" %}
+        {% include 'core/components/buttons/secondary.html' with text="Print" href=print_url icon="print" %}
+        {% include 'core/components/buttons/secondary.html' with text="Back" href=list_url %}
+    </div>
+
+    <!-- MRQN Information Card -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        {% include 'core/components/cards/card_header.html' with title="MRQN Information" %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+            <div>
+                <p class="text-xs text-gray-600 mb-1">MRQN Number</p>
+                <p class="text-sm font-medium text-gray-900">{{ mrqn.mrqnno }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-600 mb-1">MRN Number</p>
+                <p class="text-sm font-medium text-gray-900">{{ mrqn.mrnno }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-600 mb-1">Date</p>
+                <p class="text-sm font-medium text-gray-900">{{ mrqn.sysdate }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quality Details Card -->
+    <div class="bg-white rounded border border-gray-200 p-4">
+        {% include 'core/components/cards/card_header.html' with title="Quality Details" %}
+        
+        {% if details %}
+        <div class="mt-3">
+            {% include 'core/components/tables/data_table.html' with headers=detail_headers rows=details %}
+        </div>
+        {% else %}
+        {% include 'core/components/tables/table_empty.html' with message="No quality details available" %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

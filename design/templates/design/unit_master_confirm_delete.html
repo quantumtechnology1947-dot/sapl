@@ -1,0 +1,63 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Deactivate Unit{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    <!-- Header -->
+    <div>
+        <h1 class="text-sm font-bold text-gray-900">Deactivate Unit</h1>
+        <p class="text-gray-600">Confirm unit deactivation</p>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="bg-white rounded border border-gray-200">
+        <div class="p-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        Are you sure you want to deactivate this unit?
+                    </h3>
+                    <div class="mt-2 text-sm text-gray-500">
+                        <p>Unit: <strong class="text-gray-900">{{ object.unitname }}</strong></p>
+                        {% if object.unitshortname %}
+                        <p>Short Name: <strong class="text-gray-900">{{ object.unitshortname }}</strong></p>
+                        {% endif %}
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <p>This will mark the unit as inactive. It will no longer appear in active lists but historical data will be preserved.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <form method="post" class="mt-6 flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+                {% csrf_token %}
+                <a href="{% url 'design:unit_master_list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-red text-white hover:bg-sap-red-dark transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Deactivate Unit
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

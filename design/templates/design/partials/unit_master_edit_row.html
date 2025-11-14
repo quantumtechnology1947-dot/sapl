@@ -1,0 +1,47 @@
+<tr id="unit-row-{{ unit.id }}" class="bg-yellow-50 border-b">
+    <td class="px-4 py-2 text-center text-sm">-</td>
+    <td colspan="5" class="px-4 py-2">
+        <form hx-post="{% url 'design:unit-master-edit' unit.id %}"
+              hx-target="#unit-row-{{ unit.id }}"
+              hx-swap="outerHTML"
+              class="flex gap-3 items-start">
+            {% csrf_token %}
+            <div class="flex-1">
+                <input type="text" name="unitname" value="{{ unit.unitname }}" required
+                       placeholder="Unit Name"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex-1">
+                <input type="text" name="symbol" value="{{ unit.symbol }}" required
+                       placeholder="Symbol"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" name="effectoninvoice" value="1"
+                       {% if unit.effectoninvoice %}checked{% endif %}
+                       id="effectoninvoice-{{ unit.id }}"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
+                <label for="effectoninvoice-{{ unit.id }}" class="text-sm text-gray-700 whitespace-nowrap">Effect On Invoice</label>
+            </div>
+            <button type="submit"
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors whitespace-nowrap">
+                Update
+            </button>
+            <button type="button"
+                    hx-get="{% url 'design:unit-master-list' %}"
+                    hx-target="#unit-row-{{ unit.id }}"
+                    hx-swap="outerHTML"
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-md transition-colors whitespace-nowrap">
+                Cancel
+            </button>
+        </form>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

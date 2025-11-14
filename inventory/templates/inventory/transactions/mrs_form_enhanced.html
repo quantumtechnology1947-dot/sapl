@@ -1,0 +1,407 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Create MRS - Material Requisition{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Material Requisition</span>
+    </div>
+</li>
+<li>
+    <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Create MRS</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+    <div class="px-4 py-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Material Requisition Slip [MRS] - New</h2>
+                <p class="text-sm text-gray-600 mt-1">Create new material requisition with items</p>
+            </div>
+            <a href="{% url 'inventory:mrs-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<form method="post" id="mrs-form" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- Hidden field for items JSON data -->
+    <input type="hidden" name="items_json" id="items-json">
+
+    <!-- MRS Information -->
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h2 class="text-sm font-bold text-gray-900 mb-4 border-b pb-2">MRS Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    MRS Number <span class="text-red-500">*</span>
+                </label>
+                <input type="text"
+                       name="mrsno"
+                       value="{{ auto_mrs_number }}"
+                       readonly
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-sm">
+                <p class="text-xs text-gray-500 mt-1">Auto-generated</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Date
+                </label>
+                <input type="text"
+                       value="{{ today_date }}"
+                       readonly
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Financial Year
+                </label>
+                <input type="text"
+                       value="{{ financial_year }}"
+                       readonly
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-sm">
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-4 border-b pb-2">
+            <h2 class="text-sm font-bold text-gray-900">Add Items to Requisition</h2>
+            <button type="button"
+                    id="add-item-btn"
+                    class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md transition-colors text-sm">
+                <svg class="w-4 h-4 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add Item
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300 text-xs" id="items-table">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700">SN</th>
+                        <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700">Item Code</th>
+                        <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700">Description</th>
+                        <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700">UOM</th>
+                        <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700">Stock Qty</th>
+                        <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700">Req Qty</th>
+                        <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700">BG Group/WONo</th>
+                        <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700">Dept/WO</th>
+                        <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700">Remarks</th>
+                        <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="items-tbody">
+                    <!-- Items will be added here dynamically -->
+                    <tr class="empty-state">
+                        <td colspan="10" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="mt-2">No items added yet. Click "Add Item" to start.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Submit Buttons -->
+    <div class="flex gap-3 justify-end bg-white rounded border border-gray-200 p-6">
+        <a href="{% url 'inventory:mrs-list' %}"
+           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+            Cancel
+        </a>
+        <button type="submit"
+                class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+            <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Save MRS
+        </button>
+    </div>
+</form>
+
+<!-- Item Selection Modal -->
+<div id="item-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+        <div class="flex items-center justify-between mb-4 border-b pb-3">
+            <h3 class="text-lg font-semibold text-gray-900">Select Item</h3>
+            <button type="button" class="close-modal text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="mb-4">
+            <input type="text"
+                   id="item-search"
+                   placeholder="Search by item code or description..."
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm">
+        </div>
+
+        <!-- Items List -->
+        <div class="overflow-y-auto" style="max-height: 400px;">
+            <table class="w-full border-collapse border border-gray-300 text-xs">
+                <thead class="bg-gray-100 sticky top-0">
+                    <tr>
+                        <th class="border border-gray-300 px-2 py-2">Item Code</th>
+                        <th class="border border-gray-300 px-2 py-2">Description</th>
+                        <th class="border border-gray-300 px-2 py-2">UOM</th>
+                        <th class="border border-gray-300 px-2 py-2">Stock</th>
+                        <th class="border border-gray-300 px-2 py-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="items-list">
+                    {% for item in available_items %}
+                    <tr class="hover:bg-gray-50 item-row"
+                        data-item-id="{{ item.id }}"
+                        data-item-code="{{ item.itemcode }}"
+                        data-item-desc="{{ item.manfdesc }}"
+                        data-item-uom="{{ item.uombasic }}"
+                        data-item-stock="{{ item.stockqty }}">
+                        <td class="border border-gray-300 px-2 py-2">{{ item.itemcode }}</td>
+                        <td class="border border-gray-300 px-2 py-2">{{ item.manfdesc }}</td>
+                        <td class="border border-gray-300 px-2 py-2 text-center">{{ item.uombasic }}</td>
+                        <td class="border border-gray-300 px-2 py-2 text-right">{{ item.stockqty|floatformat:2 }}</td>
+                        <td class="border border-gray-300 px-2 py-2 text-center">
+                            <button type="button"
+                                    class="select-item-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let itemCounter = 0;
+    const itemsTableBody = document.getElementById('items-tbody');
+    const addItemBtn = document.getElementById('add-item-btn');
+    const itemModal = document.getElementById('item-modal');
+    const itemSearch = document.getElementById('item-search');
+    const departments = {{ departments|safe }};
+
+    // Show modal
+    addItemBtn.addEventListener('click', function() {
+        itemModal.classList.remove('hidden');
+    });
+
+    // Close modal
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            itemModal.classList.add('hidden');
+        });
+    });
+
+    // Search items
+    itemSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('.item-row').forEach(row => {
+            const itemCode = row.dataset.itemCode.toLowerCase();
+            const itemDesc = row.dataset.itemDesc.toLowerCase();
+            if (itemCode.includes(searchTerm) || itemDesc.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Select item
+    document.querySelectorAll('.select-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const row = this.closest('.item-row');
+            addItemToTable({
+                itemId: row.dataset.itemId,
+                itemCode: row.dataset.itemCode,
+                itemDesc: row.dataset.itemDesc,
+                itemUom: row.dataset.itemUom,
+                stockQty: row.dataset.itemStock
+            });
+            itemModal.classList.add('hidden');
+        });
+    });
+
+    function addItemToTable(item) {
+        // Remove empty state if exists
+        const emptyState = itemsTableBody.querySelector('.empty-state');
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        itemCounter++;
+
+        // Build department options
+        let deptOptions = '<option value="">Select Dept</option>';
+        departments.forEach(dept => {
+            deptOptions += `<option value="${dept.id}">${dept.symbol}</option>`;
+        });
+
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+        row.innerHTML = `
+            <td class="border border-gray-300 px-2 py-2 text-center">${itemCounter}</td>
+            <td class="border border-gray-300 px-2 py-2">
+                ${item.itemCode}
+                <input type="hidden" name="items[${itemCounter}][itemid]" value="${item.itemId}">
+            </td>
+            <td class="border border-gray-300 px-2 py-2">${item.itemDesc}</td>
+            <td class="border border-gray-300 px-2 py-2 text-center">${item.itemUom}</td>
+            <td class="border border-gray-300 px-2 py-2 text-right">${parseFloat(item.stockQty).toFixed(2)}</td>
+            <td class="border border-gray-300 px-2 py-2">
+                <input type="number"
+                       name="items[${itemCounter}][reqqty]"
+                       step="0.001"
+                       min="0"
+                       required
+                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+            </td>
+            <td class="border border-gray-300 px-2 py-2">
+                <select name="items[${itemCounter}][type]"
+                        class="type-selector w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        required>
+                    <option value="">Select</option>
+                    <option value="dept">BG Group</option>
+                    <option value="wo">WONo</option>
+                </select>
+            </td>
+            <td class="border border-gray-300 px-2 py-2">
+                <select name="items[${itemCounter}][deptid]"
+                        class="dept-select w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        style="display:none;">
+                    ${deptOptions}
+                </select>
+                <input type="text"
+                       name="items[${itemCounter}][wono]"
+                       class="wo-input w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                       style="display:none;"
+                       placeholder="Enter WO Number">
+            </td>
+            <td class="border border-gray-300 px-2 py-2">
+                <input type="text"
+                       name="items[${itemCounter}][remarks]"
+                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                       placeholder="Optional">
+            </td>
+            <td class="border border-gray-300 px-2 py-2 text-center">
+                <button type="button"
+                        class="remove-item-btn bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs">
+                    Remove
+                </button>
+            </td>
+        `;
+
+        itemsTableBody.appendChild(row);
+
+        // Add event listener for type selector
+        const typeSelector = row.querySelector('.type-selector');
+        const deptSelect = row.querySelector('.dept-select');
+        const woInput = row.querySelector('.wo-input');
+
+        typeSelector.addEventListener('change', function() {
+            if (this.value === 'dept') {
+                deptSelect.style.display = 'block';
+                woInput.style.display = 'none';
+                deptSelect.required = true;
+                woInput.required = false;
+                woInput.value = '';
+            } else if (this.value === 'wo') {
+                deptSelect.style.display = 'none';
+                woInput.style.display = 'block';
+                deptSelect.required = false;
+                woInput.required = true;
+                deptSelect.value = '';
+            } else {
+                deptSelect.style.display = 'none';
+                woInput.style.display = 'none';
+                deptSelect.required = false;
+                woInput.required = false;
+            }
+        });
+
+        // Add event listener for remove button
+        row.querySelector('.remove-item-btn').addEventListener('click', function() {
+            row.remove();
+            // Show empty state if no items left
+            if (itemsTableBody.children.length === 0) {
+                itemsTableBody.innerHTML = `
+                    <tr class="empty-state">
+                        <td colspan="10" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="mt-2">No items added yet. Click "Add Item" to start.</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+    }
+
+    // Form validation and submission
+    document.getElementById('mrs-form').addEventListener('submit', function(e) {
+        const hasItems = itemsTableBody.querySelectorAll('tr:not(.empty-state)').length > 0;
+        if (!hasItems) {
+            e.preventDefault();
+            alert('Please add at least one item to the MRS.');
+            return false;
+        }
+
+        // Collect all items data and serialize to JSON
+        const itemsData = [];
+        itemsTableBody.querySelectorAll('tr:not(.empty-state)').forEach(row => {
+            const itemid = row.querySelector('input[name*="[itemid]"]').value;
+            const reqqty = row.querySelector('input[name*="[reqqty]"]').value;
+            const remarks = row.querySelector('input[name*="[remarks]"]').value;
+            const type = row.querySelector('.type-selector').value;
+
+            let deptid = null;
+            let wono = null;
+
+            if (type === 'dept') {
+                deptid = row.querySelector('.dept-select').value;
+            } else if (type === 'wo') {
+                wono = row.querySelector('.wo-input').value;
+            }
+
+            itemsData.push({
+                itemid: itemid,
+                reqqty: parseFloat(reqqty),
+                remarks: remarks,
+                type: type,
+                deptid: deptid,
+                wono: wono
+            });
+        });
+
+        // Set JSON data to hidden field
+        document.getElementById('items-json').value = JSON.stringify(itemsData);
+    });
+});
+</script>
+{% endblock %}

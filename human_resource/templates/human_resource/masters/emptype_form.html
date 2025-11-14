@@ -1,0 +1,24 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Employee Type - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Employee Type{% endblock %}
+{% block form_action %}{% if object %}{% url 'human_resource:emptype-update' object.id %}{% else %}{% url 'human_resource:emptype-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'human_resource:emptype-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="description"
+        label="Employee Type"
+        value=object.description
+        required=True
+        placeholder="e.g., Permanent, Contract, Trainee"
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

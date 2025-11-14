@@ -1,0 +1,161 @@
+{% load static %}
+
+<div class="border-l-2 border-gray-300 pl-4 py-2" style="margin-left: {{ level|add:'20' }}px;" data-node-id="{{ node.item.id }}">
+    <div class="flex items-center justify-between bg-gray-50 hover:bg-gray-100 p-3 rounded transition-colors">
+        <div class="flex items-center space-x-3 flex-1">
+            <!-- Expand/Collapse Button with Alpine.js -->
+            {% if node.children %}
+            <button @click="toggle({{ node.item.id }})" class="flex-shrink-0 text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg class="w-5 h-5 transition-transform duration-200"
+                     :class="isExpanded({{ node.item.id }}) ? 'rotate-90' : ''"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+            {% else %}
+            <div class="w-5"></div>
+            {% endif %}
+            
+            <!-- Item Icon -->
+            <div class="flex-shrink-0">
+                {% if node.children %}
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                </svg>
+                {% else %}
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                {% endif %}
+            </div>
+            
+            <!-- Item Details -->
+            <div class="flex-1 min-w-0 grid grid-cols-12 gap-2">
+                <!-- Item Code & Description -->
+                <div class="col-span-5">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-semibold text-gray-900">
+                            {{ node.item.itemid.itemcode|default:node.item.partno|default:"N/A" }}
+                        </span>
+                        {% if node.item.revision %}
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700">
+                            Rev: {{ node.item.revision }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-xs text-gray-600 truncate mt-1">
+                        {{ node.item.itemid.manfdesc|default:"No description"|truncatewords:12 }}
+                    </p>
+                </div>
+                
+                <!-- UOM -->
+                <div class="col-span-2">
+                    <div class="text-xs text-gray-500">UOM</div>
+                    <div class="text-sm text-gray-900">
+                        {% if node.item.itemid.uombasic %}
+                            {{ node.item.itemid.uombasic }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Unit Qty -->
+                <div class="col-span-2">
+                    <div class="text-xs text-gray-500">Unit Qty</div>
+                    <div class="text-sm font-semibold text-blue-600">
+                        {{ node.item.qty|floatformat:2 }}
+                    </div>
+                </div>
+                
+                <!-- BOM Qty -->
+                <div class="col-span-2">
+                    <div class="text-xs text-gray-500">BOM Qty</div>
+                    <div class="text-sm font-semibold text-green-600">
+                        {{ node.bom_qty|floatformat:2 }}
+                    </div>
+                </div>
+                
+                <!-- Material -->
+                <div class="col-span-1">
+                    {% if node.item.material %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800" title="{{ node.item.material }}">
+                        Mat
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex items-center space-x-1 ml-4">
+            <!-- File indicators -->
+            {% if node.item.itemid.filename %}
+            <a href="{% url 'design:item-download-file' node.item.itemid.id %}" 
+               class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors"
+               title="Download Drawing">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+            </a>
+            {% endif %}
+            
+            {% if node.item.itemid.attname %}
+            <a href="{% url 'design:item-download-attachment' node.item.itemid.id %}" 
+               class="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-purple-50 transition-colors"
+               title="Download Spec Sheet">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </a>
+            {% endif %}
+
+            <a href="{% url 'design:bom-add-child' node.item.id %}"
+               class="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors"
+               title="Add child item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+            </a>
+            <a href="{% url 'design:bom-edit' node.item.id %}" 
+               class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors"
+               title="Edit item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+            </a>
+            <button hx-delete="{% url 'design:bom-delete' node.item.id %}"
+                    hx-confirm="Are you sure you want to delete this item and all its children?"
+                    class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors"
+                    title="Delete item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Recursively render children with Alpine.js animation -->
+    {% if node.children %}
+    <div x-show="isExpanded({{ node.item.id }})"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 transform -translate-y-2"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform -translate-y-2"
+         class="mt-2 bom-node-children">
+        {% for child in node.children %}
+            {% include 'design/partials/bom_node.html' with node=child level=level|add:1 %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+

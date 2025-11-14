@@ -1,0 +1,63 @@
+{# Edit mode for a single PO line item row #}
+<tr id="line-item-{{ item.id|default:forloop.counter }}" class="bg-blue-50">
+    <td class="px-4 py-3 text-sm text-right text-gray-900">{{ forloop.counter }}</td>
+    <td class="px-4 py-3">
+        <textarea name="itemdesc" rows="2" required
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Item description">{{ item.itemdesc }}</textarea>
+    </td>
+    <td class="px-4 py-3">
+        <select name="unit" required
+                class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select</option>
+            {% for unit in units %}
+            <option value="{{ unit.id }}" {% if item.unit.id == unit.id or item.unit == unit.id %}selected{% endif %}>
+                {{ unit.symbol }}
+            </option>
+            {% endfor %}
+        </select>
+    </td>
+    <td class="px-4 py-3">
+        <input type="number" name="totalqty" step="0.001" min="0" required value="{{ item.totalqty }}"
+               class="w-full px-2 py-1 text-sm text-right border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="0.000" />
+    </td>
+    <td class="px-4 py-3">
+        <input type="number" name="rate" step="0.01" min="0" required value="{{ item.rate }}"
+               class="w-full px-2 py-1 text-sm text-right border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="0.00" />
+    </td>
+    <td class="px-4 py-3">
+        <input type="number" name="discount" step="0.01" min="0" max="100" value="{{ item.discount|default:0 }}"
+               class="w-full px-2 py-1 text-sm text-right border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="0.00" />
+    </td>
+    <td class="px-4 py-3 text-sm text-right text-gray-500">
+        (Calculated)
+    </td>
+    <td class="px-4 py-3 text-sm text-right space-x-2">
+        <button type="button"
+                hx-put="{% url 'sales_distribution:po-line-update' poid item.id %}"
+                hx-include="closest tr"
+                hx-target="#line-item-{{ item.id|default:forloop.counter }}"
+                hx-swap="outerHTML"
+                class="text-green-600 hover:text-green-900 font-medium transition-colors">
+            Save
+        </button>
+        <button type="button"
+                hx-get="{% url 'sales_distribution:po-line-row' poid item.id %}"
+                hx-target="#line-item-{{ item.id|default:forloop.counter }}"
+                hx-swap="outerHTML"
+                class="text-gray-600 hover:text-gray-900 font-medium transition-colors">
+            Cancel
+        </button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

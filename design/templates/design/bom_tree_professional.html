@@ -1,0 +1,497 @@
+{% extends 'core/base.html' %}
+
+{% block title %}BOM Tree - {{ wono }} - Design{% endblock %}
+
+{% block extra_css %}
+<!-- jsTree CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/themes/default/style.min.css" />
+<style>
+    /* Professional jsTree Theme Customization */
+    #bom-tree-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    /* Custom node styling */
+    .jstree-default .jstree-node {
+        margin-left: 24px;
+        line-height: 32px;
+    }
+
+    .jstree-default .jstree-anchor {
+        height: 32px;
+        line-height: 32px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .jstree-default .jstree-anchor:hover {
+        background: #f0f9ff !important;
+        color: #1e40af;
+    }
+
+    .jstree-default .jstree-clicked {
+        background: #dbeafe !important;
+        color: #1e40af !important;
+    }
+
+    /* Custom icons for different item types */
+    .jstree-icon.assembly-icon {
+        background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzYjgyZjYiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTMgN3YxMGEyIDIgMCAwIDAgMiAyaDE0YTIgMiAwIDAgMCAyLTJWOWEyIDIgMCAwIDAtMi0yaC02bC0yLTJINWEyIDIgMCAwIDAtMiAyeiIvPjwvc3ZnPg==') center center no-repeat;
+        background-size: 18px 18px;
+    }
+
+    .jstree-icon.part-icon {
+        background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM2YjcyODAiIHN0cm9rZS13aWR0aD0iMiI+PHBhdGggZD0iTTkgMTJoNm0tNiA0aDZtMiA1SDdhMiAyIDAgMCAxLTItMlY1YTIgMiAwIDAgMSAyLTJoNS41ODZhMSAxIDAgMCAxIC43MDcuMjkzbDUuNDE0IDUuNDE0YTEgMSAwIDAgMSAuMjkzLjcwN1YxOWEyIDIgMCAwIDEtMiAyeiIvPjwvc3ZnPg==') center center no-repeat;
+        background-size: 18px 18px;
+    }
+
+    /* Context menu styling */
+    .vakata-context {
+        border-radius: 6px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .vakata-context li a {
+        padding: 8px 12px;
+    }
+
+    .vakata-context li a:hover {
+        background: #3b82f6;
+        color: white;
+    }
+
+    /* Search box styling */
+    #bom-search {
+        width: 100%;
+        padding: 10px 40px 10px 12px;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    #bom-search:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 16px;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+
+    /* Node badges for quantity, revision, etc */
+    .node-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        margin-left: 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .qty-badge {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .rev-badge {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .ecn-badge {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Loading state */
+    .tree-loading {
+        text-align: center;
+        padding: 40px;
+        color: #6b7280;
+    }
+
+    .tree-loading-spinner {
+        border: 3px solid #f3f4f6;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Toolbar styling */
+    .bom-toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .bom-toolbar button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-4 max-w-7xl">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-4 -mx-4 px-4 py-3">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">BOM Tree View</h1>
+                <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                    <span>WO: <span class="font-semibold">{{ wono }}</span></span>
+                    {% if customer %}
+                    <span class="border-l pl-4">Customer: <span class="font-semibold">{{ customer.customername }}</span></span>
+                    {% endif %}
+                    {% if work_order.taskdesignfinalization_fdate %}
+                    <span class="border-l pl-4">Design Date: <span class="font-semibold">{{ work_order.taskdesignfinalization_fdate }}</span></span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'design:bom-amendment-history' %}?wono={{ wono }}"
+                   class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md transition-colors text-sm">
+                    <i class="fas fa-history mr-1"></i> History
+                </a>
+                <a href="{% url 'design:bom-copy' %}?source={{ wono }}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-colors text-sm">
+                    <i class="fas fa-copy mr-1"></i> Copy BOM
+                </a>
+                <a href="{% url 'design:bom-list' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors text-sm">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+        <div class="bg-white rounded border border-gray-200 p-3 border-l-4 border-blue-500">
+            <div class="text-xs text-gray-600">Total Items</div>
+            <div class="text-xl font-bold text-gray-900">{{ statistics.total_items }}</div>
+        </div>
+        <div class="bg-white rounded border border-gray-200 p-3 border-l-4 border-green-500">
+            <div class="text-xs text-gray-600">Bought Out</div>
+            <div class="text-xl font-bold text-gray-900">{{ statistics.boughtout_count }}</div>
+        </div>
+        <div class="bg-white rounded border border-gray-200 p-3 border-l-4 border-purple-500">
+            <div class="text-xs text-gray-600">Manufacturing</div>
+            <div class="text-xl font-bold text-gray-900">{{ statistics.manufacturing_count }}</div>
+        </div>
+        <div class="bg-white rounded border border-gray-200 p-3 border-l-4 {% if statistics.has_ecn %}border-red-500{% else %}border-gray-300{% endif %}">
+            <div class="text-xs text-gray-600">ECN Status</div>
+            <div class="text-xl font-bold {% if statistics.has_ecn %}text-red-600{% else %}text-gray-500{% endif %}">
+                {% if statistics.has_ecn %}Active{% else %}None{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional BOM Tree Container -->
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <!-- Toolbar -->
+        <div class="bom-toolbar">
+            <button onclick="addRootAssembly()" class="btn-primary">
+                <i class="fas fa-plus mr-2"></i> Add Assembly
+            </button>
+            <button onclick="expandAll()" class="btn-secondary">
+                <i class="fas fa-expand-alt mr-2"></i> Expand All
+            </button>
+            <button onclick="collapseAll()" class="btn-secondary">
+                <i class="fas fa-compress-alt mr-2"></i> Collapse All
+            </button>
+            <button onclick="refreshTree()" class="btn-secondary">
+                <i class="fas fa-sync-alt mr-2"></i> Refresh
+            </button>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text"
+                   id="bom-search"
+                   placeholder="Search BOM tree (item code, description, part number...)"
+                   autocomplete="off">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <!-- jsTree Container -->
+        <div id="bom-tree-container">
+            <div class="tree-loading">
+                <div class="tree-loading-spinner"></div>
+                <div>Loading BOM tree...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="mt-4 bg-blue-50 border border-blue-200 rounded p-3">
+        <h3 class="text-sm font-semibold text-blue-900 mb-2">Legend & Shortcuts</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-blue-800">
+            <div>
+                <strong>Mouse Actions:</strong>
+                <ul class="mt-1 space-y-1">
+                    <li>• Right-click: Context menu</li>
+                    <li>• Drag & drop: Reorder items</li>
+                    <li>• Double-click: Expand/collapse</li>
+                </ul>
+            </div>
+            <div>
+                <strong>Context Menu:</strong>
+                <ul class="mt-1 space-y-1">
+                    <li>• Add Child: Add sub-item</li>
+                    <li>• Edit: Modify item</li>
+                    <li>• Delete: Remove item</li>
+                </ul>
+            </div>
+            <div>
+                <strong>Icons:</strong>
+                <ul class="mt-1 space-y-1">
+                    <li>📁 Assembly/Folder</li>
+                    <li>📄 Part/Item</li>
+                    <li class="qty-badge">Qty</li>
+                    <li class="rev-badge">Rev</li>
+                    <li class="ecn-badge">ECN</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- jQuery (required for jsTree) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<!-- jsTree Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/jstree.min.js"></script>
+
+<script>
+// BOM Tree data from Django
+const bomTreeData = {{ tree_json|safe }};
+const woNumber = "{{ wono }}";
+
+// Initialize jsTree with professional configuration
+$(document).ready(function() {
+    $('#bom-tree-container').jstree({
+        'core': {
+            'data': bomTreeData,
+            'check_callback': true,  // Enable drag & drop
+            'themes': {
+                'name': 'default',
+                'responsive': true,
+                'dots': true,
+                'icons': true
+            }
+        },
+        'plugins': [
+            'contextmenu',    // Right-click menu
+            'dnd',            // Drag and drop
+            'search',         // Search functionality
+            'state',          // Remember expanded/collapsed state
+            'types',          // Different node types
+            'wholerow'        // Better selection
+        ],
+        'contextmenu': {
+            'items': function(node) {
+                return {
+                    'add_child': {
+                        'label': 'Add Child Item',
+                        'icon': 'fas fa-plus',
+                        'action': function() {
+                            addChildItem(node.id);
+                        }
+                    },
+                    'edit': {
+                        'label': 'Edit Item',
+                        'icon': 'fas fa-edit',
+                        'action': function() {
+                            editItem(node.id);
+                        }
+                    },
+                    'delete': {
+                        'label': 'Delete Item',
+                        'icon': 'fas fa-trash',
+                        'action': function() {
+                            deleteItem(node.id);
+                        }
+                    },
+                    'separator': '---',
+                    'expand_all': {
+                        'label': 'Expand All Children',
+                        'icon': 'fas fa-expand',
+                        'action': function() {
+                            $('#bom-tree-container').jstree('open_all', node);
+                        }
+                    },
+                    'collapse_all': {
+                        'label': 'Collapse All Children',
+                        'icon': 'fas fa-compress',
+                        'action': function() {
+                            $('#bom-tree-container').jstree('close_all', node);
+                        }
+                    }
+                };
+            }
+        },
+        'types': {
+            'assembly': {
+                'icon': 'assembly-icon'
+            },
+            'part': {
+                'icon': 'part-icon'
+            }
+        },
+        'dnd': {
+            'is_draggable': function(nodes) {
+                // Allow dragging
+                return true;
+            },
+            'copy': false
+        }
+    }).on('loaded.jstree', function() {
+        // Tree loaded successfully
+        console.log('BOM Tree loaded successfully');
+
+        // Open all nodes by default for better UX
+        $('#bom-tree-container').jstree('open_all');
+    }).on('move_node.jstree', function(e, data) {
+        // Handle drag & drop reordering
+        console.log('Node moved:', data);
+        // TODO: Send AJAX request to update server
+        updateNodeOrder(data.node.id, data.parent, data.position);
+    });
+
+    // Setup search
+    let searchTimeout = null;
+    $('#bom-search').on('keyup', function() {
+        clearTimeout(searchTimeout);
+        const searchString = $(this).val();
+
+        searchTimeout = setTimeout(function() {
+            $('#bom-tree-container').jstree('search', searchString);
+        }, 250);
+    });
+});
+
+// Toolbar functions
+function expandAll() {
+    $('#bom-tree-container').jstree('open_all');
+}
+
+function collapseAll() {
+    $('#bom-tree-container').jstree('close_all');
+}
+
+function refreshTree() {
+    location.reload();
+}
+
+function addRootAssembly() {
+    window.location.href = "{% url 'design:bom-add-assembly' wono %}";
+}
+
+function addChildItem(nodeId) {
+    // Get node data to extract CId
+    const node = $('#bom-tree-container').jstree(true).get_node(nodeId);
+    const cid = node.data.cid;
+
+    // Redirect to wizard with parent_cid
+    window.location.href = `{% url 'design:bom-wizard' wono=wono parent_cid=0 %}`.replace('/0/', `/${cid}/`);
+}
+
+function editItem(nodeId) {
+    window.location.href = `/design/bom/${nodeId}/edit/`;
+}
+
+function deleteItem(nodeId) {
+    if (confirm('Are you sure you want to delete this item and all its children?')) {
+        // TODO: Implement delete with AJAX
+        window.location.href = `/design/bom/${nodeId}/delete/`;
+    }
+}
+
+function updateNodeOrder(nodeId, newParent, position) {
+    // TODO: Send AJAX request to update server
+    $.ajax({
+        url: `/design/bom/${nodeId}/reorder/`,
+        method: 'POST',
+        data: {
+            parent: newParent,
+            position: position,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+            console.log('Order updated successfully');
+        },
+        error: function() {
+            alert('Failed to update order. Refreshing...');
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GQN {{ gqn.gqnno }}</title>
+    <style>body{font-family:Arial;margin:40px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #000;padding:8px;text-align:left;}</style>
+</head>
+<body>
+    <h1>Goods Quality Note</h1>
+    <p><strong>GQN No:</strong> {{ gqn.gqnno }} | <strong>GRR No:</strong> {{ gqn.grrno }} | <strong>Date:</strong> {{ gqn.sysdate }}</p>
+    <table>
+        <thead><tr><th>Normal Acc</th><th>Accepted</th><th>Deviated</th><th>Segregated</th><th>Rejected</th><th>Total</th></tr></thead>
+        <tbody>
+            {% for detail in details %}
+            <tr>
+                <td>{{ detail.normalaccqty|default:'0' }}</td>
+                <td>{{ detail.acceptedqty|default:'0' }}</td>
+                <td>{{ detail.deviatedqty|default:'0' }}</td>
+                <td>{{ detail.segregatedqty|default:'0' }}</td>
+                <td>{{ detail.rejectedqty|default:'0' }}</td>
+                <td>{{ detail.total_qty }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p style="margin-top:40px;"><small>Printed: {{ print_date }}</small></p>
+</body>
+</html>
+
+
+
+
+
+
+
+

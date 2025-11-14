@@ -1,0 +1,71 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Assign Budget Hours{% endblock %}
+{% block page_title %}Assign Budget Hours{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Action Bar -->
+    <div class="flex items-center justify-between mb-2">
+        <div class="text-sm text-gray-600">
+            Assign budget hours to work orders
+        </div>
+        <a href="{% url 'mis:transaction_menu' %}"
+           class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-gray-500 text-white hover:bg-gray-600 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Menu
+        </a>
+    </div>
+
+    <!-- Work Order Search Section -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <h3 class="text-sm font-semibold text-gray-700">Work Order</h3>
+        </div>
+
+        <div class="p-4">
+            <!-- Search Form -->
+            <form method="get" action="{% url 'mis:budget_hours_wo_search' %}" class="mb-4">
+                <div class="flex items-center gap-2">
+                    <select name="search_type"
+                            class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                        <option value="0">Customer Name</option>
+                        <option value="1" disabled>Enquiry No</option>
+                        <option value="2" disabled>PO No</option>
+                        <option value="3">WO No</option>
+                    </select>
+
+                    <input type="text"
+                           name="search_value"
+                           placeholder="Enter search value..."
+                           class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue flex-1 max-w-md"
+                           required>
+
+                    <button type="submit"
+                            class="h-8 px-4 text-xs font-medium text-white bg-sap-blue rounded hover:bg-sap-blue-hover transition-colors">
+                        Search
+                    </button>
+
+                    <a href="{% url 'mis:transaction_menu' %}"
+                       class="h-8 px-4 inline-flex items-center text-xs font-medium text-white bg-gray-500 rounded hover:bg-gray-600 transition-colors">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <!-- Embedded Search Results -->
+            <div id="search-results" class="border border-gray-200 rounded">
+                <iframe src="{% url 'mis:budget_hours_wo_search' %}"
+                        width="100%"
+                        height="435px"
+                        frameborder="0"
+                        class="rounded">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

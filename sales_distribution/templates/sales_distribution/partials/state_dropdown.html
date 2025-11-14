@@ -1,0 +1,23 @@
+<select name="{{ field_prefix }}state"
+        id="id_{{ field_prefix }}state"
+        hx-get="{% url 'sales_distribution:cities-by-state' %}{% if use_names %}?use_names=true{% endif %}"
+        hx-trigger="change"
+        hx-target="#{{ field_prefix }}city-container"
+        hx-include="[name='{{ field_prefix }}state']"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+    <option value="">Select</option>
+    {% for state in states %}
+    <option value="{% if use_names %}{{ state.statename }}{% else %}{{ state.sid }}{% endif %}">{{ state.statename }}</option>
+    {% endfor %}
+</select>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,47 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Working Days - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Working Days{% endblock %}
+{% block form_action %}{% if object %}{% url 'human_resource:working-days-update' object.pk %}{% else %}{% url 'human_resource:working-days-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'human_resource:working-days-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="monthid"
+        label="Month ID"
+        value=object.monthid
+        required=True
+        type="number"
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="days"
+        label="Days"
+        value=object.days
+        required=True
+        type="number"
+        step="0.5"
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="compid"
+        label="Company ID"
+        value=object.compid
+        type="number"
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="finyearid"
+        label="Financial Year ID"
+        value=object.finyearid
+        type="number"
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

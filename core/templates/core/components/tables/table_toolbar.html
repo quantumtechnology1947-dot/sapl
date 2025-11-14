@@ -1,0 +1,131 @@
+{% comment %}
+Component: Table Toolbar
+Purpose: Compact toolbar for table actions including search, filters, and create button
+
+Parameters:
+  - search_enabled (optional): Boolean to show search input (default False)
+  - search_url (optional): URL for HTMX search
+  - search_placeholder (optional): Placeholder text for search input
+  - htmx_search (optional): Boolean to enable HTMX search (default False)
+  - htmx_target (optional): HTMX target selector (default '#data-table')
+  - filter_button (optional): Boolean to show filter button (default False)
+  - filter_dropdown (optional): Boolean to show filter dropdown (default False)
+  - export_enabled (optional): Boolean to show export button (default False)
+  - create_url (optional): URL for create button
+  - create_text (optional): Text for create button (default 'Create')
+  - title (optional): Toolbar title text
+
+Usage:
+  {% include 'core/components/tables/table_toolbar.html' with
+    search_enabled=True
+    search_url=search_url
+    create_url=create_url
+    create_text='New Record'
+  %}
+
+Requirements: 4.3, 4.4, 5.3
+{% endcomment %}
+
+<div class="flex items-center justify-between mb-3 gap-3 h-8">
+    <!-- Left Side: Title, Search and Filters -->
+    <div class="flex items-center gap-2 flex-1">
+        {% if title %}
+        <h2 class="text-sm font-semibold text-gray-900 mr-2">{{ title }}</h2>
+        {% endif %}
+        
+        {% if search_enabled %}
+        <div class="relative w-56">
+            <input type="text" 
+                   name="search" 
+                   value="{{ request.GET.search|default:'' }}"
+                   placeholder="{{ search_placeholder|default:'Search...' }}"
+                   {% if htmx_search %}
+                   hx-get="{{ search_url }}"
+                   hx-trigger="input changed delay:500ms, search"
+                   hx-target="{{ htmx_target|default:'#data-table' }}"
+                   hx-include="[name='search']"
+                   {% endif %}
+                   class="h-8 w-full pl-8 pr-3 text-xs border border-gray-300 rounded 
+                          focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue
+                          placeholder:text-gray-400">
+            <svg class="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400 pointer-events-none" 
+                 fill="none" 
+                 stroke="currentColor" 
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+        {% endif %}
+        
+        {% if filter_button %}
+        <button type="button" 
+                onclick="toggleFilters()"
+                class="inline-flex items-center h-8 px-3 text-xs font-medium rounded 
+                       border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 
+                       transition-colors focus:outline-none focus:ring-2 focus:ring-sap-blue/30">
+            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+            </svg>
+            Filters
+        </button>
+        {% endif %}
+        
+        {% if filter_dropdown %}
+        <div class="relative">
+            <select name="filter" 
+                    class="h-8 px-3 pr-8 text-xs border border-gray-300 rounded bg-white
+                           focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue
+                           appearance-none cursor-pointer">
+                <option value="">All Items</option>
+                {% block filter_options %}{% endblock %}
+            </select>
+            <svg class="absolute right-2 top-2.5 w-3 h-3 text-gray-400 pointer-events-none" 
+                 fill="none" 
+                 stroke="currentColor" 
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </div>
+        {% endif %}
+        
+        {% block extra_filters %}{% endblock %}
+    </div>
+    
+    <!-- Right Side: Actions -->
+    <div class="flex items-center gap-2">
+        {% if export_enabled %}
+        <button type="button"
+                onclick="exportData()"
+                class="inline-flex items-center h-8 px-3 text-xs font-medium rounded 
+                       border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 
+                       transition-colors focus:outline-none focus:ring-2 focus:ring-sap-blue/30">
+            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Export
+        </button>
+        {% endif %}
+        
+        {% if create_url %}
+        <a href="{{ create_url }}"
+           class="inline-flex items-center h-8 px-3 text-xs font-medium rounded 
+                  bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors
+                  focus:outline-none focus:ring-2 focus:ring-sap-blue/30">
+            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            {{ create_text|default:'Create' }}
+        </a>
+        {% endif %}
+        
+        {% block extra_actions %}{% endblock %}
+    </div>
+</div>
+
+
+
+
+
+
+
+

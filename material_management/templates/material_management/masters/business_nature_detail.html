@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Business Nature Details - Material Management{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200 max-w-2xl mx-auto">
+        <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-semibold text-gray-800">Business Nature Details</h1>
+                <p class="text-sm text-gray-500">ID: {{ business_nature.id }}</p>
+            </div>
+            <div class="flex space-x-2">
+                <a href="{% url 'material_management:business-nature-edit' business_nature.id %}"
+                   class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-sm">
+                    Edit
+                </a>
+                <a href="{% url 'material_management:business-nature-delete' business_nature.id %}"
+                   class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm"
+                   onclick="return confirm('Are you sure you want to delete this business nature?')">
+                    Delete
+                </a>
+                <a href="{% url 'material_management:business-nature-list' %}"
+                   class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition text-sm">
+                    Back to List
+                </a>
+            </div>
+        </div>
+
+        <div class="px-6 py-4">
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label class="text-sm text-gray-500">ID:</label>
+                    <p class="font-medium text-gray-900">{{ business_nature.id }}</p>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-500">Business Nature:</label>
+                    <p class="font-medium text-gray-900">{{ business_nature.nature|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

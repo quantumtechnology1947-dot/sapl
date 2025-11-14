@@ -1,0 +1,37 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} WO Subcategory - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Work Order Subcategory{% endblock %}
+{% block form_action %}{% if object %}{% url 'sales_distribution:wo-subcategory-update' object.scid %}{% else %}{% url 'sales_distribution:wo-subcategory-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'sales_distribution:wo-subcategory-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="scname"
+        label="Subcategory Name"
+        value=object.scname
+        required=True
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="cid"
+        label="Category ID"
+        type="number"
+        value=object.cid
+    %}
+    
+    {% include 'core/components/forms/textarea_input.html' with 
+        name="remark"
+        label="Remark"
+        value=object.remark
+        rows=3
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

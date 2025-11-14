@@ -1,0 +1,36 @@
+{% load accounts_tags %}
+<tr id="currency-{{ currency.id }}" class="hover:bg-gray-50 transition-colors">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {{ forloop.counter }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {{ currency.name|default:"-" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        <span class="text-lg">{{ currency.symbol|default:"-" }}</span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {% if currency.country %}{{ countries|get_item:currency.country }}{% else %}-{% endif %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <a href="{% url 'accounts:currency-edit' currency.id %}" 
+           class="text-blue-600 hover:text-blue-900 mr-3">
+            Edit
+        </a>
+        <button hx-delete="{% url 'accounts:currency-delete' currency.id %}"
+                hx-target="#currency-{{ currency.id }}"
+                hx-swap="outerHTML swap:1s"
+                hx-confirm="Are you sure you want to delete this currency?"
+                class="text-red-600 hover:text-red-900">
+            Delete
+        </button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

@@ -1,0 +1,94 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Sub-Category Master - Design{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- SAP Fiori Toolbar -->
+    <div class="flex items-center justify-end mb-2">
+        <a href="{% url 'design:subcategory-create' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover focus:outline-none focus:ring-2 focus:ring-sap-blue/30 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Sub-Category
+        </a>
+    </div>
+
+    <!-- SAP Fiori Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                    <th class="px-3 py-1 text-center text-xs font-semibold text-gray-700">SN</th>
+                    <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">Category</th>
+                    <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">Sub-Category Name</th>
+                    <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">Symbol</th>
+                    <th class="px-3 py-1 text-center text-xs font-semibold text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for subcategory in subcategories %}
+                <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors" id="subcategory-{{ subcategory.scid }}">
+                    <td class="px-3 py-1 text-center text-xs text-gray-700">
+                        {{ forloop.counter }}
+                    </td>
+                    <td class="px-3 py-1 text-xs text-gray-700">
+                        {% for cat in categories %}
+                            {% if cat.cid == subcategory.cid %}{{ cat.cname }}{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td class="px-3 py-1 text-xs text-gray-900 font-medium">
+                        {{ subcategory.scname }}
+                    </td>
+                    <td class="px-3 py-1 text-xs text-gray-700">
+                        {{ subcategory.symbol }}
+                    </td>
+                    <td class="px-3 py-1 text-center text-xs">
+                        <a href="{% url 'design:subcategory-edit' subcategory.scid %}" 
+                           class="text-sap-blue hover:text-sap-blue-dark transition-colors mr-3" title="Edit">
+                            <svg class="w-3.5 h-3.5 inline mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>Edit
+                        </a>
+                        <button hx-delete="{% url 'design:subcategory-delete' subcategory.scid %}"
+                                hx-target="#subcategory-{{ subcategory.scid }}"
+                                hx-swap="outerHTML swap:1s"
+                                hx-confirm="Are you sure you want to delete sub-category {{ subcategory.scname }}?"
+                                class="text-red-600 hover:text-red-800 transition-colors" title="Delete">
+                            <svg class="w-3.5 h-3.5 inline mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>Delete
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-16 text-center">
+                        <div class="flex flex-col items-center">
+                            <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-900 mb-1">No sub-categories found</p>
+                            <p class="text-xs text-gray-500">Create your first sub-category to get started</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        {% include 'core/components/tables/pagination.html' with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

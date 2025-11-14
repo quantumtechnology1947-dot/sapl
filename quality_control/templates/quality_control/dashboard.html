@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+
+{% block title %}Quality Control Dashboard - Cortex ERP{% endblock %}
+{% block page_title %}Quality Control Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-6"><h2 class="text-base font-bold text-gray-900">Quality Control Dashboard</h2></div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded border border-gray-200"><h3 class="text-gray-600 text-sm font-medium">Total GQN</h3><p class="text-base font-bold text-blue-600">{{ total_gqn }}</p></div>
+    <div class="bg-white p-6 rounded border border-gray-200"><h3 class="text-gray-600 text-sm font-medium">Total MRQN</h3><p class="text-base font-bold text-green-600">{{ total_mrqn }}</p></div>
+    <div class="bg-white p-6 rounded border border-gray-200"><h3 class="text-gray-600 text-sm font-medium">Total Scrap</h3><p class="text-base font-bold text-red-600">{{ total_scrap }}</p></div>
+    <div class="bg-white p-6 rounded border border-gray-200"><h3 class="text-gray-600 text-sm font-medium">Rejection Reasons</h3><p class="text-base font-bold text-purple-600">{{ rejection_reasons }}</p></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold mb-4">Recent GQNs</h3>
+        <div class="space-y-2">
+            {% for gqn in recent_gqns %}
+            <div class="border-l-4 border-blue-500 pl-4 py-2"><a href="{% url 'quality_control:gqn-detail' gqn.id %}" class="text-blue-600 hover:text-blue-800">{{ gqn.gqnno }}</a><p class="text-sm text-gray-600">GRR: {{ gqn.grrno }}</p></div>
+            {% empty %}
+            <p class="text-gray-500">No GQNs yet</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold mb-4">Recent MRQNs</h3>
+        <div class="space-y-2">
+            {% for mrqn in recent_mrqns %}
+            <div class="border-l-4 border-green-500 pl-4 py-2"><a href="{% url 'quality_control:mrqn-detail' mrqn.id %}" class="text-green-600 hover:text-green-800">{{ mrqn.mrqnno }}</a><p class="text-sm text-gray-600">MRN: {{ mrqn.mrnno }}</p></div>
+            {% empty %}
+            <p class="text-gray-500">No MRQNs yet</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <a href="{% url 'quality_control:gqn-create' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded text-center font-semibold">Create GQN</a>
+    <a href="{% url 'quality_control:mrqn-create' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded text-center font-semibold">Create MRQN</a>
+    <a href="{% url 'quality_control:quality-report' %}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-4 rounded text-center font-semibold">View Reports</a>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

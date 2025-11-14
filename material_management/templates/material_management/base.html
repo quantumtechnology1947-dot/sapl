@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Material Management{% endblock %} - ERP System</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- HTMX CSRF Token Configuration -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = document.querySelector('meta[name="csrf-token"]').content;
+        });
+    </script>
+
+    <!-- HTMX Loading Indicator Styles -->
+    <style>
+        .htmx-indicator {
+            display: none;
+        }
+        .htmx-request .htmx-indicator {
+            display: inline;
+        }
+        .htmx-request.htmx-indicator {
+            display: inline;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-full mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-xl font-bold">Material Management</h1>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="{% url 'material_management:dashboard' %}" class="hover:bg-blue-700 px-3 py-2 rounded">Dashboard</a>
+                        <div class="relative group">
+                            <button class="hover:bg-blue-700 px-3 py-2 rounded">
+                                Masters ▼
+                            </button>
+                            <div class="hidden group-hover:block absolute bg-white text-gray-800 shadow-lg rounded mt-2 py-2 w-48 z-10">
+                                <a href="{% url 'material_management:business-nature-list' %}" class="block px-4 py-2 hover:bg-gray-100">Business Nature</a>
+                                <a href="{% url 'material_management:business-type-list' %}" class="block px-4 py-2 hover:bg-gray-100">Business Type</a>
+                                <a href="{% url 'material_management:service-coverage-list' %}" class="block px-4 py-2 hover:bg-gray-100">Service Coverage</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm">Welcome, {{ user.username }}</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-full mx-auto px-4 py-4">
+        {% for message in messages %}
+        <div class="{% if message.tags == 'success' %}bg-green-50 border-l-4 border-green-400{% elif message.tags == 'error' %}bg-red-50 border-l-4 border-red-400{% else %}bg-blue-50 border-l-4 border-blue-400{% endif %} p-4 mb-4 rounded">
+            <p class="{% if message.tags == 'success' %}text-green-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %}">
+                {{ message }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="max-w-full mx-auto px-4 py-2">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-full mx-auto px-4 py-4 text-center text-sm">
+            <p>&copy; 2025 Cortex ERP - Material Management Module</p>
+        </div>
+    </footer>
+
+    <!-- HTMX Events for Better UX -->
+    <script>
+        // Show loading indicator during HTMX requests
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {
+            const target = evt.detail.target;
+            if (target) {
+                target.classList.add('htmx-request');
+            }
+        });
+
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            const target = evt.detail.target;
+            if (target) {
+                target.classList.remove('htmx-request');
+            }
+        });
+
+        // Handle errors
+        document.body.addEventListener('htmx:responseError', function(evt) {
+            alert('An error occurred. Please try again.');
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
+
+
+
+
+
+
+

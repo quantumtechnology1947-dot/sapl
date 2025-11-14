@@ -1,0 +1,96 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}MRQN - Select MRN - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2 py-2">
+    {% if messages %}
+    <div class="mb-2">
+        {% for message in messages %}
+        <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-2 py-1 rounded text-xs mb-1" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded shadow">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-3 py-2 rounded-t flex justify-between items-center">
+            <h2 class="text-white font-semibold text-sm">Material Return Quality Note [MRQN] - Select MRN for Inspection</h2>
+        </div>
+
+        <!-- Search Section -->
+        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <form method="get" class="flex gap-2 items-center">
+                <select name="search_type" class="px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-sap-blue">
+                    <option value="0" {% if search_type == '0' %}selected{% endif %}>MRN No</option>
+                    <option value="1" {% if search_type == '1' %}selected{% endif %}>Department</option>
+                </select>
+                <input type="text" name="search_value" value="{{ search_value }}" 
+                       placeholder="Type to search..." 
+                       class="flex-1 px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-sap-blue">
+                <button type="submit" class="px-4 py-2 bg-sap-blue hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors">
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <!-- MRN List Table -->
+        <div class="p-2">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b border-gray-300">
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">SN</th>
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Select</th>
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Fin Year</th>
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">MRN No</th>
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Date</th>
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Returned Qty</th>
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Inspected Qty</th>
+                            <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700">Pending Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mrn in pending_mrns %}
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ forloop.counter }}</td>
+                            <td class="px-2 py-2 text-center border-r border-gray-200">
+                                <a href="{% url 'quality_control:mrqn-mrn-details' mrn.id %}" 
+                                   class="text-sap-blue hover:text-blue-700 underline text-[11px] font-medium">
+                                    Select
+                                </a>
+                            </td>
+                            <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ mrn.finyear_name }}</td>
+                            <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ mrn.mrnno }}</td>
+                            <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ mrn.sysdate }}</td>
+                            <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ mrn.returned_qty|floatformat:3 }}</td>
+                            <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ mrn.inspected_qty|floatformat:3 }}</td>
+                            <td class="px-2 py-2 text-[11px] text-gray-900 text-right">{{ mrn.remaining_qty|floatformat:3 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="px-6 py-12 text-center">
+                                <p class="text-base text-red-700 font-semibold">No pending MRN records found!</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Info Note -->
+            <div class="mt-4 flex items-start gap-2 text-xs text-gray-600 bg-blue-50 p-3 rounded border border-blue-200">
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <p>
+                    <strong>Note:</strong> Select an MRN (Material Return Note) record to create a Material Return Quality Note (MRQN). 
+                    Only MRN records with pending quality inspection are shown. Search by MRN Number or Department to find specific records.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

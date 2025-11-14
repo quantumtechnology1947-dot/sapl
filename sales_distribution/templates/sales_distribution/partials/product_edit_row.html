@@ -1,0 +1,31 @@
+<tr id="product-{{ product.itemcode }}" class="bg-blue-50">
+    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ product.itemcode }}</td>
+    <td class="px-6 py-4">
+        <form hx-post="{% url 'sales_distribution:product-edit' product.itemcode %}"
+              hx-target="#product-{{ product.itemcode }}"
+              hx-swap="outerHTML">
+            {% csrf_token %}
+            {{ form.description }}
+            {% if form.description.errors %}<p class="text-red-500 text-xs mt-1">{{ form.description.errors.0 }}</p>{% endif %}
+        </form>
+    </td>
+    <td class="px-6 py-4 text-right text-sm">
+        <button hx-post="{% url 'sales_distribution:product-edit' product.itemcode %}"
+                hx-include="closest form"
+                hx-target="#product-{{ product.itemcode }}"
+                hx-swap="outerHTML"
+                class="text-green-600 hover:text-green-900 mr-3">Save</button>
+        <button hx-get="{% url 'sales_distribution:product-list' %}"
+                hx-target="#product-{{ product.itemcode }}"
+                hx-swap="outerHTML"
+                class="text-gray-600 hover:text-gray-900">Cancel</button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

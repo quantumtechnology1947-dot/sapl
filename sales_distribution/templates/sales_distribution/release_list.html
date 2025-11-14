@@ -1,0 +1,75 @@
+{% extends "core/base.html" %}
+
+{% block title %}Release History - Cortex ERP{% endblock %}
+{% block page_title %}Release History{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between gap-4">
+            <h2 class="text-sm font-semibold text-gray-800">Release History</h2>
+
+            <div class="flex items-center gap-3 flex-1 justify-end">
+                <!-- Search with HTMX -->
+                <input type="text" name="search" value="{{ search_query }}"
+                    placeholder="Search by WR or WO number..."
+                    hx-get="{% url 'sales_distribution:release-list' %}" hx-trigger="input changed delay:500ms, search"
+                    hx-target="#release-table" hx-include="[name='search']"
+                    class="w-64 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+                <a href="{% url 'sales_distribution:workorder-list' %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm transition-colors inline-flex items-center">
+                    Back to Work Orders
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="release-table" class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="w-[5%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                        <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">WR Number</th>
+                        <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">WO Number</th>
+                        <th class="w-[25%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item ID</th>
+                        <th class="w-[15%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Issued Qty</th>
+                        <th class="w-[15%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for release in releases %}
+                    <tr id="release-{{ release.id }}" class="hover:bg-gray-50 transition-colors">
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-gray-900">{{ forloop.counter }}</td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-gray-900">{{ release.wrno }}</td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">{{ release.wono }}</td>
+                        <td class="px-2 py-2 text-[11px] truncate text-gray-600">{{ release.itemid }}</td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">{{ release.issuedqty }}</td>
+                        <td class="px-2 py-2 text-right text-[11px]">
+                            <a href="{% url 'sales_distribution:release-detail' release.id %}" class="text-blue-600 hover:text-blue-900">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    {% include 'core/components/empty_state.html' with
+                        in_table=True
+                        colspan=6
+                        icon_path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        title="No releases found"
+                        message="Releases will appear here when created."
+                    %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

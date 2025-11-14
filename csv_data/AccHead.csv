@@ -1,0 +1,54 @@
+﻿Id,Category,Description,Symbol,Abbrivation
+0,,,,
+1,Labour,Out Processing,E1,PROCESS
+2,Expenses,Repairing & Maintenance,E2,MAINTEN
+3,Service Provider,Custom Duty & Clearing,E3,CUSTOM
+4,Labour,Travelling,E4,TRAVEL
+5,Service Provider,Courier Charges,E5,COURIER
+6,Service Provider,Prof. & Consult. Charges,E6,CONSULT
+7,Service Provider,News & Letters,E7,NWSLET
+8,Labour,Advertisement,E8,ADV
+9,Service Provider,Catlaogues,E9,CATLOG
+10,Service Provider,Training,E10,TRAINING
+11,Expenses,Freight Out,E11,FREITOUT
+12,Labour,Servicing Material,E12,SERVICE
+13,Service Provider,ISO 9001,E13,ISO9001
+14,Expenses,Loading Charges,E14,LOAD
+15,Expenses,Unloading Charges,E15,UNLOAD
+16,Expenses,Conveyance,E16,CONVEY
+17,Labour,Other,E17,OTH
+18,Service Provider,Inspection & Calibration Charges,E18,INSCAL
+19,Labour,Capital Items,E19,CAPIT
+20,Service Provider,Internet,E20,INT
+21,Service Provider,Telephone,E21,TEL
+22,Service Provider,Insurance,E22,INSU
+23,Expenses,Boarding,E23,BORD
+24,Expenses,Lodging,E24,LODG
+25,Expenses,Escort,E25,ESCORT
+26,Expenses,Staff Welfare,E26,STWEL
+27,Labour,Labour Welfare,E27,LBWEL
+28,With Material,Manufacturing Mechanical,P1,MANFMECH
+29,With Material,Production,P2,PROD
+30,With Material,Research & Development,P3,R&D
+31,With Material,Consumable Tools,P4,TOOLCONS
+32,With Material,Other Consumables,P5,OTHRCONS
+33,With Material,Capital Items,P6,CAPIT
+34,With Material,Import Purchase,P7,IMPORT
+35,With Material,Packing Material,P8,PACK
+36,With Material,Printing & Stationary,P9,STATION
+37,With Material,Computer Consumables,P10,COMPCONS
+38,With Material,Maintai. & Reparing Purchase,P11,MANTREP
+39,With Material,Servicing Material,P12,SERVICE
+40,With Material,Other,P13,OTH
+41,With Material,Manufacturing Electrical,P14,MANFELE
+42,With Material,Out Processing,P15,PRO
+43,Expenses,Canteen,E28,CANTE
+44,Expenses,Medical,E29,MEDI
+45,Expenses,Purchase,E30,PURCH
+46,Service Provider,MSEB,E31,MSEB
+49,Expenses,Freight In,E32,FRTIN
+50,Expenses,Other,E33,EXPOTH
+51,Expenses,Office Expences,E34,OEXP
+52,Expenses,Salary Payable,E35,SALP
+53,Expenses,Misc Exp,E36,MiscExp
+54,Labour,asdf,E100,A

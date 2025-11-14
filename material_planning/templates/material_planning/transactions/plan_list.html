@@ -1,0 +1,278 @@
+{% extends "core/base.html" %}
+
+{% block title %}Material Planning - Cortex ERP{% endblock %}
+{% block page_title %}Material Planning{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- SAP Fiori Toolbar -->
+    <div class="bg-white border border-gray-200 rounded mb-2">
+        <div class="px-4 py-2 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-xs font-semibold text-gray-700">Material Planning - Edit</h2>
+        </div>
+        <div class="p-3">
+            <form method="get" class="flex gap-2 items-center">
+                <select name="search_field"
+                        class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                    <option value="">Select</option>
+                    <option value="supplier" {% if request.GET.search_field == 'supplier' %}selected{% endif %}>Supplier Name</option>
+                    <option value="plno" {% if request.GET.search_field == 'plno' %}selected{% endif %}>PL No</option>
+                </select>
+                <input type="text"
+                       name="search_value"
+                       value="{{ request.GET.search_value }}"
+                       placeholder="Enter search value..."
+                       class="h-8 flex-1 min-w-[250px] px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                <button type="submit"
+                        class="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+                {% if request.GET.search_value %}
+                <a href="{% url 'material_planning:plan-list' %}"
+                   class="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    Clear
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Plans Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-12 px-3 py-2 text-left text-xs font-semibold text-gray-700">SN</th>
+                        <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Action</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Fin Year</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">PL No</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">WO No</th>
+                        <th class="w-48 px-3 py-2 text-left text-xs font-semibold text-gray-700">Supplier Name</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Comp Date</th>
+                        <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Status</th>
+                        <th class="w-32 px-3 py-2 text-center text-xs font-semibold text-gray-700">Edit</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for plan in plans %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors" id="plan-row-{{ plan.id }}">
+                        <td class="w-12 px-3 py-2 text-xs text-gray-600">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-center text-xs">
+                            {% if plan.in_pr %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                PR
+                            </span>
+                            {% else %}
+                            <button type="button" 
+                                    class="text-sap-blue hover:underline text-xs edit-btn"
+                                    onclick="enableEdit({{ plan.id }})">
+                                Edit
+                            </button>
+                            <a href="{% url 'material_planning:plan-detail' plan.id %}"
+                               class="text-sap-blue hover:underline text-xs ml-2">
+                                Select
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ plan.finyear_name|default:"-" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs font-medium text-sap-blue whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ plan.plno }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ plan.wono }}
+                        </td>
+                        <td class="w-48 px-3 py-2 text-xs" id="supplier-cell-{{ plan.id }}">
+                            <span class="view-mode-{{ plan.id }} block whitespace-nowrap overflow-hidden text-ellipsis" 
+                                  title="{{ plan.supplier_name|default:'' }}">
+                                {{ plan.supplier_name|default:"-" }}
+                            </span>
+                            <input type="text" 
+                                   class="edit-mode-{{ plan.id }} hidden w-full px-2 py-1 text-xs border border-gray-300 rounded h-7"
+                                   id="supplier-input-{{ plan.id }}"
+                                   value="{{ plan.supplier_name }}"
+                                   placeholder="Supplier Name [ID]">
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs" id="compdate-cell-{{ plan.id }}">
+                            <span class="view-mode-{{ plan.id }} block whitespace-nowrap overflow-hidden text-ellipsis">
+                                {{ plan.compdate_display|default:"-" }}
+                            </span>
+                            <input type="text" 
+                                   class="edit-mode-{{ plan.id }} flatpickr hidden w-full px-2 py-1 text-xs border border-gray-300 rounded h-7"
+                                   id="compdate-input-{{ plan.id }}"
+                                   value="{{ plan.compdate_display }}"
+                                   placeholder="DD-MM-YYYY">
+                        </td>
+                        <td class="w-24 px-3 py-2 text-center text-xs">
+                            {% if plan.in_pr %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                PR
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                OPEN
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-center text-xs">
+                            <button type="button"
+                                    class="edit-mode-{{ plan.id }} hidden px-2 py-1 bg-sap-green text-white rounded text-xs hover:bg-sap-green-dark h-7"
+                                    onclick="saveEdit({{ plan.id }})">
+                                Save
+                            </button>
+                            <button type="button"
+                                    class="edit-mode-{{ plan.id }} hidden px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600 ml-1 h-7"
+                                    onclick="cancelEdit({{ plan.id }})">
+                                Cancel
+                            </button>
+                            {% if not plan.in_pr %}
+                            <form method="post" action="{% url 'material_planning:plan-delete' plan.id %}" class="inline" onsubmit="return confirmDelete('{{ plan.plno }}')">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="view-mode-{{ plan.id }} px-2 py-1 bg-sap-red text-white rounded text-xs hover:bg-sap-red-dark ml-1 h-7">
+                                    Delete
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="px-6 py-16 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No plans found</h3>
+                            <p class="mt-1 text-sm text-gray-500">Get started by creating a new material plan.</p>
+                            <div class="mt-6">
+                                <a href="{% url 'material_planning:plan-create' %}"
+                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    New Plan
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SAP Fiori Pagination -->
+        {% if is_paginated %}
+        {% include 'core/components/tables/pagination.html' with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Store original values for cancel functionality
+const originalValues = {};
+
+function enableEdit(planId) {
+    // Store original values
+    originalValues[planId] = {
+        supplier: document.getElementById(`supplier-input-${planId}`).value,
+        compdate: document.getElementById(`compdate-input-${planId}`).value
+    };
+    
+    // Hide view mode, show edit mode
+    document.querySelectorAll(`.view-mode-${planId}`).forEach(el => el.style.display = 'none');
+    document.querySelectorAll(`.edit-mode-${planId}`).forEach(el => el.style.display = 'inline-block');
+    
+    // Hide edit button
+    document.querySelectorAll(`#plan-row-${planId} .edit-btn`).forEach(el => el.style.display = 'none');
+}
+
+function cancelEdit(planId) {
+    // Restore original values
+    if (originalValues[planId]) {
+        document.getElementById(`supplier-input-${planId}`).value = originalValues[planId].supplier;
+        document.getElementById(`compdate-input-${planId}`).value = originalValues[planId].compdate;
+    }
+    
+    // Show view mode, hide edit mode
+    document.querySelectorAll(`.view-mode-${planId}`).forEach(el => el.style.display = 'block');
+    document.querySelectorAll(`.edit-mode-${planId}`).forEach(el => el.style.display = 'none');
+    
+    // Show edit button
+    document.querySelectorAll(`#plan-row-${planId} .edit-btn`).forEach(el => el.style.display = 'inline-block');
+}
+
+function saveEdit(planId) {
+    const supplier = document.getElementById(`supplier-input-${planId}`).value;
+    const compdate = document.getElementById(`compdate-input-${planId}`).value;
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('plan_id', planId);
+    formData.append('supplier', supplier);
+    formData.append('compdate', compdate);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+    
+    // Send AJAX request
+    fetch('{% url "material_planning:plan-inline-edit" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'HX-Request': 'true'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text();
+        }
+        throw new Error('Network response was not ok');
+    })
+    .then(html => {
+        // Replace the row with updated content
+        const row = document.getElementById(`plan-row-${planId}`);
+        const temp = document.createElement('tbody');
+        temp.innerHTML = html;
+        row.replaceWith(temp.firstElementChild);
+        
+        // Show success message
+        showMessage('Planning updated successfully!', 'success');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error updating planning', 'error');
+        cancelEdit(planId);
+    });
+}
+
+function showMessage(message, type) {
+    // Simple message display (can be enhanced with better UI)
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `fixed top-4 right-4 px-6 py-3 rounded shadow-lg ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white z-50`;
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 3000);
+}
+
+function confirmDelete(plno) {
+    return confirm(`Are you sure you want to delete Planning ${plno}?\n\nThis action cannot be undone and will delete all related materials.`);
+}
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

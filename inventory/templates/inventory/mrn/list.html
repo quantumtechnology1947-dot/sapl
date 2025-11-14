@@ -1,0 +1,65 @@
+{% extends 'core/patterns/list_page.html' %}
+
+{% block title %}MRN List - Cortex ERP{% endblock %}
+{% block page_header %}Material Return Note (MRN){% endblock %}
+{% block create_url %}{% url 'inventory:mrn-create' %}{% endblock %}
+{% block create_button_text %}Create MRN{% endblock %}
+{% block search_url %}{% url 'inventory:mrn-list' %}{% endblock %}
+
+{% block table_headers %}
+<th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">MRN No</th>
+<th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Date</th>
+<th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Status</th>
+<th class="px-3 py-2 text-center text-xs font-semibold text-gray-700">Actions</th>
+{% endblock %}
+
+{% block table_rows %}
+{% for mrn in object_list %}
+<tr class="h-8 hover:bg-blue-50/30 transition-colors">
+    <td class="px-3 py-2 text-xs font-medium text-gray-900">
+        <a href="{% url 'inventory:mrn-detail' mrn.id %}" class="text-sap-blue hover:text-sap-blue-hover hover:underline">
+            {{ mrn.mrnno }}
+        </a>
+    </td>
+    <td class="px-3 py-2 text-xs text-gray-700">
+        {{ mrn.sysdate|date:"d-m-Y" }}
+    </td>
+    <td class="px-3 py-2 text-xs">
+        {% include 'core/components/feedback/badge.html' with status="success" text="Completed" %}
+    </td>
+    <td class="px-3 py-2 text-center text-xs">
+        <div class="flex items-center justify-center gap-2">
+            <a href="{% url 'inventory:mrn-detail' mrn.id %}" 
+               class="text-sap-blue hover:text-sap-blue-hover hover:underline font-medium inline-flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                View
+            </a>
+            <a href="#" 
+               class="text-sap-green hover:text-sap-green-dark hover:underline font-medium inline-flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                </svg>
+                Print
+            </a>
+        </div>
+    </td>
+</tr>
+{% endfor %}
+{% endblock %}
+
+{% block empty_title %}No MRNs found{% endblock %}
+{% block empty_message %}Create your first MRN to return materials{% endblock %}
+{% block empty_create_url %}{% url 'inventory:mrn-create' %}{% endblock %}
+{% block empty_create_text %}Create MRN{% endblock %}
+{% block empty_colspan %}4{% endblock %}
+
+
+
+
+
+
+
+

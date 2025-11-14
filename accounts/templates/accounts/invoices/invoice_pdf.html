@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice.invoiceno }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        
+        .company-name {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .company-details {
+            font-size: 9pt;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-title {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 72pt;
+            color: rgba(200, 200, 200, 0.3);
+            font-weight: bold;
+            z-index: -1;
+        }
+        
+        .invoice-info {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .invoice-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .invoice-info td {
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        .invoice-info .label {
+            font-weight: bold;
+            width: 120px;
+        }
+        
+        .address-section {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .address-section table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+        }
+        
+        .address-section td {
+            padding: 8px;
+            border: 1px solid #000;
+            vertical-align: top;
+        }
+        
+        .address-section .address-header {
+            font-weight: bold;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+        
+        .line-items {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .line-items table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+        }
+        
+        .line-items th {
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 9pt;
+        }
+        
+        .line-items td {
+            border: 1px solid #000;
+            padding: 5px;
+            font-size: 9pt;
+        }
+        
+        .line-items .text-right {
+            text-align: right;
+        }
+        
+        .line-items .text-center {
+            text-align: center;
+        }
+        
+        .totals-section {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .totals-section table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+        
+        .totals-section td {
+            padding: 5px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .totals-section .label {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .totals-section .amount {
+            text-align: right;
+            width: 120px;
+        }
+        
+        .totals-section .grand-total {
+            font-weight: bold;
+            font-size: 11pt;
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+        }
+        
+        .terms-section {
+            margin-bottom: 15px;
+            font-size: 9pt;
+        }
+        
+        .terms-section h4 {
+            margin: 5px 0;
+            font-size: 10pt;
+        }
+        
+        .bank-details {
+            margin-bottom: 15px;
+            border: 1px solid #000;
+            padding: 10px;
+            font-size: 9pt;
+        }
+        
+        .bank-details h4 {
+            margin: 0 0 8px 0;
+            font-size: 10pt;
+        }
+        
+        .signature-section {
+            margin-top: 30px;
+        }
+        
+        .signature-section table {
+            width: 100%;
+        }
+        
+        .signature-section td {
+            padding: 10px;
+            vertical-align: bottom;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 50px;
+            padding-top: 5px;
+            text-align: center;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% if invoice.invoicetype and invoice.invoicetype.typename != 'ORIGINAL' %}
+    <div class="watermark">{{ invoice.invoicetype.typename }}</div>
+    {% endif %}
+    
+    <div class="header">
+        <div class="company-name">
+            {{ company.companyname|default:"Company Name" }}
+        </div>
+        <div class="company-details">
+            {{ company.address|default:"" }}{% if company.city %}, {{ company.city.cityname }}{% endif %}{% if company.city.state %}, {{ company.city.state.statename }}{% endif %}<br>
+            Phone: {{ company.phoneno|default:"" }} | Email: {{ company.email|default:"" }}<br>
+            GSTIN: {{ company.gstno|default:"" }} | PAN: {{ company.panno|default:"" }}
+        </div>
+        <div class="invoice-title">Tax Invoice</div>
+    </div>
+    
+    <div class="invoice-info">
+        <table>
+            <tr>
+                <td class="label">Invoice No:</td>
+                <td>{{ invoice.invoiceno }}</td>
+                <td class="label">Invoice Date:</td>
+                <td>{{ invoice.invoicedate|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <td class="label">PO No:</td>
+                <td>{{ invoice.poid.pono|default:"" }}</td>
+                <td class="label">PO Date:</td>
+                <td>{{ invoice.poid.podate|date:"d/m/Y"|default:"" }}</td>
+            </tr>
+            {% if invoice.woid %}
+            <tr>
+                <td class="label">Work Order No:</td>
+                <td>{{ invoice.woid.wono }}</td>
+                <td class="label">WO Date:</td>
+                <td>{{ invoice.woid.wodate|date:"d/m/Y" }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+    
+    <div class="address-section">
+        <table>
+            <tr>
+                <td class="address-header w-1/2">Buyer (Bill To)</td>
+                <td class="address-header w-1/2">Consignee (Ship To)</td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>{{ invoice.buyername }}</strong><br>
+                    {{ invoice.buyeraddress }}<br>
+                    {% if invoice.buyercity %}{{ invoice.buyercity.cityname }}, {% endif %}
+                    {% if invoice.buyerstate %}{{ invoice.buyerstate.statename }}, {% endif %}
+                    {% if invoice.buyercountry %}{{ invoice.buyercountry.countryname }}{% endif %}<br>
+                    {% if invoice.buyercontactperson %}Contact: {{ invoice.buyercontactperson }}<br>{% endif %}
+                    {% if invoice.buyerphoneno %}Phone: {{ invoice.buyerphoneno }}<br>{% endif %}
+                    {% if invoice.buyeremail %}Email: {{ invoice.buyeremail }}<br>{% endif %}
+                    {% if invoice.buyertinvat %}TIN/VAT: {{ invoice.buyertinvat }}<br>{% endif %}
+                    {% if invoice.buyertincst %}CST: {{ invoice.buyertincst }}{% endif %}
+                </td>
+                <td>
+                    <strong>{{ invoice.consigneename }}</strong><br>
+                    {{ invoice.consigneeaddress }}<br>
+                    {% if invoice.consigneecity %}{{ invoice.consigneecity.cityname }}, {% endif %}
+                    {% if invoice.consigneestate %}{{ invoice.consigneestate.statename }}, {% endif %}
+                    {% if invoice.consigneecountry %}{{ invoice.consigneecountry.countryname }}{% endif %}<br>
+                    {% if invoice.consigneecontactperson %}Contact: {{ invoice.consigneecontactperson }}<br>{% endif %}
+                    {% if invoice.consigneephoneno %}Phone: {{ invoice.consigneephoneno }}<br>{% endif %}
+                    {% if invoice.consigneeemail %}Email: {{ invoice.consigneeemail }}<br>{% endif %}
+                    {% if invoice.consigneetinvat %}TIN/VAT: {{ invoice.consigneetinvat }}<br>{% endif %}
+                    {% if invoice.consigneetincst %}CST: {{ invoice.consigneetincst }}{% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="line-items">
+        <table>
+            <thead>
+                <tr>
+                    <th class="w-[5%]">Sr.</th>
+                    <th class="w-[40%]">Description of Goods</th>
+                    <th class="w-[10%]">HSN/SAC</th>
+                    <th class="w-[8%]">Unit</th>
+                    <th class="w-[10%]">Quantity</th>
+                    <th class="w-[12%]">Rate</th>
+                    <th class="w-[15%]">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in details %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>{{ detail.itemid.itemname|default:"" }}</td>
+                    <td class="text-center">{{ detail.itemid.hsncode|default:"" }}</td>
+                    <td class="text-center">{{ detail.itemid.unit.unitname|default:"" }}</td>
+                    <td class="text-right">{{ detail.qty|floatformat:2 }}</td>
+                    <td class="text-right">{{ detail.rate|floatformat:2 }}</td>
+                    <td class="text-right">{{ detail.amount|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="totals-section">
+        <table>
+            <tr>
+                <td class="label">Subtotal:</td>
+                <td class="amount">₹ {{ invoice.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% if invoice.vatid %}
+            <tr>
+                <td class="label">VAT ({{ invoice.vatid.vatper }}%):</td>
+                <td class="amount">₹ {{ invoice.vatamt|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            {% if invoice.cstid %}
+            <tr>
+                <td class="label">CST ({{ invoice.cstid.cstper }}%):</td>
+                <td class="amount">₹ {{ invoice.cstamt|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            {% if invoice.cenvatid %}
+            <tr>
+                <td class="label">CENVAT ({{ invoice.cenvatid.cenvatper }}%):</td>
+                <td class="amount">₹ {{ invoice.cenvatamt|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            {% if invoice.freightid %}
+            <tr>
+                <td class="label">Freight:</td>
+                <td class="amount">₹ {{ invoice.freightamt|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            {% if invoice.insuranceid %}
+            <tr>
+                <td class="label">Insurance:</td>
+                <td class="amount">₹ {{ invoice.insuranceamt|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            {% if invoice.othercharges %}
+            <tr>
+                <td class="label">Other Charges:</td>
+                <td class="amount">₹ {{ invoice.othercharges|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            {% if invoice.deductions %}
+            <tr>
+                <td class="label">Deductions:</td>
+                <td class="amount">- ₹ {{ invoice.deductions|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            <tr class="grand-total">
+                <td class="label">Grand Total:</td>
+                <td class="amount">₹ {{ invoice.grandtotal|floatformat:2 }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    {% if invoice.paymentterms %}
+    <div class="terms-section">
+        <h4>Payment Terms:</h4>
+        <p>{{ invoice.paymentterms }}</p>
+    </div>
+    {% endif %}
+    
+    {% if company.bankname %}
+    <div class="bank-details">
+        <h4>Bank Details:</h4>
+        <table class="w-full border-none">
+            <tr>
+                <td class="border-none w-[30%] font-bold">Bank Name:</td>
+                <td class="border-none">{{ company.bankname }}</td>
+            </tr>
+            <tr>
+                <td class="border-none font-bold">Account No:</td>
+                <td class="border-none">{{ company.accountno }}</td>
+            </tr>
+            <tr>
+                <td class="border-none font-bold">IFSC Code:</td>
+                <td class="border-none">{{ company.ifsccode }}</td>
+            </tr>
+            <tr>
+                <td class="border-none font-bold">Branch:</td>
+                <td class="border-none">{{ company.branchname }}</td>
+            </tr>
+        </table>
+    </div>
+    {% endif %}
+    
+    <div class="signature-section">
+        <table>
+            <tr>
+                <td class="w-1/2">
+                    <div>Customer Signature</div>
+                    <div class="signature-line">Authorized Signatory</div>
+                </td>
+                <td class="w-1/2">
+                    <div>For {{ company.companyname|default:"Company Name" }}</div>
+                    <div class="signature-line">Authorized Signatory</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="footer">
+        This is a computer-generated invoice and does not require a physical signature.
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,82 @@
+{# Form Row Component - SAP Fiori Style #}
+{% comment %}
+Component: Form Row
+Purpose: Reusable CSS classes for form field containers with vertical and horizontal layouts
+Design: Compact spacing (mb-2) with responsive grid layout
+
+This component provides standardized CSS class combinations for form rows.
+Use these patterns directly in your templates for consistent form layouts.
+
+Layout Patterns:
+
+1. Single Column (Default):
+   <div class="mb-2">
+     {% include 'core/components/forms/text_input.html' with label="Name" name="name" %}
+   </div>
+
+2. Two Column Grid (Responsive):
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+     {% include 'core/components/forms/text_input.html' with label="First Name" name="first_name" %}
+     {% include 'core/components/forms/text_input.html' with label="Last Name" name="last_name" %}
+   </div>
+
+3. Three Column Grid (Responsive):
+   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+     {% include 'core/components/forms/text_input.html' with label="City" name="city" %}
+     {% include 'core/components/forms/text_input.html' with label="State" name="state" %}
+     {% include 'core/components/forms/text_input.html' with label="Zip" name="zip" %}
+   </div>
+
+4. Four Column Grid (Responsive):
+   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
+     {% include 'core/components/forms/text_input.html' with label="Q1" name="q1" %}
+     {% include 'core/components/forms/text_input.html' with label="Q2" name="q2" %}
+     {% include 'core/components/forms/text_input.html' with label="Q3" name="q3" %}
+     {% include 'core/components/forms/text_input.html' with label="Q4" name="q4" %}
+   </div>
+
+5. Horizontal Layout (Flex - for inline forms):
+   <div class="flex flex-col sm:flex-row sm:items-start sm:gap-4 mb-2">
+     {% include 'core/components/forms/text_input.html' with label="Code" name="code" inline=True %}
+     {% include 'core/components/forms/text_input.html' with label="Name" name="name" inline=True %}
+   </div>
+
+6. Custom Gap Sizes:
+   - Small gap: gap-2 (8px)
+   - Medium gap: gap-4 (16px) - default
+   - Large gap: gap-6 (24px)
+   
+   Example with large gap:
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+     {% include 'core/components/forms/select_input.html' with label="Category" name="category" %}
+     {% include 'core/components/forms/select_input.html' with label="Subcategory" name="subcategory" %}
+   </div>
+
+7. No Bottom Margin (for last row in section):
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+     {% include 'core/components/forms/text_input.html' with label="Field 1" name="field1" %}
+     {% include 'core/components/forms/text_input.html' with label="Field 2" name="field2" %}
+   </div>
+
+Requirements Addressed:
+  - Requirement 5.1: Reusable component library
+  - Requirement 5.7: Parameters via Django template syntax
+  - Requirement 9.5: mb-2 (8px) spacing between form rows
+  - Requirement 12.1: Responsive breakpoints (sm:, md:, lg:, xl:)
+
+Design Notes:
+  - Default spacing between rows is mb-2 (8px) per Requirement 9.5
+  - Responsive breakpoints automatically applied for multi-column layouts per Requirement 12.1
+  - Single column on mobile (grid-cols-1), expands to specified columns on md+ screens (768px+)
+  - Use flex layout for horizontal inline forms
+  - Gap sizes: gap-2 (8px), gap-4 (16px), gap-6 (24px)
+  - All form inputs already have internal mb-2 spacing, so rows stack properly
+{% endcomment %}
+
+
+
+
+
+
+
+

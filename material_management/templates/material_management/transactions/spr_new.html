@@ -1,0 +1,203 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}SPR - New - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <table cellpadding="0" cellspacing="0" width="100%" align="center">
+        <!-- Header -->
+        <tr>
+            <td height="20" align="left" valign="middle" class="bg-gradient-to-r from-purple-700 to-purple-800 text-white px-4 py-2 font-semibold">
+                &nbsp;<b>SPR - New (Special Purpose Requisition)</b>
+            </td>
+        </tr>
+
+        <!-- Instructions -->
+        <tr>
+            <td class="px-4 py-3">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 text-sm">
+                    <p class="font-semibold text-blue-900">Select Department/Work Order and Account Head Category:</p>
+                    <ul class="list-disc ml-6 mt-2 text-blue-800">
+                        <li>For <strong>Department-based</strong> requisitions: Select a Business Group and Account Head Category</li>
+                        <li>For <strong>Work Order-based</strong> requisitions: Select a Work Order and Account Head Category</li>
+                        <li>AI will suggest items commonly used by your selection</li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Selection Form -->
+        <tr>
+            <td class="px-4 py-4">
+                <form method="post" action="#">
+                    {% csrf_token %}
+                    <div class="bg-white border border-gray-300 rounded p-6 shadow-sm" style="max-width: 800px;">
+
+                        <!-- Option 1: Department-Based SPR -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-building mr-2 text-purple-600"></i>Department-Based Requisition
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Business Group Selection -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Business Group (Department) <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="dept_id"
+                                            id="dept_id"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        <option value="">Select Department</option>
+                                        {% for bg in business_groups %}
+                                        <option value="{{ bg.id }}">{{ bg.symbol }} - {{ bg.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Account Head Category for Department -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Account Head Category <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="ah_category_dept"
+                                            id="ah_category_dept"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        <option value="">Select Category</option>
+                                        {% for cat in ah_categories %}
+                                        <option value="{{ cat.value }}">{{ cat.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="button"
+                                        onclick="proceedWithDepartment()"
+                                        class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors duration-200">
+                                    <i class="fas fa-arrow-right mr-2"></i>Proceed with Department
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="relative my-8">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative flex justify-center text-sm">
+                                <span class="px-4 bg-white text-gray-500 font-medium">OR</span>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: Work Order-Based SPR -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                                <i class="fas fa-clipboard-list mr-2 text-blue-600"></i>Work Order-Based Requisition
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Work Order Selection -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Work Order <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="wo_no"
+                                            id="wo_no"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Work Order</option>
+                                        {% for wo in work_orders %}
+                                        <option value="{{ wo.wono }}">{{ wo.wono }} - {{ wo.taskprojecttitle|truncatechars:30 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Account Head Category for WO -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Account Head Category <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="ah_category_wo"
+                                            id="ah_category_wo"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select Category</option>
+                                        {% for cat in ah_categories %}
+                                        <option value="{{ cat.value }}">{{ cat.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="button"
+                                        onclick="proceedWithWorkOrder()"
+                                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200">
+                                    <i class="fas fa-arrow-right mr-2"></i>Proceed with Work Order
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </td>
+        </tr>
+
+        <!-- Back Link -->
+        <tr>
+            <td class="px-4 py-4">
+                <a href="{% url 'material_management:spr-list' %}"
+                   class="text-blue-600 hover:text-blue-800 text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i>Back to SPR List
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+function proceedWithDepartment() {
+    const deptId = document.getElementById('dept_id').value;
+    const ahCategory = document.getElementById('ah_category_dept').value;
+
+    if (!deptId) {
+        alert('Please select a Business Group (Department)');
+        return;
+    }
+
+    if (!ahCategory) {
+        alert('Please select an Account Head Category');
+        return;
+    }
+
+    // Redirect to SPR New Details with department and category
+    window.location.href = `/material-management/spr/new/${deptId}/${ahCategory}/`;
+}
+
+function proceedWithWorkOrder() {
+    const woNo = document.getElementById('wo_no').value;
+    const ahCategory = document.getElementById('ah_category_wo').value;
+
+    if (!woNo) {
+        alert('Please select a Work Order');
+        return;
+    }
+
+    if (!ahCategory) {
+        alert('Please select an Account Head Category');
+        return;
+    }
+
+    // Redirect to SPR New Details with WO and category
+    window.location.href = `/material-management/spr/new/0/${ahCategory}/${woNo}/`;
+}
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,172 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Create New BOM - Design{% endblock %}
+{% block page_title %}BOM Design - New{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2" x-data="bomSearch()">
+    <!-- SAP Fiori Toolbar -->
+    <div class="bg-white border border-gray-200 rounded mb-2">
+        <div class="px-4 py-2 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-xs font-semibold text-gray-700">Search & Filter</h2>
+        </div>
+        <div class="p-3">
+            <form method="get" class="flex flex-wrap items-center gap-2" @submit="handleSubmit">
+                <!-- Search Type -->
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">Search By:</label>
+                    <select name="search_type"
+                            x-model="searchType"
+                            class="h-8 w-36 rounded border-gray-300 text-xs focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                        <option value="customer">Customer Name</option>
+                        <option value="wono">WO No</option>
+                    </select>
+                </div>
+
+                <!-- Search Input with Icon -->
+                <div class="flex-1 min-w-[250px] max-w-md relative">
+                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                        <svg class="h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <input type="text"
+                           name="search_value"
+                           x-model="searchValue"
+                           @input.debounce.500ms="autoSearch"
+                           :placeholder="searchType === 'customer' ? 'Enter customer name...' : 'Enter WO number...'"
+                           class="h-8 w-full pl-8 pr-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                </div>
+
+                <!-- WO Category Filter -->
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">Category:</label>
+                    <select name="wo_category"
+                            x-model="woCategory"
+                            @change="autoSearch"
+                            class="h-8 w-48 rounded border-gray-300 text-xs focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                        <option value="">All Categories</option>
+                        <option value="S">S - Standard Product</option>
+                        <option value="N">N - Non Standard Product</option>
+                        <option value="E">E - Erection & Commissioning</option>
+                        <option value="P">P - Spares</option>
+                        <option value="J">J - Job Work</option>
+                        <option value="T">T - Automation & SPM</option>
+                        <option value="A">A - Agriculture Products</option>
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 ml-auto">
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover focus:outline-none focus:ring-2 focus:ring-sap-blue/30 transition-colors">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        Search
+                    </button>
+
+                    <template x-if="searchValue || woCategory">
+                        <a href="{% url 'design:bom-create-select' %}"
+                           class="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sap-blue/30 transition-colors">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Clear
+                        </a>
+                    </template>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function bomSearch() {
+            return {
+                searchType: '{{ request.GET.search_type|default:"customer" }}',
+                searchValue: '{{ request.GET.search_value|default:"" }}',
+                woCategory: '{{ request.GET.wo_category|default:"" }}',
+                autoSearch() {
+                    // Auto-submit form after user stops typing (debounced)
+                    if (this.searchValue.length >= 3 || this.woCategory || this.searchValue.length === 0) {
+                        this.$el.querySelector('form').submit();
+                    }
+                },
+                handleSubmit(e) {
+                    // Allow form to submit normally
+                }
+            }
+        }
+    </script>
+
+    <!-- SAP Fiori Data Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-12">SN</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-24">Fin Year</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-28">WO No</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Customer Name</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-20">Code</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-24">Gen. Date</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 w-32">Gen. By</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for wo in wo_details %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+                        <td class="px-3 py-2 text-xs text-gray-700">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-700">
+                            {{ wo.finyear }}
+                        </td>
+                        <td class="px-3 py-2 text-xs font-medium">
+                            <a href="{% url 'design:bom-tree' wo.wono %}"
+                               class="text-sap-blue hover:text-sap-blue-dark hover:underline">
+                                {{ wo.wono }}
+                            </a>
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-900">
+                            {{ wo.customer_name }}
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-700">
+                            {{ wo.customer_code }}
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-700">
+                            {{ wo.gen_date }}
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-700">
+                            {{ wo.gen_by }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <p class="text-sm font-medium text-gray-900 mb-1">No work orders available for BOM creation</p>
+                                <p class="text-xs text-gray-500">All work orders already have BOMs or no work orders exist</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SAP Fiori Pagination -->
+        {% if is_paginated %}
+        {% include 'core/components/tables/pagination.html' with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+

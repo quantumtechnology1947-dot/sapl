@@ -1,0 +1,50 @@
+{% extends "machinery/base.html" %}
+
+{% block title %}Machinery Utilization Report{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include "core/components/layout/page_header.html" with title="Machinery Utilization" subtitle="Vehicle and machinery usage overview" %}
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {% include "core/components/cards/stat_card.html" with value=summary.total_vehicles label="Vehicles" color="blue" %}
+        {% include "core/components/cards/stat_card.html" with value=summary.total_processes label="Processes" color="green" %}
+        {% include "core/components/cards/stat_card.html" with value=summary.total_schedules label="Schedules" color="purple" %}
+    </div>
+    
+    <!-- Recent Activity Card -->
+    <div class="bg-white border border-gray-200 rounded">
+        {% include "core/components/cards/card_header.html" with title="Recent Activity" %}
+        
+        <div class="p-4">
+            {% if vehicles %}
+                <div class="space-y-2">
+                    {% for vehicle in vehicles %}
+                        <div class="border-b border-gray-100 pb-2 last:border-0">
+                            <span class="text-sm text-gray-900">{{ vehicle.vehno }} - {{ vehicle.vehical_name }}</span>
+                            <span class="text-xs text-gray-500 ml-2">{{ vehicle.date }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-500">No recent activity</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

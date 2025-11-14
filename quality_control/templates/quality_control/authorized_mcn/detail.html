@@ -1,0 +1,24 @@
+{% extends 'quality_control/base.html' %}
+{% block title %}Authorized MCN Details{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h2 class="text-sm font-bold">Authorized MCN Details</h2>
+    <a href="{% url 'quality_control:authorized-mcn-list' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Back</a>
+</div>
+<div class="bg-white rounded border border-gray-200 p-6">
+    <div class="grid grid-cols-2 gap-4">
+        <div><p class="text-gray-600">MCN ID</p><p class="font-medium">{{ authorized_mcn.mcnid }}</p></div>
+        <div><p class="text-gray-600">MCN Detail ID</p><p class="font-medium">{{ authorized_mcn.mcndid }}</p></div>
+        <div><p class="text-gray-600">QA Quantity</p><p class="font-medium">{{ authorized_mcn.qaqty }}</p></div>
+        <div><p class="text-gray-600">Date</p><p class="font-medium">{{ authorized_mcn.sysdate }}</p></div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

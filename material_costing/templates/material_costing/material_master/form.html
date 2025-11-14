@@ -1,0 +1,32 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Material Master - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Create{% endif %} Material Master{% endblock %}
+{% block form_action %}{% if object %}{% url 'material_costing:material-master-update' object.id %}{% else %}{% url 'material_costing:material-master-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'material_costing:material-master-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="materialcostmasterno"
+        label="Master Number"
+        value=form.materialcostmasterno.value
+        required=True
+        placeholder="e.g., MCM-001"
+    %}
+    
+    {% include 'core/components/forms/textarea_input.html' with 
+        name="description"
+        label="Description"
+        value=form.description.value
+        rows=3
+        placeholder="Enter description"
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

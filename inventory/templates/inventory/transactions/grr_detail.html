@@ -1,0 +1,196 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}GRR Details - {{ grr.grrno }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Goods Received Receipt Details</h1>
+                <p class="text-sm text-gray-600 mt-1">GRR Number: <span class="font-semibold text-purple-600">{{ grr.grrno }}</span></p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:grr-print' grr.id %}" 
+                   target="_blank"
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md transition-colors">
+                    <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print
+                </a>
+                <a href="{% url 'inventory:grr-delete' grr.id %}" 
+                   class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-md transition-colors">
+                    <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete
+                </a>
+                <a href="{% url 'inventory:grr-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Master Information -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Master Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-600">GRR Number</label>
+                <p class="mt-1 text-sm text-gray-900 font-semibold">{{ grr.grrno }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600">GIN Number</label>
+                <p class="mt-1 text-sm text-gray-900">
+                    {% if gin %}
+                    <a href="{% url 'inventory:gin-detail' gin.id %}" class="text-purple-600 hover:text-purple-900">
+                        {{ grr.ginno }}
+                    </a>
+                    {% else %}
+                    {{ grr.ginno|default:"-" }}
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Tax Invoice Number</label>
+                <p class="mt-1 text-sm text-gray-900">{{ grr.taxinvoiceno|default:"-" }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Tax Invoice Date</label>
+                <p class="mt-1 text-sm text-gray-900">{{ grr.taxinvoicedate|date:"d-M-Y"|default:"-" }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Modified VAT Applicable</label>
+                <p class="mt-1 text-sm">
+                    {% if grr.modvatapp %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Yes
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        No
+                    </span>
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Modified VAT Invoice</label>
+                <p class="mt-1 text-sm">
+                    {% if grr.modvatinv %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Yes
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        No
+                    </span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- GIN Reference (if available) -->
+    {% if gin %}
+    <div class="bg-purple-50 border-l-4 border-purple-400 p-4 mb-6 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-purple-700">
+                    <strong>GIN Reference:</strong> {{ gin.ginno }} | PO: {{ gin.pono|default:"-" }} | Challan: {{ gin.challanno|default:"-" }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Line Items -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Line Items</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-purple-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                            SN
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                            Item Code
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                            Description
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                            Received Qty
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for detail in grr_details %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ detail.poid|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            Item Description
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 font-semibold">
+                            {{ detail.receivedqty|floatformat:3 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=4 title="No records found" message="" %}
+                {% endfor %}
+                </tbody>
+                <tfoot class="bg-gray-50">
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-sm font-medium text-gray-900 text-right">
+                            Total:
+                        </td>
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-900 text-right">
+                            {{ total_qty|floatformat:3 }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Stock Update Notice -->
+    <div class="mt-6 bg-green-50 border-l-4 border-green-400 p-4 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-green-700">
+                    <strong>Stock Updated:</strong> This GRR has updated the stock ledger. Materials are now available for use.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

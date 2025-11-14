@@ -1,0 +1,59 @@
+{% comment %}
+Component: Page Header
+Purpose: Standard page header with title, breadcrumb, and action buttons
+Parameters:
+  - title (required): Page title text
+  - subtitle (optional): Subtitle or description text
+  - breadcrumb_items (optional): List of breadcrumb items for navigation
+  - show_breadcrumb (optional): Boolean to show breadcrumb (default: true if items provided)
+  - show_actions (optional): Boolean to show action area (default: true)
+  - border (optional): Boolean to add bottom border (default: false)
+Usage:
+  {% include 'core/components/layout/page_header.html' with 
+    title="Page Title"
+    subtitle="Optional description"
+    breadcrumb_items=breadcrumb_list
+    show_actions=True
+  %}
+  {% block header_actions %}
+    <!-- Custom action buttons -->
+  {% endblock %}
+Requirements: 3.3, 3.4, 3.6, 5.4
+{% endcomment %}
+
+<!-- Breadcrumb Navigation -->
+{% if breadcrumb_items and show_breadcrumb|default:True %}
+{% include 'core/components/layout/breadcrumb.html' with items=breadcrumb_items %}
+{% endif %}
+
+<!-- Page Header -->
+<div class="flex items-center justify-between mb-4 {% if border %}pb-3 border-b border-gray-200{% endif %}">
+    <div class="flex-1 min-w-0">
+        <h1 class="text-base font-semibold text-gray-900">{{ title }}</h1>
+        {% if subtitle %}
+        <p class="text-xs text-gray-600 mt-1">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    
+    {% if show_actions|default:True %}
+    <div class="flex items-center gap-2 ml-4">
+        {% block header_actions %}
+        {# Action buttons go here #}
+        {# Example:
+        {% include 'core/components/buttons/primary.html' with 
+          text="Create New"
+          icon="plus"
+        %}
+        #}
+        {% endblock %}
+    </div>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+

@@ -1,0 +1,43 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} PF Slab - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} PF Slab{% endblock %}
+{% block form_action %}{% if object %}{% url 'human_resource:pf-slab-update' object.id %}{% else %}{% url 'human_resource:pf-slab-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'human_resource:pf-slab-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="pfemployee"
+        label="PF Employee %"
+        value=object.pfemployee
+        required=True
+        type="number"
+        step="0.01"
+        placeholder="e.g., 12.00"
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="pfcompany"
+        label="PF Company %"
+        value=object.pfcompany
+        required=True
+        type="number"
+        step="0.01"
+        placeholder="e.g., 13.00"
+    %}
+    
+    {% include 'core/components/forms/select_input.html' with 
+        name="active"
+        label="Status"
+        value=object.active
+        options='<option value="1">Active</option><option value="0">Inactive</option>'
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

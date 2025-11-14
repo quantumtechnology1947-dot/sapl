@@ -1,0 +1,134 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Material Return Quality Note (MRQN) - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2 py-2">
+    {% if messages %}
+    <div class="mb-2">
+        {% for message in messages %}
+        <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-2 py-1 rounded text-xs mb-1" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded shadow">
+        <!-- Header with New MRQN Button and Search -->
+        <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+            <div class="flex justify-between items-center gap-4">
+                <!-- Tabs (placeholder for future) -->
+                <div class="flex gap-2">
+                    <!-- Add tabs here if needed -->
+                </div>
+
+                <!-- New MRQN Button and Search -->
+                <div class="flex gap-2 items-center flex-1 justify-end">
+                    <a href="{% url 'quality_control:mrqn-new' %}" 
+                       class="px-4 py-2 bg-sap-blue hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors whitespace-nowrap">
+                        + New MRQN
+                    </a>
+
+                    <!-- Search Form -->
+                    <form method="get" class="flex gap-2 items-center">
+                        <div class="relative">
+                            <select name="search_by" class="px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-sap-blue appearance-none pr-8">
+                                <option value="0" {% if request.GET.search_by == '0' %}selected{% endif %}>MRN No</option>
+                                <option value="1" {% if request.GET.search_by == '1' %}selected{% endif %}>MRQN No</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <input type="text" name="search_value" value="{{ request.GET.search_value }}" 
+                               placeholder="Type to search..." 
+                               class="px-3 py-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-sap-blue w-64">
+                        <button type="submit" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded transition-colors">
+                            Search
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- MRQN List Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-xs border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-300">
+                        <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">SN</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Select</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Fin Year</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">MRQN No</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">Date</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700">MRN No</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mrqn in mrqns %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                        <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ forloop.counter }}</td>
+                        <td class="px-2 py-2 text-center border-r border-gray-200">NA</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ mrqn.finyear_name|default:"-" }}</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ mrqn.mrqnno|default:"-" }}</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ mrqn.sysdate|default:"-" }}</td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900 text-center">{{ mrqn.mrnno|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <p class="text-base text-red-700 font-semibold">No MRQN records found!</p>
+                            <p class="text-sm text-gray-600 mt-2">Get started by creating a new Material Return Quality Note</p>
+                            <a href="{% url 'quality_control:mrqn-new' %}" 
+                               class="inline-block mt-4 px-4 py-2 bg-sap-blue hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors">
+                                + New MRQN
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between">
+            <div class="text-xs text-gray-700">
+                Items {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+            </div>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" 
+                   class="px-3 py-1 bg-white border border-gray-300 rounded text-xs hover:bg-gray-50">
+                    Previous
+                </a>
+                {% else %}
+                <button disabled class="px-3 py-1 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400 cursor-not-allowed">
+                    Previous
+                </button>
+                {% endif %}
+
+                <span class="px-3 py-1 text-xs text-gray-700">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" 
+                   class="px-3 py-1 bg-white border border-gray-300 rounded text-xs hover:bg-gray-50">
+                    Next
+                </a>
+                {% else %}
+                <button disabled class="px-3 py-1 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400 cursor-not-allowed">
+                    Next
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

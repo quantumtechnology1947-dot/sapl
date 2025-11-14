@@ -1,0 +1,59 @@
+﻿Id,Type,Symbol
+1,Not Applicable,NA
+2,Director,D
+3,Managing Director,MD
+4,Asst. Manager,AM
+5,Officer,OF
+6,HOD,HOD
+7,Group Leader,GL
+8,Assistant Head,AH-IT
+9,Executive,E
+10,Worker,W
+11,Helper,HL
+12,Supervisor,S
+13,Manager,M
+14,Milling Operator,MO
+15,Data Entry Operator,DTP
+16,General Manager,GM
+17,Driver,H
+18,On Contract,Neha
+19,Manager Project,MP
+20,Data Entry Operator,DEO
+21,Jr. Engineer,JE
+22,Trainee Engineer,TE
+23,Sr.Fitter,SF
+24,Store Assistant,SA
+25,Software Developer,SD
+26,Hardware Engineer,HE
+27,Design Engineer,DE
+28,HR,HR
+29,Store Officere,E
+30,Sr. Design Engineer,SDE
+31,Jr.Project Engineer,PRJ
+32,Q.A.Engineer,S
+33,Q.A.Engineer,QA
+34,Admin,Ad
+35,Project Engineer,PE
+36,Assembly Fitter,AS
+37,Fitter,F
+38,Assistant Engineer,AE
+39,Trainee  Engineer,TE
+40,Technician,TC
+41,Assi. Maintenance,A.M.
+42,Plant In-charge,PI
+43,Sr. Welder & Fitter,SWF
+44,Programmer,PLC
+45,Machine Operator,MO
+46,Painter,P
+47,Welder,W
+48,Cook,C
+49,Sr.Executive,E
+50,Vendor Developement Engineer,VDE
+51,Draughtsman,D
+52,Sr.manufacturing Engineer,MFG
+53,Deputy General Manager,DGM
+54,Manufacturing Engineer,ME
+55,Electrical Technician,ET
+56,Sr.Project Engineer,SP
+57,Operational Head,OH
+58,Sr. Engineer,SE

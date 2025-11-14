@@ -1,0 +1,76 @@
+{% extends "core/base.html" %}
+
+{% block title %}New Quotation - Cortex ERP{% endblock %}
+{% block page_title %}New Quotation{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-gray-800">New Quotation</h2>
+            <a href="{% url 'sales_distribution:quotation-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md">Back</a>
+        </div>
+    </div>
+
+    <form method="post" class="bg-white rounded border border-gray-200 p-6 space-y-6">
+        {% csrf_token %}
+        
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Customer Enquiry <span class="text-red-500">*</span></label>
+            {{ form.enquiry }}
+            {% if form.enquiry.errors %}<p class="text-red-500 text-sm">{{ form.enquiry.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Quotation No</label>
+                {{ form.quotationno }}
+                <p class="text-xs text-gray-500">Auto-generated</p>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Due Date</label>
+                {{ form.duedate }}
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Payment Terms</label>
+            {{ form.paymentterms }}
+        </div>
+
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Delivery Terms</label>
+            {{ form.deliveryterms }}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Validity</label>
+                {{ form.validity }}
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Warranty</label>
+                {{ form.warrenty }}
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Remarks</label>
+            {{ form.remarks }}
+        </div>
+
+        <div class="flex gap-4 justify-end pt-6 border-t">
+            <a href="{% url 'sales_distribution:quotation-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md">Cancel</a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-sm">Create Quotation</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

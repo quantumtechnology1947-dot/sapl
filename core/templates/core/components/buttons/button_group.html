@@ -1,0 +1,58 @@
+{# Button Group - SAP Fiori Style #}
+{% comment %}
+Usage:
+{% include 'core/components/buttons/button_group.html' with buttons=button_list alignment="left" %}
+
+Or use as a wrapper:
+<div class="inline-flex gap-2">
+  {% include 'core/components/buttons/primary.html' with text="Save" %}
+  {% include 'core/components/buttons/secondary.html' with text="Cancel" %}
+</div>
+
+Parameters:
+- buttons: List of button configurations (optional, if using wrapper style)
+- alignment: "left", "center", "right" (default: "left")
+- spacing: "tight", "default", "loose" (default: "default")
+  - tight: gap-1 (4px)
+  - default: gap-2 (8px)
+  - loose: gap-3 (12px)
+- extra_classes: Additional CSS classes (optional)
+
+Button configuration format (when using buttons parameter):
+{
+  'type': 'primary|secondary|success|danger',
+  'text': 'Button Text',
+  'icon': 'icon-name',
+  'url': '#',
+  'htmx_get': '/url',
+  'htmx_post': '/url',
+  'disabled': False
+}
+{% endcomment %}
+
+<div class="inline-flex
+  {% if spacing == 'tight' %}gap-1
+  {% elif spacing == 'loose' %}gap-3
+  {% else %}gap-2{% endif %}
+  {% if alignment == 'center' %}justify-center
+  {% elif alignment == 'right' %}justify-end
+  {% else %}justify-start{% endif %}
+  {{ extra_classes }}">
+  
+  {% if buttons %}
+    {% for button in buttons %}
+      {% if button.type == 'primary' %}
+        {% include 'core/components/buttons/primary.html' with text=button.text icon=button.icon url=button.url htmx_get=button.htmx_get htmx_post=button.htmx_post disabled=button.disabled size=button.size %}
+      {% elif button.type == 'success' %}
+        {% include 'core/components/buttons/success.html' with text=button.text icon=button.icon url=button.url htmx_get=button.htmx_get htmx_post=button.htmx_post disabled=button.disabled size=button.size %}
+      {% elif button.type == 'danger' %}
+        {% include 'core/components/buttons/danger.html' with text=button.text icon=button.icon url=button.url htmx_get=button.htmx_get htmx_post=button.htmx_post disabled=button.disabled size=button.size %}
+      {% else %}
+        {% include 'core/components/buttons/secondary.html' with text=button.text icon=button.icon url=button.url htmx_get=button.htmx_get htmx_post=button.htmx_post disabled=button.disabled size=button.size %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    {# Content will be provided by the including template #}
+    {{ content }}
+  {% endif %}
+</div>

@@ -1,0 +1,161 @@
+{% extends 'inventory/base.html' %}
+{% block title %}ABC Analysis - Inventory{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">ABC Analysis</h1>
+                <p class="text-sm text-gray-600 mt-1">Inventory categorization based on Pareto principle</p>
+            </div>
+            {% if analysis_data %}
+            <div class="flex gap-2">
+                <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Print
+                </button>
+                <a href="#" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Export Excel
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Analysis Parameters</h2>
+        <form method="get" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Start Date <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" name="start_date" value="{{ start_date }}" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        End Date <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" name="end_date" value="{{ end_date }}" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Criteria</label>
+                    <select name="criteria" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="value" {% if criteria == 'value' %}selected{% endif %}>By Value</option>
+                        <option value="quantity" {% if criteria == 'quantity' %}selected{% endif %}>By Quantity</option>
+                        <option value="frequency" {% if criteria == 'frequency' %}selected{% endif %}>By Frequency</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
+                        Run Analysis
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if analysis_data %}
+    <!-- Summary Cards -->
+    {% if summary %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <p class="text-sm text-gray-600">Total Items</p>
+            <p class="text-base font-bold text-gray-900">{{ summary.total_items }}</p>
+        </div>
+        <div class="bg-red-50 rounded border border-gray-200 p-6 border-l-4 border-red-500">
+            <p class="text-sm text-red-600">Category A Items</p>
+            <p class="text-base font-bold text-red-700">{{ summary.a_items }}</p>
+            <p class="text-xs text-red-600 mt-1">High Value (70%)</p>
+        </div>
+        <div class="bg-yellow-50 rounded border border-gray-200 p-6 border-l-4 border-yellow-500">
+            <p class="text-sm text-yellow-600">Category B Items</p>
+            <p class="text-base font-bold text-yellow-700">{{ summary.b_items }}</p>
+            <p class="text-xs text-yellow-600 mt-1">Medium Value (20%)</p>
+        </div>
+        <div class="bg-green-50 rounded border border-gray-200 p-6 border-l-4 border-green-500">
+            <p class="text-sm text-green-600">Category C Items</p>
+            <p class="text-base font-bold text-green-700">{{ summary.c_items }}</p>
+            <p class="text-xs text-green-600 mt-1">Low Value (10%)</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Category Filter Tabs -->
+    <div class="bg-white rounded-t-lg border border-gray-200">
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+                <a href="?start_date={{ start_date }}&end_date={{ end_date }}&criteria={{ criteria }}&category_filter=all" 
+                   class="px-6 py-3 text-sm font-medium {% if category_filter == 'all' %}border-b-2 border-blue-500 text-blue-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    All Items
+                </a>
+                <a href="?start_date={{ start_date }}&end_date={{ end_date }}&criteria={{ criteria }}&category_filter=A" 
+                   class="px-6 py-3 text-sm font-medium {% if category_filter == 'A' %}border-b-2 border-red-500 text-red-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    Category A
+                </a>
+                <a href="?start_date={{ start_date }}&end_date={{ end_date }}&criteria={{ criteria }}&category_filter=B" 
+                   class="px-6 py-3 text-sm font-medium {% if category_filter == 'B' %}border-b-2 border-yellow-500 text-yellow-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    Category B
+                </a>
+                <a href="?start_date={{ start_date }}&end_date={{ end_date }}&criteria={{ criteria }}&category_filter=C" 
+                   class="px-6 py-3 text-sm font-medium {% if category_filter == 'C' %}border-b-2 border-green-500 text-green-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    Category C
+                </a>
+            </nav>
+        </div>
+
+        <!-- Analysis Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Consumption Qty</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Consumption Value</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Transactions</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Total</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cumulative %</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Category</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for data in analysis_data %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ data.item.itemcode|default:"-" }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ data.item.itemname }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ data.consumption_qty|floatformat:3 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">₹ {{ data.consumption_value|floatformat:2 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ data.transaction_count }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ data.percentage_of_total|floatformat:2 }}%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">{{ data.cumulative_percentage|floatformat:2 }}%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 text-sm font-bold rounded-full 
+                                {% if data.abc_category == 'A' %}bg-red-100 text-red-800
+                                {% elif data.abc_category == 'B' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ data.abc_category }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=9 title="No records found" message="" %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+

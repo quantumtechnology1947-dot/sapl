@@ -1,0 +1,81 @@
+{% comment %}
+Component: Table Empty State
+Purpose: Centered empty state display for tables with no data
+
+Parameters:
+  - message (optional): Main message text (default: 'No data found')
+  - title (optional): Title text above message
+  - icon (optional): Icon type - 'search', 'folder', 'document', 'inbox' (default: 'document')
+  - action_url (optional): URL for call-to-action button
+  - action_text (optional): Text for action button (default: 'Create New')
+  - colspan (optional): Number of columns to span (used when in <tr> context)
+
+Usage (standalone):
+  {% include 'core/components/tables/table_empty.html' with
+    message='No customers found'
+    action_url=create_url
+    action_text='Add Customer'
+  %}
+
+Usage (in table row):
+  <tr>
+    <td colspan="5">
+      {% include 'core/components/tables/table_empty.html' with message='No data' %}
+    </td>
+  </tr>
+
+Requirements: 5.3
+{% endcomment %}
+
+<div class="flex flex-col items-center justify-center py-12">
+    <!-- Icon -->
+    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {% if icon == 'search' %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        {% elif icon == 'folder' %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+        {% elif icon == 'inbox' %}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        {% else %}
+            {# Default: document icon #}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        {% endif %}
+    </svg>
+    
+    <!-- Title (optional) -->
+    {% if title %}
+    <p class="text-sm font-semibold text-gray-900 mb-1">
+        {{ title }}
+    </p>
+    {% endif %}
+    
+    <!-- Message -->
+    <p class="text-xs text-gray-500 mb-4">
+        {{ message|default:'No data found' }}
+    </p>
+    
+    <!-- Call-to-action button (optional) -->
+    {% if action_url %}
+    <a href="{{ action_url }}"
+       class="inline-flex items-center h-8 px-3 text-xs font-medium rounded 
+              bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors
+              focus:outline-none focus:ring-2 focus:ring-sap-blue/30">
+        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        {{ action_text|default:'Create New' }}
+    </a>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PR Items Grid</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            background: white;
+        }
+        
+        .grid-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        .pr-items-grid {
+            width: 150%;
+            border-collapse: collapse;
+            font-size: 9pt;
+        }
+        
+        .pr-items-grid th {
+            background: #D8D8D8;
+            border: 1px solid #7F7F7F;
+            padding: 4px 6px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .pr-items-grid td {
+            border: 1px solid #CBCBCB;
+            padding: 3px 5px;
+            white-space: nowrap;
+        }
+        
+        .pr-items-grid tbody tr:nth-child(even) {
+            background: #F0F0F0;
+        }
+        
+        .pr-items-grid tbody tr:hover {
+            background: #E8F4FF;
+        }
+        
+        .pr-items-grid a {
+            color: #0000FF;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .pr-items-grid a:hover {
+            text-decoration: underline;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: maroon;
+            font-size: 11pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container">
+        <div id="loading" class="loading">Loading PR items...</div>
+        <div id="no-data" class="no-data hidden">No PR items available for this supplier</div>
+        <table id="pr-items-table" class="pr-items-grid hidden">
+            <thead>
+                <tr>
+                    <th>Add</th>
+                    <th>PR No</th>
+                    <th>WO No</th>
+                    <th>Item Code</th>
+                    <th>Description</th>
+                    <th>UOM</th>
+                    <th>PR Qty</th>
+                    <th>Remain Qty</th>
+                    <th>Rate</th>
+                    <th>Del. Date</th>
+                    <th>A/c Head</th>
+                    <th>Id</th>
+                </tr>
+            </thead>
+            <tbody id="pr-items-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Get supplier code from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const supplierCode = urlParams.get('supplier');
+        
+        // Load PR items
+        function loadPRItems() {
+            if (!supplierCode) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('no-data').style.display = 'block';
+                document.getElementById('no-data').textContent = 'No supplier selected';
+                return;
+            }
+            
+            fetch(`/material-management/api/po/pr-items-grid/?supplier=${supplierCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (!data.items || data.items.length === 0) {
+                        document.getElementById('no-data').style.display = 'block';
+                        return;
+                    }
+                    
+                    const tbody = document.getElementById('pr-items-body');
+                    tbody.innerHTML = '';
+                    
+                    data.items.forEach(item => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td class="text-center">
+                                <a href="#" onclick="addItem(${item.Id}, '${item.PRNo}', '${item.WONo}', '${escapeHtml(item.ItemCode)}', '${escapeHtml(item.PurchDesc)}', '${item.UOMPurch}', ${item.PRQty}, ${item.RemainQty}, ${item.Rate || 0}, '${item.DelDate}', '${escapeHtml(item.AcHead)}', ${item.AHId}, ${item.ItemId}); return false;">Add</a>
+                            </td>
+                            <td class="text-center">${item.PRNo}</td>
+                            <td class="text-center">${item.WONo || ''}</td>
+                            <td class="text-center">${item.ItemCode}</td>
+                            <td>${item.PurchDesc}</td>
+                            <td class="text-center">${item.UOMPurch}</td>
+                            <td class="text-right">${formatNumber(item.PRQty)}</td>
+                            <td class="text-right">${formatNumber(item.RemainQty)}</td>
+                            <td class="text-right">${formatNumber(item.Rate, 2)}</td>
+                            <td class="text-center">${formatDate(item.DelDate)}</td>
+                            <td>${item.AcHead || ''}</td>
+                            <td class="text-center">${item.Id}</td>
+                        `;
+                    });
+                    
+                    document.getElementById('pr-items-table').style.display = 'table';
+                })
+                .catch(error => {
+                    console.error('Error loading PR items:', error);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('no-data').style.display = 'block';
+                    document.getElementById('no-data').textContent = 'Error loading PR items';
+                });
+        }
+        
+        function addItem(id, prNo, woNo, itemCode, desc, uom, prQty, remainQty, rate, delDate, acHead, ahId, itemId) {
+            // Call parent window function to show add item modal
+            if (window.parent && window.parent.showAddItemModal) {
+                window.parent.showAddItemModal({
+                    Id: id,
+                    PRNo: prNo,
+                    WONo: woNo,
+                    ItemCode: itemCode,
+                    Description: desc,
+                    UOM: uom,
+                    PRQty: prQty,
+                    RemainQty: remainQty,
+                    Rate: rate,
+                    DelDate: delDate,
+                    AcHead: acHead,
+                    AHId: ahId,
+                    ItemId: itemId
+                });
+            }
+        }
+        
+        function formatNumber(num, decimals = 0) {
+            if (num === null || num === undefined) return '0';
+            return parseFloat(num).toFixed(decimals);
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+        
+        // Load items on page load
+        loadPRItems();
+    </script>
+</body>
+</html>

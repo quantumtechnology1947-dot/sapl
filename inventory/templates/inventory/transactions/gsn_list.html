@@ -1,0 +1,195 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Goods Service Note (GSN) - List{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-4 -mx-4 px-4 py-3">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-base font-bold text-gray-800">Goods Service Note [GSN] - List</h1>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:gsn-create' %}"
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 text-sm rounded shadow-sm transition-colors">
+                    New
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <!-- Search Bar Component -->
+{% include 'core/components/search_bar.html' with placeholder='Search by GSN number or tax invoice number...' %}
+
+    <!-- GSN List -->
+    {% if gsn_list %}
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">SN</th>
+                        <th class="px-4 py-2 text-center text-xs font-bold text-gray-700">Select</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Fin Year</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">GSN No</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">GIN No</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Date</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">PONo</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Name of Supplier</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Challan No</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for gsn in gsn_list %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-center">
+                            <a href="{% url 'inventory:gsn-detail' gsn.id %}"
+                               class="text-blue-600 hover:text-blue-900 underline text-xs">
+                                Select
+                            </a>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                            {{ gsn.finyearid|default:"-" }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-900">
+                            {{ gsn.gsnno|default:"-" }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                            {{ gsn.ginno|default:"-" }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                            {{ gsn.sysdate|default:"-" }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                            {% if gsn.gin_data and gsn.gin_data.pono %}
+                                {{ gsn.gin_data.pono }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2 text-xs text-gray-600">
+                            {% if gsn.supplier_data and gsn.supplier_data.suppliername %}
+                                {{ gsn.supplier_data.suppliername|truncatewords:5 }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                            {% if gsn.gin_data and gsn.gin_data.challanno %}
+                                {{ gsn.gin_data.challanno }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-600">
+                            {% if gsn.gin_data and gsn.gin_data.challandate %}
+                                {{ gsn.gin_data.challandate }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded">
+        <div class="flex-1 flex justify-between sm:hidden">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Previous
+            </a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Next
+            </a>
+            {% endif %}
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700">
+                    Showing
+                    <span class="font-medium">{{ page_obj.start_index }}</span>
+                    to
+                    <span class="font-medium">{{ page_obj.end_index }}</span>
+                    of
+                    <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                    results
+                </p>
+            </div>
+            <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        Previous
+                    </a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium {% if num == page_obj.number %}text-orange-600 bg-orange-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                        {{ num }}
+                    </a>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        Next
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded border border-gray-200 p-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No GSN found</h3>
+        <p class="mt-1 text-sm text-gray-500">
+            {% if search_query %}
+                No GSN match your search criteria.
+            {% else %}
+                Get started by creating a new Goods Service Note.
+            {% endif %}
+        </p>
+        <div class="mt-6">
+            <a href="{% url 'inventory:gsn-create' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                New GSN
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

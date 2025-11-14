@@ -1,0 +1,189 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Rate Register{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-4">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-gray-700 to-gray-600 px-4 py-2 rounded-t">
+        <h2 class="text-white font-bold text-base">Rate Register</h2>
+    </div>
+
+    <!-- Search and Filter Form -->
+    <div class="bg-white border border-gray-300 p-4">
+        <form method="get" id="filterForm" class="flex items-center gap-3 mb-4">
+            <input type="hidden" name="item_id" value="{{ item_id }}">
+
+            <label class="font-bold text-sm">Supplier Name</label>
+            <input type="text" name="supplier" id="txtSearchSupplier" value="{{ supplier_search }}"
+                   class="px-3 py-2 border border-gray-300 rounded text-sm w-96"
+                   placeholder="Search supplier..."
+                   list="supplierList">
+            <datalist id="supplierList">
+                <!-- This will be populated via HTMX or JavaScript -->
+            </datalist>
+
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-semibold">
+                View
+            </button>
+
+            <a href="{% url 'material_management:rate-set-search' %}"
+               class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-semibold">
+                Cancel
+            </a>
+
+            {% if messages %}
+            {% for message in messages %}
+            <span class="font-bold text-red-600 text-sm ml-4">{{ message }}</span>
+            {% endfor %}
+            {% endif %}
+        </form>
+
+        <!-- Item Info (if available) -->
+        {% if item %}
+        <div class="mb-3 text-sm text-gray-700">
+            <strong>Item:</strong> {{ item.itemcode }} - {{ item.manfdesc }}
+        </div>
+        {% endif %}
+
+        <!-- Rate Register Grid -->
+        {% if enriched_rates %}
+        <form method="post" id="rateSetForm">
+            {% csrf_token %}
+            <input type="hidden" name="item_id" value="{{ item_id }}">
+
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse text-xs">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border border-gray-300 px-2 py-1 text-center">SN</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">FinYear</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">Item Code</th>
+                            <th class="border border-gray-300 px-2 py-1">Desc</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">UOM</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">PONo</th>
+                            <th class="border border-gray-300 px-2 py-1">SupplierName</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">Set Min</th>
+                            <th class="border border-gray-300 px-2 py-1 text-right">Rate</th>
+                            <th class="border border-gray-300 px-2 py-1 text-right">Disc</th>
+                            <th class="border border-gray-300 px-2 py-1 text-right">Amount</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">Excise</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">VAT</th>
+                            <th class="border border-gray-300 px-2 py-1 text-center">PF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rate in enriched_rates %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="border border-gray-300 px-2 py-1 text-center">{{ forloop.counter }}</td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">{{ rate.finyear }}</td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">
+                                {% if item %}{{ item.itemcode }}{% else %}-{% endif %}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1">
+                                {% if item %}{{ item.manfdesc }}{% else %}-{% endif %}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">
+                                {% if item %}{{ item.uombasic_symbol|default:'-' }}{% else %}-{% endif %}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">{{ rate.po_no }}</td>
+                            <td class="border border-gray-300 px-2 py-1">{{ rate.supplier_name }}</td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">
+                                <input type="radio" name="rate_id" value="{{ rate.id }}"
+                                       {% if rate.flag == 1 %}checked{% endif %}
+                                       onclick="selectSingleRadioButton(this)">
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-right">
+                                {{ rate.rate|floatformat:2 }}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-right">
+                                {{ rate.discount|floatformat:2 }}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-right">
+                                {{ rate.amount|floatformat:2 }}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">
+                                {{ rate.ex_st|default:'-' }}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">
+                                {{ rate.vat|default:'-' }}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1 text-center">
+                                {{ rate.pf|default:'-' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <div class="mt-4 flex justify-center gap-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?item_id={{ item_id }}&supplier={{ supplier_search }}&page=1"
+                       class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">First</a>
+                    <a href="?item_id={{ item_id }}&supplier={{ supplier_search }}&page={{ page_obj.previous_page_number }}"
+                       class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">Previous</a>
+                    {% endif %}
+
+                    <span class="px-3 py-1">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+                    {% if page_obj.has_next %}
+                    <a href="?item_id={{ item_id }}&supplier={{ supplier_search }}&page={{ page_obj.next_page_number }}"
+                       class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">Next</a>
+                    <a href="?item_id={{ item_id }}&supplier={{ supplier_search }}&page={{ page_obj.paginator.num_pages }}"
+                       class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">Last</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-4 text-center">
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded text-sm font-semibold">
+                    Submit
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <div class="text-center text-gray-500 text-lg py-8">
+            No data to display!
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function selectSingleRadioButton(radio) {
+    // Ensure only one radio button is selected
+    const allRadios = document.getElementsByName('rate_id');
+    allRadios.forEach(r => {
+        if (r !== radio) {
+            r.checked = false;
+        }
+    });
+}
+
+// Supplier autocomplete using fetch API
+document.getElementById('txtSearchSupplier').addEventListener('input', function(e) {
+    const query = e.target.value;
+    if (query.length < 1) return;
+
+    fetch(`{% url 'material_management:api-supplier-autocomplete' %}?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            const datalist = document.getElementById('supplierList');
+            datalist.innerHTML = '';
+
+            // Add options to datalist
+            data.suppliers.forEach(supplier => {
+                const option = document.createElement('option');
+                option.value = supplier;
+                datalist.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching suppliers:', error));
+});
+</script>
+{% endblock %}

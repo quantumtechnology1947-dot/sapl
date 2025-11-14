@@ -1,0 +1,65 @@
+{% extends 'inventory/base.html' %}
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} MCN - Inventory{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div><h1 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} MCN</h1><p class="text-sm text-gray-600 mt-1">Material Credit Note - Return to supplier</p></div>
+            <a href="{% url 'inventory:mcn-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">Back</a>
+        </div>
+    </div>
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">MCN Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">MCN Number</label>{{ form.mcnno }}</div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">MCN Date <span class="text-red-500">*</span></label>{{ form.mcndate }}</div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">Supplier <span class="text-red-500">*</span></label>{{ form.supplierid }}</div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">GRR Number</label>{{ form.grrno }}</div>
+            </div>
+            <div class="mt-6"><label class="block text-sm font-medium text-gray-700 mb-2">Remarks</label>{{ form.remarks }}</div>
+        </div>
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Return Items</h2>
+            {{ detail_formset.management_form }}
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-red-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-red-900 uppercase">Item</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-red-900 uppercase">Quantity</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-red-900 uppercase">Reason</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-red-900 uppercase">Remarks</th>
+                            <th class="px-4 py-2 text-center text-xs font-medium text-red-900 uppercase">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in detail_formset %}
+                        <tr class="border-b border-gray-200">
+                            <td class="px-4 py-2">{{ form.itemid }}{{ form.id }}</td>
+                            <td class="px-4 py-2">{{ form.qty }}</td>
+                            <td class="px-4 py-2">{{ form.reason }}</td>
+                            <td class="px-4 py-2">{{ form.remarks }}</td>
+                            <td class="px-4 py-2 text-center">{{ form.DELETE }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="flex gap-3 justify-end">
+            <a href="{% url 'inventory:mcn-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">Cancel</a>
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">{% if object %}Update{% else %}Create{% endif %} MCN</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

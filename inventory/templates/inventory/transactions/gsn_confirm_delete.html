@@ -1,0 +1,104 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Delete GSN - {{ gsn.gsnno }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-2xl">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <h1 class="text-sm font-bold text-gray-800">Delete Goods Service Note</h1>
+        <p class="text-sm text-gray-600 mt-1">Confirm deletion of GSN</p>
+    </div>
+
+    <!-- Warning Card -->
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">
+                    Warning: This action cannot be undone
+                </h3>
+                <div class="mt-2 text-sm text-red-700">
+                    <p>You are about to delete this Goods Service Note. This will permanently remove the record from the system.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GSN Details -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">GSN Details</h2>
+        <div class="space-y-3">
+            <div class="flex justify-between py-2 border-b border-gray-200">
+                <span class="text-sm font-medium text-gray-600">GSN Number:</span>
+                <span class="text-sm text-gray-900 font-semibold">{{ gsn.gsnno }}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-gray-200">
+                <span class="text-sm font-medium text-gray-600">GIN Number:</span>
+                <span class="text-sm text-gray-900">{{ gsn.ginno|default:"-" }}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-gray-200">
+                <span class="text-sm font-medium text-gray-600">Tax Invoice Number:</span>
+                <span class="text-sm text-gray-900">{{ gsn.taxinvoiceno|default:"-" }}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b border-gray-200">
+                <span class="text-sm font-medium text-gray-600">Tax Invoice Date:</span>
+                <span class="text-sm text-gray-900">{{ gsn.taxinvoicedate|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-blue-700">
+                    <strong>Note:</strong> This is a service receipt. No stock reversal is needed as GSN doesn't affect stock.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Form -->
+    <form method="post" class="bg-white rounded border border-gray-200 p-6">
+        {% csrf_token %}
+        
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-700">
+                Are you sure you want to delete GSN <strong class="text-orange-600">{{ gsn.gsnno }}</strong>?
+            </p>
+        </div>
+
+        <div class="mt-6 flex gap-3 justify-end">
+            <a href="{% url 'inventory:gsn-detail' gsn.id %}" 
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Yes, Delete GSN
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

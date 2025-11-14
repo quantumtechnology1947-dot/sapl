@@ -1,0 +1,104 @@
+{# Stat Card Component - SAP Fiori Dashboard Style #}
+{# 
+Purpose: Display key metrics and statistics in a compact, professional card format
+Parameters:
+  - title (required): Label for the statistic (e.g., "Total Sales")
+  - value (required): The main value to display (e.g., "₹1,234,567")
+  - icon (optional): Icon name (chart, users, currency, document, box, truck, clipboard)
+  - color (optional): Color theme for icon (blue, green, orange, red) - defaults to 'blue'
+  - change (optional): Trend value (e.g., "+12.5%")
+  - change_type (optional): Type of change (increase, decrease, neutral)
+  - change_label (optional): Label for change (e.g., "vs last month")
+  - link (optional): URL for "View details" link
+  - class (optional): Additional CSS classes
+
+Usage:
+  {% include 'core/components/cards/stat_card.html' with 
+    title='Total Sales' 
+    value='₹1,234,567' 
+    icon='currency'
+    color='green'
+    change='+12.5%'
+    change_type='increase'
+    change_label='vs last month'
+  %}
+#}
+
+<div class="bg-white border border-gray-200 rounded shadow-sm p-3 hover:shadow-md transition-shadow {{ class|default:'' }}">
+    <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+            {# Label - compact text #}
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+                {{ title }}
+            </p>
+            
+            {# Large number display #}
+            <p class="text-2xl font-bold text-gray-900 mb-1 truncate">
+                {{ value }}
+            </p>
+            
+            {# Trend indicator #}
+            {% if change %}
+            <div class="flex items-center mt-1.5">
+                {% if change_type == 'increase' %}
+                <svg class="w-3.5 h-3.5 text-sap-green mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                </svg>
+                <span class="text-xs font-semibold text-sap-green">{{ change }}</span>
+                {% elif change_type == 'decrease' %}
+                <svg class="w-3.5 h-3.5 text-sap-red mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+                <span class="text-xs font-semibold text-sap-red">{{ change }}</span>
+                {% else %}
+                <span class="text-xs font-semibold text-gray-500">{{ change }}</span>
+                {% endif %}
+                
+                {% if change_label %}
+                <span class="text-xs text-gray-500 ml-1">{{ change_label }}</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        {# Icon #}
+        {% if icon %}
+        <div class="ml-3 flex-shrink-0">
+            <div class="w-10 h-10 rounded bg-{{ color|default:'blue' }}-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-{{ color|default:'blue' }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {% if icon == 'chart' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    {% elif icon == 'users' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    {% elif icon == 'currency' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    {% elif icon == 'document' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    {% elif icon == 'box' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    {% elif icon == 'truck' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                    {% elif icon == 'clipboard' %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    {% endif %}
+                </svg>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {# Optional link #}
+    {% if link %}
+    <a href="{{ link }}" class="block mt-2.5 text-xs text-sap-blue hover:text-sap-blue-hover font-medium transition-colors">
+        View details →
+    </a>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+

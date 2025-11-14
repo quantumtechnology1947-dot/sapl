@@ -1,0 +1,128 @@
+{% extends "core/base.html" %}
+
+{% block title %}Confirm New Financial Year - Cortex ERP{% endblock %}
+{% block page_title %}Confirm New Financial Year{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-8">
+        {% if pending_fy %}
+        <div class="text-center mb-8">
+            <h2 class="text-base font-bold text-gray-800 mb-2">New Financial Year</h2>
+            <p class="text-gray-600">Please review the details before creating the financial year</p>
+        </div>
+        
+        <!-- Financial Year Details -->
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-6 mb-8">
+            <div class="space-y-3">
+                <div class="flex items-center">
+                    <span class="font-bold text-gray-700 w-48">Name of Company:</span>
+                    <span class="text-gray-900 text-lg font-semibold">{{ pending_fy.company_name }}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="font-bold text-gray-700 w-48">New Financial Year:</span>
+                    <span class="text-gray-900 font-semibold">{{ pending_fy.finyear }}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="font-bold text-gray-700 w-48">Date From:</span>
+                    <span class="text-gray-900">{{ pending_fy.finyearfrom }}</span>
+                    <span class="mx-2">-</span>
+                    <span class="font-bold text-gray-700">To:</span>
+                    <span class="text-gray-900 ml-2">{{ pending_fy.finyearto }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Year-End Operations -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">The following operations will be performed:</h3>
+            <ul class="space-y-3 text-gray-700">
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Closing stock qty shifted to opening stock qty.</span>
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Users access shifted to next financial year.</span>
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Operations of all transactions of previous financial year will be closed.</span>
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Resetting the all transaction nos.</span>
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Partial transactions of previous financial year will be carry forwarded to next financial year.</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Warning -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        <strong>Important:</strong> This action will perform critical year-end operations. Please ensure all data is backed up before proceeding.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <form method="post" class="flex gap-4 justify-center">
+            {% csrf_token %}
+            <button type="submit" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-sm">
+                Do you want to continue?
+            </button>
+           <a href="{% url 'sys_admin:financial_year_list' %}"
+              class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 shadow-sm">
+                Cancel
+            </a>
+        </form>
+        
+        {% else %}
+        <!-- No pending financial year -->
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No pending financial year found</h3>
+            <p class="mt-1 text-sm text-gray-500">Please create a new financial year first.</p>
+            <div class="mt-6">
+                <a href="{% url 'sys_admin:financial-year-create' %}"
+                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                    Create Financial Year
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

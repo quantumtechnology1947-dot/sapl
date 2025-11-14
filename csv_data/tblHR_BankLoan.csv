@@ -1,0 +1,30 @@
+﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,BankName,Branch,Amount,Installment,fromDate,ToDate
+14,2017-05-13,3:06:57 PM,Sapl0061,1,5,Sapl0070,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,0.0,0.0,2012-11-30,2017-11-30
+16,2015-01-20,12:26:33 PM,sapl0061,1,2,Sapl0071,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,35000.0,2330.0,2008-09-01,2015-12-31
+17,2013-10-09,12:20:27 PM,Sapl0001,1,1,Sapl0055,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,0.0,0.0,2008-09-01,2013-09-30
+18,2013-08-16,6:52:36 PM,Sapl0004,1,1,Sapl0048,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,139800.0,2330.0,2012-09-01,2017-09-30
+20,2015-01-20,12:26:33 PM,sapl0061,1,2,Sapl0058,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,13500.0,631.5,2014-01-01,2015-12-31
+21,2013-09-02,4:55:55 PM,Sapl0004,1,1,Sapl0048,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,0.0,852.5,2013-07-01,2013-12-31
+22,2014-09-25,3:56:19 PM,Sapl0205,1,2,Sapl0057,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,0.0,852.0,2013-07-01,2014-12-31
+28,2014-03-12,11:45:21 AM,Sapl0173,1,1,Sapl0080,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,10500.0,840.0,2014-01-01,2014-12-31
+29,2017-05-12,4:36:17 PM,Sapl0061,1,5,Sapl0013,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,200000.0,4800.0,2013-01-01,2014-12-31
+31,2014-09-25,3:56:19 PM,Sapl0205,1,2,Sapl0057,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,0.0,2330.0,2008-04-01,2014-05-31
+34,2014-12-29,2:53:18 PM,Sapl0061,1,2,Sapl0097,Dnyandeep Co. Bank,"Nasrapur, Pune",144000.0,2400.0,2014-11-01,2019-11-30
+35,2014-12-29,3:33:02 PM,sapl0061,1,2,Sapl0100,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-12-01,2019-12-30
+36,2017-11-07,10:24:35 AM,Sapl0061,1,5,Sapl0049,Dnyandeep Co.Bank,Nasrapur  Pune,0.0,0.0,2014-12-01,2019-12-30
+38,2014-12-29,3:43:06 PM,sapl0061,1,2,Sapl0047,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-12-01,2019-12-30
+39,2014-12-29,3:46:12 PM,sapl0061,1,2,Sapl0103,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-12-01,2019-12-30
+40,2014-12-29,3:47:45 PM,sapl0061,1,2,Sapl0122,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-12-01,2019-12-30
+41,2014-12-29,3:48:43 PM,sapl0061,1,2,Sapl0072,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-12-01,2019-12-30
+42,2014-12-29,3:52:12 PM,sapl0061,1,2,Sapl0073,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-12-01,2019-12-30
+43,2014-12-29,3:55:39 PM,sapl0061,1,2,Sapl0037,Dnyandeep Co.Bank,Nasrapur  Pune,432000.0,7200.0,2014-11-01,2019-12-30
+44,2014-12-29,3:57:10 PM,sapl0061,1,2,Sapl0071,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-11-01,2019-12-30
+45,2014-12-29,3:58:11 PM,sapl0061,1,2,Sapl0078,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2014-11-01,2019-12-30
+47,2014-12-29,4:18:25 PM,sapl0061,1,2,Sapl0073,Panjab & Maharashtra Co. Bank,Pashan Pune,184572.0,5127.0,2014-11-01,2017-12-30
+50,2014-12-29,4:26:54 PM,sapl0061,1,2,Sapl0071,Panjab & Maharashtra Co. Bank,Pashan Pune,246096.0,6836.0,2014-11-01,2017-12-30
+51,2015-01-13,7:25:55 PM,sapl0061,1,2,Sapl0086,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2015-01-01,2019-12-31
+52,2015-03-20,5:15:41 PM,sapl0061,1,2,Sapl0031,Dnyandeep Co.Bank,Nasrapur  Pune,250000.0,4800.0,2015-01-01,2020-12-31
+53,2015-03-31,11:30:11 AM,sapl0061,1,2,Sapl0155,Dnyandeep Co.Bank,Nasrapur  Pune,144000.0,2400.0,2015-02-01,2019-12-31
+54,2015-03-31,11:31:44 AM,sapl0061,1,2,Sapl0078,Panjab & Maharashtra Co. Bank,Pashan Pune,250000.0,5127.0,2015-02-01,2019-12-31
+55,2018-02-24,4:31:50 PM,Sapl0061,1,5,Sapl0054,Dnyandeep Co.Bank,Nasrapur  Pune,432000.0,0.0,2015-02-01,2019-12-31
+57,2016-02-09,11:16:35 AM,Sapl0061,1,3,Sapl0011,Dnyandeep,Nasarapur,200000.0,4800.0,2015-12-01,2020-12-31

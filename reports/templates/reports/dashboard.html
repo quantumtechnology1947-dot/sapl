@@ -1,0 +1,146 @@
+{% extends "core/base.html" %}
+
+{% block title %}Reports Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-base font-bold text-gray-800">Reports Dashboard</h1>
+        <p class="text-gray-600 mt-2">Access all business reports and analytics</p>
+    </div>
+
+    <!-- Reports Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Boughtout Reports Section -->
+        <div class="col-span-full">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
+                <i class="fas fa-shopping-cart mr-2"></i>Boughtout Reports
+            </h2>
+        </div>
+
+        <!-- Boughtout Design Report -->
+        <a href="{% url 'reports:boughtout-design' %}" 
+           class="block bg-white rounded border border-gray-200 hover:shadow-lg transition-shadow p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Boughtout Design</h3>
+                    <p class="text-sm text-gray-600 mt-2">Items by design/category</p>
+                </div>
+                <div class="text-blue-500">
+                    <i class="fas fa-chart-bar text-base"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Boughtout Vendor Report -->
+        <a href="{% url 'reports:boughtout-vendor' %}" 
+           class="block bg-white rounded border border-gray-200 hover:shadow-lg transition-shadow p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Boughtout Vendor</h3>
+                    <p class="text-sm text-gray-600 mt-2">Items grouped by supplier</p>
+                </div>
+                <div class="text-green-500">
+                    <i class="fas fa-users text-base"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Boughtout Assembly Report -->
+        <a href="{% url 'reports:boughtout-assembly' %}" 
+           class="block bg-white rounded border border-gray-200 hover:shadow-lg transition-shadow p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Boughtout Assembly</h3>
+                    <p class="text-sm text-gray-600 mt-2">Items by assembly/product</p>
+                </div>
+                <div class="text-purple-500">
+                    <i class="fas fa-cubes text-base"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Manufacturing Reports Section -->
+        <div class="col-span-full mt-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">
+                <i class="fas fa-industry mr-2"></i>Manufacturing Reports
+            </h2>
+        </div>
+
+        <!-- Manufacturing Design Report -->
+        <a href="{% url 'reports:manufacturing-design' %}" 
+           class="block bg-white rounded border border-gray-200 hover:shadow-lg transition-shadow p-6 border-l-4 border-orange-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Manufacturing Design</h3>
+                    <p class="text-sm text-gray-600 mt-2">Manufactured items by design</p>
+                </div>
+                <div class="text-orange-500">
+                    <i class="fas fa-drafting-compass text-base"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Manufacturing Vendor Report -->
+        <a href="{% url 'reports:manufacturing-vendor' %}" 
+           class="block bg-white rounded border border-gray-200 hover:shadow-lg transition-shadow p-6 border-l-4 border-red-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Manufacturing Vendor</h3>
+                    <p class="text-sm text-gray-600 mt-2">Items by subcontractor</p>
+                </div>
+                <div class="text-red-500">
+                    <i class="fas fa-truck text-base"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Manufacturing Assembly Report -->
+        <a href="{% url 'reports:manufacturing-assembly' %}" 
+           class="block bg-white rounded border border-gray-200 hover:shadow-lg transition-shadow p-6 border-l-4 border-indigo-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Manufacturing Assembly</h3>
+                    <p class="text-sm text-gray-600 mt-2">Manufactured items by assembly</p>
+                </div>
+                <div class="text-indigo-500">
+                    <i class="fas fa-cogs text-base"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Quick Stats (Optional) -->
+    <div class="mt-8 bg-gray-50 rounded p-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Quick Stats</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded p-4 text-center">
+                <div class="text-sm font-bold text-blue-600">--</div>
+                <div class="text-sm text-gray-600">Total Boughtout Items</div>
+            </div>
+            <div class="bg-white rounded p-4 text-center">
+                <div class="text-sm font-bold text-green-600">--</div>
+                <div class="text-sm text-gray-600">Active Suppliers</div>
+            </div>
+            <div class="bg-white rounded p-4 text-center">
+                <div class="text-sm font-bold text-orange-600">--</div>
+                <div class="text-sm text-gray-600">Manufacturing Items</div>
+            </div>
+            <div class="bg-white rounded p-4 text-center">
+                <div class="text-sm font-bold text-purple-600">--</div>
+                <div class="text-sm text-gray-600">Active Work Orders</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

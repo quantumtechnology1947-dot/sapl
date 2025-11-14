@@ -1,0 +1,149 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} GST Rate - Cortex ERP{% endblock %}
+{% block form_header %}{% if object %}Edit{% else %}Add{% endif %} GST Rate{% endblock %}
+{% block back_url %}{% url 'accounts:gst-list' %}{% endblock %}
+{% block cancel_url %}{% url 'accounts:gst-list' %}{% endblock %}
+
+{% block form_sections %}
+    <div class="p-4 space-y-6">
+        {# GST Rate Information Section #}
+        <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">GST Rate Information</h3>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    GST Rate Description <span class="text-red-500">*</span>
+                </label>
+                <input type="text"
+                       name="gstrate"
+                       id="id_gstrate"
+                       value="{{ object.gstrate|default:'' }}"
+                       placeholder="e.g., GST @ 18% (Standard)"
+                       class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue"
+                       required>
+                {% if form.gstrate.errors %}
+                    <p class="text-red-500 text-xs">{{ form.gstrate.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Total GST Rate (%) <span class="text-red-500">*</span>
+                </label>
+                <input type="number"
+                       name="ratevalue"
+                       id="id_ratevalue"
+                       value="{{ object.ratevalue|default:'' }}"
+                       step="0.01"
+                       min="0"
+                       max="100"
+                       placeholder="e.g., 18.00"
+                       class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue"
+                       required>
+                {% if form.ratevalue.errors %}
+                    <p class="text-red-500 text-xs">{{ form.ratevalue.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-gray-500">Enter the total GST percentage. CGST, SGST, and IGST will be calculated automatically.</p>
+            </div>
+        </div>
+
+        {# Auto-Calculated Rates Section #}
+        <div class="space-y-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Auto-Calculated Rates</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">CGST %</label>
+                        <div id="calc-cgst" class="text-lg font-bold text-blue-600">
+                            {% if object %}{{ object.cgstrate|floatformat:2 }}{% else %}0.00{% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">SGST %</label>
+                        <div id="calc-sgst" class="text-lg font-bold text-blue-600">
+                            {% if object %}{{ object.sgstrate|floatformat:2 }}{% else %}0.00{% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">IGST %</label>
+                        <div id="calc-igst" class="text-lg font-bold text-blue-600">
+                            {% if object %}{{ object.igstrate|floatformat:2 }}{% else %}0.00{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Additional Information Section #}
+        <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">Additional Information</h3>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    HSN Codes Applicable
+                </label>
+                <textarea name="hsnapplicable"
+                          id="id_hsnapplicable"
+                          rows="3"
+                          placeholder="e.g., 8471, 8473, 8504 (Computer hardware)"
+                          class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue">{{ object.hsnapplicable|default:'' }}</textarea>
+                {% if form.hsnapplicable.errors %}
+                    <p class="text-red-500 text-xs">{{ form.hsnapplicable.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-gray-500">Enter applicable HSN codes or product categories</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Effective From
+                    </label>
+                    <input type="date"
+                           name="effectivefrom"
+                           id="id_effectivefrom"
+                           value="{{ object.effectivefrom|default:'' }}"
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue">
+                    {% if form.effectivefrom.errors %}
+                        <p class="text-red-500 text-xs">{{ form.effectivefrom.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Status
+                    </label>
+                    <select name="live"
+                            id="id_live"
+                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sap-blue focus:border-sap-blue">
+                        <option value="1" {% if not object or object.live == 1 %}selected{% endif %}>Active</option>
+                        <option value="0" {% if object and object.live == 0 %}selected{% endif %}>Inactive</option>
+                    </select>
+                    {% if form.live.errors %}
+                        <p class="text-red-500 text-xs">{{ form.live.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block form_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rateInput = document.getElementById('id_ratevalue');
+        const cgstDisplay = document.getElementById('calc-cgst');
+        const sgstDisplay = document.getElementById('calc-sgst');
+        const igstDisplay = document.getElementById('calc-igst');
+
+        function updateCalculatedRates() {
+            const rate = parseFloat(rateInput.value) || 0;
+            cgstDisplay.textContent = (rate / 2).toFixed(2);
+            sgstDisplay.textContent = (rate / 2).toFixed(2);
+            igstDisplay.textContent = rate.toFixed(2);
+        }
+
+        rateInput.addEventListener('input', updateCalculatedRates);
+    });
+</script>
+{% endblock %}

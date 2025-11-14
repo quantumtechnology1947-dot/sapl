@@ -1,0 +1,200 @@
+{% extends "core/base.html" %}
+
+{% block title %}OnSite Attendance - Cortex ERP{% endblock %}
+{% block page_title %}OnSite Attendance{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <h2 class="text-sm font-semibold text-gray-800">OnSite Attendance Records</h2>
+            <div class="flex gap-2">
+                <a href="{% url 'project_management:attendance-new' %}"
+                   class="px-4 py-1.5 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    New Attendance
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <form method="get" class="flex gap-2 items-end">
+            <div class="flex-1">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Date:</label>
+                <input type="text"
+                       name="search_date"
+                       value="{{ request.GET.search_date }}"
+                       placeholder="DD-MM-YYYY"
+                       class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex-1">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Employee ID:</label>
+                <input type="text"
+                       name="search_empid"
+                       value="{{ request.GET.search_empid }}"
+                       placeholder="Enter Employee ID..."
+                       class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex-1">
+                <label class="block text-xs font-medium text-gray-700 mb-1">BG Group:</label>
+                <select name="search_bg"
+                        class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Groups</option>
+                    {% for bg in bg_groups %}
+                    <option value="{{ bg.id }}" {% if request.GET.search_bg == bg.id|stringformat:"s" %}selected{% endif %}>{{ bg.symbol }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit"
+                    class="px-4 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors inline-flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Search
+            </button>
+            {% if request.GET.search_date or request.GET.search_empid or request.GET.search_bg %}
+            <a href="{% url 'project_management:attendance-list-view' %}"
+               class="px-4 py-1.5 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 transition-colors">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Attendance Table -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="w-[4%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                        <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Date</th>
+                        <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Emp ID</th>
+                        <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Employee Name</th>
+                        <th class="w-[10%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">BG Group</th>
+                        <th class="w-[8%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Shift</th>
+                        <th class="w-[8%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Status</th>
+                        <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Site Location</th>
+                        <th class="w-[10%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">From Time</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for att in attendances %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900 text-right">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">
+                            {{ att.onsitedate }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                            {{ att.empid }}
+                        </td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900 truncate" title="{{ att.empname }}">
+                            {{ att.empname }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-center">
+                            {{ att.bg_symbol }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-center">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium {% if att.shift == 0 %}bg-blue-100 text-blue-800{% else %}bg-purple-100 text-purple-800{% endif %}">
+                                {% if att.shift == 0 %}Day{% else %}Night{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-center">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium {% if att.status == 0 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {% if att.status == 0 %}Present{% else %}Absent{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900 truncate" title="{{ att.onsite }}">
+                            {{ att.onsite|default:"-" }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-center">
+                            {{ att.fromtime|default:"-" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="px-6 py-16 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No attendance records found</h3>
+                            <p class="mt-1 text-sm text-gray-500">Try adjusting your search filters or create new attendance records.</p>
+                            <div class="mt-6">
+                                <a href="{% url 'project_management:attendance-new' %}"
+                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    New Attendance
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search_date %}&search_date={{ request.GET.search_date }}{% endif %}{% if request.GET.search_empid %}&search_empid={{ request.GET.search_empid }}{% endif %}{% if request.GET.search_bg %}&search_bg={{ request.GET.search_bg }}{% endif %}"
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Previous
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search_date %}&search_date={{ request.GET.search_date }}{% endif %}{% if request.GET.search_empid %}&search_empid={{ request.GET.search_empid }}{% endif %}{% if request.GET.search_bg %}&search_bg={{ request.GET.search_bg }}{% endif %}"
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Next
+                </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{ page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search_date %}&search_date={{ request.GET.search_date }}{% endif %}{% if request.GET.search_empid %}&search_empid={{ request.GET.search_empid }}{% endif %}{% if request.GET.search_bg %}&search_bg={{ request.GET.search_bg }}{% endif %}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            Previous
+                        </a>
+                        {% endif %}
+
+                        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search_date %}&search_date={{ request.GET.search_date }}{% endif %}{% if request.GET.search_empid %}&search_empid={{ request.GET.search_empid }}{% endif %}{% if request.GET.search_bg %}&search_bg={{ request.GET.search_bg }}{% endif %}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            Next
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

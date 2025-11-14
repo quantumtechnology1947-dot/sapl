@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Daily Reporting System{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="max-w-full mx-auto flex justify-between items-center">
+            <div class="text-xl font-bold">Daily Reporting System</div>
+            <div class="space-x-4">
+                <a href="{% url 'daily_report_system:dashboard' %}" class="hover:underline">Dashboard</a>
+                <a href="{% url 'daily_report_system:design-plan-list' %}" class="hover:underline">Design Plans</a>
+                <a href="{% url 'daily_report_system:manufacturing-plan-list' %}" class="hover:underline">Manufacturing</a>
+                <a href="{% url 'daily_report_system:vendor-plan-list' %}" class="hover:underline">Vendor Plans</a>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+        <div class="max-w-full mx-auto mt-4">
+            {% for message in messages %}
+                <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-4 py-3 rounded mb-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="max-w-full mx-auto mt-6 px-4">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,346 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Item - Design{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-4xl">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <h1 class="text-sm font-bold text-gray-800">
+            {% if form.instance.pk %}Edit Item{% else %}Create New Item{% endif %}
+        </h1>
+        <p class="text-sm text-gray-600 mt-1">
+            {% if form.instance.pk %}Update item information{% else %}Add a new item to the master{% endif %}
+        </p>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Basic Information -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Basic Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Item Code -->
+                    <div>
+                        <label for="{{ form.itemcode.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.itemcode.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.itemcode }}
+                        {% if form.itemcode.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.itemcode.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Part Number -->
+                    <div>
+                        <label for="{{ form.partno.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.partno.label }}
+                        </label>
+                        {{ form.partno }}
+                        {% if form.partno.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.partno.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="md:col-span-2">
+                        <label for="{{ form.manfdesc.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.manfdesc.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.manfdesc }}
+                        {% if form.manfdesc.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.manfdesc.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Category -->
+                    <div>
+                        <label for="{{ form.cid.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.cid.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.cid }}
+                        {% if form.cid.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.cid.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Sub-Category -->
+                    <div>
+                        <label for="{{ form.scid.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.scid.label }}
+                        </label>
+                        {{ form.scid }}
+                        {% if form.scid.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.scid.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Unit of Measurement -->
+                    <div>
+                        <label for="{{ form.uombasic.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.uombasic.label }} <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.uombasic }}
+                        {% if form.uombasic.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.uombasic.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quantity Information -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Quantity Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Min Order Qty -->
+                    <div>
+                        <label for="{{ form.minorderqty.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.minorderqty.label }}
+                        </label>
+                        {{ form.minorderqty }}
+                        {% if form.minorderqty.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.minorderqty.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Min Stock Qty -->
+                    <div>
+                        <label for="{{ form.minstockqty.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.minstockqty.label }}
+                        </label>
+                        {{ form.minstockqty }}
+                        {% if form.minstockqty.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.minstockqty.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Stock Qty -->
+                    <div>
+                        <label for="{{ form.stockqty.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.stockqty.label }}
+                        </label>
+                        {{ form.stockqty }}
+                        {% if form.stockqty.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.stockqty.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Information -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Additional Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Process -->
+                    <div>
+                        <label for="{{ form.process.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.process.label }}
+                        </label>
+                        {{ form.process }}
+                        {% if form.process.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.process.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Class -->
+                    <div>
+                        <label for="{{ form.class_field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.class_field.label }}
+                        </label>
+                        {{ form.class_field }}
+                        {% if form.class_field.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.class_field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Lead Days -->
+                    <div>
+                        <label for="{{ form.leaddays.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.leaddays.label }}
+                        </label>
+                        {{ form.leaddays }}
+                        {% if form.leaddays.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.leaddays.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Inspection Days -->
+                    <div>
+                        <label for="{{ form.inspectiondays.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.inspectiondays.label }}
+                        </label>
+                        {{ form.inspectiondays }}
+                        {% if form.inspectiondays.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.inspectiondays.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Location -->
+                    <div>
+                        <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.location.label }}
+                        </label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.location.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- HSN Code -->
+                    <div>
+                        <label for="{{ form.hsncode.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.hsncode.label }}
+                        </label>
+                        {{ form.hsncode }}
+                        {% if form.hsncode.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.hsncode.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Opening Balance -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Opening Balance</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Opening Balance Date -->
+                    <div>
+                        <label for="{{ form.openingbaldate.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.openingbaldate.label }}
+                        </label>
+                        {{ form.openingbaldate }}
+                        {% if form.openingbaldate.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.openingbaldate.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Opening Balance Qty -->
+                    <div>
+                        <label for="{{ form.openingbalqty.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.openingbalqty.label }}
+                        </label>
+                        {{ form.openingbalqty }}
+                        {% if form.openingbalqty.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.openingbalqty.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Attachments Section -->
+            <div class="border-b border-gray-200 pb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">File Attachments</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Drawing/Document Upload -->
+                    <div>
+                        <label for="{{ form.file_upload.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.file_upload.label }}
+                        </label>
+                        {{ form.file_upload }}
+                        {% if form.file_upload.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.file_upload.help_text }}</p>
+                        {% endif %}
+                        {% if form.file_upload.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.file_upload.errors.0 }}</p>
+                        {% endif %}
+                        {% if form.instance.pk and form.instance.filename %}
+                        <div class="mt-2 p-2 bg-green-50 border border-green-200 rounded">
+                            <p class="text-sm text-green-700">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Current: {{ form.instance.filename }}
+                                <a href="{% url 'design:item-download-file' form.instance.id %}"
+                                   class="text-blue-600 hover:underline ml-2" target="_blank">Download</a>
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Additional Attachment Upload -->
+                    <div>
+                        <label for="{{ form.attachment_upload.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.attachment_upload.label }}
+                        </label>
+                        {{ form.attachment_upload }}
+                        {% if form.attachment_upload.help_text %}
+                        <p class="text-xs text-gray-500 mt-1">{{ form.attachment_upload.help_text }}</p>
+                        {% endif %}
+                        {% if form.attachment_upload.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.attachment_upload.errors.0 }}</p>
+                        {% endif %}
+                        {% if form.instance.pk and form.instance.attname %}
+                        <div class="mt-2 p-2 bg-green-50 border border-green-200 rounded">
+                            <p class="text-sm text-green-700">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                </svg>
+                                Current: {{ form.instance.attname }}
+                                <a href="{% url 'design:item-download-attachment' form.instance.id %}"
+                                   class="text-blue-600 hover:underline ml-2" target="_blank">Download</a>
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end gap-4">
+                <a href="{% url 'design:item-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                    {% if form.instance.pk %}Update Item{% else %}Create Item{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Handle cascading dropdown for category -> sub-category
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('{{ form.cid.id_for_label }}');
+    const subcategorySelect = document.getElementById('{{ form.scid.id_for_label }}');
+    
+    if (categorySelect && subcategorySelect) {
+        categorySelect.addEventListener('change', function() {
+            const categoryId = this.value;
+            
+            if (!categoryId) {
+                subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
+                return;
+            }
+            
+            // Fetch sub-categories via HTMX endpoint
+            fetch(`/design/subcategory/by-category/?cid=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
+                    data.subcategories.forEach(sc => {
+                        const option = document.createElement('option');
+                        option.value = sc.id;
+                        option.textContent = sc.name;
+                        subcategorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching sub-categories:', error));
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

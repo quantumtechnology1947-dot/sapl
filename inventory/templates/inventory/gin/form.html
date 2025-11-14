@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Create GIN
+{{ load static }}
+<script src="{{ static 'inventory/js/form.js' }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    {% include 'core/components/layout/page_header.html' with 
+        title="Create Goods Inward Note (GIN)"
+        subtitle="Receive materials from supplier against purchase order"
+    %}
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+        
+        <!-- PO Selection -->
+        <div class="bg-white rounded border border-gray-200 p-4">
+            {% include 'core/components/forms/form_section.html' with title="Purchase Order Details" %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                {% include 'core/components/forms/select_input.html' with 
+                    label="Select PO"
+                    name="po_id"
+                    id="po_id"
+                    required=True
+                    onchange="loadPODetails(this.value)"
+                %}
+                    <option value="">-- Select Purchase Order --</option>
+                    {% for po in pos %}
+                    <option value="{{ po.poid }}" {% if po.poid == request.GET.po_id|add:0 %}selected{% endif %}>
+                        {{ po.pono }} - {{ po.podate }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                {% include 'core/components/forms/text_input.html' with 
+                    label="Challan Number"
+                    name="challan_no"
+                    placeholder="Supplier challan number"
+                %}
+                
+                {% include 'core/components/forms/date_input.html' with 
+                    label="Challan Date"
+                    name="challan_date"
+                %}
+                
+                {% include 'core/components/forms/text_input.html' with 
+                    label="Gate Entry Number"
+                    name="gate_entry_no"
+                    placeholder="Gate entry number"
+                %}
+                
+                {% include 'core/components/forms/text_input.html' with 
+                    label="Vehicle Number"
+                    name="vehicle_no"
+                    placeholder="Vehicle registration number"
+                %}
+            </div>
+        </div>
+
+        <!-- Line Items -->
+        {% if po_details %}
+        <div class="bg-white rounded border border-gray-200 p-4">
+            {% include 'core/components/forms/form_section.html' with title="Items to Receive" %}
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead>
+                        <tr class="h-8 bg-gray-50 border-b border-gray-200">
+                            <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">
+                                <input type="checkbox" id="select_all" onclick="toggleAll(this)" class="w-4 h-4 text-sap-blue border-gray-300 rounded focus:ring-sap-blue">
+                            </th>
+                            <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">Item</th>
+                            <th class="px-3 py-1 text-left text-xs font-semibold text-gray-700">Unit</th>
+                            <th class="px-3 py-1 text-right text-xs font-semibold text-gray-700">PO Qty</th>
+                            <th class="px-3 py-1 text-right text-xs font-semibold text-gray-700">Received Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for detail in po_details %}
+                        <tr class="h-8 hover:bg-blue-50/30">
+                            <td class="px-3 py-1">
+                                <input type="checkbox" name="item_{{ forloop.counter0 }}_selected" class="w-4 h-4 text-sap-blue border-gray-300 rounded focus:ring-sap-blue item-checkbox">
+                                <input type="hidden" name="item_{{ forloop.counter0 }}_po_detail_id" value="{{ detail.id }}">
+                            </td>
+                            <td class="px-3 py-1 text-xs text-gray-900">
+                                {{ detail.itemid.itemname|default:"N/A" }}
+                            </td>
+                            <td class="px-3 py-1 text-xs text-gray-700">
+                                {{ detail.unitid.unitname|default:"N/A" }}
+                            </td>
+                            <td class="px-3 py-1 text-xs text-gray-900 text-right">
+                                {{ detail.poqty|floatformat:2 }}
+                            </td>
+                            <td class="px-3 py-1">
+                                <input type="number" name="item_{{ forloop.counter0 }}_received_qty" 
+                                       step="0.01" min="0" max="{{ detail.poqty }}"
+                                       class="h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-28 text-right" placeholder="0.00">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        {% include 'core/components/feedback/alert.html' with 
+            type="warning"
+            message="Please select a Purchase Order to view items"
+        %}
+        {% endif %}
+
+        <!-- Actions -->
+        {% include 'core/components/buttons/button_group.html' %}
+            <a href="{% url 'inventory:gin-list' %}">
+                {% include 'core/components/buttons/secondary.html' with text="Cancel" icon="times" %}
+            </a>
+            {% if po_details %}
+            {% include 'core/components/buttons/primary.html' with text="Create GIN" icon="save" type="submit" %}
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+
+
+{{ load static }}
+<script src="{{ static 'inventory/js/form.js' }}"></script>
+{% endblock %}
+
+
+
+
+
+
+
+

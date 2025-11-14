@@ -1,0 +1,104 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Material Issue List{% endblock %}
+
+{% block breadcrumb_items %}
+<li>
+    <div class="flex items-center">
+        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Material Issue</span>
+    </div>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+    <div class="px-4 py-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Material Issue Note (MIN)</h2>
+                <p class="text-sm text-gray-600 mt-1">Manage material issue transactions</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:mrs-pending-list' %}" class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                    <svg class="inline-block w-5 h-5 mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Issue Material
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<!-- Search Bar Component -->
+{% include 'core/components/search_bar.html' with placeholder='Search by MIN Number or MRS Number...' %}
+
+<!-- MIN Table -->
+<div class="bg-white rounded border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SN</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MIN Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MRS Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issued By</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for min in min_list %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ forloop.counter }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {{ min.minno }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                        <a href="{% url 'inventory:mrs-detail' min.mrsid %}" class="hover:text-blue-800">
+                            {{ min.mrsno }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {{ min.sysdate }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {{ min.sessionid }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Issued
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{% url 'inventory:min-detail' min.id %}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
+                        <a href="{% url 'inventory:min-print' min.id %}" class="text-green-600 hover:text-green-900 mr-3" target="_blank">Print</a>
+                        <a href="{% url 'inventory:min-delete' min.id %}" class="text-red-600 hover:text-red-900">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=7 title="No MIN found" message="Get started by issuing material against pending MRS." %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% include 'core/components/pagination.html' with page_obj=page_obj %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

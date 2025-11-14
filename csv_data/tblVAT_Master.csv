@@ -1,0 +1,117 @@
+﻿Id,Terms,Value,Live,IsVAT,IsCST
+1,NA,0.0,0,0,0
+2,0%,0.0,0,0,0
+3,CST @ 2% Against C form,2.0,0,0,1
+4,Composition Tax - Baker @ 4%,4.0,0,0,0
+5,Composition Tax - Builders and Developers @ 1%,1.0,0,0,0
+6,Composition Tax - Motor Vehicle @ 12.5%,12.5,0,0,0
+7,Composition Tax - Restaurant Etc @ 5%,5.0,0,0,0
+8,Composition Tax - Restaurant Etc @ 8%,8.0,0,0,0
+9,Composition Tax - Retail @ 5%,5.0,0,0,0
+10,Composition Tax - Retail @ 8%,8.0,0,0,0
+11,Consignment/Branch Transfer Inward,0.0,0,0,0
+12,Consignment/Branch Transfer Inward (Within State),0.0,0,0,0
+13,Consignment/Branch Transfer Outward,0.0,0,0,0
+14,Consignment/Branch Transfer Outward (Within State),0.0,0,0,0
+15,CST @ 1%  Against,1.0,0,0,1
+16,CST @ 12.5%  Against,12.5,0,0,1
+17,CST @ 2% Against,2.0,0,0,1
+18,CST @ 20%  Against,20.0,0,0,1
+19,CST @ 4%  Against,4.0,0,0,1
+20,CST @ 5%  Against,5.0,0,0,1
+21,Exempt Sales - Lease (on Going),0.0,0,0,0
+22,Exempt Sales - Works Contract (on Going),0.0,0,0,0
+23,Exports,0.0,0,0,0
+24,Imports,0.0,0,0,0
+25,Imports (High Seas),0.0,0,0,0
+26,Input VAT @ 1%,1.0,0,1,0
+27,Input VAT @ 12.5%,12.5,0,1,0
+28,Input VAT @ 20%,20.0,0,1,0
+29,Input VAT @ 25%,25.0,0,1,0
+30,Input VAT @ 4%,4.0,0,1,0
+31,Input VAT @ 5%,5.0,0,1,0
+32,Input VAT @ 8% on Works Contract,8.0,0,1,0
+33,Input VAT - Works Contract @ 5% (Construction),5.0,0,1,0
+34,Input VAT - Works Contract @ 8%,8.0,0,1,0
+35,Input VAT - Works Contract @ 8% (Others),8.0,0,1,0
+36,Inter-State Purchases,0.0,0,0,0
+37,Interstate Purchases @ 1%,1.0,0,0,0
+38,Interstate Purchases @ 12.5%,12.5,0,0,0
+39,Interstate Purchases @ 2% Against Form C,2.0,0,0,0
+40,Interstate Purchases @ 20%,20.0,0,0,0
+41,Interstate Purchases @ 4%,4.0,0,0,0
+42,Interstate Purchases @ 5%,5.0,0,0,0
+43,Inter-State Purchases - Baker (Composition),0.0,0,0,0
+44,Inter-State Sales,0.0,0,0,0
+45,Inter State Sales Against Form - E1,0.0,0,0,0
+46,Inter State Sales Against Form - E2,0.0,0,0,0
+47,Interstate Sales at Lower Rate,0.0,0,0,0
+48,Inter- State Sales - Exempted,0.0,0,0,0
+49,Inter- State Sales - Tax Free,0.0,0,0,0
+50,"Labour, Job Work & Other Charges Paid",0.0,0,0,0
+51,"Labour, Service, Job Work & Other Charges",0.0,0,0,0
+52,Non-Creditable Purchases,0.0,0,0,0
+53,Other Exempt Purchases,0.0,0,0,0
+54,Other Exempt Sales,0.0,0,0,0
+55,Output VAT @ 1%,1.0,0,1,0
+56,Output VAT @ 12.5%,12.5,0,1,0
+57,Output VAT @ 20%,20.0,0,1,0
+58,Output VAT @ 25%,25.0,0,1,0
+59,Output VAT @ 4%,4.0,0,1,0
+60,Output VAT @ 5%,5.0,0,1,0
+61,Output VAT @ 5% on Works Contract (Construction),5.0,0,1,0
+62,Output VAT @ 8% on Works Contract,8.0,0,1,0
+63,Output VAT - Lease @ 4% (on Going),4.0,0,1,0
+64,Output VAT - Works Contract @ 1% (on Going),1.0,0,1,0
+65,Output VAT - Works Contract @ 12.5%,12.5,0,1,0
+66,Output VAT - Works Contract @ 12.5% (on Going),12.5,0,1,0
+67,Output VAT - Works Contract @ 15% (on Going),15.0,0,1,0
+68,Output VAT - Works Contract @ 4% (on Going),4.0,0,1,0
+69,Output VAT - Works Contract @ 5%,5.0,0,1,0
+70,Purchase-Allowable Deduction,0.0,0,0,0
+71,Purchases - Capital Goods @ 12.5%,12.5,0,0,0
+72,Purchases - Capital Goods @ 4%,4.0,0,0,0
+73,Purchases - Capital Goods @ 5%,5.0,0,0,0
+74,Purchases - Exempt,0.0,0,0,0
+75,Purchases - From Unregistered Dealers,0.0,0,0,0
+76,Purchases - Motor Vehicle (Composition),0.0,0,0,0
+77,Purchases - Not Qualified for Input Tax,0.0,0,0,0
+78,Purchases - Others,0.0,0,0,0
+79,Purchases - Tax Free,0.0,0,0,0
+80,Purchases - Zero Rated,0.0,0,0,0
+81,Resale of MRP Purchases,0.0,0,0,0
+82,Sale of ATF - Exempted,0.0,0,0,0
+83,Sales(Against Form-H Deemed Export),0.0,0,0,0
+84,Sales Baker @ 4% (Composition),4.0,0,0,0
+85,Sales Builders and Developers @ 1% (Composition),1.0,0,0,0
+86,Sales - Exempt,0.0,0,0,0
+87,Sales in the Course of Import Into India,0.0,0,0,0
+88,Sales Motor Vehicle @ 12.5% (Composition),12.5,0,0,0
+89,Sales - Others,0.0,0,0,0
+90,Sales - Others (Inter State),0.0,0,0,0
+91,Sales - Restaurant Etc @ 5% (Compostion),5.0,0,0,0
+92,Sales - Restaurant Etc @ 8% (Compostion),8.0,0,0,0
+93,SGST@ 4%,4.0,0,1,0
+94,SGST@ 9%,9.0,0,1,1
+95,SGST@14%,14.0,0,1,1
+96,Sales - Tax Free,0.0,0,0,0
+97,Sales to Diplomatic Missions & U.N. Etc.,0.0,0,0,0
+98,Sales - Works Contract Composition @ 2% (on Going),2.0,0,0,0
+99,Sales - Works Contract Composition @ 4% (on Going),4.0,0,0,0
+100,Sales - Works Contract Composition @ 8% (on Going),8.0,0,0,0
+101,Sales - Zero Rated,0.0,0,0,0
+102,Sales - Zero Rated (Inter State),0.0,0,0,0
+103,Works Contract - Composition Tax @ 2% (on Going),2.0,0,0,0
+104,Works Contract - Composition Tax @ 4% (on Going),4.0,0,0,0
+105,Works Contract - Composition Tax @ 8% (on Going),8.0,0,0,0
+106,Works Contract - Expenses,0.0,0,0,0
+107,Input VAT @11.11,11.11,0,1,0
+109,Input VAT @13%,13.0,0,1,0
+110,Input VAT @ 5.5%,5.5,0,1,0
+113,Output VAT 13.5%,13.5,0,0,0
+119,Input VAT @ 6%,6.0,0,1,0
+120,Input VAT @ 13.5%,13.5,0,1,0
+124,SGST@2.5%,2.5,0,1,0
+125,NA,0.0,0,0,0
+129,SGST@6%,6.0,0,1,0
+130,SGST@1.5%,1.5,0,0,0

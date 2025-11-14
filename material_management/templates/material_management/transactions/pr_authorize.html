@@ -1,0 +1,87 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}PR Authorize Dashboard - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-gradient-to-r from-blue-800 to-blue-900 shadow-lg">
+        <div class="max-w-full px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-white font-bold text-xl">PR Authorize Dashboard</h1>
+                </div>
+                <div class="flex gap-4">
+                    <a href="{% url 'material_management:pr-list' %}" class="text-white hover:bg-blue-700 px-4 py-2 rounded transition">All PRs</a>
+                    <a href="{% url 'material_management:pr-approve-list' %}" class="text-white hover:bg-blue-700 px-4 py-2 rounded transition">Approve PRs</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-full px-6 py-6">
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-sm font-bold text-gray-900 mb-6">Approved PRs for Authorization</h2>
+
+            {% if prs %}
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-blue-100">
+                            <th class="border border-gray-300 px-4 py-2 text-left">PR No</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Work Order</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Approved By</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Items Count</th>
+                            <th class="border border-gray-300 px-4 py-2 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pr in prs %}
+                        <tr class="hover:bg-blue-50">
+                            <td class="border border-gray-300 px-4 py-2">
+                                <a href="{% url 'material_management:pr-detail' pr.pr_id %}" class="text-blue-600 hover:underline">
+                                    {{ pr.pr_no }}
+                                </a>
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2">{{ pr.sys_date }}</td>
+                            <td class="border border-gray-300 px-4 py-2">{{ pr.wo_no|default:"-" }}</td>
+                            <td class="border border-gray-300 px-4 py-2">User {{ pr.approved_by }}</td>
+                            <td class="border border-gray-300 px-4 py-2">{{ pr.prdetails_set.count }}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                <form method="post" class="inline" onsubmit="return confirm('Authorize this PR?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="pr_id" value="{{ pr.pr_id }}">
+                                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                                        ✓ Authorize
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-gray-50 rounded border-2 border-dashed border-gray-300">
+                <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p class="text-gray-600 text-lg font-medium">No PRs pending for authorization</p>
+                <p class="text-gray-500 text-sm mt-2">All approved PRs have been authorized or there are no approved PRs.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

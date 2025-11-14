@@ -1,0 +1,30 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Grade - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Grade{% endblock %}
+{% block form_action %}{% if object %}{% url 'human_resource:grade-update' object.id %}{% else %}{% url 'human_resource:grade-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'human_resource:grade-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="description"
+        label="Grade"
+        value=object.description
+        required=True
+        placeholder="e.g., A, B, C"
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="symbol"
+        label="Symbol"
+        value=object.symbol
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,163 @@
+{% extends "core/base.html" %}
+
+{% block title %}Work Order Categories - Cortex ERP{% endblock %}
+{% block page_title %}Work Order Categories{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between mb-2">
+        <!-- Info Text -->
+        <p class="text-xs text-gray-600">Manage work order categories and symbols</p>
+
+        <!-- Add Button -->
+        <button
+            onclick="document.getElementById('add-form').classList.toggle('hidden')"
+            class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-dark focus:outline-none focus:ring-2 focus:ring-sap-blue/30 transition-colors">
+            <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add New
+        </button>
+    </div>
+
+    <!-- Add New Category Form (Initially Hidden) -->
+    <div id="add-form" class="hidden bg-white border border-gray-200 rounded p-3 mb-2">
+        <h3 class="text-xs font-semibold text-gray-800 mb-2">Add New Category</h3>
+        <form method="post" action="{% url 'sales_distribution:wo-category-create' %}" class="space-y-2">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Category Name *</label>
+                    {{ form.cname }}
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Symbol *</label>
+                    {{ form.symbol }}
+                    <p class="text-xs text-gray-500 mt-0.5">Single character (e.g. M, S, P)</p>
+                </div>
+                <div class="flex items-end">
+                    <label class="flex items-center space-x-2">
+                        {{ form.hassubcat }}
+                        <span class="text-xs font-medium text-gray-700">Has Sub-Category</span>
+                    </label>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-1">
+                <button type="submit"
+                        onclick="return confirm('Are you sure you want to add this category?')"
+                        class="inline-flex items-center h-7 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-dark transition-colors">
+                    Insert
+                </button>
+                <button type="button"
+                        onclick="document.getElementById('add-form').classList.add('hidden')"
+                        class="inline-flex items-center h-7 px-3 text-xs font-medium rounded bg-gray-500 text-white hover:bg-gray-600 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- SAP Fiori Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Actions</th>
+                        <th class="w-64 px-3 py-2 text-left text-xs font-semibold text-gray-700">Category</th>
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Symbol</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Has SubCat</th>
+                    </tr>
+                </thead>
+                <tbody id="category-table" class="divide-y divide-gray-100">
+                    {% for category in categories %}
+                    <tr id="category-{{ category.cid }}" class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors group" x-data="{ editing: false }">
+                        <!-- View Mode -->
+                        <td class="w-32 px-3 py-2 text-xs" x-show="!editing">
+                            <div class="flex gap-1">
+                                <button @click="editing = true"
+                                        class="inline-flex items-center h-6 px-2 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-dark transition-colors">
+                                    Edit
+                                </button>
+                                <button hx-delete="{% url 'sales_distribution:wo-category-delete' category.cid %}"
+                                        hx-target="#category-{{ category.cid }}"
+                                        hx-swap="outerHTML swap:1s"
+                                        hx-confirm="Are you sure you want to delete this category?"
+                                        class="inline-flex items-center h-6 px-2 text-xs font-medium rounded bg-sap-red text-white hover:bg-sap-red-dark transition-colors">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                        <td class="w-64 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            x-show="!editing" title="{{ category.cname }}">{{ category.cname }}</td>
+                        <td class="w-24 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            x-show="!editing">{{ category.symbol|default:"-" }}</td>
+                        <td class="w-32 px-3 py-2 text-xs" x-show="!editing">
+                            {% if category.hassubcat %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Yes</span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">No</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Edit Mode -->
+                        <template x-if="editing">
+                            <td colspan="4" class="px-3 py-2">
+                                <form method="post" action="{% url 'sales_distribution:wo-category-edit' category.cid %}" class="flex items-center gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="_method" value="PUT">
+                                    <div class="flex-1">
+                                        <input type="text" name="cname" value="{{ category.cname }}" required
+                                               class="w-full h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue"
+                                               placeholder="Category name">
+                                    </div>
+                                    <div class="w-24">
+                                        <input type="text" name="symbol" value="{{ category.symbol }}" maxlength="1"
+                                               class="w-full h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue"
+                                               placeholder="Symbol">
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="flex items-center space-x-1">
+                                            <input type="checkbox" name="hassubcat" {% if category.hassubcat %}checked{% endif %}
+                                                   class="w-3.5 h-3.5 text-sap-blue border-gray-300 rounded focus:ring-2 focus:ring-sap-blue">
+                                            <span class="text-xs text-gray-700">SubCat</span>
+                                        </label>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button type="submit"
+                                                class="inline-flex items-center h-6 px-2 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-dark transition-colors">
+                                            Update
+                                        </button>
+                                        <button type="button" @click="editing = false"
+                                                class="inline-flex items-center h-6 px-2 text-xs font-medium rounded bg-gray-500 text-white hover:bg-gray-600 transition-colors">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </td>
+                        </template>
+                    </tr>
+                    {% empty %}
+                    {% include 'core/components/empty_state.html' with
+                        in_table=True
+                        colspan=4
+                        icon_path="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                        title="No categories found"
+                        message="Get started by creating a new work order category"
+                    %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

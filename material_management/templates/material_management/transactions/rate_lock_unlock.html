@@ -1,0 +1,270 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Rate Lock-Unlock - Cortex ERP{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Force dropdown visibility */
+    .rate-lock-form select,
+    .rate-lock-form select:focus,
+    .rate-lock-form select:hover {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        -webkit-appearance: menulist !important;
+        -moz-appearance: menulist !important;
+        appearance: menulist !important;
+    }
+
+    .rate-lock-form select option,
+    .rate-lock-form select option:checked,
+    .rate-lock-form select option:hover {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .rate-lock-form input[type="text"] {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-2" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded border border-gray-200">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3 rounded-t-lg">
+            <h1 class="text-white font-semibold text-lg">Rate Lock-Unlock</h1>
+        </div>
+
+        <!-- Search Form -->
+        <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <form method="GET" class="rate-lock-form flex flex-wrap items-end gap-2">
+                <!-- Type Dropdown -->
+                <div>
+                    <select name="type" id="type" onchange="toggleFields()" class="h-8 px-2 text-sm border border-gray-300 rounded text-gray-900 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-32">
+                        <option value="" class="text-gray-900">Select</option>
+                        <option value="Category" {% if search_type == 'Category' %}selected{% endif %} class="text-gray-900">Category</option>
+                        <option value="WOItems" {% if search_type == 'WOItems' %}selected{% endif %} class="text-gray-900">WO Items</option>
+                    </select>
+                </div>
+
+                <!-- Category Dropdown (shown when Type=Category) -->
+                <div id="category_div" class="{% if search_type == 'Category' %}block{% else %}hidden{% endif %}">
+                    <select name="category" id="category" class="h-8 px-2 text-sm border border-gray-300 rounded text-gray-900 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-64">
+                        <option value="" class="text-gray-900">Select</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.cid }}" {% if category|stringformat:"s" == cat.cid|stringformat:"s" %}selected{% endif %} class="text-gray-900">
+                            {{ cat.symbol }} - {{ cat.cname }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Search Code Dropdown -->
+                <div id="search_code_div" class="{% if search_type %}block{% else %}hidden{% endif %}">
+                    <select name="search_code" id="search_code" class="h-8 px-2 text-sm border border-gray-300 rounded text-gray-900 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-48">
+                        <option value="" class="text-gray-900">Select</option>
+                        <option value="ItemCode" {% if search_code == 'ItemCode' %}selected{% endif %} class="text-gray-900">Item Code</option>
+                        <option value="ManfDesc" {% if search_code == 'ManfDesc' %}selected{% endif %} class="text-gray-900">Description</option>
+                    </select>
+                </div>
+
+                <!-- Search Value Text Input -->
+                <div id="search_value_div" class="{% if search_type and search_code %}block{% else %}hidden{% endif %}">
+                    <input type="text" name="search_value" id="search_value" value="{{ search_value }}" class="h-8 px-2 text-sm border border-gray-300 rounded text-gray-900 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-52" placeholder="Enter search value">
+                </div>
+
+                <!-- Search Button -->
+                <div>
+                    <button type="submit" class="h-8 px-4 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Table -->
+        <div class="p-4">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700" style="width: 3%;">SN</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700" style="width: 10%;">Item Code</th>
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-semibold text-gray-700" style="width: 54%;">Description</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700" style="width: 5%;">UOM</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700" style="width: 12%;">Unlock For</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-semibold text-gray-700" style="width: 4%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in items_data %}
+                        <tr class="{% cycle 'bg-white' 'bg-gray-50' %}">
+                            <td class="border border-gray-300 px-2 py-1.5 text-right text-xs text-gray-700">{{ forloop.counter }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center text-xs text-gray-700">{{ data.item.itemcode|default:"-" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-left text-xs text-gray-700">{{ data.item.manfdesc|default:"-" }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center text-xs text-gray-700">{{ data.uom_symbol }}</td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center text-xs">
+                                {% if data.is_locked %}
+                                    <!-- Locked: Show disabled radio buttons with current type selected -->
+                                    <div class="flex justify-center items-center gap-3">
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="lock_type_display_{{ forloop.counter }}" value="0" {% if data.lock_type == 0 %}checked{% endif %} disabled class="text-gray-400">
+                                            <span class="ml-1 text-gray-500">PR</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="lock_type_display_{{ forloop.counter }}" value="1" {% if data.lock_type == 1 %}checked{% endif %} disabled class="text-gray-400">
+                                            <span class="ml-1 text-gray-500">SPR</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="lock_type_display_{{ forloop.counter }}" value="2" {% if data.lock_type == 2 %}checked{% endif %} disabled class="text-gray-400">
+                                            <span class="ml-1 text-gray-500">PO</span>
+                                        </label>
+                                    </div>
+                                {% else %}
+                                    <!-- Unlocked: Show enabled radio buttons -->
+                                    <form method="POST" action="{% url 'material_management:rate-lock-unlock' %}" style="display:inline;" id="unlock_form_{{ forloop.counter }}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="unlock">
+                                        <input type="hidden" name="item_id" value="{{ data.item.id }}">
+                                        <div class="flex justify-center items-center gap-3">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="radio" name="lock_type" value="0" required class="text-blue-600 cursor-pointer">
+                                                <span class="ml-1">PR</span>
+                                            </label>
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="radio" name="lock_type" value="1" required class="text-blue-600 cursor-pointer">
+                                                <span class="ml-1">SPR</span>
+                                            </label>
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="radio" name="lock_type" value="2" required class="text-blue-600 cursor-pointer">
+                                                <span class="ml-1">PO</span>
+                                            </label>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            </td>
+                            <td class="border border-gray-300 px-2 py-1.5 text-center text-xs">
+                                {% if data.is_locked %}
+                                    <!-- Locked: Show "Lock" button (which unlocks) -->
+                                    <form method="POST" action="{% url 'material_management:rate-lock-unlock' %}?{{ request.GET.urlencode }}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="lock">
+                                        <input type="hidden" name="lock_record_id" value="{{ data.lock_record.id }}">
+                                        <button type="submit" class="text-blue-600 hover:text-blue-800 underline font-medium">
+                                            Lock
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <!-- Unlocked: Show "Unlock" button (which locks) -->
+                                    <button type="button" onclick="submitUnlockForm({{ forloop.counter }})" class="text-blue-600 hover:text-blue-800 underline font-medium">
+                                        Unlock
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="border border-gray-300 px-3 py-12 text-center text-gray-500">
+                                <div>
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No data to display !</h3>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {% if search_type and search_code and search_value %}
+                                        No items match your search criteria.
+                                        {% else %}
+                                        Please select Type, Search Code, and enter a search value to find items.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Cascading dropdown logic
+function toggleFields() {
+    var type = document.getElementById('type').value;
+    var categoryDiv = document.getElementById('category_div');
+    var searchCodeDiv = document.getElementById('search_code_div');
+    var searchValueDiv = document.getElementById('search_value_div');
+
+    if (type === 'Category') {
+        categoryDiv.classList.remove('hidden');
+        categoryDiv.classList.add('block');
+        searchCodeDiv.classList.remove('hidden');
+        searchCodeDiv.classList.add('block');
+        searchValueDiv.classList.remove('hidden');
+        searchValueDiv.classList.add('block');
+    } else if (type === 'WOItems') {
+        categoryDiv.classList.remove('block');
+        categoryDiv.classList.add('hidden');
+        searchCodeDiv.classList.remove('hidden');
+        searchCodeDiv.classList.add('block');
+        searchValueDiv.classList.remove('hidden');
+        searchValueDiv.classList.add('block');
+    } else {
+        categoryDiv.classList.remove('block');
+        categoryDiv.classList.add('hidden');
+        searchCodeDiv.classList.remove('block');
+        searchCodeDiv.classList.add('hidden');
+        searchValueDiv.classList.remove('block');
+        searchValueDiv.classList.add('hidden');
+    }
+}
+
+// Submit unlock form with validation
+function submitUnlockForm(counter) {
+    var form = document.getElementById('unlock_form_' + counter);
+    var radios = form.querySelectorAll('input[name="lock_type"]');
+    var isChecked = false;
+
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            isChecked = true;
+            break;
+        }
+    }
+
+    if (!isChecked) {
+        alert('Invalid data input.! Please select PR, SPR, or PO before clicking Unlock.');
+        return false;
+    }
+
+    // Preserve GET parameters
+    var urlParams = new URLSearchParams(window.location.search);
+    form.action = '{% url "material_management:rate-lock-unlock" %}?' + urlParams.toString();
+    form.submit();
+}
+
+// Initialize on page load
+toggleFields();
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

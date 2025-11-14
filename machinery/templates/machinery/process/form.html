@@ -1,0 +1,58 @@
+{% extends "machinery/base.html" %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Vehicle Process - Machinery{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include "core/components/layout/page_header.html" with title=page_title subtitle="Manage vehicle process information" show_back=True back_url=back_url %}
+    
+    <!-- Form Card -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="p-4">
+            <form method="post" id="process-form">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    {% include "core/components/feedback/alert.html" with type="error" message=form.non_field_errors dismissible=True %}
+                {% endif %}
+
+                <!-- Form Fields -->
+                <div class="space-y-2">
+                    {% for field in form %}
+                        {% if field.field.widget.input_type == 'checkbox' %}
+                            {% include "core/components/forms/checkbox.html" with field=field %}
+                        {% elif field.field.widget.input_type == 'select' %}
+                            {% include "core/components/forms/select_input.html" with field=field %}
+                        {% elif field.field.widget.input_type == 'date' %}
+                            {% include "core/components/forms/date_input.html" with field=field %}
+                        {% elif field.field.widget.input_type == 'textarea' %}
+                            {% include "core/components/forms/textarea_input.html" with field=field %}
+                        {% else %}
+                            {% include "core/components/forms/text_input.html" with field=field %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-2 pt-4 mt-4 border-t border-gray-200">
+                    <a href="{% url 'machinery:process-list' %}">
+                        {% include "core/components/buttons/secondary.html" with text="Cancel" %}
+                    </a>
+                    <button type="submit">
+                        {% include "core/components/buttons/primary.html" with text="Save Process" icon="check" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

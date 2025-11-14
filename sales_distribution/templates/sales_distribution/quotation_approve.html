@@ -1,0 +1,154 @@
+{% extends "core/base.html" %}
+
+{% block title %}Quotation Approval - Cortex ERP{% endblock %}
+{% block page_title %}Quotation Approval{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <h2 class="text-sm font-semibold text-gray-800">Quotation Approval Dashboard</h2>
+                <p class="text-xs text-gray-600 mt-1">Review and approve checked quotations</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="{% url 'sales_distribution:quotation-list' %}"
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1.5 rounded-md text-sm transition-colors inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="w-[4%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                    <th class="w-[9%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Fin Year</th>
+                    <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Enq</th>
+                    <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase truncate">Customer Name</th>
+                    <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Code</th>
+                    <th class="w-[11%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Quot No</th>
+                    <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Date</th>
+                    <th class="w-[11%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Gen By</th>
+                    <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Status</th>
+                    <th class="w-[9%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Action</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for quotation in quotations %}
+                <tr id="quotation-{{ quotation.id }}" class="hover:bg-gray-50">
+                    <td class="px-2 py-2 text-xs text-gray-900">{{ forloop.counter }}</td>
+                    <td class="px-2 py-2 text-xs text-gray-600">{{ quotation.finyear_name }}</td>
+                    <td class="px-2 py-2 text-xs text-gray-600">{{ quotation.enqid.enqid }}</td>
+                    <td class="px-2 py-2 text-xs font-medium text-gray-900 truncate" title="{{ quotation.enqid.customername }}">{{ quotation.enqid.customername|default:"-" }}</td>
+                    <td class="px-2 py-2 text-xs text-gray-600">{{ quotation.customerid }}</td>
+                    <td class="px-2 py-2 text-xs font-medium">
+                        <a href="{% url 'sales_distribution:quotation-detail' quotation.id %}"
+                           class="text-blue-600 hover:text-blue-900 hover:underline"
+                           title="View quotation details">
+                            {{ quotation.quotationno }}
+                        </a>
+                    </td>
+                    <td class="px-2 py-2 text-xs text-gray-600">{{ quotation.sysdate }}</td>
+                    <td class="px-2 py-2 text-xs text-gray-600 truncate" title="{{ quotation.generated_by }}">{{ quotation.generated_by }}</td>
+                    <td class="px-2 py-2 text-xs">
+                        <span class="px-1.5 py-0.5 text-[10px] rounded-full bg-yellow-100 text-yellow-800">Checked</span>
+                    </td>
+                    <td class="px-2 py-2 text-xs text-center">
+                        <button hx-post="{% url 'sales_distribution:quotation-approve' %}"
+                                hx-vals='{"quotation_id": "{{ quotation.id }}"}'
+                                hx-target="#quotation-{{ quotation.id }}"
+                                hx-swap="outerHTML swap:1s"
+                                hx-confirm="Approve this quotation?"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px]"
+                                title="Approve quotation">
+                            Approve
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="px-6 py-16 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No checked quotations</h3>
+                        <p class="mt-1 text-sm text-gray-500">All checked quotations have been approved.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Previous
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Next
+                </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing
+                        <span class="font-medium">{{ page_obj.start_index }}</span>
+                        to
+                        <span class="font-medium">{{ page_obj.end_index }}</span>
+                        of
+                        <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                        results
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            Previous
+                        </a>
+                        {% endif %}
+
+                        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            Next
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

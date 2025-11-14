@@ -1,0 +1,37 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Currency - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Currency{% endblock %}
+{% block form_action %}{% if object %}{% url 'accounts:currency-update' object.id %}{% else %}{% url 'accounts:currency-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'accounts:currency-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="name"
+        label="Currency Name"
+        value=object.name
+        required=True
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="symbol"
+        label="Symbol"
+        value=object.symbol
+        placeholder="e.g., $, €, ₹"
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="country"
+        label="Country ID"
+        type="number"
+        value=object.country
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

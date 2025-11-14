@@ -1,0 +1,126 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Create GRR
+{{ load static }}
+<script src="{{ static 'inventory/js/form.js' }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    {% include 'core/components/layout/page_header.html' with 
+        title="Create Goods Received Receipt (GRR)"
+        subtitle="Confirm receipt of materials from GIN"
+    %}
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="bg-white rounded border border-gray-200 p-4">
+            {% include 'core/components/forms/form_section.html' with title="GIN Details" %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                {% include 'core/components/forms/select_input.html' with 
+                    label="Select GIN"
+                    name="gin_id"
+                    id="gin_id"
+                    required=True
+                    onchange="loadGINDetails(this.value)"
+                %}
+                    <option value="">-- Select GIN --</option>
+                    {% for gin in pending_gins %}
+                    <option value="{{ gin.id }}" {% if gin.id == request.GET.gin_id|add:0 %}selected{% endif %}>
+                        {{ gin.ginno }} - {{ gin.receiptdate }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                {% include 'core/components/forms/text_input.html' with 
+                    label="Tax Invoice No"
+                    name="tax_invoice_no"
+                    placeholder="Supplier invoice number"
+                %}
+                
+                {% include 'core/components/forms/date_input.html' with 
+                    label="Tax Invoice Date"
+                    name="tax_invoice_date"
+                %}
+            </div>
+        </div>
+
+        {% if gin_details %}
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold mb-4">Items to Receive</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <input type="checkbox" id="select_all" onclick="toggleAll(this)" class="h-4 w-4 text-sap-blue border-gray-300 rounded focus:ring-sap-blue">
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">PO ID</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Inward Qty</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Received Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for detail in gin_details %}
+                        <tr>
+                            <td class="px-4 py-3">
+                                <input type="checkbox" name="item_{{ forloop.counter0 }}_selected" class="h-4 w-4 text-sap-blue border-gray-300 rounded focus:ring-sap-blue item-checkbox">
+                                <input type="hidden" name="item_{{ forloop.counter0 }}_gin_detail_id" value="{{ detail.id }}">
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                PO ID: {{ detail.poid }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 text-right">
+                                {{ detail.inwardqty|floatformat:2 }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <input type="number" name="item_{{ forloop.counter0 }}_received_qty" 
+                                       step="0.01" min="0" max="{{ detail.inwardqty }}"
+                                       class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-32 text-right" placeholder="0.00">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-yellow-50 border border-yellow-200 rounded p-4">
+            <div class="flex items-center">
+                <i class="fas fa-info-circle text-yellow-600 mr-2"></i>
+                <p class="text-yellow-800">Please select a GIN to view items</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'inventory:grr-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+            </a>
+            {% if gin_details %}
+            <button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Create GRR
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+
+
+{{ load static }}
+<script src="{{ static 'inventory/js/form.js' }}"></script>
+{% endblock %}
+
+
+
+
+
+
+
+

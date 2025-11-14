@@ -1,0 +1,372 @@
+<!-- Item Header -->
+<div class="mb-4">
+    <h3 class="text-sm font-bold text-gray-800">Item Code: <span class="text-blue-600">{{ item_code }}</span></h3>
+    <p class="text-xs text-gray-600">BOM Qty: <span class="font-medium">{{ bom_qty }}</span></p>
+</div>
+
+<form id="detail-form-{{ item_id }}" data-item-id="{{ item_id }}" data-bom-qty="{{ bom_qty }}">
+    <!-- Raw Material Section -->
+    <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-gray-700">Raw Material [A]</label>
+            <input type="checkbox"
+                   id="rm-check-{{ item_id }}"
+                   class="material-type-check"
+                   data-type="rm"
+                   data-item-id="{{ item_id }}">
+        </div>
+
+        <div id="rm-grid-{{ item_id }}" class="overflow-visible">
+            <table class="w-full text-[10px] border border-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-2 py-1 text-left border-b">Supplier</th>
+                        <th class="px-2 py-1 text-left border-b">Qty</th>
+                        <th class="px-2 py-1 text-left border-b">Rate</th>
+                        <th class="px-2 py-1 text-left border-b">Disc</th>
+                        <th class="px-2 py-1 text-left border-b">Del.Date</th>
+                        <th class="px-2 py-1 text-center border-b">×</th>
+                    </tr>
+                </thead>
+                <tbody id="rm-rows-{{ item_id }}">
+                    <!-- Empty row for new entry -->
+                    <tr class="rm-row">
+                        <td class="px-1 py-1 border-b">
+                            <div class="relative">
+                                <input type="text"
+                                       name="rm_supplier[]"
+                                       class="w-full px-1 py-1 text-[10px] border border-gray-300 rounded supplier-autocomplete"
+                                       placeholder="Supplier">
+                            </div>
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="rm_qty[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.001"
+                                   value="{{ bom_qty }}">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="rm_rate[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.01"
+                                   value="0">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="rm_discount[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.01"
+                                   value="0">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="text"
+                                   name="rm_deldate[]"
+                                   class="w-full px-1 py-1 text-[10px] border border-gray-300 rounded flatpickr"
+                                   placeholder="DD-MM-YYYY">
+                        </td>
+                        <td class="px-1 py-1 border-b text-center">
+                            <button type="button" class="text-red-600 hover:text-red-800 remove-row" disabled>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Processing Material Section -->
+    <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-gray-700">Process [O]</label>
+            <input type="checkbox"
+                   id="pro-check-{{ item_id }}"
+                   class="material-type-check"
+                   data-type="pro"
+                   data-item-id="{{ item_id }}">
+        </div>
+
+        <div id="pro-grid-{{ item_id }}" class="overflow-visible">
+            <table class="w-full text-[10px] border border-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-2 py-1 text-left border-b">Supplier</th>
+                        <th class="px-2 py-1 text-left border-b">Qty</th>
+                        <th class="px-2 py-1 text-left border-b">Rate</th>
+                        <th class="px-2 py-1 text-left border-b">Disc</th>
+                        <th class="px-2 py-1 text-left border-b">Del.Date</th>
+                        <th class="px-2 py-1 text-center border-b">×</th>
+                    </tr>
+                </thead>
+                <tbody id="pro-rows-{{ item_id }}">
+                    <!-- Empty row for new entry -->
+                    <tr class="pro-row">
+                        <td class="px-1 py-1 border-b">
+                            <div class="relative">
+                                <input type="text"
+                                       name="pro_supplier[]"
+                                       class="w-full px-1 py-1 text-[10px] border border-gray-300 rounded supplier-autocomplete"
+                                       placeholder="Supplier">
+                            </div>
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="pro_qty[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.001"
+                                   value="{{ bom_qty }}">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="pro_rate[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.01"
+                                   value="0">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="pro_discount[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.01"
+                                   value="0">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="text"
+                                   name="pro_deldate[]"
+                                   class="w-full px-1 py-1 text-[10px] border border-gray-300 rounded flatpickr"
+                                   placeholder="DD-MM-YYYY">
+                        </td>
+                        <td class="px-1 py-1 border-b text-center">
+                            <button type="button" class="text-red-600 hover:text-red-800 remove-row" disabled>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Finish Material Section -->
+    <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-gray-700">Finish [F]</label>
+            <input type="checkbox"
+                   id="fin-check-{{ item_id }}"
+                   class="material-type-check"
+                   data-type="fin"
+                   data-item-id="{{ item_id }}">
+        </div>
+
+        <div id="fin-grid-{{ item_id }}" class="overflow-visible">
+            <table class="w-full text-[10px] border border-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-2 py-1 text-left border-b">Supplier</th>
+                        <th class="px-2 py-1 text-left border-b">Qty</th>
+                        <th class="px-2 py-1 text-left border-b">Rate</th>
+                        <th class="px-2 py-1 text-left border-b">Disc</th>
+                        <th class="px-2 py-1 text-left border-b">Del.Date</th>
+                        <th class="px-2 py-1 text-center border-b">×</th>
+                    </tr>
+                </thead>
+                <tbody id="fin-rows-{{ item_id }}">
+                    <!-- Empty row for new entry -->
+                    <tr class="fin-row">
+                        <td class="px-1 py-1 border-b">
+                            <div class="relative">
+                                <input type="text"
+                                       name="fin_supplier[]"
+                                       class="w-full px-1 py-1 text-[10px] border border-gray-300 rounded supplier-autocomplete"
+                                       placeholder="Supplier">
+                            </div>
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="fin_qty[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.001"
+                                   value="{{ bom_qty }}">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="fin_rate[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.01"
+                                   value="0">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="number"
+                                   name="fin_discount[]"
+                                   class="w-full px-1 py-1 text-[10px] text-right border border-gray-300 rounded"
+                                   step="0.01"
+                                   value="0">
+                        </td>
+                        <td class="px-1 py-1 border-b">
+                            <input type="text"
+                                   name="fin_deldate[]"
+                                   class="w-full px-1 py-1 text-[10px] border border-gray-300 rounded flatpickr"
+                                   placeholder="DD-MM-YYYY">
+                        </td>
+                        <td class="px-1 py-1 border-b text-center">
+                            <button type="button" class="text-red-600 hover:text-red-800 remove-row" disabled>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add to Temp Button -->
+    <button type="button"
+            id="add-temp-btn-{{ item_id }}"
+            class="w-full px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors add-temp-btn"
+            data-item-id="{{ item_id }}">
+        Add to Temp
+    </button>
+</form>
+
+<script>
+// Initialize flatpickr and supplier autocomplete after HTMX swap
+(function() {
+    // Initialize Flatpickr
+    flatpickr('.flatpickr', {
+        dateFormat: 'd-m-Y',
+        allowInput: true
+    });
+
+    // Initialize supplier autocomplete
+    initializeSupplierAutocomplete();
+
+    // Add to Temp button handler
+    // FIXED: Support MULTIPLE procurement types (ASP.NET pdt.aspx.cs lines 1559-1934)
+    // User can check RM + Process + Finish simultaneously
+    document.querySelectorAll('.add-temp-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.dataset.itemId;
+            const form = document.getElementById(`detail-form-${itemId}`);
+            const bomQty = form.dataset.bomQty;
+
+            // Check which procurement types are selected
+            const rmChecked = document.getElementById(`rm-check-${itemId}`).checked;
+            const proChecked = document.getElementById(`pro-check-${itemId}`).checked;
+            const finChecked = document.getElementById(`fin-check-${itemId}`).checked;
+            const available = {{ available|default:0 }};
+
+            // At least one must be checked
+            if (!rmChecked && !proChecked && !finChecked) {
+                alert('Please select at least one procurement type (Raw Material, Process, or Finish)');
+                return;
+            }
+
+            // Collect form data manually to ensure all fields are captured
+            const formData = new FormData();
+            formData.append('item_id', itemId);
+            formData.append('bom_qty', bomQty);
+            formData.append('available', available);
+
+            // Send checkbox states
+            formData.append('rm_checked', rmChecked);
+            formData.append('pro_checked', proChecked);
+            formData.append('fin_checked', finChecked);
+
+            // Manually collect RM fields
+            const rmSuppliers = form.querySelectorAll('input[name="rm_supplier[]"]');
+            const rmQtys = form.querySelectorAll('input[name="rm_qty[]"]');
+            const rmRates = form.querySelectorAll('input[name="rm_rate[]"]');
+            const rmDiscounts = form.querySelectorAll('input[name="rm_discount[]"]');
+            const rmDeldates = form.querySelectorAll('input[name="rm_deldate[]"]');
+
+            rmSuppliers.forEach((el, i) => formData.append('rm_supplier[]', el.value));
+            rmQtys.forEach((el, i) => formData.append('rm_qty[]', el.value));
+            rmRates.forEach((el, i) => formData.append('rm_rate[]', el.value));
+            rmDiscounts.forEach((el, i) => formData.append('rm_discount[]', el.value));
+            rmDeldates.forEach((el, i) => formData.append('rm_deldate[]', el.value));
+
+            // Manually collect PRO fields
+            const proSuppliers = form.querySelectorAll('input[name="pro_supplier[]"]');
+            const proQtys = form.querySelectorAll('input[name="pro_qty[]"]');
+            const proRates = form.querySelectorAll('input[name="pro_rate[]"]');
+            const proDiscounts = form.querySelectorAll('input[name="pro_discount[]"]');
+            const proDeldates = form.querySelectorAll('input[name="pro_deldate[]"]');
+
+            proSuppliers.forEach((el, i) => formData.append('pro_supplier[]', el.value));
+            proQtys.forEach((el, i) => formData.append('pro_qty[]', el.value));
+            proRates.forEach((el, i) => formData.append('pro_rate[]', el.value));
+            proDiscounts.forEach((el, i) => formData.append('pro_discount[]', el.value));
+            proDeldates.forEach((el, i) => formData.append('pro_deldate[]', el.value));
+
+            // Manually collect FIN fields
+            const finSuppliers = form.querySelectorAll('input[name="fin_supplier[]"]');
+            const finQtys = form.querySelectorAll('input[name="fin_qty[]"]');
+            const finRates = form.querySelectorAll('input[name="fin_rate[]"]');
+            const finDiscounts = form.querySelectorAll('input[name="fin_discount[]"]');
+            const finDeldates = form.querySelectorAll('input[name="fin_deldate[]"]');
+
+            finSuppliers.forEach((el, i) => formData.append('fin_supplier[]', el.value));
+            finQtys.forEach((el, i) => formData.append('fin_qty[]', el.value));
+            finRates.forEach((el, i) => formData.append('fin_rate[]', el.value));
+            finDiscounts.forEach((el, i) => formData.append('fin_discount[]', el.value));
+            finDeldates.forEach((el, i) => formData.append('fin_deldate[]', el.value));
+
+            // Get CSRF token from cookies
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrfToken = getCookie('csrftoken');
+
+            // Send POST request
+            fetch(`/material-planning/api/add-to-temp/{{ wono }}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    // Do NOT reload - it will clear temp data!
+                    // Just close the detail panel or clear the form
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving to temp');
+            });
+        });
+    });
+})();
+</script>
+
+
+
+
+
+
+
+

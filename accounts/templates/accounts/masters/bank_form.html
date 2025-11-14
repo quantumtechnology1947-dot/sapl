@@ -1,0 +1,96 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Bank - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Bank{% endblock %}
+{% block form_action %}{% if object %}{% url 'accounts:bank-update' object.id %}{% else %}{% url 'accounts:bank-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'accounts:bank-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/form_section.html' with title='Basic Information' %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include 'core/components/forms/text_input.html' with 
+                name="name"
+                label="Bank Name"
+                value=object.name
+                required=True
+                class="md:col-span-2"
+            %}
+            
+            {% include 'core/components/forms/text_input.html' with 
+                name="ifsc"
+                label="IFSC Code"
+                value=object.ifsc
+            %}
+            
+            {% include 'core/components/forms/text_input.html' with 
+                name="ordno"
+                label="Order No"
+                type="number"
+                value=object.ordno
+            %}
+        </div>
+    {% endinclude %}
+    
+    {% include 'core/components/forms/form_section.html' with title='Address Details' %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include 'core/components/forms/textarea_input.html' with 
+                name="address"
+                label="Address"
+                value=object.address
+                rows=3
+                class="md:col-span-2"
+            %}
+            
+            {% include 'core/components/forms/text_input.html' with 
+                name="country"
+                label="Country"
+                type="number"
+                value=object.country
+            %}
+            
+            {% include 'core/components/forms/text_input.html' with 
+                name="state"
+                label="State"
+                type="number"
+                value=object.state
+            %}
+            
+            {% include 'core/components/forms/text_input.html' with 
+                name="city"
+                label="City"
+                type="number"
+                value=object.city
+            %}
+            
+            {% include 'core/components/forms/text_input.html' with 
+                name="pinno"
+                label="PIN Code"
+                value=object.pinno
+            %}
+        </div>
+    {% endinclude %}
+    
+    {% include 'core/components/forms/form_section.html' with title='Contact Information' %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% include 'core/components/forms/text_input.html' with 
+                name="contactno"
+                label="Contact No"
+                value=object.contactno
+            %}
+            
+            {% include 'core/components/forms/text_input.html' with 
+                name="faxno"
+                label="Fax No"
+                value=object.faxno
+            %}
+        </div>
+    {% endinclude %}
+{% endblock %}
+
+
+
+
+
+
+
+

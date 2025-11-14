@@ -1,0 +1,70 @@
+{% comment %}
+Component: Tabs
+Purpose: Tab navigation with Alpine.js and HTMX support
+Parameters:
+  - tabs (required): List of tab objects with 'label', optional 'icon', 'count', 'url' (for HTMX)
+  - active_tab (optional): Index of initially active tab (default: 0)
+  - htmx_target (optional): Target selector for HTMX tab content loading
+Usage with Alpine.js:
+  <div x-data="{ activeTab: 0 }">
+    {% include 'core/components/layout/tabs.html' with tabs=tab_list %}
+    <div x-show="activeTab === 0">Tab 1 Content</div>
+    <div x-show="activeTab === 1">Tab 2 Content</div>
+  </div>
+
+Usage with HTMX:
+  {% include 'core/components/layout/tabs.html' with 
+    tabs=tab_list 
+    htmx_target="#tab-content"
+  %}
+  <div id="tab-content"></div>
+
+Requirements: 5.4, 11.1, 11.2
+{% endcomment %}
+
+<div class="border-b border-gray-200">
+    <nav class="flex -mb-px" role="tablist">
+        {% for tab in tabs %}
+        <button type="button"
+                role="tab"
+                {% if tab.url and htmx_target %}
+                hx-get="{{ tab.url }}"
+                hx-target="{{ htmx_target }}"
+                hx-swap="innerHTML"
+                hx-indicator="#tab-loading"
+                {% else %}
+                @click="activeTab = {{ forloop.counter0 }}"
+                {% endif %}
+                :aria-selected="activeTab === {{ forloop.counter0 }}"
+                :class="activeTab === {{ forloop.counter0 }} ? 'border-b-2 border-sap-blue text-sap-blue font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'"
+                class="h-10 px-4 text-sm transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-sap-blue/30 flex items-center">
+            {% if tab.icon %}
+            <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {{ tab.icon|safe }}
+            </svg>
+            {% endif %}
+            {{ tab.label }}
+            {% if tab.count is not None %}
+            <span class="ml-2 px-1.5 py-0.5 text-xs rounded-full"
+                  :class="activeTab === {{ forloop.counter0 }} ? 'bg-blue-100 text-sap-blue' : 'bg-gray-200 text-gray-600'">
+                {{ tab.count }}
+            </span>
+            {% endif %}
+        </button>
+        {% endfor %}
+    </nav>
+    <!-- Loading indicator for HTMX -->
+    {% if htmx_target %}
+    <div id="tab-loading" class="htmx-indicator">
+        <div class="h-1 bg-sap-blue animate-pulse"></div>
+    </div>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+

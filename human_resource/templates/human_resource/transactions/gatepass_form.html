@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Gate Pass - HR Management{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-12">
+    <div class="bg-white border border-gray-200 rounded overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} Gate Pass</h2>
+        </div>
+
+        <form method="post" class="px-6 py-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="flex gap-4 mt-6">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">
+                    <i class="fas fa-save mr-2"></i>Save
+                </button>
+                <a href="{% url 'human_resource:gatepass-list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md">
+                    <i class="fas fa-times mr-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

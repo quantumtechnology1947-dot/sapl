@@ -1,0 +1,5 @@
+﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,SCNo,SupplierId,Remarks,VehicleNo,Transpoter
+10,2014-08-22,3:56:35 PM,Sapl0001,1,2,0001,S098,Testing of Supplier Challn.,MH 12 DC 7129.,Bicke.
+11,2014-08-22,4:34:50 PM,sapl0172,1,2,0002,S098,FOR MILLING & DRILLING ,MH 12 EF 5483,SELF
+12,2018-09-11,6:41:22 PM,Sapl0263,1,6,0001,S098,,,
+14,2022-01-31,3:36:41 PM,sapl0001,1,9,0001,C042,-,By Hand,Mr. Sathe

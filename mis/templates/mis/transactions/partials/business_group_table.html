@@ -1,0 +1,73 @@
+<table class="w-full text-xs border-collapse">
+    <thead class="bg-[#FAFAFA] sticky top-0 z-10">
+        <tr class="border-b border-gray-300">
+            <th class="w-10 px-2 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">#</th>
+            <th class="w-10 px-2 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">
+                <input type="checkbox" id="selectAll" class="rounded border-gray-400">
+            </th>
+            <th class="w-[200px] px-3 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">Business Group</th>
+            <th class="w-20 px-2 py-2 text-left font-semibold text-gray-700 border-r border-gray-200">Symbol</th>
+            <th class="w-[110px] px-3 py-2 text-right font-semibold text-gray-700 border-r border-gray-200">Budget Amt</th>
+            <th class="w-[110px] px-3 py-2 text-right font-semibold text-gray-700 border-r border-gray-200">PO</th>
+            <th class="w-[110px] px-3 py-2 text-right font-semibold text-gray-700 border-r border-gray-200">Cash Pay</th>
+            <th class="w-[110px] px-3 py-2 text-right font-semibold text-gray-700 border-r border-gray-200">Cash Rec</th>
+            <th class="w-[110px] px-3 py-2 text-right font-semibold text-gray-700 border-r border-gray-200">Tax</th>
+            <th class="w-[110px] px-3 py-2 text-right font-semibold text-gray-700 border-r border-gray-200">Balance</th>
+            <th class="w-[70px] px-2 py-2 text-center font-semibold text-gray-700">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bg in business_groups %}
+        <tr class="border-b border-gray-200 hover:bg-blue-50/40 transition-colors">
+            <td class="px-2 py-1.5 text-gray-600 border-r border-gray-200">{{ forloop.counter }}</td>
+            <td class="px-2 py-1.5 text-center border-r border-gray-200">
+                <input type="checkbox" name="selected_groups" value="{{ bg.id }}" class="group-checkbox rounded border-gray-400">
+            </td>
+            <td class="px-3 py-1.5 font-medium text-gray-900 border-r border-gray-200">{{ bg.name }}</td>
+            <td class="px-2 py-1.5 text-gray-700 border-r border-gray-200">{{ bg.symbol|default:"-" }}</td>
+            <td class="px-3 py-1.5 text-right font-medium text-gray-900 border-r border-gray-200">{{ bg.budget_amount|floatformat:2 }}</td>
+            <td class="px-3 py-1.5 text-right text-gray-700 border-r border-gray-200">{{ bg.po_total|floatformat:2 }}</td>
+            <td class="px-3 py-1.5 text-right text-gray-700 border-r border-gray-200">{{ bg.cash_pay|floatformat:2 }}</td>
+            <td class="px-3 py-1.5 text-right text-gray-700 border-r border-gray-200">{{ bg.cash_rec|floatformat:2 }}</td>
+            <td class="px-3 py-1.5 text-right text-gray-700 border-r border-gray-200">{{ bg.tax|floatformat:2 }}</td>
+            <td class="px-3 py-1.5 text-right font-semibold border-r border-gray-200 {% if bg.balance < 0 %}text-red-600{% else %}text-green-700{% endif %}">
+                {{ bg.balance|floatformat:2 }}
+            </td>
+            <td class="px-2 py-1.5 text-center">
+                <a href="{% url 'mis:business_group_detail' bg.id %}"
+                   class="inline-block px-2 py-1 text-xs font-medium text-white bg-[#0854A0] hover:bg-[#0a6fc9] rounded transition-colors">
+                    Select
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="11" class="px-6 py-12 text-center">
+                <div class="flex flex-col items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    <h3 class="text-sm font-medium text-gray-700">No Results Found</h3>
+                    <p class="text-xs text-gray-500 mt-1">No business groups match your search.</p>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+
+        <!-- Totals Row (Sticky Footer) -->
+        {% if business_groups %}
+        <tr class="bg-[#F5F5F5] border-t-2 border-gray-400 font-semibold sticky bottom-0">
+            <td colspan="4" class="px-3 py-2 text-right text-gray-900 border-r border-gray-200">Total:</td>
+            <td class="px-3 py-2 text-right text-gray-900 border-r border-gray-200">{{ totals.budget_amount|floatformat:2 }}</td>
+            <td class="px-3 py-2 text-right text-gray-900 border-r border-gray-200">{{ totals.po_total|floatformat:2 }}</td>
+            <td class="px-3 py-2 text-right text-gray-900 border-r border-gray-200">{{ totals.cash_pay|floatformat:2 }}</td>
+            <td class="px-3 py-2 text-right text-gray-900 border-r border-gray-200">{{ totals.cash_rec|floatformat:2 }}</td>
+            <td class="px-3 py-2 text-right text-gray-900 border-r border-gray-200">{{ totals.tax|floatformat:2 }}</td>
+            <td class="px-3 py-2 text-right {% if totals.balance < 0 %}text-red-600{% else %}text-green-700{% endif %} border-r border-gray-200">
+                {{ totals.balance|floatformat:2 }}
+            </td>
+            <td class="px-2 py-2"></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>

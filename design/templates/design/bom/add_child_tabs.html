@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Add Child Item - BOM{% endblock %}
+
+{% block page_title %}Add Child Item to BOM{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-sm font-bold text-gray-900">Add Child Item to BOM</h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    Parent: <span class="font-medium">{{ parent_item.item_code|default:"N/A" }}</span> - {{ parent_item.description }}
+                </p>
+            </div>
+            <a href="{% url 'design:bom_tree' work_order.wono %}" 
+               class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">
+                ← Back to Tree
+            </a>
+        </div>
+    </div>
+
+    <!-- Parent Info Card -->
+    <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
+        <h3 class="text-sm font-semibold text-blue-900 mb-2">Parent Item Information</h3>
+        <div class="grid grid-cols-3 gap-4 text-sm">
+            <div>
+                <span class="text-blue-700 font-medium">Work Order:</span>
+                <span class="text-blue-900">{{ work_order.wono }}</span>
+            </div>
+            <div>
+                <span class="text-blue-700 font-medium">Item Code:</span>
+                <span class="text-blue-900">{{ parent_item.item_code|default:"N/A" }}</span>
+            </div>
+            <div>
+                <span class="text-blue-700 font-medium">Quantity:</span>
+                <span class="text-blue-900">{{ parent_item.qty|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-Tab Interface -->
+    <div class="bg-white rounded border border-gray-200" x-data="{ activeTab: 'item-master' }">
+        <!-- Tab Headers -->
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px" aria-label="Tabs">
+                <button @click="activeTab = 'item-master'"
+                        :class="activeTab === 'item-master' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm transition">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Item Master
+                </button>
+                <button @click="activeTab = 'new-items'"
+                        :class="activeTab === 'new-items' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm transition">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    New Items
+                </button>
+                <button @click="activeTab = 'copy-from'"
+                        :class="activeTab === 'copy-from' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm transition">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    Copy From
+                </button>
+                <button @click="activeTab = 'selected'"
+                        :class="activeTab === 'selected' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm transition">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Selected Items
+                    {% if temp_items_count > 0 %}
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ temp_items_count }}
+                    </span>
+                    {% endif %}
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="p-6">
+            <!-- Item Master Tab -->
+            <div x-show="activeTab === 'item-master'" x-cloak>
+                {% include 'design/bom/tabs/item_master.html' %}
+            </div>
+
+            <!-- New Items Tab -->
+            <div x-show="activeTab === 'new-items'" x-cloak>
+                {% include 'design/bom/tabs/new_items.html' %}
+            </div>
+
+            <!-- Copy From Tab -->
+            <div x-show="activeTab === 'copy-from'" x-cloak>
+                {% include 'design/bom/tabs/copy_from.html' %}
+            </div>
+
+            <!-- Selected Items Tab -->
+            <div x-show="activeTab === 'selected'" x-cloak>
+                {% include 'design/bom/tabs/selected_items.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-6 flex items-center justify-between">
+        <a href="{% url 'design:bom_tree' work_order.wono %}" 
+           class="px-6 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">
+            Cancel
+        </a>
+        <button type="button"
+                @click="activeTab = 'selected'"
+                class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+            Review Selected Items →
+        </button>
+    </div>
+</div>
+
+<style>
+[x-cloak] { display: none !important; }
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+

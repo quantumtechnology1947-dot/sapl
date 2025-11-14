@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Issue Note - {{ min.minno }}</title>
+    <style>
+        @media print {
+            .no-print { display: none; }
+            @page { margin: 1cm; }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .document-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 150px;
+        }
+        .info-value {
+            flex: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-box {
+            width: 200px;
+            text-align: center;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 50px;
+            padding-top: 5px;
+        }
+        .print-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .print-button:hover {
+            background-color: #45a049;
+        }
+        .reference-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()" class="print-button">🖨️ Print Document</button>
+        <button onclick="window.close()" class="print-button" style="background-color: #666;">✕ Close</button>
+    </div>
+
+    <div class="header">
+        <div class="company-name">ERP SYSTEM</div>
+        <div>Inventory Management</div>
+        <div class="document-title">MATERIAL ISSUE NOTE</div>
+    </div>
+
+    <div class="info-section">
+        <div class="info-row">
+            <div class="info-label">MIN Number:</div>
+            <div class="info-value"><strong>{{ min.minno }}</strong></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date:</div>
+            <div class="info-value">{{ min.sysdate }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Time:</div>
+            <div class="info-value">{{ min.systime }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Issued By:</div>
+            <div class="info-value">{{ min.sessionid }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Company ID:</div>
+            <div class="info-value">{{ min.compid }}</div>
+        </div>
+    </div>
+
+    <div class="reference-box">
+        <div class="info-row">
+            <div class="info-label">Reference MRS:</div>
+            <div class="info-value"><strong>{{ min.mrsno }}</strong></div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">MRS ID:</div>
+            <div class="info-value">{{ min.mrsid }}</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center" style="width: 50px;">SN</th>
+                <th>MRS Detail ID</th>
+                <th class="text-right">Issue Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in details %}
+            <tr>
+                <td class="text-center">{{ forloop.counter }}</td>
+                <td>{{ detail.mrsid }}</td>
+                <td class="text-right">{{ detail.issueqty|floatformat:3 }}</td>
+            </tr>
+            {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=3 title="No records found" message="" %}
+                {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <div class="signature-box">
+            <div class="signature-line">Issued By</div>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line">Received By</div>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line">Approved By</div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

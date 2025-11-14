@@ -1,0 +1,112 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Create GIN - Cortex ERP{% endblock %}
+
+{% block page_title %}Goods Inward Note - New{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-4 -mx-4 px-4 py-3">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Goods Inward Note [GIN] - New</h1>
+                <p class="text-xs text-gray-600 mt-1">Search PO and create GIN entry</p>
+            </div>
+            <a href="{% url 'inventory:gin-list' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 text-sm rounded-md transition-colors">
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- PO Search Section -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        <div class="flex items-center gap-3 flex-wrap">
+            <!-- Search Type Dropdown -->
+            <select id="search-type"
+                    name="search-type"
+                    class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    style="width: 160px;">
+                <option value="supplier">Supplier Name</option>
+                <option value="po_no">PO No</option>
+            </select>
+
+            <!-- Search Input (for autocomplete) -->
+            <input type="text"
+                   id="search-input"
+                   name="search-input"
+                   placeholder="Type to search..."
+                   class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                   style="width: 350px;"
+                   hx-get="{% url 'inventory:gin-po-search-autocomplete' %}"
+                   hx-trigger="keyup changed delay:300ms"
+                   hx-target="#autocomplete-results"
+                   hx-include="#search-type"
+                   autocomplete="off">
+
+            <!-- Search Button -->
+            <button type="button"
+                    id="search-btn"
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2 text-sm rounded-md transition-colors"
+                    hx-get="{% url 'inventory:gin-po-search-results' %}"
+                    hx-trigger="click"
+                    hx-target="#po-results-table"
+                    hx-include="#search-type, #search-input"
+                    hx-indicator="#search-loading">
+                Search
+            </button>
+
+            <!-- Loading Indicator -->
+            <div id="search-loading" class="htmx-indicator">
+                <svg class="animate-spin h-5 w-5 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Autocomplete Results Dropdown -->
+        <div id="autocomplete-results" class="relative mt-2"></div>
+    </div>
+
+    <!-- PO Results Table -->
+    <div id="po-results-table">
+        <!-- Initial empty state -->
+        <div class="bg-gray-50 border border-gray-200 rounded-md p-8 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No PO Selected</h3>
+            <p class="mt-1 text-sm text-gray-500">Search for a PO using the filters above</p>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Search Functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchType = document.getElementById('search-type');
+    const searchInput = document.getElementById('search-input');
+
+    // Update placeholder based on search type
+    searchType.addEventListener('change', function() {
+        if (this.value === 'supplier') {
+            searchInput.placeholder = 'Type supplier name...';
+        } else {
+            searchInput.placeholder = 'Type PO number...';
+        }
+        searchInput.value = '';
+        searchInput.focus();
+    });
+
+    // Allow Enter key to trigger search
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('search-btn').click();
+        }
+    });
+});
+</script>
+{% endblock %}

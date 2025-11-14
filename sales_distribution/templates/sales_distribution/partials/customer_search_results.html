@@ -1,0 +1,19 @@
+{% if customers %}
+    {% for customer in customers %}
+    <div class="customer-search-item" data-customer-id="{{ customer.salesid }}">
+        {{ customer.customername }}
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="px-3 py-2 text-xs text-gray-500">
+        No customers found
+    </div>
+{% endif %}
+
+
+
+
+
+
+
+

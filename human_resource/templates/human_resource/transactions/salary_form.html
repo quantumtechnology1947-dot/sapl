@@ -1,0 +1,274 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Process{% endif %} Salary - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Employee Info Panel -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Employee Information</h2>
+            {% if employee %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Emp ID</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ employee.empid }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ employee.title }} {{ employee.employeename }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Department</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ department_name.description|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Designation</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ designation_name.type|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Account No</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ employee.bankaccountno|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">PF No</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ employee.pfno|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">PAN No</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ employee.panno|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Month</label>
+                    <p class="mt-1 text-sm text-gray-900 font-semibold">{{ month_name }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Working Days</label>
+                    <p class="mt-1 text-sm text-gray-900">{{ working_days }}</p>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-red-600">Employee not found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Attendance Section -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Attendance Details</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    {{ form.present.label_tag }}
+                    {{ form.present }}
+                    {% if form.present.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.present.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.absent.label_tag }}
+                    {{ form.absent }}
+                    {% if form.absent.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.absent.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.latein.label_tag }}
+                    {{ form.latein }}
+                    {% if form.latein.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.latein.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.halfday.label_tag }}
+                    {{ form.halfday }}
+                    {% if form.halfday.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.halfday.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.sunday.label_tag }}
+                    {{ form.sunday }}
+                    {% if form.sunday.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.sunday.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.coff.label_tag }}
+                    {{ form.coff }}
+                    {% if form.coff.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.coff.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.pl.label_tag }}
+                    {{ form.pl }}
+                    {% if form.pl.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.pl.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    {{ form.overtimehrs.label_tag }}
+                    {{ form.overtimehrs }}
+                    {% if form.overtimehrs.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.overtimehrs.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Deductions & Additions Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Deductions -->
+            <div class="bg-white rounded border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Deductions</h2>
+                <div class="space-y-4">
+                    <div>
+                        {{ form.installment.label_tag }}
+                        {{ form.installment }}
+                        {% if form.installment.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.installment.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.mobileexeamt.label_tag }}
+                        {{ form.mobileexeamt }}
+                        {% if form.mobileexeamt.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.mobileexeamt.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.deduction.label_tag }}
+                        {{ form.deduction }}
+                        {% if form.deduction.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.deduction.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.remarks2.label_tag }}
+                        {{ form.remarks2 }}
+                        {% if form.remarks2.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.remarks2.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additions -->
+            <div class="bg-white rounded border border-gray-200 p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Additions</h2>
+                <div class="space-y-4">
+                    <div>
+                        {{ form.addition.label_tag }}
+                        {{ form.addition }}
+                        {% if form.addition.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.addition.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.remarks1.label_tag }}
+                        {{ form.remarks1 }}
+                        {% if form.remarks1.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.remarks1.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salary Breakdown Grid -->
+        {% if salary_components %}
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Salary Breakdown</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Particulars</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Qty</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Includes In</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for component in salary_components %}
+                        <tr>
+                            <td class="px-4 py-2 text-sm text-gray-900">{{ component.perticulars }}</td>
+                            <td class="px-4 py-2 text-sm text-right text-gray-900">{{ component.qty|default:"0" }}</td>
+                            <td class="px-4 py-2 text-sm text-right text-gray-900">{{ component.amount|floatformat:2|default:"0.00" }}</td>
+                            <td class="px-4 py-2 text-sm text-right font-medium text-gray-900">
+                                {% widthratio component.qty 1 component.amount as total %}
+                                {{ total|floatformat:2 }}
+                            </td>
+                            <td class="px-4 py-2 text-sm text-gray-500">
+                                {% if component.includesin == 1 %}Gross
+                                {% elif component.includesin == 2 %}CTC
+                                {% elif component.includesin == 3 %}Net
+                                {% else %}-{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="bg-gray-50 font-semibold">
+                            <td colspan="3" class="px-4 py-2 text-sm text-right">Gross Total:</td>
+                            <td class="px-4 py-2 text-sm text-right">{{ gross_total|floatformat:2 }}</td>
+                            <td></td>
+                        </tr>
+                        <tr class="bg-gray-50 font-semibold">
+                            <td colspan="3" class="px-4 py-2 text-sm text-right">CTC Total:</td>
+                            <td class="px-4 py-2 text-sm text-right">{{ ctc_total|floatformat:2 }}</td>
+                            <td></td>
+                        </tr>
+                        <tr class="bg-gray-50 font-semibold">
+                            <td colspan="3" class="px-4 py-2 text-sm text-right">Net Total:</td>
+                            <td class="px-4 py-2 text-sm text-right">{{ net_total|floatformat:2 }}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Other Fields -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Other Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    {{ form.increment.label_tag }}
+                    {{ form.increment }}
+                    {% if form.increment.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.increment.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div class="flex items-center">
+                    {{ form.releaseflag }}
+                    <label for="id_releaseflag" class="ml-2 text-sm text-gray-700">{{ form.releaseflag.label }}</label>
+                    {% if form.releaseflag.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.releaseflag.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'human_resource:salary-list' %}" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition">
+                Cancel
+            </a>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+                {% if is_edit %}Update Salary{% else %}Process Salary{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

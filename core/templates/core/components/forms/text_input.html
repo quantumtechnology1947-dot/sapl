@@ -1,0 +1,108 @@
+{# Text Input Field - SAP Fiori Style #}
+{% comment %}
+Component: Text Input
+Purpose: Standard text input field with label, validation, and HTMX support
+Design: Compact SAP Fiori styling with h-9 height, text-sm input, text-xs label
+
+Parameters:
+  - label (optional): Field label text
+  - name (required): Input name attribute
+  - value (optional): Current value
+  - input_type (optional): Input type (default: 'text')
+  - placeholder (optional): Placeholder text
+  - required (optional): Boolean for required field
+  - readonly (optional): Boolean for read-only state
+  - disabled (optional): Boolean for disabled state
+  - maxlength (optional): Maximum character length
+  - pattern (optional): Validation pattern
+  - help_text (optional): Helper text below input
+  - error (optional): Error message to display
+  - inline (optional): Boolean for inline layout (label beside input)
+  - extra_classes (optional): Additional CSS classes
+  - htmx_get (optional): HTMX GET URL
+  - htmx_trigger (optional): HTMX trigger event
+  - htmx_target (optional): HTMX target selector
+  - htmx_swap (optional): HTMX swap strategy
+  - htmx_include (optional): HTMX include selector
+
+Usage Examples:
+  Basic:
+    {% include 'core/components/forms/text_input.html' with 
+      label="Customer Name" 
+      name="customer_name" 
+      value=form.customer_name.value 
+      required=True 
+    %}
+  
+  Inline Layout:
+    {% include 'core/components/forms/text_input.html' with 
+      label="Code" 
+      name="code" 
+      inline=True 
+      maxlength=10 
+    %}
+  
+  With HTMX:
+    {% include 'core/components/forms/text_input.html' with 
+      label="Search" 
+      name="search" 
+      htmx_get="/api/search/" 
+      htmx_trigger="input changed delay:500ms" 
+      htmx_target="#results" 
+    %}
+  
+  With Error:
+    {% include 'core/components/forms/text_input.html' with 
+      label="Email" 
+      name="email" 
+      input_type="email" 
+      error=form.email.errors.0 
+    %}
+{% endcomment %}
+
+<div class="{% if inline %}flex items-center gap-3{% else %}mb-2{% endif %}">
+    {% if label %}
+    <label for="id_{{ name }}" class="block text-xs font-medium text-gray-700 {% if inline %}w-32 flex-shrink-0{% else %}mb-1{% endif %}">
+        {{ label }}{% if required %}<span class="text-sap-red ml-0.5">*</span>{% endif %}
+    </label>
+    {% endif %}
+    <div class="{% if inline %}flex-1{% else %}w-full{% endif %}">
+        <input type="{{ input_type|default:'text' }}" 
+               name="{{ name }}" 
+               id="id_{{ name }}"
+               value="{{ value|default:'' }}"
+               {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+               {% if required %}required{% endif %}
+               {% if readonly %}readonly{% endif %}
+               {% if disabled %}disabled{% endif %}
+               {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+               {% if pattern %}pattern="{{ pattern }}"{% endif %}
+               {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+               class="w-full h-9 px-3 text-sm border {% if error %}border-sap-red{% else %}border-gray-300{% endif %} rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed readonly:bg-gray-50 readonly:text-gray-600 {{ extra_classes }}"
+               {% if htmx_get %}hx-get="{{ htmx_get }}"{% endif %}
+               {% if htmx_post %}hx-post="{{ htmx_post }}"{% endif %}
+               {% if htmx_trigger %}hx-trigger="{{ htmx_trigger }}"{% endif %}
+               {% if htmx_target %}hx-target="{{ htmx_target }}"{% endif %}
+               {% if htmx_swap %}hx-swap="{{ htmx_swap }}"{% endif %}
+               {% if htmx_include %}hx-include="{{ htmx_include }}"{% endif %}>
+        {% if help_text %}
+        <p class="mt-0.5 text-xs text-gray-500">{{ help_text }}</p>
+        {% endif %}
+        {% if error %}
+        <p class="mt-0.5 text-xs text-sap-red flex items-center">
+            <svg class="w-3 h-3 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            {{ error }}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+
+
+

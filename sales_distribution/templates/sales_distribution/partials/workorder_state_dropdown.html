@@ -1,0 +1,21 @@
+<select name="shippingstate"
+        id="id_shippingstate"
+        hx-get="{% url 'sales_distribution:workorder-cities' %}"
+        hx-trigger="change"
+        hx-target="#id_shippingcity_container"
+        hx-include="[name='shippingstate']"
+        hx-swap="innerHTML"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+    <option value="">Select State</option>
+    {% for state in states %}
+    <option value="{{ state.sid }}">{{ state.statename }}</option>
+    {% endfor %}
+</select>
+
+
+
+
+
+
+
+

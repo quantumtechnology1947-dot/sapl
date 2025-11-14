@@ -1,0 +1,5 @@
+﻿Id,MId,DMId,EquipId,Category,SubCategory,PlannedDesc,ActualDesc,Hour
+1,1,14,31858,2,1,defsadfsd,,2.0
+2,1,14,31858,2,1,defsadfsd,fghgfh,2.0
+3,1,15,51787,3,9,panel connections,,3.0
+4,1,15,51787,3,9,panel connections,completed,3.0

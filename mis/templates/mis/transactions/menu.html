@@ -1,0 +1,86 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}MIS Transactions - Menu{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <!-- Budget [Financial] Section -->
+        <div class="col-md-5 mb-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="bg-secondary text-white">
+                            <strong>Budget [Financial]</strong>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="w-[30px]"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <a href="{% url 'mis:budget_code_list' %}" class="text-decoration-none text-primary">Budget Code</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <a href="{% url 'mis:business_group_budget' %}" class="text-decoration-none text-primary fw-bold">Assign</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Budget [Hrs] Section -->
+        <div class="col-md-5 mb-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="bg-secondary text-white">
+                            <strong>Budget [Hrs]</strong>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="w-[30px]"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <a href="{% url 'mis:budget_hrs_fields' %}" class="text-decoration-none text-primary">Category / Sub-Category</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <a href="{% url 'mis:budget_hours_assign' %}" class="text-decoration-none text-primary">Assign</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <a href="#" class="text-decoration-none text-muted" title="Coming soon">Summary</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,302 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.release-table {
+    font-size: 0.9rem;
+}
+.release-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+.qty-input {
+    width: 80px;
+}
+.panel-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+.employee-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+.form-check {
+    padding-left: 1.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-clipboard-check"></i> {{ title }}
+        </h1>
+        <a href="{% url 'sales_distribution:release-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+
+    <form method="post" id="releaseForm">
+        {% csrf_token %}
+        {{ form.wo_id }}
+        {{ form.wo_no }}
+
+        <!-- Work Order Items Panel -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-boxes"></i> Work Order Items - Select Items to Release
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="panel-scroll">
+                    {% if items %}
+                    <table class="table table-bordered table-hover release-table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="w-[5%]">SN</th>
+                                <th class="w-[5%]">
+                                    <input type="checkbox" id="selectAll" title="Select All">
+                                </th>
+                                <th class="w-[12%]">To Release Qty</th>
+                                <th class="w-[15%]">Item Code</th>
+                                <th class="w-[35%]">Description</th>
+                                <th class="w-[10%]">Qty</th>
+                                <th class="w-[10%]">Released Qty</th>
+                                <th class="w-[10%]">Remain Qty</th>
+                            </tr>
+                            <tr>
+                                <td colspan="8" class="text-center bg-light">
+                                    <button type="button" id="allClearBtn" class="inline-flex items-center justify-center gap-1.5 h-7 px-2 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                                        <i class="fas fa-check-double"></i> All Clear (Select All & Fill Remaining Qty)
+                                    </button>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td class="text-center">
+                                    <input type="checkbox" 
+                                           name="item_selected_{{ item.Id }}" 
+                                           class="item-checkbox"
+                                           value="1">
+                                </td>
+                                <td class="text-center">
+                                    <input type="number" 
+                                           name="item_qty_{{ item.Id }}" 
+                                           class="h-7 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue qty-input" 
+                                           step="0.001" 
+                                           min="0" 
+                                           max="{{ item.RemainQty }}"
+                                           placeholder="0.000">
+                                </td>
+                                <td>{{ item.ItemCode }}</td>
+                                <td>{{ item.Description }}</td>
+                                <td class="text-right">{{ item.Qty|floatformat:3 }}</td>
+                                <td class="text-right">{{ item.ReleasedQty|floatformat:3 }}</td>
+                                <td class="text-right font-weight-bold text-primary">
+                                    {{ item.RemainQty|floatformat:3 }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">All items have been fully released.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Employees Notification Panel -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-users"></i> Notify Employees (Optional)
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="panel-scroll">
+                    {% if employees %}
+                    <table class="table table-bordered table-hover release-table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="w-[5%]">SN</th>
+                                <th class="w-[5%]">
+                                    <input type="checkbox" id="selectAllEmp" title="Select All">
+                                </th>
+                                <th class="w-[30%]">Name of Employee</th>
+                                <th class="w-[15%]">Emp Id</th>
+                                <th class="w-[45%]">Email Id</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for emp in employees %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td class="text-center">
+                                    <input type="checkbox" 
+                                           name="notify_emp_{{ emp.empid }}" 
+                                           class="emp-checkbox"
+                                           value="1">
+                                </td>
+                                <td>{{ emp.employeename }}</td>
+                                <td class="text-center">{{ emp.empid }}</td>
+                                <td>{{ emp.emailid1|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-muted">No employees available for notification.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-body text-center">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-dark transition-colors btn-lg" id="submitBtn">
+                    <i class="fas fa-check"></i> Submit Release
+                </button>
+                <a href="{% url 'sales_distribution:release-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors btn-lg">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Select all items checkbox
+    $('#selectAll').on('change', function() {
+        $('.item-checkbox').prop('checked', this.checked);
+        // Auto-fill quantities when selecting all
+        if (this.checked) {
+            $('.item-checkbox:checked').each(function() {
+                const itemId = $(this).attr('name').replace('item_selected_', '');
+                const qtyInput = $('input[name="item_qty_' + itemId + '"]');
+                const maxQty = qtyInput.attr('max');
+                if (!qtyInput.val() || parseFloat(qtyInput.val()) === 0) {
+                    qtyInput.val(maxQty);
+                }
+            });
+        }
+    });
+    
+    // Select all employees checkbox
+    $('#selectAllEmp').on('change', function() {
+        $('.emp-checkbox').prop('checked', this.checked);
+    });
+    
+    // Form validation
+    $('#releaseForm').on('submit', function(e) {
+        let hasSelected = false;
+        let hasError = false;
+        
+        $('.item-checkbox:checked').each(function() {
+            hasSelected = true;
+            const itemId = $(this).attr('name').replace('item_selected_', '');
+            const qtyInput = $('input[name="item_qty_' + itemId + '"]');
+            const qty = parseFloat(qtyInput.val());
+            const maxQty = parseFloat(qtyInput.attr('max'));
+            
+            if (!qty || qty <= 0) {
+                alert('Please enter a valid quantity for all selected items.');
+                hasError = true;
+                qtyInput.focus();
+                return false;
+            }
+            
+            if (qty > maxQty) {
+                alert('Release quantity cannot exceed remaining quantity for item.');
+                hasError = true;
+                qtyInput.focus();
+                return false;
+            }
+        });
+        
+        if (!hasSelected) {
+            alert('Please select at least one item to release.');
+            e.preventDefault();
+            return false;
+        }
+        
+        if (hasError) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Confirmation
+        if (!confirm('Do you really want to release this Work Order?')) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Disable submit button to prevent double submission
+        $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+    });
+    
+    // Auto-fill remaining quantity when checkbox is checked
+    $('.item-checkbox').on('change', function() {
+        if (this.checked) {
+            const itemId = $(this).attr('name').replace('item_selected_', '');
+            const qtyInput = $('input[name="item_qty_' + itemId + '"]');
+            const maxQty = qtyInput.attr('max');
+            
+            if (!qtyInput.val() || parseFloat(qtyInput.val()) === 0) {
+                qtyInput.val(maxQty);
+            }
+        }
+    });
+    
+    // All Clear button - Select all items and fill all remaining quantities
+    $('#allClearBtn').on('click', function() {
+        // Check all item checkboxes
+        $('.item-checkbox').prop('checked', true);
+        $('#selectAll').prop('checked', true);
+        
+        // Fill all quantities with remaining qty
+        $('.item-checkbox').each(function() {
+            const itemId = $(this).attr('name').replace('item_selected_', '');
+            const qtyInput = $('input[name="item_qty_' + itemId + '"]');
+            const maxQty = qtyInput.attr('max');
+            qtyInput.val(maxQty);
+        });
+        
+        // Visual feedback
+        $(this).html('<i class="fas fa-check"></i> All Items Selected!').removeClass('btn-info').addClass('btn-success');
+        setTimeout(() => {
+            $(this).html('<i class="fas fa-check-double"></i> All Clear (Select All & Fill Remaining Qty)').removeClass('btn-success').addClass('btn-info');
+        }, 1500);
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+

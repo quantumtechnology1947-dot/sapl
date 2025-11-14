@@ -1,0 +1,14 @@
+{# Basic Card Component - SAP Fiori Style #}
+{# Usage: {% include 'core/components/cards/card.html' %} ... {% endinclude %} #}
+
+<div class="bg-white border border-gray-200 rounded shadow-sm {% if not no_margin %}mb-4{% endif %} {{ class|default:'' }}">
+    {% block card_content %}{% endblock %}
+</div>
+
+
+
+
+
+
+
+

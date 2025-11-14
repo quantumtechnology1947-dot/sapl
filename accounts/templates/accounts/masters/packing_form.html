@@ -1,0 +1,31 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Packing Term - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Packing Term{% endblock %}
+{% block form_action %}{% if object %}{% url 'accounts:packing-update' object.id %}{% else %}{% url 'accounts:packing-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'accounts:packing-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="terms"
+        label="Packing Terms"
+        value=object.terms
+        required=True
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="value"
+        label="Value"
+        type="number"
+        value=object.value
+        attrs='step="0.01"'
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

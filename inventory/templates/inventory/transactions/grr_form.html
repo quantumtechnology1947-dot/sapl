@@ -1,0 +1,287 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Create Goods Received Receipt - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-gradient-to-r from-purple-800 to-purple-900 shadow-lg">
+        <div class="max-w-full px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-white font-bold text-xl">Create Goods Received Receipt</h1>
+                </div>
+                <div class="flex gap-4">
+                    <a href="{% url 'inventory:gin-pending-list' %}" class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">Pending GINs</a>
+                    <a href="{% url 'inventory:grr-list' %}" class="text-white hover:bg-purple-700 px-4 py-2 rounded transition">GRR List</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-full px-6 py-6">
+        {% if not selected_gin %}
+        <!-- No GIN Selected State -->
+        <div class="bg-white rounded border border-gray-200 p-12 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No GIN Selected</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                Please select a pending GIN to create a Goods Received Receipt.
+            </p>
+            <div class="mt-6">
+                <a href="{% url 'inventory:gin-pending-list' %}"
+                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
+                    View Pending GINs
+                </a>
+            </div>
+        </div>
+        {% else %}
+
+        <!-- GRR Form -->
+        <form method="post" id="grr-form">
+            {% csrf_token %}
+
+            <!-- GIN Information (Readonly) -->
+            <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+                <h2 class="text-sm font-bold text-gray-900 mb-4 border-b pb-2">GIN Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">GIN Number</label>
+                        <input type="text" value="{{ selected_gin.ginno }}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">PO Number</label>
+                        <input type="text" value="{{ selected_gin.pono|default:'-' }}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">GRR Number (Auto)</label>
+                        <input type="text" value="{{ auto_grr_number }}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm font-semibold text-purple-600">
+                        {{ form.grrno }}
+                        {{ form.ginno }}
+                        {{ form.ginid }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tax Invoice Details -->
+            <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+                <h2 class="text-sm font-bold text-gray-900 mb-4 border-b pb-2">Tax Invoice Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="id_taxinvoiceno" class="block text-xs font-medium text-gray-700 mb-1">
+                            Tax Invoice Number <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.taxinvoiceno }}
+                        {% if form.taxinvoiceno.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.taxinvoiceno.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="id_taxinvoicedate" class="block text-xs font-medium text-gray-700 mb-1">
+                            Tax Invoice Date <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.taxinvoicedate }}
+                        {% if form.taxinvoicedate.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.taxinvoicedate.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODVAT Options -->
+            <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+                <h2 class="text-sm font-bold text-gray-900 mb-4 border-b pb-2">MODVAT Options</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-center">
+                        {{ form.modvatapp }}
+                        <label for="id_modvatapp" class="ml-2 text-xs text-gray-700">MODVAT Applicable</label>
+                    </div>
+                    <div class="flex items-center">
+                        {{ form.modvatinv }}
+                        <label for="id_modvatinv" class="ml-2 text-xs text-gray-700">MODVAT Invoice</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Grid -->
+            <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+                <h2 class="text-sm font-bold text-gray-900 mb-4 border-b pb-2">Select Items to Receive</h2>
+
+                {% if gin_items %}
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300 text-xs">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-12">
+                                    <input type="checkbox" id="select-all" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                </th>
+                                <th class="border border-gray-300 px-2 py-2 text-right font-semibold text-gray-700 w-12">SN</th>
+                                <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700">Item Code</th>
+                                <th class="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-700">Description</th>
+                                <th class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-700 w-16">UOM</th>
+                                <th class="border border-gray-300 px-2 py-2 text-right font-semibold text-gray-700 w-24">PO Qty</th>
+                                <th class="border border-gray-300 px-2 py-2 text-right font-semibold text-gray-700 w-24">Inward Qty</th>
+                                <th class="border border-gray-300 px-2 py-2 text-right font-semibold text-gray-700 w-28">Total Received</th>
+                                <th class="border border-gray-300 px-2 py-2 text-right font-semibold text-gray-700 w-24 bg-yellow-50">Balance Qty</th>
+                                <th class="border border-gray-300 px-2 py-2 text-right font-semibold text-gray-700 w-32 bg-green-50">Received Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in gin_items %}
+                            <tr class="hover:bg-gray-50" data-item-row="{{ item.po_detail_id }}">
+                                <td class="border border-gray-300 px-2 py-1.5 text-center">
+                                    <input type="checkbox"
+                                           name="item_selected_{{ item.po_detail_id }}"
+                                           value="1"
+                                           class="item-checkbox h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                                           data-target="received_qty_{{ item.po_detail_id }}"
+                                           data-balance="{{ item.balance_qty }}">
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-right">{{ forloop.counter }}</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-left font-medium">{{ item.item_code }}</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-left">{{ item.item_description }}</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-center">{{ item.uom }}</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-right">{{ item.po_qty|floatformat:3 }}</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-right">{{ item.inward_qty|floatformat:3 }}</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-right">{{ item.received_qty|floatformat:3 }}</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-right">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        {{ item.balance_qty|floatformat:3 }}
+                                    </span>
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-right">
+                                    <input type="number"
+                                           name="received_qty_{{ item.po_detail_id }}"
+                                           id="received_qty_{{ item.po_detail_id }}"
+                                           step="0.001"
+                                           min="0"
+                                           max="{{ item.balance_qty }}"
+                                           placeholder="0.000"
+                                           disabled
+                                           class="w-full px-2 py-1 border border-gray-300 rounded text-right text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 text-xs text-gray-600">
+                    <p><strong>Instructions:</strong></p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li>Check the checkbox to select items you want to receive</li>
+                        <li>Enter the received quantity (must be ≤ balance quantity)</li>
+                        <li>At least one item must be selected with a valid quantity</li>
+                    </ul>
+                </div>
+
+                {% else %}
+                <div class="text-center py-8 bg-gray-50 rounded border-2 border-dashed border-gray-300">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p class="text-gray-600 text-sm font-medium mt-2">No items available for receipt</p>
+                    <p class="text-gray-500 text-xs mt-1">All items have been fully received or are not eligible.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex gap-3 justify-end bg-white rounded border border-gray-200 p-6">
+                <a href="{% url 'inventory:gin-pending-list' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors text-sm">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-md transition-colors text-sm">
+                    <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Create GRR
+                </button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle checkbox toggle for received quantity input
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const targetId = this.dataset.target;
+            const input = document.getElementById(targetId);
+            if (input) {
+                input.disabled = !this.checked;
+                if (this.checked) {
+                    input.focus();
+                    // Set max value from balance
+                    input.max = this.dataset.balance;
+                } else {
+                    input.value = '';
+                }
+            }
+        });
+    });
+
+    // Handle select all checkbox
+    const selectAll = document.getElementById('select-all');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+                checkbox.dispatchEvent(new Event('change'));
+            });
+        });
+    }
+
+    // Form validation
+    const form = document.getElementById('grr-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+            if (checkedItems.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one item to receive.');
+                return false;
+            }
+
+            // Validate that all checked items have valid quantities
+            let hasError = false;
+            checkedItems.forEach(checkbox => {
+                const targetId = checkbox.dataset.target;
+                const input = document.getElementById(targetId);
+                const balance = parseFloat(checkbox.dataset.balance);
+                const receivedQty = parseFloat(input.value);
+
+                if (!receivedQty || receivedQty <= 0) {
+                    hasError = true;
+                    input.classList.add('border-red-500');
+                    alert(`Please enter a valid received quantity for all selected items.`);
+                } else if (receivedQty > balance) {
+                    hasError = true;
+                    input.classList.add('border-red-500');
+                    alert(`Received quantity cannot exceed balance quantity (${balance.toFixed(3)}) for item.`);
+                } else {
+                    input.classList.remove('border-red-500');
+                }
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

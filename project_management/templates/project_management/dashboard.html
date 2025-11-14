@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white border border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-sm font-bold text-blue-600">Cortex ERP</h1>
+                    </div>
+                    <div class="ml-10 flex items-center space-x-4">
+                        <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2">Home</a>
+                        <a href="{% url 'project_management:dashboard' %}" class="text-blue-600 font-semibold px-3 py-2">Project Management</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h2 class="text-base font-bold text-gray-900">Project Management Dashboard</h2>
+            <p class="mt-2 text-sm text-gray-600">Overview of project activities and planning</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- ManPower Planning -->
+            <div class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">ManPower Plans</p>
+                        <p class="text-base font-bold text-blue-600">{{ manpower_count }}</p>
+                    </div>
+                    <svg class="h-12 w-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+                <a href="{% url 'project_management:manpower-list' %}" class="mt-4 text-sm text-blue-600 hover:underline block">View All �</a>
+            </div>
+
+            <!-- Material Credit Notes -->
+            <div class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Credit Notes</p>
+                        <p class="text-base font-bold text-green-600">{{ mcn_count }}</p>
+                    </div>
+                    <svg class="h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <a href="{% url 'project_management:mcn-list' %}" class="mt-4 text-sm text-green-600 hover:underline block">View All �</a>
+            </div>
+
+            <!-- Project Planning -->
+            <div class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Projects</p>
+                        <p class="text-base font-bold text-purple-600">{{ project_count }}</p>
+                    </div>
+                    <svg class="h-12 w-12 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                </div>
+                <a href="{% url 'project_management:project-list' %}" class="mt-4 text-sm text-purple-600 hover:underline block">View All �</a>
+            </div>
+
+            <!-- OnSite Attendance -->
+            <div class="bg-white rounded border border-gray-200 p-6 hover:shadow-lg transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">Attendance</p>
+                        <p class="text-base font-bold text-orange-600">{{ attendance_count }}</p>
+                    </div>
+                    <svg class="h-12 w-12 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                </div>
+                <a href="{% url 'project_management:attendance-edit' %}" class="mt-4 text-sm text-orange-600 hover:underline block">View All �</a>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded border border-gray-200 p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <a href="{% url 'project_management:manpower-create' %}" class="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 rounded transition">
+                    <svg class="h-8 w-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-900">New ManPower Plan</span>
+                </a>
+                <a href="{% url 'project_management:mcn-new' %}" class="flex flex-col items-center p-4 bg-green-50 hover:bg-green-100 rounded transition">
+                    <svg class="h-8 w-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-900">New Credit Note</span>
+                </a>
+                <a href="{% url 'project_management:project-create' %}" class="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded transition">
+                    <svg class="h-8 w-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-900">New Project</span>
+                </a>
+                <a href="{% url 'project_management:attendance-new' %}" class="flex flex-col items-center p-4 bg-orange-50 hover:bg-orange-100 rounded transition">
+                    <svg class="h-8 w-8 text-orange-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-900">Record Attendance</span>
+                </a>
+                <a href="{% url 'project_management:status-create' %}" class="flex flex-col items-center p-4 bg-gray-50 hover:bg-gray-100 rounded transition">
+                    <svg class="h-8 w-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-900">New Status</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- OnSite Attendance Menu -->
+        <div class="bg-white rounded border border-gray-200 p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">OnSite Attendance - Transactions</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="{% url 'project_management:attendance-new' %}" class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded transition">
+                    <svg class="h-10 w-10 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <span class="text-sm font-semibold text-gray-900 block">New</span>
+                        <span class="text-xs text-gray-600">Create Attendance</span>
+                    </div>
+                </a>
+                <a href="{% url 'project_management:attendance-edit' %}" class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded transition">
+                    <svg class="h-10 w-10 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <div>
+                        <span class="text-sm font-semibold text-gray-900 block">Edit</span>
+                        <span class="text-xs text-gray-600">Modify Records</span>
+                    </div>
+                </a>
+                <a href="{% url 'project_management:attendance-delete' %}" class="flex items-center p-4 bg-red-50 hover:bg-red-100 rounded transition">
+                    <svg class="h-10 w-10 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    <div>
+                        <span class="text-sm font-semibold text-gray-900 block">Delete</span>
+                        <span class="text-xs text-gray-600">Remove Records</span>
+                    </div>
+                </a>
+                <a href="{% url 'project_management:attendance-print' %}" class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded transition">
+                    <svg class="h-10 w-10 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <div>
+                        <span class="text-sm font-semibold text-gray-900 block">Print</span>
+                        <span class="text-xs text-gray-600">Generate Reports</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Recent ManPower Plans -->
+            <div class="bg-white rounded border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent ManPower Plans</h3>
+                {% if recent_manpower %}
+                <div class="space-y-3">
+                    {% for plan in recent_manpower %}
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition">
+                        <div>
+                            <p class="font-medium text-gray-900">WO: {{ plan.wono }}</p>
+                            <p class="text-sm text-gray-600">Emp: {{ plan.empid }} - Amd: {{ plan.amendmentno }}</p>
+                        </div>
+                        <a href="{% url 'project_management:manpower-detail' plan.id %}" class="text-blue-600 hover:text-blue-800">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-sm">No recent manpower plans</p>
+                {% endif %}
+            </div>
+
+            <!-- Recent Material Credit Notes -->
+            <div class="bg-white rounded border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Credit Notes</h3>
+                {% if recent_mcn %}
+                <div class="space-y-3">
+                    {% for mcn in recent_mcn %}
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition">
+                        <div>
+                            <p class="font-medium text-gray-900">MCN: {{ mcn.mcnno }}</p>
+                            <p class="text-sm text-gray-600">WO: {{ mcn.wono }}</p>
+                        </div>
+                        <a href="{% url 'project_management:mcn-detail' mcn.id %}" class="text-green-600 hover:text-green-800">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 text-sm">No recent credit notes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,36 @@
+<div class="bg-white rounded border border-gray-200 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">City Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">State</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Country</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for city in cities %}
+                {% include 'sys_admin/partials/city_row.html' %}
+            {% empty %}
+                {% include 'core/components/empty_state.html' with
+                    in_table=True
+                    colspan=5
+                    icon_path="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    title="No cities found"
+                    message="Select a state or click \"Add City\"."
+                %}
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% include 'core/components/tables/pagination.html' with page_obj=page_obj is_paginated=is_paginated htmx_enabled=True htmx_target="#city-table" %}
+</div>
+
+
+
+
+
+
+
+

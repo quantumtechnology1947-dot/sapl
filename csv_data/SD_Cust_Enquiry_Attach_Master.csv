@@ -1,0 +1,11 @@
+﻿Id,EnqId,CompId,SessionId,FinYearId,FileName,FileSize,ContentType,FileData
+3,32,1,Sapl0005,1,S A P L = 10298378.pdf,91928.0,application/pdf,
+4,635,1,sapl0292,6,Synergetic_PO_9887.pdf,225065.0,application/pdf,
+5,664,1,sapl0313,7,NOD0000115318_--A_CATDRAWING_1_Sheet_2.zip,2890239.0,application/octet-stream,
+6,664,1,sapl0313,7,1.pdf,178850.0,application/pdf,
+7,664,1,sapl0313,7,2.pdf,301271.0,application/pdf,
+8,664,1,sapl0313,7,3.pdf,134231.0,application/pdf,
+9,667,1,sapl0313,7,1435-3-3_REV00_Component drawing.pdf,408701.0,application/pdf,
+10,667,1,sapl0313,7,1435-2-3_REV00_Hinged footstep drawing.pdf,180546.0,application/pdf,
+12,667,1,sapl0313,7,1435-1-3_REV00_Drawbridge design.pdf,472121.0,application/pdf,
+13,667,1,sapl0313,7,1435_REV00_CUMMINS DRAWBRIDGE-BOM.XLSX,36174.0,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,

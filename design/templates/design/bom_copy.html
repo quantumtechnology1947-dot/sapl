@@ -1,0 +1,120 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-12">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-base font-bold text-gray-900">Copy BOM</h1>
+            <p class="mt-2 text-sm text-gray-600">
+                Copy entire BOM structure from one work order to another work order
+            </p>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}bg-red-50 border-l-4 border-red-400 text-red-700{% elif message.tags == 'success' %}bg-green-50 border-l-4 border-green-400 text-green-700{% elif message.tags == 'warning' %}bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700{% else %}bg-blue-50 border-l-4 border-blue-400 text-blue-700{% endif %} p-4 mb-4 rounded">
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- BOM Copy Form -->
+        <div class="bg-white border border-gray-200 rounded p-6">
+            <form method="post" action="{% url 'design:bom-copy' %}" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Source Work Order -->
+                <div>
+                    <label for="source_wono" class="block text-sm font-medium text-gray-700 mb-2">
+                        Source Work Order Number <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="source_wono"
+                        name="source_wono"
+                        value="{{ source_wono|default:'' }}"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter source work order number"
+                    >
+                    <p class="mt-1 text-sm text-gray-500">
+                        The work order from which BOM will be copied
+                    </p>
+                </div>
+
+                <!-- Target Work Order -->
+                <div>
+                    <label for="target_wono" class="block text-sm font-medium text-gray-700 mb-2">
+                        Target Work Order Number <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="target_wono"
+                        name="target_wono"
+                        value="{{ target_wono|default:'' }}"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter target work order number"
+                    >
+                    <p class="mt-1 text-sm text-gray-500">
+                        The work order to which BOM will be copied (must not have existing BOM)
+                    </p>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <h3 class="text-sm font-semibold text-blue-900 mb-2">Important Notes:</h3>
+                    <ul class="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                        <li>The entire BOM tree structure will be copied</li>
+                        <li>All parent-child relationships will be preserved</li>
+                        <li>Amendment numbers and ECN flags will be reset to 0</li>
+                        <li>Target work order must not have an existing BOM</li>
+                        <li>This operation cannot be undone</li>
+                    </ul>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-between pt-4 border-t">
+                    <a
+                        href="{% url 'design:bom-list' %}"
+                        class="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition"
+                    >
+                        Cancel
+                    </a>
+                    <button
+                        type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                    >
+                        Copy BOM
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-6 bg-gray-50 rounded p-4">
+            <h3 class="text-sm font-semibold text-gray-700 mb-2">How to use:</h3>
+            <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                <li>Enter the source work order number that has the BOM you want to copy</li>
+                <li>Enter the target work order number where you want to copy the BOM</li>
+                <li>Click "Copy BOM" to execute the copy operation</li>
+                <li>The system will copy all items and maintain the hierarchical structure</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,24 @@
+{% extends "daily_report_system/base.html" %}
+{% block content %}
+<div class="bg-white rounded shadow p-6">
+    <h1 class="text-sm font-bold mb-4">{{ plan.wono }}</h1>
+    <div class="grid grid-cols-2 gap-4">
+        <div><strong>WO No:</strong> {{ plan.itemcode }}</div>
+        <div><strong>Design Leader:</strong> {{ plan.description }}</div>
+        <div><strong>No of Fixtures:</strong> {{ plan.no_fix_rqu }}</div>
+        <div><strong>Activity:</strong> {{ plan.name_act }}</div>
+    </div>
+    <div class="mt-6">
+        <a href="{% url 'daily_report_system:hardware-plan-edit' plan.pk %}" class="bg-blue-500 text-white px-4 py-2 rounded">Edit</a>
+        <a href="{% url 'daily_report_system:hardware-plan-list' %}" class="bg-gray-500 text-white px-4 py-2 rounded ml-2">Back</a>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

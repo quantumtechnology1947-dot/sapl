@@ -1,0 +1,51 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SN</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Has Sub-Category</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for category in categories %}
+            <tr id="category-{{ category.cid }}" class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ forloop.counter }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ category.cname }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ category.symbol }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {% if category.hassubcat == 'Y' or category.hassubcat == '1' or category.hassubcat == True %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Yes</span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">No</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="{% url 'sales_distribution:wo-category-edit' category.cid %}" class="text-blue-600 hover:text-blue-900 mr-3 transition">Edit</a>
+                    <button hx-delete="{% url 'sales_distribution:wo-category-delete' category.cid %}"
+                            hx-target="#category-{{ category.cid }}"
+                            hx-swap="outerHTML swap:1s"
+                            hx-confirm="Are you sure you want to delete category {{ category.cname }}?"
+                            class="text-red-600 hover:text-red-900 transition">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            {% include 'core/components/empty_state.html' with
+                in_table=True
+                colspan=5
+                title="No categories found."
+            %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+
+
+

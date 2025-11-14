@@ -1,0 +1,225 @@
+{% extends 'core/base.html' %}
+
+{% block title %}BOM Amendment History - Design{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-7xl">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">BOM Amendment History</h1>
+                <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                    {% if wono %}
+                    <span>WO: <span class="font-semibold">{{ wono }}</span></span>
+                    {% endif %}
+                    {% if bom_item %}
+                    <span class="border-l pl-4">Item: <span class="font-semibold">{{ bom_item.itemid.itemcode }}</span></span>
+                    <span class="border-l pl-4">Current Amendment: <span class="font-semibold">#{{ bom_item.amdno }}</span></span>
+                    {% endif %}
+                    <span class="border-l pl-4">Total Amendments: <span class="font-semibold">{{ total_amendments }}</span></span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                {% if current_wono %}
+                <a href="{% url 'design:bom-tree' current_wono %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-colors text-sm">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to BOM Tree
+                </a>
+                {% else %}
+                <a href="{% url 'design:bom-list' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors text-sm">
+                    Back to List
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-6">
+        <form method="get" class="flex items-end gap-4">
+            <div class="flex-1">
+                <label for="wono" class="block text-sm font-medium text-gray-700 mb-1">Work Order Number</label>
+                <input type="text"
+                       name="wono"
+                       id="wono"
+                       value="{{ wono }}"
+                       placeholder="Enter WO Number"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex-1">
+                <label for="bom_id" class="block text-sm font-medium text-gray-700 mb-1">BOM Item ID</label>
+                <input type="text"
+                       name="bom_id"
+                       id="bom_id"
+                       value="{{ bom_id }}"
+                       placeholder="Enter BOM ID"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                <i class="fas fa-filter mr-2"></i> Filter
+            </button>
+            <a href="{% url 'design:bom-amendment-history' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                Clear
+            </a>
+        </form>
+    </div>
+
+    <!-- Amendment Records -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        {% if amendments %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amd #</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WO Number</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Old Qty</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UOM</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modified By</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for amendment in amendments %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            #{{ amendment.amdno }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ amendment.sysdate }}<br>
+                            <span class="text-xs text-gray-400">{{ amendment.systime }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <a href="{% url 'design:bom-tree' amendment.wono %}"
+                               class="text-blue-600 hover:text-blue-800 underline">
+                                {{ amendment.wono }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {% if amendment.itemid %}
+                                <span class="text-gray-700">{{ amendment.itemid }}</span>
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-700 max-w-md">
+                            {{ amendment.description|default:"No description"|truncatewords:15 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
+                            {{ amendment.qty|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {% if amendment.uom %}
+                                {{ amendment.uom }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ amendment.sessionid|default:"System" }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Previous
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Next
+                </a>
+                {% endif %}
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing
+                        <span class="font-medium">{{ page_obj.start_index }}</span>
+                        to
+                        <span class="font-medium">{{ page_obj.end_index }}</span>
+                        of
+                        <span class="font-medium">{{ paginator.count }}</span>
+                        amendments
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">Previous</span>
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        {% endif %}
+
+                        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                            Page {{ page_obj.number }} of {{ paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span class="sr-only">Next</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No amendments found</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                {% if wono or bom_id %}
+                    No amendment records match your filter criteria. Try adjusting your filters.
+                {% else %}
+                    No amendment records exist yet. Amendments are created when BOM items are modified after the design finalization date.
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded p-4">
+        <h3 class="text-sm font-semibold text-blue-900 mb-2">About Amendment Tracking</h3>
+        <div class="text-xs text-blue-800 space-y-1">
+            <p><strong>Purpose:</strong> Amendment records preserve the historical state of BOM items when they are modified after the design finalization date.</p>
+            <p><strong>When Created:</strong> Automatically created when a BOM item is updated after the work order's design finalization date has passed.</p>
+            <p><strong>ECN Workflow:</strong> Items with amendments typically require an Engineering Change Notice (ECN) to document the reasons for changes.</p>
+            <p><strong>Amendment Number:</strong> Increments with each modification to track the version history of the BOM item.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

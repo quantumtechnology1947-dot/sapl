@@ -1,0 +1,30 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Rejection Reason - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Rejection Reason{% endblock %}
+{% block form_action %}{% if object %}{% url 'quality_control:rejection-reason-update' object.id %}{% else %}{% url 'quality_control:rejection-reason-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'quality_control:rejection-reason-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="reason"
+        label="Reason"
+        value=object.reason
+        required=True
+    %}
+    
+    {% include 'core/components/forms/textarea_input.html' with 
+        name="description"
+        label="Description"
+        value=object.description
+        rows=3
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

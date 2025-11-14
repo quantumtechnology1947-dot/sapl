@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+{% block title %}Project - {{ project.wono }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between"><div><h2 class="text-sm font-bold">Project Details</h2></div>
+<div class="space-x-2"><a href="{% url 'project_management:project-update' project.id %}" class="bg-purple-600 text-white px-4 py-2 rounded">Edit</a>
+{% if project.has_file %}<a href="{% url 'project_management:project-download' project.id %}" class="bg-blue-600 text-white px-4 py-2 rounded">Download File</a>{% endif %}
+<a href="{% url 'project_management:project-list' %}" class="bg-gray-600 text-white px-4 py-2 rounded">Back</a></div></div>
+<div class="bg-white rounded border border-gray-200 p-6">
+<div class="grid grid-cols-3 gap-4">
+<div><p class="text-sm text-gray-600">ID</p><p class="font-medium">{{ project.id }}</p></div>
+<div><p class="text-sm text-gray-600">Work Order</p><p class="font-medium">{{ project.wono }}</p></div>
+<div><p class="text-sm text-gray-600">Date</p><p class="font-medium">{{ project.sysdate }}</p></div>
+<div><p class="text-sm text-gray-600">File</p><p class="font-medium">{% if project.has_file %}{{ project.filename }} ({{ project.filesize|filesizeformat }}){% else %}No file{% endif %}</p></div>
+</div></div>
+{% endblock %}
+
+
+
+
+
+
+
+

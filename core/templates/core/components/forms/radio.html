@@ -1,0 +1,91 @@
+{% comment %}
+Component: Radio Button Input
+Purpose: Compact radio button with SAP Fiori styling, inline label support, and group layout options
+Parameters:
+  - name (required): Input name attribute (shared across radio group)
+  - value (required): Radio button value
+  - label (optional): Label text displayed next to radio button
+  - checked (optional): Boolean for checked state
+  - required (optional): Boolean to show required indicator
+  - disabled (optional): Boolean to disable the radio button
+  - inline (optional): Boolean for inline layout (no bottom margin)
+  - help_text (optional): Helper text displayed below
+  - class (optional): Additional CSS classes
+  - attrs (optional): Additional HTML attributes
+  - htmx_post (optional): HTMX post URL
+  - htmx_trigger (optional): HTMX trigger event
+  - htmx_target (optional): HTMX target selector
+  - htmx_swap (optional): HTMX swap strategy
+  - group_layout (optional): 'vertical' (default) or 'horizontal' for group spacing
+Usage:
+  Single radio button:
+  {% include 'core/components/forms/radio.html' with
+    name="status"
+    value="active"
+    label="Active"
+    checked=True
+  %}
+  
+  Radio group (vertical):
+  <div class="space-y-2">
+    {% include 'core/components/forms/radio.html' with name="status" value="active" label="Active" checked=True %}
+    {% include 'core/components/forms/radio.html' with name="status" value="inactive" label="Inactive" %}
+    {% include 'core/components/forms/radio.html' with name="status" value="pending" label="Pending" %}
+  </div>
+  
+  Radio group (horizontal):
+  <div class="flex gap-4">
+    {% include 'core/components/forms/radio.html' with name="status" value="active" label="Active" inline=True %}
+    {% include 'core/components/forms/radio.html' with name="status" value="inactive" label="Inactive" inline=True %}
+  </div>
+{% endcomment %}
+
+<div class="flex items-center {% if not inline %}mb-2{% endif %}">
+    <input type="radio" 
+           id="id_{{ name }}_{{ value }}" 
+           name="{{ name }}"
+           value="{{ value }}"
+           {% if checked %}checked{% endif %}
+           {% if disabled %}disabled{% endif %}
+           {% if required %}required{% endif %}
+           class="w-4 h-4 text-sap-blue bg-white border-gray-300 
+                  focus:ring-2 focus:ring-sap-blue focus:ring-offset-0
+                  hover:border-sap-blue transition-colors
+                  disabled:cursor-not-allowed disabled:opacity-50
+                  {{ class|default:'' }}"
+           {% if htmx_post %}hx-post="{{ htmx_post }}"{% endif %}
+           {% if htmx_trigger %}hx-trigger="{{ htmx_trigger }}"{% endif %}
+           {% if htmx_target %}hx-target="{{ htmx_target }}"{% endif %}
+           {% if htmx_swap %}hx-swap="{{ htmx_swap }}"{% endif %}
+           {% if attrs %}{{ attrs|safe }}{% endif %}>
+    
+    {% if label %}
+    <label for="id_{{ name }}_{{ value }}" 
+           class="ml-2 text-sm text-gray-700 select-none cursor-pointer
+                  {% if disabled %}opacity-50 cursor-not-allowed{% endif %}">
+        {{ label }}
+        {% if required %}<span class="text-sap-red ml-0.5">*</span>{% endif %}
+    </label>
+    {% endif %}
+</div>
+
+{% if help_text %}
+<p class="ml-6 mt-1 text-xs text-gray-500">{{ help_text }}</p>
+{% endif %}
+
+{% if error %}
+<p class="ml-6 mt-1 text-xs text-sap-red flex items-center gap-1">
+    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+    </svg>
+    {{ error }}
+</p>
+{% endif %}
+
+
+
+
+
+
+
+

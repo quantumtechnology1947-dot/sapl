@@ -1,0 +1,9 @@
+﻿CId,SysDate,SysTime,CompId,FinYearId,SessionId,CName,Symbol,HasSubCat
+34,2013-04-01,09:28:26 AM,1,1,Sapl0002,Standard Product,S,0
+35,2013-04-01,09:28:26 AM,1,1,Sapl0002,Non Standard Product,N,0
+36,2013-04-01,09:28:26 AM,1,1,Sapl0002,Erection & Commissioning,E,0
+37,2013-04-01,09:28:26 AM,1,1,Sapl0002,Spares,P,0
+38,2013-04-01,09:28:26 AM,1,1,Sapl0002,Job Work,J,0
+43,2013-04-03,2:08:28 PM,1,1,Sapl0001,Automation & SPM,T,0
+44,2022-02-20,4:31:46 PM,1,9,Sapl0002,Agriculture Products,A,0
+45,02-11-2025,06:13:20,1,1,1,Test Category,Z,False

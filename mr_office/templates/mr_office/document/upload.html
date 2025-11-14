@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+{% block title %}Upload Document{% endblock %}
+{% block content %}
+<div class="mb-6"><h2 class="text-sm font-bold">Upload Document</h2></div>
+<div class="bg-white rounded border border-gray-200 p-4">
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="flex justify-end gap-2 pt-4 border-t">
+            <a href="{% url 'mr_office:document-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Cancel</a>
+            <button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-hover transition-colors">Upload</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

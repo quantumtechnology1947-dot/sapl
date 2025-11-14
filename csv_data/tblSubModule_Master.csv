@@ -1,0 +1,151 @@
+﻿SubModId,MTR,SubModName,DashBoardPage,ModId
+1,1,Financial Year,Dashboard.aspx,1
+2,1,System BackUp,Dashboard.aspx,1
+3,1,Role Mangement,Dashboard.aspx,1
+4,1,Access Management,Dashboard.aspx,1
+5,1,System Support,Dashboard.aspx,1
+7,1,Customer,Dashboard.aspx,2
+10,2,Enquiry,Dashboard.aspx,2
+11,2,PO,Dashboard.aspx,2
+12,2,Cost Sheet,Dashboard.aspx,2
+13,2,Work Order,Dashboard.aspx,2
+15,2,WO Release,WorkOrder_Release.aspx,2
+18,1,Item Location,Dashboard.aspx,9
+19,1,Item Category,Dashboard.aspx,3
+20,1,Item SubCategory,Dashboard.aspx,3
+21,1,Item Master,Dashboard.aspx,3
+22,1,Supplier,Dashboard.aspx,6
+23,2,TPL,Dashboard.aspx,3
+24,2,Staff,Dashboard.aspx,12
+25,2,Offer,Dashboard.aspx,12
+26,2,BOM,Dashboard_BOM.aspx,3
+28,1,Material Process,ItemProcess.aspx,4
+29,2,News,Dashboard.aspx,12
+30,1,,,14
+31,2,SPR,SPR_Dashboard.aspx,6
+32,1,Live Cost,Dashboard.aspx,5
+33,2,BOM,Dashboard.aspx,4
+34,2,PR,PR_Dashboard.aspx,6
+35,2,Purchase Order,PO_Dashboard.aspx,6
+36,2,Financial Budget,Dashboard.aspx,14
+37,2,Goods Inward Note,Inward_DashBoard.aspx,9
+38,2,Goods Received Receipt,RecievedReciept_Dashboard.aspx,9
+39,2,Goods Service Note,ServiceNote_Dashboard.aspx,9
+40,2,Material Requisition Slip,MaterialReturnSlip_Dashboard.aspx,9
+41,2,Material Issue Note,MaterialIssueNote_Dashboard.aspx,9
+42,3,Stock Ledger,StockLedger.aspx,9
+43,3,Stock Statement,StockStatement.aspx,9
+44,3,Non Moving Items,NonMovingItems.aspx,9
+45,2,Material Credit Note,MaterialCreditNote_Dashboard.aspx,9
+46,2,Goods Quality Note,QualityNote_Dashboard.aspx,10
+47,2,Goods Rejection,GoodsRejection_GRN.aspx,10
+48,2,Material Return Note,MaterialReturnNote_Dashboard.aspx,9
+49,2,Material Return Quality Note,MaterialReturnNote_Dashboard.aspx,10
+50,2,Mobile,MobileBills_New.aspx,12
+51,2,SalesInvoice,SalesInvoice_Dashboard.aspx,11
+52,2,ServiceTaxInvoice,ServiceTaxInvoice_Dashboard.aspx,11
+53,2,WIS_DryActualRun,WIS_Dry_Actual_Run.aspx,9
+54,2,WorkOrder_Dispatch,WO_Dispatch_Dashboard.aspx,2
+55,2,PO Check,PO_Check_Dashboard.aspx,6
+56,2,PO Approve,PO_Approve_Dashboard.aspx,6
+57,2,PO Authorize,PO_Authorize_Dashboard.aspx,6
+58,2,SPR Check,SPR_Check_Dashboard.aspx,6
+59,2,SPR  Approve,SPR_Approve_Dashboard.aspx,6
+60,2,SPR Authorize,SPR_Authorize_Dashboard.aspx,6
+61,2,RateLockUnlock,Dashboard.aspx,6
+62,2,Bill Booking,Dashboard.aspx,11
+63,2,Quotation,Quotation_Dashboard.aspx,2
+64,2,Quotation Check,Quotation_Check_Dashboard.aspx,2
+65,2,Quotation Approve,Quotation_Approve_Dashboard.aspx,2
+66,2,Quotation Authorize,Quotation_Authorize_Dashboard.aspx,2
+67,1,Machine Master,Dashboard.aspx,15
+68,2,P/B Maintenance,PMBM_Dashboard.aspx,15
+69,2,Schedule Input,Schedule_Input_Dashboard.aspx,15
+70,2,Schedule Output,Schedule_Machine_Dashboard.aspx,15
+71,1,Work Order Category,WO_Category_Dashboard.aspx,2
+72,1,Work Order SubCategory,WO_SubCategory_Dashboard.aspx,2
+73,2,Work Order Open/Close,Dashboard.aspx,2
+74,1,Products,Product.aspx,2
+75,1,WO Release & DA,WO_Release_DA.aspx,2
+76,1,Unit Master,Dashboard.aspx,3
+77,1,Business Nature,Dashboard.aspx,6
+78,1,Business Type,	Dashboard.aspx,6
+79,1,Service Coverage,Dashboard.aspx,6
+80,1,Buyer,Dashboard.aspx,6
+81,2,Release WIS,Dashboard.aspx,9
+82,1,Acc Head,Dashboard.aspx,11
+83,1,Excise,Dashboard.aspx,11
+84,1,VAT,Dashboard.aspx,11
+85,1,Octroi,Dashboard.aspx,11
+86,1,Packing Forwarding,Dashboard.aspx,11
+87,1,Freight,Dashboard.aspx,11
+88,1,Excisable Commodity,Dashboard.aspx,11
+89,1,Warrenty Terms ,Dashboard.aspx,11
+90,1,Payment Terms,Dashboard.aspx,11
+91,1,Business Group,Dashboard.aspx,12
+92,1,Designation,Dashboard.aspx,12
+93,1,Department,Dashboard.aspx,12
+94,1,Grade,Dashboard.aspx,12
+95,1,Swap Card No,Dashboard.aspx,12
+96,1,Corporate Mobile No,Dashboard.aspx,12
+97,1,InterCommExt No,Dashboard.aspx,12
+101,2,SMS,Dashboard.aspx,12
+102,1,Gate Pass,Dashboard.aspx,12
+103,2,Authorize Gate Pass,Dashboard.aspx,12
+104,2,Proforma Invoice,Dashboard.aspx,11
+105,1,CashBank_Entry,Dashboard.aspx,11
+106,1,IOU Reasons,Dashboard.aspx,11
+107,1,Payment Receipt Against,Dashboard.aspx,11
+108,1,Bank,Dashboard.aspx,11
+109,2,Contra,Dashboard.aspx,11
+110,2,Debit Note,Dashboard.aspx,11
+111,2,Credit Note,Dashboard.aspx,11
+112,2,IOU Payment,Dashboard.aspx,11
+113,2,Cash Voucher,Dashboard.aspx,11
+114,2,Bank Voucher,Dashboard.aspx,11
+115,2,Onsite Attendance,OnsiteAttendance_DashBoard.aspx,7
+116,2,Project Planning,Dashboard.aspx,7
+117,2,Man Power Planning,Dashboard.aspx,7
+118,2,Supplier Challan,Dashboard.aspx,9
+119,2,Advice,Dashboard.aspx,11
+120,2,Authorize Bill Booking,Dashboard.aspx,11
+121,2,Customer Challan,Dashboard.aspx,9
+122,1,ECN Reason,Dashboard.aspx,3
+123,1,Invoice Against,Dashboard.aspx,11
+124,2,Tour Intimation,Dashboard.aspx,12
+125,1,Payment Mode,Dashboard.aspx,11
+126,2,Tour Voucher,Dashboard.aspx,11
+127,2,Material Credit Note,Dashboard.aspx,7
+128,2,Material Credit Quality Note,Dashboard.aspx,10
+129,2,Bank Loan,Dashboard.aspx,12
+130,2,FormatDocument,Dashboard.aspx,13
+131,2,Slido GunRail,Dashboard_Slido.aspx,3
+132,2,Dispatch Slido Gunrail,Dispatch_Gunrail_Dashboard.aspx,2
+133,2,PayRoll,Dashboard.aspx,12
+134,1,Working Days,Dashboard.aspx,12
+135,2,Creditors/Debitors,Dashboard.aspx,11
+137,2,ECN Unlock,Dashboard_BOM.aspx,3
+138,2,MailMerge,Dashboard.aspx,11
+139,1,Set Rate,Dashboard.aspx,6
+140,1,Asset,Dashboard.aspx,11
+141,2,Asset Register,Dashboard.aspx,11
+143,1,LoanType,Dashboard.aspx,11
+144,1,Intrest Type,Dashboard.aspx,11
+145,1,System Credentials,DashBord_Credentials.aspx,17
+146,2,Head Approve PO,PO_Head_Approve_Dashboard.aspx,6
+147,2,Delivery Challan,Dashboard.aspx,9
+148,1,,,17
+151,3,Statement,Stock_Statement1.aspx,9
+152,2,Site Report,Dashboard.aspx,7
+154,3,Design Report,PR_New.aspx,18
+155,3,Vendor Report,Boughtout_Report_Info_Edit.aspx,18
+156,3,Assemly Report,VendorA_Report_Info.aspx,18
+158,3,Manufacturing Design,Dashboard.aspx,18
+159,3,Manufacturing Vendor,Manufacturing_Report_Info.aspx,18
+160,3,Manufacturing Assemly,VendorA_Report_Info.aspx,18
+161,1,ASSET SUPPLIER,ASupplierMaster_New.aspx,20
+162,2,VISITOR PASS,GatePass_New.aspx,19
+163,2,ASSET SPR,ASPR_New.aspx,20
+164,2,ASSET PO,APO_New.aspx,20
+165,1,VEHICLE ENTRY,Vehical_Master.aspx,9
+166,2,VEHICLE REGISTRATION FORM,Dashboard.aspx,9

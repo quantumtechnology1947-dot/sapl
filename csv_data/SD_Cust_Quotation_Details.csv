@@ -1,0 +1,93 @@
+﻿Id,SessionId,CompId,FinYearId,ItemDesc,TotalQty,Rate,Discount,MId,Unit
+19,Sapl0005,1,1,Air Hoist with Tackle for Door handling,4.0,144000.0,0.0,8,16
+20,Sapl0005,1,1,3022-R302K/R302N--ROBO PEDASTAL 1,2.0,40500.0,0.0,9,1
+21,Sapl0005,1,1,3022-R302 J--ROBO PEDASTAL 2,1.0,32000.0,0.0,9,1
+22,Sapl0005,1,1,3710-R372F--ROBO PEDASTAL 3,1.0,29473.0,0.0,9,1
+23,Sapl0005,1,1,RISER-(FR-101)FOR-A265201,4.0,925.0,0.0,10,1
+24,Sapl0005,1,1,RISER-(FR-151)FOR-A265201,2.0,1030.0,0.0,10,1
+25,Sapl0005,1,1,RISER-(FR-201)FOR-A265201,2.0,1240.0,0.0,10,1
+26,Sapl0005,1,1,RISER-(FR-251)FOR-A265201,4.0,1370.0,0.0,10,1
+27,Sapl0005,1,1,RISER-(FR-401)FOR-A265201,5.0,1880.0,0.0,10,1
+28,Sapl0005,1,1,RISER-(FR-101)FOR-A265203,8.0,925.0,0.0,10,1
+29,Sapl0005,1,1,RISER-(FR-151)FOR-A265203,5.0,1030.0,0.0,10,1
+30,Sapl0005,1,1,RISER-(FR-201)FOR-A265203,6.0,1240.0,0.0,10,1
+31,Sapl0005,1,1,RISER-(FR-251)FOR-A265203,5.0,1370.0,0.0,10,1
+32,Sapl0005,1,1,RISER-(FR-301)FOR-A265203,2.0,1510.0,0.0,10,1
+33,Sapl0005,1,1,"Reverce Phase Protector ( Code
+No.8030001011000200 ) for Synergytech Hoist",3.0,1940.0,0.0,11,1
+34,Sapl0005,1,1,"Break Shoe Assembly ( Code
+No.8030001010000200 ) for Synergytech Hoist",2.0,5500.0,0.0,11,1
+35,Sapl0005,1,1,PVC TROLLEYS,40.0,270.0,0.0,12,1
+36,Sapl0005,1,1,Wire Rope of dia. 8mm,50.0,36.0,0.0,12,3
+37,Sapl0005,1,1,RISER-(FR-101)FOR-A265202,2.0,925.0,0.0,14,1
+38,Sapl0005,1,1,RISER-(FR-151)FOR-A265202,12.0,1030.0,0.0,14,1
+39,Sapl0005,1,1,RISER-(FR-101)FOR-A265101,1.0,925.0,0.0,14,1
+40,Sapl0005,1,1,RISER-(FR-151)FOR-A265101,4.0,1030.0,0.0,14,1
+41,Sapl0005,1,1,RISER-(FR-201)FOR-A265101,2.0,1240.0,0.0,14,1
+43,Sapl0005,1,1,RISER-(FR-401)FOR-A265101,3.0,1880.0,0.0,14,1
+44,Sapl0005,1,1,RISER-(FR-101)FOR-A265102,5.0,925.0,0.0,14,1
+45,Sapl0005,1,1,RISER-(FR-151)FOR-A265102,2.0,1030.0,0.0,14,1
+46,Sapl0005,1,1,RISER-(FR-201)FOR-A265102,2.0,1240.0,0.0,14,1
+48,Sapl0005,1,1,RISER-(FR-301)FOR-A265102,2.0,1510.0,0.0,14,1
+49,Sapl0005,1,1,RISER-(FR-401)FOR-A265102,3.0,1880.0,0.0,14,1
+50,Sapl0005,1,1,Long rail 3.5mtrs with its accessories -,20.0,30000.0,0.0,15,16
+51,Sapl0005,1,1,"Cross rail 3 mtrs, With its accessories.",10.0,24000.0,0.0,15,16
+52,Sapl0005,1,1,Hoist - 2 Ton Application - Engine Mounting station.,1.0,300000.0,0.0,15,16
+53,Sapl0005,1,1,ontrol Panel Assembly Manipulator Weight carrying capacity - 40 to 80 Kg Mounted on KBK rail with telescopic arrangement. 360 degree rotation. Accessibility upto 4 meter from Genset side,1.0,250000.0,0.0,15,16
+54,Sapl0005,1,1,Battery Manipulator Weight carrying from 40 to 45 kgs Mounted on KBK rail with telescopic arrangement. 360 degree rotation. Accessibility upto 4 meter from Genset side,1.0,250000.0,0.0,15,16
+55,Sapl0005,1,1,"Hoist - 250 Kgs and its accessories Application - Air Cleaner, fan & Radiator Load display facility. Parts life details All Safety features.",3.0,125000.0,0.0,15,16
+56,Sapl0005,1,1,"Boom Assembly with trolley Applications -Air Cleaner, Fan 360 degree rotation facility. Maximum reach upto 4 m wrt genset side",3.0,150000.0,0.0,15,16
+57,Sapl0005,1,1,Structure - ISMB 150 - 30 meters,4.0,50000.0,0.0,15,16
+58,Sapl0005,1,1,Structure - Mounting Plate - 500 Kg per line,500.0,140.0,0.0,15,2
+59,Sapl0005,1,1,Long rail 3.5mtrs with its accessories - of Kone or Knight or Demag make only. Section of 150 mm and point load carrying capacity should be 500 Kg Application- Engine & Alternator mounting Stn (or Single piece of 7 meters x 2),4.0,56250.0,0.0,15,16
+60,Sapl0005,1,1,3024-05-21 R & L-L Bracket,2.0,689.0,0.0,16,1
+61,Sapl0005,1,1,## 3024-01-31L-Pad,1.0,275.0,0.0,16,1
+63,Sapl0005,1,4,service charges,1.0,12500.0,0.0,18,30
+64,Sapl0005,1,6,Deburring Fixture forQSK23&60 connecting rod & cap,1.0,140000.0,0.0,19,1
+65,Sapl0005,1,6,Deburring Fixture forQSK23&60 connecting rod & tool stand,1.0,175000.0,0.0,19,1
+66,Sapl0005,1,6,Gantry for Pick & Place System,1.0,6640000.0,0.0,20,1
+67,Sapl0005,1,6,SIMULATOR/ TEST BENCH DEVELOPMENT,1.0,3200000.0,0.0,21,1
+68,Sapl0005,1,6,Chassis Line for Frame.,1.0,29623350.0,0.0,22,1
+69,Sapl0005,1,6,Robotic Welding Machine.,1.0,6800000.0,0.0,23,1
+70,Sapl0005,1,6,Manufacturing of Trolley.,1.0,119500.0,0.0,24,1
+71,Sapl0005,1,6,Fabrication & Machining of Frame.,1.0,85000.0,0.0,25,1
+72,Sapl0005,1,6,SLIDO Track C63S rail,6.0,2500.0,0.0,26,3
+73,Sapl0005,1,6,Load Trolley,4.0,2000.0,0.0,26,1
+74,Sapl0005,1,6,Slido Long Rail C63(12mtrs X 3nos. = 36mtrs),36.0,2520.0,0.0,27,3
+75,Sapl0005,1,6,Slido Cross Rail C63(5mtrs X 3nos. = 15mtrs),15.0,2520.0,0.0,27,3
+76,Sapl0005,1,6,Trolley Set for C63,3.0,10800.0,0.0,27,9
+77,Sapl0005,1,6,flipping unit for conrod cleaning & washing,1.0,840000.0,0.0,28,1
+78,Sapl0005,1,6,New Fixture A56802,1.0,1250000.0,0.0,29,1
+79,Sapl0005,1,6,"new fixture for Lock slot operation on AMS
+VMC",1.0,555000.0,0.0,30,1
+80,Sapl0005,1,6,Transformer fixture with trolley,1.0,1440000.0,0.0,31,1
+81,Sapl0005,1,6,ERP SOFTWARE,1.0,691000.0,0.0,32,1
+82,Sapl0005,1,6,LIFTO BREAK LINER,6.0,5533.0,0.0,33,1
+83,Sapl0005,1,6,Slido Long Rail C63(3mtrs X 2nos. = 6mtrs),6.0,2800.0,0.0,34,3
+84,Sapl0005,1,6,Slido Cross Rail C63(3mtrs X 1nos. = 3mtrs),3.0,2800.0,0.0,34,3
+85,Sapl0005,1,6,Trolley Set for C63,1.0,10000.0,0.0,34,9
+86,Sapl0005,1,6,"Additional Fixture For Cross Member &
+Accommodation of Balance Models in Current Fixtures",1.0,18500000.0,0.0,35,1
+87,Sapl0005,1,6,Welding Fixtures For Load Body,1.0,3510000.0,0.0,36,1
+88,Sapl0005,1,6,"Gravity roller conveyor for K & Q 19 cyl.
+block",5.0,45000.0,0.0,37,3
+89,Sapl0005,1,6,Welding Fixtures For G75 & G90,1.0,3500000.0,0.0,38,1
+90,Sapl0005,1,6,Slido Long Rail C63,500.0,2622.0,0.0,39,3
+91,Sapl0005,1,6,Slido Cross Rail C63(2.5m X 40nos. = 100mtrs),100.0,2622.0,0.0,39,3
+92,Sapl0005,1,6,Trolley Set for C63,40.0,10800.0,0.0,39,9
+93,Sapl0005,1,6,Fabrication & Machining of Base,1.0,352000.0,0.0,40,1
+94,sapl0313,1,7,Operator Platform,3.0,1220000.0,0.0,41,16
+95,sapl0313,1,7,Draw Bridge - 01 No.,1.0,300000.0,0.0,42,16
+96,sapl0313,1,7,CBS OP2- Fabricated Tools and Accessories.,1.0,698000.0,0.0,43,16
+97,sapl0313,1,7,Fabricated Assemblies - CP01,1.0,320961.0,0.0,44,16
+98,sapl0313,1,7,Job Work for various assemblies - 1 Set,1.0,1285000.0,0.0,45,16
+99,sapl0313,1,7,Motorized Cart for Long member transfer,1.0,1144918.0,0.0,46,16
+100,sapl0313,1,7,Powerised Conveyor with tressel/table for transfer  of Long member on LM assembly fixture,1.0,1363006.0,0.0,46,16
+101,sapl0313,1,7,Long member Assembly fixture LH and RH,1.0,3348722.0,0.0,46,16
+102,sapl0313,1,7,Modification in existing Geometric Ladder making fixture,1.0,3225978.0,0.0,46,16
+103,sapl0313,1,7,Tightening & Outer bracket fitment fixture,1.0,3803588.0,0.0,46,16
+104,sapl0313,1,7,Motorized Cart for Frame transfer to Conveyor,1.0,1281416.0,0.0,46,16
+105,sapl0313,1,7,Inspection + Correction fixture,1.0,5762446.0,0.0,46,16
+106,1,1,13,for testing,100.0,20000.0,1.0,48,1
+108,1,1,13,for customer,1000.0,100.0,1.0,49,1
+110,1,1,13,"Hydraulic Cylinder Assembly - 50mm bore, 300mm stroke, 250 bar pressure rating",15.0,45500.0,5.0,50,1

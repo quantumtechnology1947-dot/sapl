@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Material Planning{% endblock %} - Cortex ERP</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX CDN -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Flatpickr CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- HTMX CSRF Token Configuration -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = document.querySelector('meta[name="csrf-token"]').content;
+        });
+    </script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-full mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'material_planning:dashboard' %}" class="text-xl font-bold">Material Planning</a>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="{% url 'material_planning:planning-search' %}" class="hover:text-blue-200">BOM / New Planning</a>
+                        <a href="{% url 'material_planning:plan-list' %}" class="hover:text-blue-200">Edit Planning</a>
+                    </div>
+                </div>
+                <div>
+                    <a href="/" class="hover:text-blue-200">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-full mx-auto px-4 py-4">
+        {% for message in messages %}
+        <div class="bg-{{ message.tags|default:'info' }}-100 border-l-4 border-{{ message.tags|default:'info' }}-500 text-{{ message.tags|default:'info' }}-700 p-4 rounded mb-2" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="max-w-full mx-auto px-4 py-2">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- HTMX Loading Indicator -->
+    <div id="htmx-indicator" class="htmx-indicator fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow-lg hidden">
+        Loading...
+    </div>
+
+    <style>
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+    </style>
+
+    <!-- Initialize Flatpickr for all date inputs -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFlatpickr();
+        });
+
+        // Function to initialize Flatpickr on elements with class 'flatpickr'
+        function initializeFlatpickr() {
+            flatpickr('.flatpickr', {
+                dateFormat: 'd-m-Y',
+                allowInput: true,
+                locale: {
+                    firstDayOfWeek: 1
+                }
+            });
+        }
+
+        // Re-initialize Flatpickr after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', function() {
+            initializeFlatpickr();
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
+
+
+
+
+
+
+

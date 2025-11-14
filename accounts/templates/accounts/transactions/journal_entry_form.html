@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Journal Entry{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+        <div class="px-4 py-4">
+            <h1 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} Journal Entry</h1>
+        </div>
+    </div>
+    
+    <div class="max-w-3xl mx-auto bg-white rounded border border-gray-200 p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Entry Date <span class="text-red-500">*</span></label>
+                    {{ form.date }}
+                    {% if form.date.errors %}<p class="text-red-500 text-sm">{{ form.date.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Amount <span class="text-red-500">*</span></label>
+                    {{ form.amount }}
+                    {% if form.amount.errors %}<p class="text-red-500 text-sm">{{ form.amount.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Debit Account <span class="text-red-500">*</span></label>
+                    {{ form.dr }}
+                    {% if form.dr.errors %}<p class="text-red-500 text-sm">{{ form.dr.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Credit Account <span class="text-red-500">*</span></label>
+                    {{ form.cr }}
+                    {% if form.cr.errors %}<p class="text-red-500 text-sm">{{ form.cr.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+            
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Narration</label>
+                {{ form.narration }}
+                {% if form.narration.errors %}<p class="text-red-500 text-sm">{{ form.narration.errors.0 }}</p>{% endif %}
+            </div>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">
+                    {% if object %}Update{% else %}Create{% endif %}
+                </button>
+                <a href="{% url 'accounts:journal-entry-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

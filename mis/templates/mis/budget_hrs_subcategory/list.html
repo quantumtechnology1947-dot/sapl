@@ -1,0 +1,45 @@
+{% extends 'mis/base.html' %}
+{% block title %}Budget Hours Sub-Categories{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h2 class="text-sm font-bold">Budget Hours Field Sub-Categories</h2>
+    <a href="{% url 'mis:budget-hrs-subcategory-create' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Create Sub-Category</a>
+</div>
+<div class="bg-white rounded border border-gray-200 p-6">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Symbol</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sub-Category</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for sub in subcategories %}
+            <tr>
+                <td class="px-6 py-4 text-sm">{{ sub.id }}</td>
+                <td class="px-6 py-4 text-sm">{{ sub.mid.symbol }}</td>
+                <td class="px-6 py-4 text-sm font-medium">{{ sub.symbol }}</td>
+                <td class="px-6 py-4 text-sm">{{ sub.subcategory|truncatewords:10 }}</td>
+                <td class="px-6 py-4 text-sm space-x-2">
+                    <a href="{% url 'mis:budget-hrs-subcategory-update' sub.id %}" class="text-green-600 hover:text-green-900">Edit</a>
+                    <a href="{% url 'mis:budget-hrs-subcategory-delete' sub.id %}" class="text-red-600 hover:text-red-900">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No sub-categories found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,58 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Current Stock</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock Value</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Transaction</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for data in stock_data %}
+            <tr class="hover:bg-gray-50 {% if data.stock_status == 'Zero Stock' %}bg-red-50{% elif data.stock_status == 'Low Stock' %}bg-yellow-50{% endif %}">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ forloop.counter }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ data.item.itemcode|default:"-" }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ data.item.itemname }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900">
+                    {{ data.current_qty|floatformat:3 }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ data.unit }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                    ₹ {{ data.stock_value|floatformat:2 }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{ data.location }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {% if data.last_transaction_date %}
+                        {{ data.last_transaction_type }} - {{ data.last_transaction_date|date:"d/m/Y" }}
+                    {% else %}
+                        No transactions
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                        {% if data.stock_status == 'Zero Stock' %}bg-red-100 text-red-800
+                        {% elif data.stock_status == 'Low Stock' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-green-100 text-green-800{% endif %}">
+                        {{ data.stock_status }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=9 title="No records found" message="" %}
+                {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+
+

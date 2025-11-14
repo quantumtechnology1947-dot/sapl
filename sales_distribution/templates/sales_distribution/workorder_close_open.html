@@ -1,0 +1,54 @@
+{% extends "core/base.html" %}
+{% block title %}Work Order - Open/Close - Cortex ERP{% endblock %}
+{% block page_title %}Work Order - Open/Close{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Search Bar -->
+    <div class="bg-white border border-gray-200 rounded mb-2 p-3">
+        <form method="GET" action="{% url 'sales_distribution:workorder-close-open-page' %}" class="flex items-center gap-2" id="search-form">
+            <select name="search_type"
+                hx-get="{% url 'sales_distribution:workorder-close-open-page' %}"
+                hx-trigger="change"
+                hx-target="#workorder-table-container"
+                hx-include="#search-form input, #search-form select"
+                class="h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">Select</option>
+                <option value="0" {% if search_type == '0' %}selected{% endif %}>Customer Name</option>
+                <option value="1" {% if search_type == '1' %}selected{% endif %}>Enquiry No</option>
+                <option value="2" {% if search_type == '2' %}selected{% endif %}>PO No</option>
+                <option value="3" {% if search_type == '3' %}selected{% endif %}>WO No</option>
+            </select>
+
+            <input type="text"
+                name="search_value"
+                value="{{ search_value }}"
+                placeholder="Enter search value"
+                hx-get="{% url 'sales_distribution:workorder-close-open-page' %}"
+                hx-trigger="keyup changed delay:300ms"
+                hx-target="#workorder-table-container"
+                hx-include="#search-form input, #search-form select"
+                class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 flex-grow max-w-md">
+
+            {% if search_type or search_value %}
+            <a href="{% url 'sales_distribution:workorder-close-open-page' %}"
+                class="h-8 px-4 flex items-center text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Work Orders Table -->
+    <div id="workorder-table-container" class="bg-white border border-gray-200 rounded">
+        {% include 'sales_distribution/partials/workorder_close_open_table.html' %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

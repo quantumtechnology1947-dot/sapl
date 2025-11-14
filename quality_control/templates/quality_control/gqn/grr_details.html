@@ -1,0 +1,259 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}GQN - Quality Inspection - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2 py-2">
+    {% if messages %}
+    <div class="mb-2">
+        {% for message in messages %}
+        <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-2 py-1 rounded text-xs mb-1" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded shadow">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-3 py-2 rounded-t">
+            <h1 class="text-white font-semibold text-sm">Goods Quality Note [GQN] - New</h1>
+        </div>
+
+        <!-- GRR Information -->
+        <div class="bg-white px-4 py-3 border-b border-gray-200">
+            <table class="w-full text-xs">
+                <tr>
+                    <td class="w-16 py-1"><strong>GRR No:</strong></td>
+                    <td class="w-24 py-1">{{ grr_master.grrno|default:"-" }}</td>
+                    <td class="w-16 py-1"><strong>GIN No:</strong></td>
+                    <td class="w-32 py-1">{{ grr_master.ginno|default:"-" }}</td>
+                    <td class="w-20 py-1"><strong>Challan No:</strong></td>
+                    <td class="w-20 py-1">{{ challan_no|default:"-" }}</td>
+                    <td class="w-12 py-1"><strong>Date:</strong></td>
+                    <td class="py-1">{{ challan_date|default:"-" }}</td>
+                </tr>
+            </table>
+            <div class="mt-2">
+                <strong>Supplier:</strong> {{ supplier.supplier_name|default:"-" }}
+            </div>
+            <div class="mt-2 text-xs font-semibold text-blue-700">
+                <strong>A:</strong> Total Received Quantity, 
+                <strong>B:</strong> Normal Accepted Quantity, 
+                <strong>C:</strong> Accepted Quantity,
+                <strong>D:</strong> Deviated Quantity, 
+                <strong>E:</strong> Segregated Quantity, 
+                <strong>F:</strong> Rejected Quantity.
+            </div>
+        </div>
+
+        <!-- Quality Inspection Form -->
+        <form method="post" id="gqnForm">
+            {% csrf_token %}
+            <div class="p-2">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 border-b border-gray-300">
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">SN</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">SELECT</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">ITEM CODE</th>
+                                <th class="px-2 py-2 text-left text-[10px] font-semibold text-gray-700 border-r border-gray-300">DESCRIPTION</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">UOM</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">PO QTY</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">INWARD QTY</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">A</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">B</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">C</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">D</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">E</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">F</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">REJ REASON</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">S/N</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700 border-r border-gray-300">P/N</th>
+                                <th class="px-2 py-2 text-center text-[10px] font-semibold text-gray-700">REMARKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detail in grr_details %}
+                            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ forloop.counter }}</td>
+                                <td class="px-2 py-2 text-center border-r border-gray-200">
+                                    <input type="checkbox" name="selected_{{ detail.id }}" id="ck_{{ detail.id }}" 
+                                           onchange="toggleInputs({{ detail.id }})" class="h-4 w-4 text-sap-blue border-gray-300 rounded focus:ring-sap-blue">
+                                    <input type="hidden" name="item_id" value="{{ detail.id }}">
+                                </td>
+                                <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ detail.item_code }}</td>
+                                <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200">{{ detail.description }}</td>
+                                <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-center">{{ detail.uom }}</td>
+                                <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ detail.po_qty|floatformat:3 }}</td>
+                                <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ detail.inward_qty|floatformat:3 }}</td>
+                                <td class="px-2 py-2 text-[11px] text-gray-900 border-r border-gray-200 text-right">{{ detail.receivedqty|floatformat:3 }}</td>
+                                <td class="px-2 py-2 border-r border-gray-200">
+                                    <input type="number" name="normal_acc_qty_{{ detail.id }}" id="normal_acc_qty_{{ detail.id }}"
+                                           step="0.001" min="0" value="0" class="w-16 px-1 py-1 text-xs border border-gray-300 rounded" 
+                                           disabled>
+                                </td>
+                                <td class="px-2 py-2 border-r border-gray-200">
+                                    <input type="number" name="accepted_qty_{{ detail.id }}" id="accepted_qty_{{ detail.id }}"
+                                           step="0.001" min="0" value="0" class="w-16 px-1 py-1 text-xs border border-gray-300 rounded" 
+                                           disabled>
+                                </td>
+                                <td class="px-2 py-2 border-r border-gray-200">
+                                    <input type="number" name="deviated_qty_{{ detail.id }}" id="deviated_qty_{{ detail.id }}"
+                                           step="0.001" min="0" value="0" class="w-16 px-1 py-1 text-xs border border-gray-300 rounded" 
+                                           disabled>
+                                </td>
+                                <td class="px-2 py-2 border-r border-gray-200">
+                                    <input type="number" name="segregated_qty_{{ detail.id }}" id="segregated_qty_{{ detail.id }}"
+                                           step="0.001" min="0" value="0" class="w-16 px-1 py-1 text-xs border border-gray-300 rounded" 
+                                           disabled>
+                                </td>
+                                <td class="px-2 py-2 border-r border-gray-200 text-right text-[11px]">
+                                    <span id="rejected_qty_{{ detail.id }}">0.000</span>
+                                    <input type="hidden" name="rejected_qty_{{ detail.id }}" id="rejected_qty_hidden_{{ detail.id }}" value="0">
+                                </td>
+                                <td class="px-2 py-2 border-r border-gray-200">
+                                    <select name="rejection_reason_{{ detail.id }}" id="rejection_reason_{{ detail.id }}"
+                                            class="w-24 px-1 py-1 text-xs border border-gray-300 rounded" disabled>
+                                        <option value="">-- Select --</option>
+                                        {% for reason in rejection_reasons %}
+                                        <option value="{{ reason.id }}">{{ reason.symbol }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td class="px-2 py-2 border-r border-gray-200">
+                                    <input type="text" name="sn_{{ detail.id }}" id="sn_{{ detail.id }}"
+                                           class="w-20 px-1 py-1 text-xs border border-gray-300 rounded" disabled required>
+                                </td>
+                                <td class="px-2 py-2 border-r border-gray-200">
+                                    <input type="text" name="pn_{{ detail.id }}" id="pn_{{ detail.id }}"
+                                           class="w-20 px-1 py-1 text-xs border border-gray-300 rounded" disabled required>
+                                </td>
+                                <td class="px-2 py-2">
+                                    <input type="text" name="remarks_{{ detail.id }}" id="remarks_{{ detail.id }}"
+                                           class="w-32 px-1 py-1 text-xs border border-gray-300 rounded" disabled>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="16" class="px-6 py-12 text-center">
+                                    <p class="text-base text-red-700 font-semibold">No data to display !</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-4 flex gap-2">
+                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
+                            onclick="return confirmationAdd()">
+                        Add
+                    </button>
+                    <a href="{% url 'quality_control:gqn-new' %}" 
+                       class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white text-sm font-medium rounded transition-colors">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleInputs(detailId) {
+    const checkbox = document.getElementById('ck_' + detailId);
+    const inputs = [
+        'normal_acc_qty_' + detailId,
+        'accepted_qty_' + detailId,
+        'deviated_qty_' + detailId,
+        'segregated_qty_' + detailId,
+        'rejection_reason_' + detailId,
+        'sn_' + detailId,
+        'pn_' + detailId,
+        'remarks_' + detailId
+    ];
+
+    inputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.disabled = !checkbox.checked;
+            if (checkbox.checked && inputId.includes('normal_acc_qty')) {
+                input.focus();
+            }
+        }
+    });
+
+    // Calculate rejected quantity when inputs change
+    if (checkbox.checked) {
+        calculateRejectedQty(detailId);
+        
+        // Add event listeners for quantity calculation
+        ['normal_acc_qty_' + detailId, 'accepted_qty_' + detailId, 'deviated_qty_' + detailId, 'segregated_qty_' + detailId].forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', () => calculateRejectedQty(detailId));
+            }
+        });
+    }
+}
+
+function calculateRejectedQty(detailId) {
+    // Find the row containing this detail
+    const checkbox = document.getElementById('ck_' + detailId);
+    const row = checkbox.closest('tr');
+    const receivedQtyCell = row.querySelector('td:nth-child(8)'); // Column A (received qty)
+    const receivedQty = parseFloat(receivedQtyCell.textContent) || 0;
+    
+    const normalAccQty = parseFloat(document.getElementById('normal_acc_qty_' + detailId).value) || 0;
+    const acceptedQty = parseFloat(document.getElementById('accepted_qty_' + detailId).value) || 0;
+    const deviatedQty = parseFloat(document.getElementById('deviated_qty_' + detailId).value) || 0;
+    const segregatedQty = parseFloat(document.getElementById('segregated_qty_' + detailId).value) || 0;
+    
+    const totalAccepted = normalAccQty + acceptedQty + deviatedQty + segregatedQty;
+    const rejectedQty = Math.max(0, receivedQty - totalAccepted);
+    
+    document.getElementById('rejected_qty_' + detailId).textContent = rejectedQty.toFixed(3);
+    document.getElementById('rejected_qty_hidden_' + detailId).value = rejectedQty;
+}
+
+function confirmationAdd() {
+    const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    if (checkedBoxes.length === 0) {
+        alert('Please select at least one item for quality inspection!');
+        return false;
+    }
+
+    let allValid = true;
+    let missingFields = [];
+    
+    checkedBoxes.forEach(checkbox => {
+        const detailId = checkbox.id.replace('ck_', '');
+        const sn = document.getElementById('sn_' + detailId);
+        const pn = document.getElementById('pn_' + detailId);
+
+        if (!sn.value || !pn.value) {
+            allValid = false;
+            if (!sn.value) missingFields.push('S/N');
+            if (!pn.value) missingFields.push('P/N');
+        }
+    });
+
+    if (!allValid) {
+        alert('Please fill all required fields (S/N, P/N) for selected items!');
+        return false;
+    }
+
+    return confirm('Are you sure you want to create this GQN?');
+}
+</script>
+{% endblock %}
+
+
+
+
+
+
+

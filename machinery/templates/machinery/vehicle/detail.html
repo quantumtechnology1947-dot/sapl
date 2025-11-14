@@ -1,0 +1,77 @@
+{% extends "machinery/base.html" %}
+
+{% block title %}{{ vehicle.vehical_name }} - Vehicle Detail{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include "core/components/layout/page_header.html" with title=vehicle.vehical_name subtitle="Vehicle Details" show_back=True back_url=back_url %}
+    
+    <!-- Detail Card -->
+    <div class="bg-white border border-gray-200 rounded">
+        {% include "core/components/cards/card_header.html" with title="Vehicle Information" %}
+        
+        <div class="p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">Vehicle No</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.vehno|default:"-" }}</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">Contact</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.contact|default:"-" }}</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">Destination</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.destination|default:"-" }}</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">Date</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.date|default:"-" }}</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">From KM</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.fromkm|default:"-" }}</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">To KM</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.fromto|default:"-" }}</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">Average</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.avg|default:"-" }}</span>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="text-xs font-medium text-gray-500">Fuel Date</span>
+                    <span class="text-sm text-gray-900 mt-0.5">{{ vehicle.fluel_date|default:"-" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
+            <a href="{% url 'machinery:vehicle-list' %}">
+                {% include "core/components/buttons/secondary.html" with text="Back to List" %}
+            </a>
+            <a href="{% url 'machinery:vehicle-edit' vehicle.pk %}">
+                {% include "core/components/buttons/primary.html" with text="Edit Vehicle" icon="edit" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

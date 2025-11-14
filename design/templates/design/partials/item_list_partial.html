@@ -1,0 +1,115 @@
+{% load design_filters %}
+<div class="overflow-x-auto">
+    <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                <th class="w-[15%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                <th class="w-[35%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                <th class="w-[15%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Category</th>
+                <th class="w-[12%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Stock Qty</th>
+                <th class="w-[15%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for item in items %}
+            <tr id="item-{{ item.id }}" class="hover:bg-gray-50">
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                    {{ forloop.counter|add:page_obj.start_index|add:"-1" }}
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-gray-900">
+                    {{ item.itemcode }}
+                </td>
+                <td class="px-2 py-2 text-[11px] truncate" title="{{ item.manfdesc }}">
+                    <span class="text-gray-900">{{ item.manfdesc|truncatewords:8 }}</span>
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                    {{ categories_dict|get_item:item.cid|safe }}
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-right">
+                    {{ item.stockqty|floatformat:2 }}
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-[11px] text-right">
+                    <a href="{% url 'design:item-detail' item.id %}"
+                       class="text-blue-600 hover:text-blue-900 mr-2">View</a>
+                    <a href="{% url 'design:item-edit' item.id %}"
+                       class="text-green-600 hover:text-green-900 mr-2">Edit</a>
+                    <button hx-delete="{% url 'design:item-delete' item.id %}"
+                            hx-target="#item-{{ item.id }}"
+                            hx-swap="outerHTML swap:1s"
+                            hx-confirm="Are you sure you want to delete {{ item.itemcode }}?"
+                            class="text-red-600 hover:text-red-900">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-6 py-16 text-center text-gray-500">
+                    No items found. <a href="{% url 'design:item-create' %}" class="text-blue-600">Create one</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200">
+    <div class="flex-1 flex justify-between sm:hidden">
+        {% if page_obj.has_previous %}
+        <button hx-get="?page={{ page_obj.previous_page_number }}{% if search_itemcode %}&search_itemcode={{ search_itemcode }}{% endif %}{% if search_desc %}&search_desc={{ search_desc }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                hx-target="#item-table"
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+        </button>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <button hx-get="?page={{ page_obj.next_page_number }}{% if search_itemcode %}&search_itemcode={{ search_itemcode }}{% endif %}{% if search_desc %}&search_desc={{ search_desc }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                hx-target="#item-table"
+                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+        </button>
+        {% endif %}
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-gray-700">
+                Showing <span class="font-medium">{{ page_obj.start_index }}</span> to 
+                <span class="font-medium">{{ page_obj.end_index }}</span> of 
+                <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+            </p>
+        </div>
+        <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                {% if page_obj.has_previous %}
+                <button hx-get="?page={{ page_obj.previous_page_number }}{% if search_itemcode %}&search_itemcode={{ search_itemcode }}{% endif %}{% if search_desc %}&search_desc={{ search_desc }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                        hx-target="#item-table"
+                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    Previous
+                </button>
+                {% endif %}
+                
+                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                <button hx-get="?page={{ page_obj.next_page_number }}{% if search_itemcode %}&search_itemcode={{ search_itemcode }}{% endif %}{% if search_desc %}&search_desc={{ search_desc }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                        hx-target="#item-table"
+                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    Next
+                </button>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+
+

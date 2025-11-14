@@ -1,0 +1,33 @@
+﻿Id,DEPT,LOCATION,CAMERA_NUM
+1,ELE,ELE Dept. Entry (ACC & HR),CAM1
+2,DESIGN,Design Staircase,CAM2
+3,DESIGN,Design ,CAM3
+4,OLD EDP,OLD EDP,CAM4
+5,ELE,ELE Maintenance Area,CAM5
+6,SHOP FLOOR,A5 Pillar (Assembly Area),CAM6
+7,MACHINE SHOP,Machine Shop,CAM7
+8,SHOP FLOOR,A5 Pillar (QA Area),CAM8
+9,RECEPTION,Reception,CAM9
+10,SERVER,Server Room,CAM10
+11,RECEPTION,Reception Outside,CAM11
+12,STORE,Store Racks,CAM12
+13,STORE,Store Main Entry,CAM13
+14,VMC,VMC MACHINE 1,CAM14
+15,VMC,VMC MACHINE 2,CAM15
+16,PAINT,Paint Shop,CAM16
+17,SHOP FLOOR,Worker Changing room South,CAM17
+18,FABRICATION,Fabrication(Flamecut),CAM18
+19,FABRICATION,Fabrication (Fabrication Area),CAM19
+20,SHOP FLOOR,B3 Pillar,CAM20
+21,SHOP FLOOR, B0 Pillar,CAM21
+22,SHOP FLOOR,A0 Pillar,CAM22
+23,ON ROAD,On road Scrap Area & Paint Shop,CAM23
+24,ON ROAD,On road Infront of Material Gate,CAM24
+25,ON ROAD,On road Infront of Datta Mandir SAPL,CAM25
+26,ON ROAD,On road Infront of Datta Mandir ,CAM26
+27,ON ROAD,On road to parking area,CAM27
+28,SECURITY,Security Cabin&Parking Area,CAM28
+29,SECURITY,Room back corner,CAM29
+30,SECURITY,Security cabin toword main gate,CAM30
+31,GATE,Main gate,CAM31
+32,GENRATOR,Generator Shed,CAM32

@@ -1,0 +1,7 @@
+﻿Feature,CompatibleSchemaVersion,IsCurrentVersion
+common,1,True
+health monitoring,1,True
+membership,1,True
+personalization,1,True
+profile,1,True
+role manager,1,True

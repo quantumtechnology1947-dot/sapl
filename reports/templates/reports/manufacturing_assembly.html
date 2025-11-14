@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+
+{% block title %}Manufacturing Assembly Report{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-sm font-bold text-gray-800">Manufacturing Assembly Report</h1>
+            <p class="text-gray-600 mt-1">Manufactured items by assembly</p>
+        </div>
+        <a href="{% url 'reports:dashboard' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Back
+        </a>
+    </div>
+
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                    This report requires BOM (Bill of Materials) structure data to be fully implemented.
+                    Currently showing placeholder data.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 p-8 text-center">
+        <i class="fas fa-cogs text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Report Under Development</h3>
+        <p class="text-gray-600">
+            This report will show manufactured items grouped by assembly/product once BOM structure is available.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+{% extends "core/base.html" %}
+{% block title %}Project Status{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between"><div><h2 class="text-sm font-bold">Project Status</h2></div>
+<a href="{% url 'project_management:status-create' %}" class="bg-gray-600 text-white px-4 py-2 rounded">+ New Status</a></div>
+<div class="bg-white rounded border border-gray-200 overflow-hidden">
+<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50">
+<tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sr No</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Work Order</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activities</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr></thead>
+<tbody class="bg-white divide-y divide-gray-200">
+{% for status in statuses %}<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">{{ status.srno }}</td>
+<td class="px-6 py-4 whitespace-nowrap font-medium">{{ status.wono }}</td>
+<td class="px-6 py-4">{{ status.activities|truncatewords:15 }}</td>
+<td class="px-6 py-4 space-x-2"><a href="{% url 'project_management:status-detail' status.id %}" class="text-gray-600">View</a>
+<a href="{% url 'project_management:status-update' status.id %}" class="text-blue-600">Edit</a></td></tr>
+{% empty %}<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No status records</td></tr>
+{% endfor %}</tbody></table></div>
+{% endblock %}
+
+
+
+
+
+
+
+

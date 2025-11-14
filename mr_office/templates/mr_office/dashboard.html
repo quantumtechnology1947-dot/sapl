@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% block title %}MR Office Dashboard{% endblock %}
+{% block content %}
+<div class="mb-6"><h2 class="text-base font-bold">MR Office Dashboard</h2></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded border border-gray-200"><h3 class="text-gray-600 text-sm">Total Documents</h3><p class="text-base font-bold text-blue-600">{{ total_documents }}</p></div>
+    <div class="bg-white p-6 rounded border border-gray-200"><h3 class="text-gray-600 text-sm">Storage Used</h3><p class="text-base font-bold text-green-600">{{ total_storage_mb }} MB</p></div>
+    <div class="bg-white p-6 rounded border border-gray-200"><h3 class="text-gray-600 text-sm">Modules</h3><p class="text-base font-bold text-purple-600">{{ module_stats|length }}</p></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold mb-4">Documents by Module</h3>
+        <div class="space-y-2">
+            {% for stat in module_stats %}
+            <div class="flex justify-between items-center border-b pb-2">
+                <span class="text-gray-700">{{ stat.name }}</span>
+                <span class="font-bold text-blue-600">{{ stat.count }}</span>
+            </div>
+            {% empty %}
+            <p class="text-gray-500">No documents yet</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold mb-4">Recent Documents</h3>
+        <div class="space-y-2">
+            {% for doc in recent_documents %}
+            <div class="border-l-4 border-green-500 pl-4 py-2">
+                <a href="{% url 'mr_office:document-detail' doc.id %}" class="text-blue-600 hover:text-blue-800">{{ doc.filename|truncatewords:5 }}</a>
+                <p class="text-xs text-gray-500">{{ doc.get_module_display }} - {{ doc.file_size_display }}</p>
+            </div>
+            {% empty %}
+            <p class="text-gray-500">No documents yet</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <a href="{% url 'mr_office:document-create' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded text-center font-semibold">Upload Document</a>
+    <a href="{% url 'mr_office:storage-report' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded text-center font-semibold">Storage Report</a>
+    <a href="{% url 'mr_office:by-module-report' %}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-4 rounded text-center font-semibold">By Module Report</a>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

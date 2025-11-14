@@ -1,0 +1,21 @@
+<tr id="city-{{ city.cityid }}" class="hover:bg-gray-50" data-city-row>
+    <td class="px-6 py-4 text-sm text-gray-900 city-sn">{{ forloop.counter }}</td>
+    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ city.cityname }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">{{ city.sid.statename|default:"-" }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">{{ city.sid.cid.countryname|default:"-" }}</td>
+    <td class="px-6 py-4 text-right text-sm">
+        <button hx-get="{% url 'sys_admin:city-edit' city.cityid %}" hx-target="#city-{{ city.cityid }}" hx-swap="outerHTML"
+                hx-confirm="Are you sure you want to Update this record?"
+                class="text-purple-600 hover:text-purple-900 mr-3">Edit</button>
+        <button hx-delete="{% url 'sys_admin:city-delete' city.cityid %}" hx-target="#city-{{ city.cityid }}" hx-swap="outerHTML swap:1s"
+                hx-confirm="Are you sure you want to Delete this record?" class="text-red-600 hover:text-red-900">Delete</button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

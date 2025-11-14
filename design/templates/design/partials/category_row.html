@@ -1,0 +1,39 @@
+<tr class="hover:bg-gray-50 transition-colors" id="category-{{ category.cid }}">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {{ forloop.counter }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {{ category.cname }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {{ category.symbol }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {% if category.hassubcat == 'Y' %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Yes
+        </span>
+        {% else %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            No
+        </span>
+        {% endif %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <a href="{% url 'design:category-edit' category.cid %}" 
+           class="text-green-600 hover:text-green-900 mr-3">Edit</a>
+        <button hx-delete="{% url 'design:category-delete' category.cid %}"
+                hx-target="#category-{{ category.cid }}"
+                hx-swap="outerHTML swap:1s"
+                hx-confirm="Are you sure you want to delete category {{ category.cname }}?"
+                class="text-red-600 hover:text-red-900">Delete</button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

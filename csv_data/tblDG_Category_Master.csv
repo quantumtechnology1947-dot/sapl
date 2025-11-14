@@ -1,0 +1,27 @@
+﻿CId,SysDate,SysTime,CompId,FinYearId,SessinId,CName,Symbol,HasSubCat
+1,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Flats,IS Angles, Channels, Beams, Sq.Tubes, Rec. Tubes,Al. Extrusions,Round Bars, Tubes, Seamless Tubes, M S Plate",A,0
+2,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Bearings, LM Rails, LM Blocks, Guide Bars, PAP Bush, Asob,Ball Screws,Ball Nuts, Lead Screws, Lead Nuts",B,0
+3,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Pulleys, Gears, Chains, Wire Ropes, Dschakles,Rope Attachements, Belts, Rack, Pinion, Gears, Couplings, Springs,O-Rings, Seals",C,0
+4,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Gear Boxes, Motors, Geared Motors",D,0
+5,2013-04-01,10:41:46 AM,1,1,Sapl0001,"All Pneumatics,Acceosries, Compressor,Vacuum Technology",E,0
+6,2013-04-01,10:41:46 AM,1,1,Sapl0001,"All Hydraulics,Accessories, Power Pack",F,0
+7,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Machine Tool s Fixtures, Equipments (eg. Leak Tester), Welding Guns",G,0
+8,2013-04-01,10:41:46 AM,1,1,Sapl0001,All Hardwares,H,0
+9,2013-04-01,10:41:46 AM,1,1,Sapl0001,"General, Stickers, Labels,All Tools, Drill Tips & Drills",I,0
+10,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Pneumatic Toggle Clamps, Hyadraulic Toggle Clamps, Manual Toggle Clamps",J,0
+11,2013-04-01,10:41:46 AM,1,1,Sapl0001,"STD Fixture BIW, Slido Gunrail",K,0
+12,2013-04-01,10:41:46 AM,1,1,Sapl0001,Wires and Cables,L,0
+13,2013-04-01,10:41:46 AM,1,1,Sapl0001,Maintenance Material,M,0
+14,2013-04-01,10:41:46 AM,1,1,Sapl0001,Control Panel,N,0
+15,2013-04-01,10:41:46 AM,1,1,Sapl0001,O,O,0
+16,2013-04-01,10:41:46 AM,1,1,Sapl0001,PLC and Accessories,P,0
+17,2013-04-01,10:41:46 AM,1,1,Sapl0001,Control Panel Accessories,Q,0
+18,2013-04-01,10:41:46 AM,1,1,Sapl0001,Switch Gear,R,0
+19,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Switches,Sensor,Indication,Timer,Counter,Display,Pendant,SMPS,Relay",S,0
+20,2013-04-01,10:41:46 AM,1,1,Sapl0001,T,T,0
+21,2013-04-01,10:41:46 AM,1,1,Sapl0001,U,U,0
+22,2013-04-01,10:41:46 AM,1,1,Sapl0001,V,V,0
+23,2013-04-01,10:41:46 AM,1,1,Sapl0001,W,W,0
+24,2013-04-01,10:41:46 AM,1,1,Sapl0001,X,X,0
+25,2013-04-01,10:41:46 AM,1,1,Sapl0001,Y,Y,0
+26,2013-04-01,10:41:46 AM,1,1,Sapl0001,Others,Z,0

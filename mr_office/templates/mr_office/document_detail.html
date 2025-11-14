@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{% block title %}Document - {{ document.filename }}{% endblock %}
+{% block content %}
+<div class="mb-4 flex justify-between items-center">
+    <div><h2 class="text-sm font-bold">Document Details</h2><p class="text-xs text-gray-600">{{ document.filename }}</p></div>
+    <div class="flex gap-2">
+        <a href="{% url 'mr_office:document-download' document.id %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-hover transition-colors">Download</a>
+        <a href="{% url 'mr_office:document-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Back</a>
+    </div>
+</div>
+<div class="bg-white rounded border border-gray-200 p-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div><p class="text-xs text-gray-600">ID</p><p class="text-xs font-medium">{{ document.id }}</p></div>
+        <div><p class="text-xs text-gray-600">Filename</p><p class="text-xs font-medium">{{ document.filename }}</p></div>
+        <div><p class="text-xs text-gray-600">Module</p><p class="text-xs font-medium">{{ document.get_module_display }}</p></div>
+        <div><p class="text-xs text-gray-600">Format</p><p class="text-xs font-medium">{{ document.file_extension }}</p></div>
+        <div><p class="text-xs text-gray-600">Size</p><p class="text-xs font-medium">{{ document.file_size_display }}</p></div>
+        <div><p class="text-xs text-gray-600">Content Type</p><p class="text-xs font-medium">{{ document.contenttype|default:'N/A' }}</p></div>
+        <div><p class="text-xs text-gray-600">Upload Date</p><p class="text-xs font-medium">{{ document.sysdate }}</p></div>
+        <div><p class="text-xs text-gray-600">Upload Time</p><p class="text-xs font-medium">{{ document.systime }}</p></div>
+        <div><p class="text-xs text-gray-600">Company ID</p><p class="text-xs font-medium">{{ document.compid }}</p></div>
+        <div><p class="text-xs text-gray-600">Financial Year</p><p class="text-xs font-medium">{{ document.finyearid }}</p></div>
+        <div><p class="text-xs text-gray-600">Has File Data</p><p class="text-xs font-medium">{% if document.has_file %}Yes{% else %}No{% endif %}</p></div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,89 @@
+{# Card with Header Component - SAP Fiori Style #}
+{# 
+Purpose: Reusable card container with optional header, subtitle, and action buttons
+Parameters:
+  - title (optional): Card title text
+  - subtitle (optional): Subtitle text below title
+  - actions (optional): HTML for action buttons (use |safe filter)
+  - padding (optional): Set to 'none' to remove body padding, defaults to p-4
+  - no_margin (optional): Set to True to remove bottom margin
+  - class (optional): Additional CSS classes
+  - collapsible (optional): Set to True to make card collapsible
+  - collapsed (optional): Set to True to start collapsed (requires collapsible=True)
+  - id (optional): Unique ID for the card (required for collapsible)
+
+Usage:
+  {% include 'core/components/cards/card_header.html' with 
+    title='Recent Orders' 
+    subtitle='Last 30 days'
+    actions='<button class="text-xs text-sap-blue">View All</button>'
+  %}
+  
+  Or with content block:
+  {% include 'core/components/cards/card_header.html' with title='Card Title' %}
+    {% block card_content %}
+      <p>Your content here</p>
+    {% endblock %}
+  {% endinclude %}
+#}
+
+<div class="bg-white border border-gray-200 rounded shadow-sm {% if not no_margin %}mb-4{% endif %} {{ class|default:'' }}">
+    {% if title or actions %}
+    <div class="px-4 py-2.5 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+        <div class="flex-1 min-w-0">
+            <h3 class="text-sm font-semibold text-gray-700">{{ title }}</h3>
+            {% if subtitle %}
+            <p class="text-xs text-gray-500 mt-0.5">{{ subtitle }}</p>
+            {% endif %}
+        </div>
+        
+        {% if actions %}
+        <div class="flex items-center gap-2 ml-4 flex-shrink-0">
+            {{ actions|safe }}
+        </div>
+        {% endif %}
+        
+        {% if collapsible %}
+        <button 
+            type="button"
+            class="ml-2 p-1 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+            onclick="toggleCard('{{ id }}')"
+            aria-label="Toggle card"
+        >
+            <svg id="{{ id }}-icon" class="w-4 h-4 transition-transform {% if collapsed %}rotate-180{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+            </svg>
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div id="{{ id }}-content" class="{% if padding != 'none' %}p-4{% endif %} {% if collapsed %}hidden{% endif %}">
+        {% block card_content %}{% endblock %}
+    </div>
+</div>
+
+{% if collapsible %}
+<script>
+function toggleCard(cardId) {
+    const content = document.getElementById(cardId + '-content');
+    const icon = document.getElementById(cardId + '-icon');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.remove('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        icon.classList.add('rotate-180');
+    }
+}
+</script>
+{% endif %}
+
+
+
+
+
+
+
+

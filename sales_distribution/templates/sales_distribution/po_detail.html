@@ -1,0 +1,212 @@
+{% extends "core/base.html" %}
+
+{% block title %}PO {{ po.pono }} - Cortex ERP{% endblock %}
+{% block page_title %}Purchase Order Details{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">PO {{ po.pono }}</h2>
+                <p class="text-sm text-gray-600 mt-1">Purchase Order Details</p>
+            </div>
+            <div class="flex gap-2">
+                {% if po.filename %}
+                <a href="{% url 'sales_distribution:po-download' po.poid %}" 
+                   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md inline-flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Download PO
+                </a>
+                {% endif %}
+                <a href="{% url 'sales_distribution:po-edit' po.poid %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Edit</a>
+                <a href="{% url 'sales_distribution:po-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">Back</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PO Information -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">PO Information</h3>
+        
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <p class="text-sm text-gray-600">Customer ID</p>
+                <p class="text-base font-medium text-gray-900">{{ po.customerid }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">PO Number</p>
+                <p class="text-base font-medium text-gray-900">{{ po.pono }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">PO Date</p>
+                <p class="text-base font-medium text-gray-900">{{ po.podate }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">PO Received Date</p>
+                <p class="text-base font-medium text-gray-900">{{ po.poreceiveddate|default:"-" }}</p>
+            </div>
+            {% if po.quotationno %}
+            <div>
+                <p class="text-sm text-gray-600">Quotation</p>
+                <p class="text-base font-medium text-gray-900">QT-{{ po.quotationno }}</p>
+            </div>
+            {% endif %}
+            {% if po.enqid %}
+            <div>
+                <p class="text-sm text-gray-600">Enquiry</p>
+                <p class="text-base font-medium text-gray-900">ENQ-{{ po.enqid.enqid }}</p>
+            </div>
+            {% endif %}
+            {% if po.vendorcode %}
+            <div>
+                <p class="text-sm text-gray-600">Vendor Code</p>
+                <p class="text-base font-medium text-gray-900">{{ po.vendorcode }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if po.paymentterms %}
+        <div class="mt-4">
+            <p class="text-sm text-gray-600">Payment Terms</p>
+            <p class="text-base text-gray-900">{{ po.paymentterms }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-3 gap-4 mt-4">
+            {% if po.validity %}
+            <div>
+                <p class="text-sm text-gray-600">Validity</p>
+                <p class="text-base text-gray-900">{{ po.validity }}</p>
+            </div>
+            {% endif %}
+            {% if po.warrenty %}
+            <div>
+                <p class="text-sm text-gray-600">Warranty</p>
+                <p class="text-base text-gray-900">{{ po.warrenty }}</p>
+            </div>
+            {% endif %}
+            {% if po.insurance %}
+            <div>
+                <p class="text-sm text-gray-600">Insurance</p>
+                <p class="text-base text-gray-900">{{ po.insurance }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if po.remarks %}
+        <div class="mt-4">
+            <p class="text-sm text-gray-600">Remarks</p>
+            <p class="text-base text-gray-900">{{ po.remarks }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Tax & Charges -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Tax & Charges</h3>
+        
+        <div class="grid grid-cols-4 gap-4">
+            {% if po.pf %}
+            <div>
+                <p class="text-sm text-gray-600">P&F</p>
+                <p class="text-base font-medium text-gray-900">{{ po.pf }}</p>
+            </div>
+            {% endif %}
+            {% if po.vat %}
+            <div>
+                <p class="text-sm text-gray-600">VAT</p>
+                <p class="text-base font-medium text-gray-900">{{ po.vat }}</p>
+            </div>
+            {% endif %}
+            {% if po.excise %}
+            <div>
+                <p class="text-sm text-gray-600">Excise</p>
+                <p class="text-base font-medium text-gray-900">{{ po.excise }}</p>
+            </div>
+            {% endif %}
+            {% if po.octroi %}
+            <div>
+                <p class="text-sm text-gray-600">Octroi</p>
+                <p class="text-base font-medium text-gray-900">{{ po.octroi }}</p>
+            </div>
+            {% endif %}
+            {% if po.cst %}
+            <div>
+                <p class="text-sm text-gray-600">CST</p>
+                <p class="text-base font-medium text-gray-900">{{ po.cst }}</p>
+            </div>
+            {% endif %}
+            {% if po.freight %}
+            <div>
+                <p class="text-sm text-gray-600">Freight</p>
+                <p class="text-base font-medium text-gray-900">{{ po.freight }}</p>
+            </div>
+            {% endif %}
+            {% if po.transport %}
+            <div>
+                <p class="text-sm text-gray-600">Transport</p>
+                <p class="text-base font-medium text-gray-900">{{ po.transport }}</p>
+            </div>
+            {% endif %}
+            {% if po.othercharges %}
+            <div>
+                <p class="text-sm text-gray-600">Other Charges</p>
+                <p class="text-base font-medium text-gray-900">{{ po.othercharges }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Line Items -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-semibold text-gray-800">Line Items</h3>
+        </div>
+        
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Description</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Discount</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for item in line_items %}
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ item.itemdesc }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ item.totalqty }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ item.unit.unitname }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ item.rate }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ item.discount|default:"0" }}%</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 text-right">
+                        {% widthratio item.totalqty 1 item.rate as subtotal %}
+                        {% widthratio subtotal item.discount 100 as discount_amt %}
+                        {% widthratio subtotal 1 1 as final_subtotal %}
+                        {{ final_subtotal|floatformat:2 }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-16 text-center text-gray-500">No line items</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

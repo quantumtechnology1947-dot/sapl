@@ -1,0 +1,127 @@
+{% extends "core/base.html" %}
+
+{% block title %}ManPower Plan - {{ plan.wono }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-sm font-bold text-gray-900">ManPower Plan Details</h2>
+        <p class="mt-1 text-sm text-gray-600">Work Order: {{ plan.wono }}</p>
+    </div>
+    <div class="space-x-2">
+        <a href="{% url 'project_management:manpower-update' plan.id %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Edit</a>
+        <a href="{% url 'project_management:manpower-list' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Back to List</a>
+    </div>
+</div>
+
+<!-- Main Details -->
+<div class="bg-white rounded border border-gray-200 p-6 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <p class="text-sm text-gray-600">ID</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.id }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Work Order Number</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.wono }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Employee ID</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.empid }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Date</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.date }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Department</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.dept|default:'N/A' }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Types</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.types|default:'N/A' }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Amendment Number</p>
+            <p class="text-base font-medium">
+                <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">#{{ plan.amendmentno }}</span>
+            </p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Company ID</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.compid }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-600">Financial Year ID</p>
+            <p class="text-base font-medium text-gray-900">{{ plan.finyearid }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Planning Details -->
+<div class="bg-white rounded border border-gray-200 p-6 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Planning Details</h3>
+    {% if details %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Equipment ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sub-Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Planned Desc</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for detail in details %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ detail.equipid }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ detail.category }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ detail.subcategory }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ detail.hour }} hrs</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ detail.planneddesc|truncatewords:10 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-500">No planning details available</p>
+    {% endif %}
+</div>
+
+<!-- Amendment History -->
+<div class="bg-white rounded border border-gray-200 p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Amendment History</h3>
+    {% if amendments %}
+    <div class="space-y-3">
+        {% for amd in amendments %}
+        <div class="border border-gray-200 rounded p-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-medium text-gray-900">Amendment #{{ amd.amendmentno }}</p>
+                    <p class="text-sm text-gray-600 mt-1">WO: {{ amd.wono }} - Employee: {{ amd.empid }}</p>
+                    <p class="text-sm text-gray-600">Date: {{ amd.date }}</p>
+                </div>
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                    {{ amd.sysdate }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-500">No amendments yet</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

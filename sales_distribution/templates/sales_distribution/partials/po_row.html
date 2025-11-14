@@ -1,0 +1,42 @@
+<tr id="po-{{ po.poid }}" class="hover:bg-gray-50">
+    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ po.pono }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">{{ po.podate }}</td>
+    <td class="px-6 py-4 text-sm text-gray-900">{{ po.customerid }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">
+        {% if po.quotationno %}
+        QT-{{ po.quotationno }}
+        {% else %}
+        <span class="text-gray-400">-</span>
+        {% endif %}
+    </td>
+    <td class="px-6 py-4 text-sm">
+        {% if po.filename %}
+        <a href="{% url 'sales_distribution:po-download' po.poid %}" 
+           class="text-blue-600 hover:text-blue-900 inline-flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Download
+        </a>
+        {% else %}
+        <span class="text-gray-400">No file</span>
+        {% endif %}
+    </td>
+    <td class="px-6 py-4 text-right text-sm">
+        <a href="{% url 'sales_distribution:po-detail' po.poid %}" class="text-green-600 hover:text-green-900 mr-3">View</a>
+        <a href="{% url 'sales_distribution:po-edit' po.poid %}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
+        <button hx-delete="{% url 'sales_distribution:po-delete' po.poid %}"
+                hx-target="#po-{{ po.poid }}"
+                hx-swap="outerHTML swap:1s"
+                hx-confirm="Delete this PO?"
+                class="text-red-600 hover:text-red-900">Delete</button>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

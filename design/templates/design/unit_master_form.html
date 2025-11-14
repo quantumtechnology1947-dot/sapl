@@ -1,0 +1,116 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Unit{% else %}Add Unit{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-sm font-bold text-gray-900">
+                {% if object %}Edit Unit{% else %}Add New Unit{% endif %}
+            </h1>
+            <p class="text-gray-600">Unit of measurement details</p>
+        </div>
+        <a href="{% url 'design:unit_master_list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to List
+        </a>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded border border-gray-200">
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Unit Name -->
+            <div>
+                <label for="{{ form.unitname.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.unitname.label }} <span class="text-red-500">*</span>
+                </label>
+                {{ form.unitname }}
+                {% if form.unitname.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.unitname.help_text }}</p>
+                {% endif %}
+                {% if form.unitname.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.unitname.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Short Name -->
+            <div>
+                <label for="{{ form.unitshortname.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.unitshortname.label }}
+                </label>
+                {{ form.unitshortname }}
+                {% if form.unitshortname.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.unitshortname.help_text }}</p>
+                {% endif %}
+                {% if form.unitshortname.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.unitshortname.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Effect on Invoice -->
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    {{ form.effectoninvoice }}
+                </div>
+                <div class="ml-3">
+                    <label for="{{ form.effectoninvoice.id_for_label }}" class="text-sm font-medium text-gray-700">
+                        {{ form.effectoninvoice.label }}
+                    </label>
+                    {% if form.effectoninvoice.help_text %}
+                    <p class="text-sm text-gray-500">{{ form.effectoninvoice.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Active Flag -->
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    {{ form.flag }}
+                </div>
+                <div class="ml-3">
+                    <label for="{{ form.flag.id_for_label }}" class="text-sm font-medium text-gray-700">
+                        {{ form.flag.label }}
+                    </label>
+                    {% if form.flag.help_text %}
+                    <p class="text-sm text-gray-500">{{ form.flag.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+                <a href="{% url 'design:unit_master_list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    {% if object %}Update Unit{% else %}Create Unit{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

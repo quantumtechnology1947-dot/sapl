@@ -1,0 +1,63 @@
+{% extends "core/base.html" %}
+
+{% block title %}GST Master - Cortex ERP{% endblock %}
+{% block page_title %}GST Master{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">GST Master</h2>
+                <p class="text-sm text-gray-600 mt-1">Manage GST rates with auto-calculated CGST, SGST, and IGST</p>
+            </div>
+            <a href="{% url 'sys_admin:gst-master-create' %}"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md inline-flex items-center transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add GST Rate
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        <form hx-get="{% url 'sys_admin:gst-master-list' %}"
+              hx-target="#gst-table"
+              hx-swap="innerHTML"
+              class="flex items-center gap-4">
+            
+            <!-- Status Filter -->
+            <div>
+                <select name="status"
+                        class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Status</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+
+            <!-- Clear Button -->
+            <a href="{% url 'sys_admin:gst-master-list' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md transition-colors">
+                Clear
+            </a>
+        </form>
+    </div>
+
+    <!-- GST Table -->
+    <div id="gst-table" class="bg-white rounded border border-gray-200 overflow-hidden">
+        {% include "sys_admin/partials/gst_master_list_partial.html" %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,47 @@
+{% extends 'material_planning/base.html' %}
+{% block title %}Raw Material Details{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h2 class="text-sm font-bold text-gray-900">Raw Material Details</h2>
+    <a href="{% url 'material_planning:raw-material-create' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Add Raw Material</a>
+</div>
+<div class="bg-white rounded border border-gray-200 p-6">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan No</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for rm in object_list %}
+            <tr>
+                <td class="px-6 py-4 text-sm">{{ rm.id }}</td>
+                <td class="px-6 py-4 text-sm">{{ rm.planno|default:'-' }}</td>
+                <td class="px-6 py-4 text-sm">{{ rm.item }}</td>
+                <td class="px-6 py-4 text-sm">{{ rm.qty }}</td>
+                <td class="px-6 py-4 text-sm">{{ rm.rate }}</td>
+                <td class="px-6 py-4 text-sm space-x-2">
+                    <a href="{% url 'material_planning:raw-material-update' rm.id %}" class="text-green-600 hover:text-green-900">Edit</a>
+                    <a href="{% url 'material_planning:raw-material-delete' rm.id %}" class="text-red-600 hover:text-red-900">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No raw materials found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

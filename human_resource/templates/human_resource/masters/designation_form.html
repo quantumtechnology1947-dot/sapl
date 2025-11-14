@@ -1,0 +1,29 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Designation - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Designation{% endblock %}
+{% block form_action %}{% if object %}{% url 'human_resource:designation-update' object.id %}{% else %}{% url 'human_resource:designation-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'human_resource:designation-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="type"
+        label="Designation"
+        value=object.type
+        required=True
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="symbol"
+        label="Symbol"
+        value=object.symbol
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

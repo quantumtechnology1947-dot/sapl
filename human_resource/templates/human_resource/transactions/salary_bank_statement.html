@@ -1,0 +1,257 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Salary Bank Statement - Human Resource{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-sm font-bold text-gray-800">Salary Bank Statement</h1>
+            <p class="text-gray-600 text-sm mt-1">Generate bank transfer statements for salary payments</p>
+        </div>
+        <a href="{% url 'human_resource:salary-list' %}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-200">
+            <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Salary List
+        </a>
+    </div>
+
+    <!-- Month Selection Form -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <form method="get" class="flex gap-4 items-end">
+            <div class="flex-1">
+                <label for="month" class="block text-sm font-medium text-gray-700 mb-2">Select Month</label>
+                <select name="month" id="month" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">-- Select Month --</option>
+                    {% for month_num, month_name in months %}
+                        <option value="{{ month_num }}" {% if selected_month == month_num %}selected{% endif %}>{{ month_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200">
+                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Load Data
+            </button>
+        </form>
+    </div>
+
+    {% if employee_list %}
+        <!-- Employee List Form -->
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-800">Employee List - {{ month_name }}</h2>
+                        <p class="text-sm text-gray-600 mt-1">Select employees for bank transfer</p>
+                    </div>
+                    <div>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="selectAll" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" onchange="toggleAll(this)">
+                            <span class="text-sm font-medium text-gray-700">Select All</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <form id="bankStatementForm" action="{% url 'human_resource:salary-bank-statement-export' %}" method="get">
+                <input type="hidden" name="month" value="{{ selected_month }}">
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Select
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    SN
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Employee Name
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Employee ID
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    A/C Number
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Net Pay Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in employee_list %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input type="checkbox" name="empid" value="{{ item.employee.empid }}" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 employee-checkbox">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {{ forloop.counter }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ item.employee.employeename|default:"N/A" }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ item.employee.empid }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ item.employee.bankaccountno|default:"N/A" }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right text-gray-900">
+                                        ₹ {{ item.net_pay|floatformat:2 }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="bg-gray-50">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-sm font-medium text-gray-900 text-right">
+                                    Total Amount:
+                                </td>
+                                <td class="px-6 py-4 text-sm font-bold text-right text-blue-600">
+                                    ₹ <span id="totalAmount">0.00</span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="p-6 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                    <div class="text-sm text-gray-600">
+                        <span id="selectedCount">0</span> employee(s) selected
+                    </div>
+                    <div class="space-x-3">
+                        <a href="{% url 'human_resource:salary-list' %}" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-200">
+                            Cancel
+                        </a>
+                        <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition duration-200" onclick="return validateSelection()">
+                            <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Export to CSV
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    {% elif selected_month %}
+        <!-- No Data Message -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800">No salary records found</h3>
+                    <p class="mt-2 text-sm text-yellow-700">
+                        There are no processed salaries for {{ month_name }}. Please process salaries first before generating bank statements.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{% url 'human_resource:salary-employee-list' %}" class="text-sm font-medium text-yellow-800 hover:text-yellow-700">
+                            Process Salaries →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Initial Message -->
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Select a month to begin</h3>
+                    <p class="mt-2 text-sm text-blue-700">
+                        Choose a month from the dropdown above to view employees with processed salaries and generate bank transfer statements.
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Toggle all checkboxes
+function toggleAll(source) {
+    const checkboxes = document.querySelectorAll('.employee-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = source.checked;
+    });
+    updateSelectedCount();
+    updateTotalAmount();
+}
+
+// Update selected count
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('.employee-checkbox:checked');
+    document.getElementById('selectedCount').textContent = checkboxes.length;
+}
+
+// Update total amount
+function updateTotalAmount() {
+    const checkboxes = document.querySelectorAll('.employee-checkbox:checked');
+    let total = 0;
+
+    checkboxes.forEach(checkbox => {
+        const row = checkbox.closest('tr');
+        const amountCell = row.querySelector('td:last-child');
+        const amountText = amountCell.textContent.replace('₹', '').replace(/,/g, '').trim();
+        total += parseFloat(amountText) || 0;
+    });
+
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+}
+
+// Validate selection before submit
+function validateSelection() {
+    const checkboxes = document.querySelectorAll('.employee-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert('Please select at least one employee.');
+        return false;
+    }
+    return true;
+}
+
+// Add event listeners to checkboxes
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.employee-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectedCount();
+            updateTotalAmount();
+
+            // Update "Select All" checkbox state
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const allCheckboxes = document.querySelectorAll('.employee-checkbox');
+            const checkedCheckboxes = document.querySelectorAll('.employee-checkbox:checked');
+            selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length;
+        });
+    });
+
+    // Initial update
+    updateSelectedCount();
+    updateTotalAmount();
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

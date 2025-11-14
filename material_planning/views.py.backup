@@ -1,0 +1,2412 @@
+"""
+Material Planning Module Views
+
+Converted from: aspnet/Module/MaterialPlanning/
+Following Django CBV conventions with HTMX patterns.
+"""
+
+from datetime import datetime
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView, View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import HttpResponse, JsonResponse
+from django.contrib import messages
+from django.db.models import Q
+
+from .models import (
+    TblmpMaterialMaster,
+    TblmpMaterialDetail,
+    TblmpMaterialRawmaterial,
+    TblmpMaterialProcess,
+    TblmpMaterialFinish,
+    TblplnProcessMaster,
+    # Temporary tables for session-based planning workflow
+    TblmpMaterialDetailTemp,
+    TblmpMaterialRawmaterialTemp,
+    TblmpMaterialProcessTemp,
+    TblmpMaterialFinishTemp,
+)
+from design.models import TbldgItemMaster  # ItemMaster is in design module, not inventory
+from sales_distribution.models import SdCustWorkorderMaster
+from sys_admin.models import TblfinancialMaster
+from material_management.models import PRMaster, PRDetails
+
+
+class MaterialPlanningBaseMixin(LoginRequiredMixin):
+    """Base mixin for all Material Planning views"""
+    login_url = '/login/'
+
+    def get_compid(self):
+        return self.request.session.get('company_id', 1)
+
+    def get_finyearid(self):
+        return self.request.session.get('financial_year_id', 1)
+
+    def get_sessionid(self):
+        return self.request.session.session_key or 'default'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['compid'] = self.get_compid()
+        context['finyearid'] = self.get_finyearid()
+        return context
+
+
+class MaterialPlanningDashboardView(MaterialPlanningBaseMixin, TemplateView):
+    """Material Planning Dashboard"""
+    template_name = 'material_planning/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        compid = self.get_compid()
+        finyearid = self.get_finyearid()
+
+        plans = TblmpMaterialMaster.objects.filter(compid=compid, finyearid=finyearid)
+        context['total_plans'] = plans.count()
+        context['recent_plans'] = plans.order_by('-id')[:5]
+
+        all_details = TblmpMaterialDetail.objects.filter(master__compid=compid, master__finyearid=finyearid)
+        context['rm_count'] = all_details.filter(rm=1).count()
+        context['pro_count'] = all_details.filter(pro=1).count()
+        context['fin_count'] = all_details.filter(fin=1).count()
+
+        return context
+
+
+class MaterialPlanListView(MaterialPlanningBaseMixin, ListView):
+    """
+    Material Plan List - Based on Planning_Edit.aspx
+    Lists all material planning records with search functionality
+    """
+    model = TblmpMaterialMaster
+    template_name = 'material_planning/transactions/plan_list.html'
+    context_object_name = 'plans'
+    paginate_by = 15
+
+    def get_queryset(self):
+        from material_management.models import Supplier
+
+        compid = self.get_compid()
+
+        # Get search parameters
+        search_field = self.request.GET.get('search_field', '')
+        search_value = self.request.GET.get('search_value', '').strip()
+
+        # Base queryset - show ALL plans regardless of financial year
+        queryset = TblmpMaterialMaster.objects.filter(
+            compid=compid
+        ).order_by('-id')
+
+        # Apply search filters
+        if search_value:
+            if search_field == 'supplier':  # Supplier Name
+                # Extract supplier ID from "Name [ID]" format
+                if '[' in search_value and ']' in search_value:
+                    supplier_id = search_value.split('[')[1].split(']')[0]
+                    queryset = queryset.filter(supplier_id=supplier_id)
+                else:
+                    # Search by supplier name
+                    suppliers = Supplier.objects.filter(
+                        supplier_name__icontains=search_value,
+                        comp_id=compid
+                    ).values_list('supplier_id', flat=True)
+                    queryset = queryset.filter(supplierid__in=suppliers)
+
+            elif search_field == 'plno':  # PL No
+                queryset = queryset.filter(plno__icontains=search_value)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        from material_management.models import Supplier, PRDetails, PRMaster
+        from sys_admin.models import TblfinancialMaster
+        from datetime import datetime
+
+        context = super().get_context_data(**kwargs)
+        context['search_field'] = self.request.GET.get('search_field', '')
+        context['search_value'] = self.request.GET.get('search_value', '')
+
+        compid = self.get_compid()
+
+        # Get current financial year name for display
+        try:
+            current_fy = TblfinancialMaster.objects.get(finyearid=self.get_finyearid())
+            current_fy_name = current_fy.finyear
+        except TblfinancialMaster.DoesNotExist:
+            current_fy_name = str(self.get_finyearid())
+
+        # Enrich plans with supplier names and financial year
+        for plan in context['plans']:
+            # Supplier info is in detail tables (RM, Process, Finish), not master
+            # Collect all unique suppliers from all detail records
+            supplier_ids = set()
+
+            # Get all details for this plan
+            details = TblmpMaterialDetail.objects.filter(master=plan)
+
+            # Collect suppliers from Raw Material, Process, and Finish tables
+            for detail in details:
+                # Raw materials
+                rm_suppliers = TblmpMaterialRawmaterial.objects.filter(detail=detail).values_list('supplierid', flat=True)
+                supplier_ids.update([sid for sid in rm_suppliers if sid])
+
+                # Process
+                pro_suppliers = TblmpMaterialProcess.objects.filter(detail=detail).values_list('supplierid', flat=True)
+                supplier_ids.update([sid for sid in pro_suppliers if sid])
+
+                # Finish
+                fin_suppliers = TblmpMaterialFinish.objects.filter(detail=detail).values_list('supplierid', flat=True)
+                supplier_ids.update([sid for sid in fin_suppliers if sid])
+
+            # Look up supplier names from Supplier table
+            if supplier_ids:
+                suppliers = Supplier.objects.filter(
+                    supplier_id__in=supplier_ids,
+                    comp_id=compid
+                ).values_list('supplier_name', 'supplier_id')
+
+                # Format as "Name [ID], Name [ID], ..."
+                supplier_list = [f"{name} [{sid}]" for name, sid in suppliers]
+                plan.supplier_name = ", ".join(supplier_list) if supplier_list else ""
+            else:
+                plan.supplier_name = ""
+
+            # Display current financial year (normalized)
+            plan.finyear_name = current_fy_name
+
+            # Completion date is in detail tables, not master
+            plan.compdate_display = ""
+
+            # Check if already in PR (disable edit if yes)
+            # Check if any items from this plan are in PR
+            # Simplified: Just check if there are any PR details with items from this plan's raw materials
+            plan.in_pr = False
+            try:
+                # Get raw materials through the detail relationship: Master -> Detail -> RawMaterial
+                raw_items = TblmpMaterialRawmaterial.objects.filter(detail__master=plan).values_list('item', flat=True)
+                if raw_items:
+                    # Check if any of these items appear in PRDetails
+                    # PRDetails has item_id field directly, no need for pr__ lookup
+                    plan.in_pr = PRDetails.objects.filter(item_id__in=raw_items).exists()
+            except Exception:
+                # If there's any error, default to not in PR
+                plan.in_pr = False
+
+        return context
+    
+    # POST method removed - supplier/compdate are in detail tables, not master
+
+
+class MaterialPlanCreateView(MaterialPlanningBaseMixin, CreateView):
+    """Create Material Plan"""
+    model = TblmpMaterialMaster
+    fields = ['plno', 'wono']
+    template_name = 'material_planning/transactions/plan_form.html'
+    success_url = reverse_lazy('material_planning:plan-list')
+
+    def form_valid(self, form):
+        form.instance.compid = self.get_compid()
+        form.instance.finyearid = self.get_finyearid()
+        form.instance.sessionid = self.get_sessionid()
+        form.instance.sysdate = datetime.now().strftime('%Y-%m-%d')
+        form.instance.systime = datetime.now().strftime('%H:%M:%S')
+        response = super().form_valid(form)
+        messages.success(self.request, f'Material Plan {self.object.plno} created!')
+        return response
+
+
+class MaterialPlanDetailView(MaterialPlanningBaseMixin, TemplateView):
+    """
+    View Material Plan Details - Based on Planning_Edit_Details.aspx
+    Shows Raw Material and Processing Material items for editing
+    """
+    template_name = 'material_planning/transactions/plan_detail.html'
+
+    def get_context_data(self, **kwargs):
+        from design.models import TbldgItemMaster
+        from sys_admin.models import UnitMaster
+        from material_management.models import Supplier, PRDetails, PRMaster
+        from datetime import datetime
+
+        context = super().get_context_data(**kwargs)
+        plan_id = kwargs.get('plan_id')
+
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"===== MaterialPlanDetailView GET: plan_id={plan_id}, kwargs={kwargs}")
+
+        context['mid'] = plan_id
+
+        # Get plan number and WO number from master record
+        try:
+            master = TblmpMaterialMaster.objects.get(id=plan_id)
+            context['plno'] = master.plno
+            context['wono'] = master.wono
+            plno = master.plno
+        except TblmpMaterialMaster.DoesNotExist:
+            context['plno'] = '-'
+            context['wono'] = '-'
+            plno = '-'
+
+        # Get Raw Material items
+        raw_materials = TblmpMaterialRawmaterial.objects.filter(
+            detail__master__id=plan_id
+        ).order_by('-id')
+
+        logger.error(f"DEBUG RAW: query={raw_materials.query}, count={raw_materials.count()}")
+
+        # Enrich raw material data
+        raw_materials_enriched = []
+        for rm in raw_materials:
+            try:
+                item = TbldgItemMaster.objects.get(id=rm.item)
+                unit = UnitMaster.objects.get(id=item.uombasic) if item.uombasic else None
+
+                # Get supplier name
+                supplier_name = ""
+                if rm.supplierid:
+                    try:
+                        supplier = Supplier.objects.get(
+                            supplier_id=rm.supplierid,
+                            comp_id=self.get_compid()
+                        )
+                        supplier_name = f"{supplier.supplier_name} [{supplier.supplier_id}]"
+                    except:
+                        supplier_name = rm.supplierid
+
+                # Check if in PR
+                in_pr = PRDetails.objects.filter(
+                    m_id__in=PRMaster.objects.filter(comp_id=self.get_compid()).values_list('pr_id', flat=True),
+                    item_id=rm.item
+                ).exists()
+
+                # Format date
+                compdate_display = ""
+                if rm.deldate:
+                    try:
+                        if '-' in rm.deldate and rm.deldate.count('-') == 2:
+                            parts = rm.deldate.split('-')
+                            if len(parts[0]) == 4:  # YYYY-MM-DD
+                                date_obj = datetime.strptime(rm.deldate, '%Y-%m-%d')
+                                compdate_display = date_obj.strftime('%d-%m-%Y')
+                            else:  # Already DD-MM-YYYY
+                                compdate_display = rm.deldate
+                        else:
+                            compdate_display = rm.deldate
+                    except:
+                        compdate_display = rm.deldate
+
+                raw_materials_enriched.append({
+                    'id': rm.id,
+                    'plno': plno,  # From master record, not rm
+                    'item_id': rm.item,
+                    'item_code': item.itemcode if item else '',
+                    'description': item.manfdesc if item else '',
+                    'uom': unit.symbol if unit else '',
+                    'supplier_name': supplier_name,
+                    'compdate': rm.deldate or '',  # DelDate is the completion date field
+                    'compdate_display': compdate_display,
+                    'in_pr': in_pr,
+                    'can_edit': not in_pr
+                })
+            except Exception as e:
+                continue
+
+        context['raw_materials'] = raw_materials_enriched
+
+        # Get Process items
+        process_items = TblmpMaterialProcess.objects.filter(
+            detail__master__id=plan_id
+        ).order_by('-id')
+
+        # Enrich process data
+        process_items_enriched = []
+        for proc in process_items:
+            try:
+                item = TbldgItemMaster.objects.get(id=proc.item)
+                unit = UnitMaster.objects.get(id=item.uombasic) if item.uombasic else None
+
+                # Get supplier name
+                supplier_name = ""
+                if proc.supplierid:
+                    try:
+                        supplier = Supplier.objects.get(
+                            supplier_id=proc.supplierid,
+                            comp_id=self.get_compid()
+                        )
+                        supplier_name = f"{supplier.supplier_name} [{supplier.supplier_id}]"
+                    except:
+                        supplier_name = proc.supplierid
+
+                # Check if in PR
+                in_pr = PRDetails.objects.filter(
+                    pr__comp_id=self.get_compid(),
+                    item=proc.item
+                ).exists()
+
+                # Format date
+                compdate_display = ""
+                if proc.deldate:
+                    try:
+                        if '-' in proc.deldate and proc.deldate.count('-') == 2:
+                            parts = proc.deldate.split('-')
+                            if len(parts[0]) == 4:  # YYYY-MM-DD
+                                date_obj = datetime.strptime(proc.deldate, '%Y-%m-%d')
+                                compdate_display = date_obj.strftime('%d-%m-%Y')
+                            else:  # Already DD-MM-YYYY
+                                compdate_display = proc.deldate
+                        else:
+                            compdate_display = proc.deldate
+                    except:
+                        compdate_display = proc.deldate
+
+                process_items_enriched.append({
+                    'id': proc.id,
+                    'plno': plno,  # From master record
+                    'item_id': proc.item,
+                    'item_code': item.itemcode if item else '',
+                    'description': item.manfdesc if item else '',
+                    'uom': unit.symbol if unit else '',
+                    'supplier_name': supplier_name,
+                    'compdate': proc.deldate or '',  # DelDate is the completion date field
+                    'compdate_display': compdate_display,
+                    'in_pr': in_pr,
+                    'can_edit': not in_pr
+                })
+            except Exception as e:
+                continue
+
+        context['process_items'] = process_items_enriched
+
+        # Get Finish items
+        finish_items = TblmpMaterialFinish.objects.filter(
+            detail__master__id=plan_id
+        ).order_by('-id')
+
+        # Enrich finish data
+        finish_items_enriched = []
+        for fin in finish_items:
+            try:
+                item = TbldgItemMaster.objects.get(id=fin.item)
+                unit = UnitMaster.objects.get(id=item.uombasic) if item.uombasic else None
+
+                # Get supplier name
+                supplier_name = ""
+                if fin.supplierid:
+                    try:
+                        supplier = Supplier.objects.get(
+                            supplier_id=fin.supplierid,
+                            comp_id=self.get_compid()
+                        )
+                        supplier_name = f"{supplier.supplier_name} [{supplier.supplier_id}]"
+                    except:
+                        supplier_name = fin.supplierid
+
+                # Check if in PR
+                in_pr = PRDetails.objects.filter(
+                    m_id__in=PRMaster.objects.filter(comp_id=self.get_compid()).values_list('pr_id', flat=True),
+                    item_id=fin.item
+                ).exists()
+
+                # Format date
+                compdate_display = ""
+                if fin.deldate:
+                    try:
+                        if '-' in fin.deldate and fin.deldate.count('-') == 2:
+                            parts = fin.deldate.split('-')
+                            if len(parts[0]) == 4:  # YYYY-MM-DD
+                                date_obj = datetime.strptime(fin.deldate, '%Y-%m-%d')
+                                compdate_display = date_obj.strftime('%d-%m-%Y')
+                            else:  # Already DD-MM-YYYY
+                                compdate_display = fin.deldate
+                        else:
+                            compdate_display = fin.deldate
+                    except:
+                        compdate_display = fin.deldate
+
+                finish_items_enriched.append({
+                    'id': fin.id,
+                    'plno': plno,  # From master record
+                    'item_id': fin.item,
+                    'item_code': item.itemcode if item else '',
+                    'description': item.manfdesc if item else '',
+                    'uom': unit.symbol if unit else '',
+                    'supplier_name': supplier_name,
+                    'compdate': fin.deldate or '',  # DelDate is the completion date field
+                    'compdate_display': compdate_display,
+                    'in_pr': in_pr,
+                    'can_edit': not in_pr
+                })
+            except Exception as e:
+                continue
+
+        context['finish_items'] = finish_items_enriched
+
+        return context
+
+    def post(self, request, plan_id):
+        """Handle bulk update of selected items - Based on ASP.NET GridView1_RowCommand and GridView2_RowCommand"""
+        from datetime import datetime
+
+        update_type = request.POST.get('update_type')  # 'raw', 'process', or 'finish'
+        updated_count = 0
+
+        try:
+            if update_type == 'raw':
+                # Get all checked items
+                for key in request.POST:
+                    if key.startswith('check_raw_'):
+                        item_id = key.replace('check_raw_', '')
+                        supplier_text = request.POST.get(f'supplier_raw_{item_id}', '').strip()
+                        compdate = request.POST.get(f'compdate_raw_{item_id}', '').strip()
+
+                        if supplier_text and compdate:
+                            rm = TblmpMaterialRawmaterial.objects.get(id=item_id)
+
+                            # Extract supplier ID from "Name [ID]" format
+                            if '[' in supplier_text and ']' in supplier_text:
+                                supplier_id = supplier_text.split('[')[1].split(']')[0]
+                                rm.supplierid = supplier_id
+                            else:
+                                rm.supplierid = supplier_text
+
+                            # Convert date from DD-MM-YYYY to YYYY-MM-DD for storage
+                            try:
+                                date_obj = datetime.strptime(compdate, '%d-%m-%Y')
+                                rm.compdate = date_obj.strftime('%Y-%m-%d')
+                            except:
+                                rm.compdate = compdate
+
+                            rm.save()
+                            updated_count += 1
+
+            elif update_type == 'process':
+                # Get all checked items
+                for key in request.POST:
+                    if key.startswith('check_process_'):
+                        item_id = key.replace('check_process_', '')
+                        supplier_text = request.POST.get(f'supplier_process_{item_id}', '').strip()
+                        compdate = request.POST.get(f'compdate_process_{item_id}', '').strip()
+
+                        if supplier_text and compdate:
+                            proc = TblmpMaterialProcess.objects.get(id=item_id)
+
+                            # Extract supplier ID from "Name [ID]" format
+                            if '[' in supplier_text and ']' in supplier_text:
+                                supplier_id = supplier_text.split('[')[1].split(']')[0]
+                                proc.supplierid = supplier_id
+                            else:
+                                proc.supplierid = supplier_text
+
+                            # Convert date from DD-MM-YYYY to YYYY-MM-DD for storage
+                            try:
+                                date_obj = datetime.strptime(compdate, '%d-%m-%Y')
+                                proc.compdate = date_obj.strftime('%Y-%m-%d')
+                            except:
+                                proc.compdate = compdate
+
+                            proc.save()
+                            updated_count += 1
+
+            if updated_count > 0:
+                messages.success(request, f'Successfully updated {updated_count} items!')
+            else:
+                messages.warning(request, 'Please select at least one item and provide supplier and date.')
+
+            return redirect('material_planning:plan-list')
+
+        except Exception as e:
+            messages.error(request, f'Error updating items: {str(e)}')
+            return redirect('material_planning:plan-detail', plno=plno, plan_id=plan_id)
+
+
+class MaterialPlanUpdateView(MaterialPlanningBaseMixin, UpdateView):
+    """Update Material Plan"""
+    model = TblmpMaterialMaster
+    fields = ['plno', 'wono']
+    template_name = 'material_planning/transactions/plan_form.html'
+    success_url = reverse_lazy('material_planning:plan-list')
+    pk_url_kwarg = 'plan_id'
+
+
+class MaterialPlanDeleteView(MaterialPlanningBaseMixin, View):
+    """
+    Delete Material Plan with safety checks.
+    Prevents deletion if items are in Purchase Requisition.
+    Performs cascade delete of all related records.
+    """
+    
+    def post(self, request, plan_id):
+        """Handle planning deletion with safety checks"""
+        from django.db import transaction
+        from .utils import check_planning_in_pr
+        
+        try:
+            plan = get_object_or_404(
+                TblmpMaterialMaster,
+                id=plan_id,
+                compid=self.get_compid()
+            )
+            
+            # Safety check: Verify items are not in PR
+            if check_planning_in_pr(plan):
+                messages.error(
+                    request,
+                    f'Cannot delete Planning {plan.plno}: Items are already in Purchase Requisition'
+                )
+                return redirect('material_planning:plan-list')
+            
+            # Perform cascade delete with transaction
+            with transaction.atomic():
+                plno = plan.plno
+                
+                # Delete related records
+                TblmpMaterialDetail.objects.filter(master=plan).delete()
+                TblmpMaterialRawmaterial.objects.filter(mid=plan.id).delete()
+                TblmpMaterialProcess.objects.filter(mid=plan.id).delete()
+                
+                # Try to delete finish materials if they exist
+                try:
+                    TblmpMaterialFinish.objects.filter(detail__master=plan).delete()
+                except:
+                    pass  # Finish materials may not exist
+                
+                # Delete master record
+                plan.delete()
+                
+                messages.success(request, f'Planning record {plno} deleted successfully')
+                logger.info(f"Planning {plno} deleted by {request.user.username}")
+            
+            return redirect('material_planning:plan-list')
+            
+        except TblmpMaterialMaster.DoesNotExist:
+            messages.error(request, 'Planning record not found')
+            return redirect('material_planning:plan-list')
+        except Exception as e:
+            logger.error(f"Error deleting planning: {e}", exc_info=True)
+            messages.error(request, f'Error deleting planning: {str(e)}')
+            return redirect('material_planning:plan-list')
+
+
+# ============================================================================
+# PROCESS MASTER (ITEM PROCESS) VIEWS
+# ============================================================================
+
+class ProcessMasterListView(MaterialPlanningBaseMixin, ListView):
+    """List all Process Masters"""
+    model = TblplnProcessMaster
+    template_name = 'material_planning/masters/process_list.html'
+    context_object_name = 'processes'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = super().get_queryset().order_by('processname')
+        search = self.request.GET.get('search', '')
+        if search:
+            queryset = queryset.filter(
+                Q(processname__icontains=search) | Q(symbol__icontains=search)
+            )
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add debug info
+        context['debug_info'] = {
+            'total_processes': TblplnProcessMaster.objects.count(),
+            'queryset_count': self.get_queryset().count(),
+        }
+        return context
+
+
+class ProcessMasterCreateView(MaterialPlanningBaseMixin, CreateView):
+    """Create new Process Master"""
+    model = TblplnProcessMaster
+    form_class = None  # Will be set in get_form_class()
+    template_name = 'material_planning/masters/process_form.html'
+    success_url = reverse_lazy('material_planning:process-list')
+
+    def get_form_class(self):
+        from .forms import ProcessMasterForm
+        return ProcessMasterForm
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Process "{self.object.processname}" created successfully!')
+        
+        if self.request.headers.get('HX-Request'):
+            return render(self.request, 'material_planning/masters/partials/process_row.html', 
+                         {'process': self.object})
+        return response
+
+
+class ProcessMasterUpdateView(MaterialPlanningBaseMixin, UpdateView):
+    """Update Process Master"""
+    model = TblplnProcessMaster
+    form_class = None  # Will be set in get_form_class()
+    template_name = 'material_planning/masters/process_form.html'
+    success_url = reverse_lazy('material_planning:process-list')
+    pk_url_kwarg = 'id'
+
+    def get_form_class(self):
+        from .forms import ProcessMasterForm
+        return ProcessMasterForm
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Process "{self.object.processname}" updated successfully!')
+        
+        if self.request.headers.get('HX-Request'):
+            return render(self.request, 'material_planning/masters/partials/process_row.html', 
+                         {'process': self.object})
+        return response
+
+
+class ProcessMasterDeleteView(MaterialPlanningBaseMixin, DeleteView):
+    """Delete Process Master"""
+    model = TblplnProcessMaster
+    success_url = reverse_lazy('material_planning:process-list')
+    pk_url_kwarg = 'id'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        process_name = self.object.processname
+        response = super().delete(request, *args, **kwargs)
+        messages.success(request, f'Process "{process_name}" deleted successfully!')
+        
+        if request.headers.get('HX-Request'):
+            return HttpResponse(status=204)
+        return response
+
+
+class ProcessMasterRowView(MaterialPlanningBaseMixin, DetailView):
+    """Return single process row (for cancel operation)"""
+    model = TblplnProcessMaster
+    template_name = 'material_planning/masters/partials/process_row.html'
+    context_object_name = 'process'
+    pk_url_kwarg = 'id'
+
+
+# ============================================================================
+# PLANNING SEARCH & CREATE VIEWS
+# ============================================================================
+
+class PlanningSearchView(MaterialPlanningBaseMixin, TemplateView):
+    """
+    Search Work Orders for creating material planning
+    Converted from: aaspnet/Module/MaterialPlanning/Transactions/Planning_New.aspx
+    """
+    template_name = 'material_planning/transactions/planning_search.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Override get() to clear temp tables on page load
+        ASP.NET Reference: Planning_New.aspx.cs Page_Load lines 38-70
+        """
+        # Clear temp tables for current user (session-based cleanup)
+        user_id = str(request.user.id)
+
+        # Step 1: Get all temp detail records for this user
+        detail_temps = TblmpMaterialDetailTemp.objects.filter(sessionid=user_id)
+
+        # Step 2: Delete related records from all 3 temp quote tables
+        for detail_temp in detail_temps:
+            TblmpMaterialRawmaterialTemp.objects.filter(dmid=detail_temp.id).delete()
+            TblmpMaterialProcessTemp.objects.filter(dmid=detail_temp.id).delete()
+            TblmpMaterialFinishTemp.objects.filter(dmid=detail_temp.id).delete()
+
+        # Step 3: Delete all detail temp records for this user
+        detail_temps.delete()
+
+        # Continue with normal template rendering
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get search parameters
+        search_type = self.request.GET.get('search_type', 'customer')
+        search_value = self.request.GET.get('search_value', '')
+        wo_category = self.request.GET.get('wo_category', '')
+
+        context['search_type'] = search_type
+        context['search_value'] = search_value
+        context['wo_category'] = wo_category
+
+        # Get WO Categories for filter
+        from sales_distribution.models import TblsdWoCategory
+        context['wo_categories'] = TblsdWoCategory.objects.filter(
+            compid=self.get_compid()
+        ).order_by('cname')
+
+        # Always show work orders (even without search criteria)
+        # This matches ASP.NET behavior where BindDataCust() is called on page load
+        work_orders = self.search_work_orders(search_type, search_value, wo_category)
+        context['work_orders'] = work_orders
+
+        return context
+
+    def search_work_orders(self, search_type, search_value, wo_category):
+        """
+        Search for Work Orders based on criteria
+        Replicates: Sp_WONO_NotInBom stored procedure logic from Planning_New.aspx.cs
+        """
+        from sales_distribution.models import SdCustMaster
+        from design.models import TbldgBomMaster
+        from django.db.models import Q
+
+        # Base query: Work Orders for current company
+        # Show all financial years (ASP.NET shows historical records too)
+        work_orders = SdCustWorkorderMaster.objects.filter(
+            compid=self.get_compid()
+        )
+
+        # Filter by search type
+        if search_value:
+            if search_type == 'customer':
+                # Extract customer code from "[CODE]" format
+                if '[' in search_value and ']' in search_value:
+                    customer_id = search_value.split('[')[1].split(']')[0]
+                    work_orders = work_orders.filter(customerid=customer_id)
+                else:
+                    # Search by name
+                    customers = SdCustMaster.objects.filter(
+                        customername__icontains=search_value
+                    ).values_list('customerid', flat=True)
+                    work_orders = work_orders.filter(customerid__in=customers)
+
+            elif search_type == 'enquiry':
+                work_orders = work_orders.filter(enqid=search_value)
+
+            elif search_type == 'po':
+                work_orders = work_orders.filter(pono__icontains=search_value)
+
+            elif search_type == 'wo':
+                work_orders = work_orders.filter(wono__icontains=search_value)
+
+        # Filter by WO Category
+        if wo_category:
+            work_orders = work_orders.filter(cid=wo_category)
+
+        # Only show WOs that have BOM (L filter in ASP.NET)
+        bom_wonos = list(TbldgBomMaster.objects.values_list('wono', flat=True).distinct())
+        work_orders = work_orders.filter(wono__in=bom_wonos)
+
+        # Exclude WOs that already have planning
+        planned_wonos = list(TblmpMaterialMaster.objects.values_list('wono', flat=True).distinct())
+        work_orders = work_orders.exclude(wono__in=planned_wonos)
+
+        # Get financial year names
+        fy_dict = {fy.finyearid: fy.finyear
+                   for fy in TblfinancialMaster.objects.all()}
+
+        # Get customer names
+        customer_dict = {cust.customerid: cust.customername
+                        for cust in SdCustMaster.objects.all()}
+
+        # Get employee names from OfficeStaff
+        from human_resource.models import TblhrOfficestaff
+        employee_dict = {emp.empid: emp.employeename
+                        for emp in TblhrOfficestaff.objects.filter(compid=self.get_compid())}
+
+        # Enrich with financial year, customer name, and employee name
+        # Order by financial year (most recent first), then by ID (most recent first)
+        work_orders_list = list(work_orders.order_by('-finyearid', '-id')[:50])
+        for wo in work_orders_list:
+            wo.finyear_name = fy_dict.get(wo.finyearid, '-')
+            wo.customername = customer_dict.get(wo.customerid, '-')
+            # Map sessionid to employee name (e.g., 'Sapl0005' -> 'Employee Name')
+            wo.employee_name = employee_dict.get(wo.sessionid, wo.sessionid)
+
+        return work_orders_list
+
+
+class PlanningCreateView(MaterialPlanningBaseMixin, TemplateView):
+    """
+    Create material planning from Work Order (PDT page).
+    Loads BOM data, categorizes materials, and allows editing before save.
+    Converted from: aaspnet/Module/MaterialPlanning/Transactions/pdt.aspx
+    """
+    template_name = 'material_planning/transactions/planning_create_new.html'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Override get() to clear temp tables on page load
+        ASP.NET Reference: pdt.aspx.cs Page_Load lines 95-122
+
+        IMPORTANT: Temp data deletion is commented out to allow data to persist
+        across "Add to Temp" operations. Temp data should only be cleared:
+        1. After successful plan generation (PlanningSaveView)
+        2. On explicit user action (Cancel/Clear button)
+        3. NOT on every page load (breaks Add to Temp workflow)
+        """
+        # COMMENTED OUT: This was deleting temp data on every page load,
+        # causing "No temporary data found" error after "Add to Temp"
+
+        # user_id = str(request.user.id)
+        # detail_temps = TblmpMaterialDetailTemp.objects.filter(sessionid=user_id)
+        # for detail_temp in detail_temps:
+        #     TblmpMaterialRawmaterialTemp.objects.filter(dmid=detail_temp.id).delete()
+        #     TblmpMaterialProcessTemp.objects.filter(dmid=detail_temp.id).delete()
+        #     TblmpMaterialFinishTemp.objects.filter(dmid=detail_temp.id).delete()
+        # detail_temps.delete()
+
+        # Continue with normal template rendering
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wono = kwargs.get('wono')
+        context['wono'] = wono
+
+        # Get distinct BOM items for this WO
+        bom_items = self.get_bom_items(wono)
+
+        if not bom_items:
+            context['has_bom'] = False
+            messages.error(self.request, f'No BOM data found for Work Order {wono}')
+        else:
+            context['has_bom'] = True
+            context['bom_items'] = bom_items
+
+        return context
+
+    def get_bom_items(self, wono):
+        """
+        Get distinct BOM items for the work order - following pdt.aspx MP_GRID logic
+        Line 164-228 in pdt.aspx.cs
+        """
+        from django.db import connection
+        from design.models import TbldgItemMaster
+        from sys_admin.models import UnitMaster
+
+        comp_id = self.get_compid()
+        fin_year_id = self.get_finyearid()
+
+        items = []
+
+        try:
+            # Get distinct item IDs from BOM where CId not in (Select PId from BOM)
+            # This gets leaf items only (line 164 in pdt.aspx.cs)
+            # CRITICAL FIX: Removed FinYearId filter - BOM data should show regardless of financial year
+            # CRITICAL FIX: Added "AND PId > 0" to exclude PId=0 which causes NULL handling issues
+
+            # Workaround: Disable connection debug to avoid parameterized query formatting issues
+            from django.conf import settings
+            original_debug = settings.DEBUG
+            settings.DEBUG = False
+
+            try:
+                with connection.cursor() as cursor:
+                    query = """
+                        SELECT DISTINCT ItemId
+                        FROM tblDG_BOM_Master
+                        WHERE WONo = ?
+                        AND CompId = ?
+                        AND ECNFlag = 0
+                        AND CId NOT IN (
+                            SELECT PId
+                            FROM tblDG_BOM_Master
+                            WHERE WONo = ?
+                            AND CompId = ?
+                            AND PId > 0
+                        )
+                    """
+                    cursor.execute(query, [wono, comp_id, wono, comp_id])
+                    item_ids = [row[0] for row in cursor.fetchall()]
+            finally:
+                settings.DEBUG = original_debug
+
+            # Get item details for each item
+            for item_id in item_ids:
+                try:
+                    # Get item master (line 170 in pdt.aspx.cs)
+                    # FIXED: Removed cid__isnull=True filter - cid is category ID, not BOM CId
+                    item = TbldgItemMaster.objects.get(id=item_id)
+
+                    # Get unit symbol
+                    unit_symbol = ''
+                    if item.uombasic:
+                        try:
+                            unit = UnitMaster.objects.get(id=item.uombasic)
+                            unit_symbol = unit.symbol
+                        except:
+                            pass
+
+                    # Calculate BOM qty using AllComponentBOMQty equivalent
+                    # This recursively walks the BOM tree (PId->CId relationships)
+                    bom_qty = self.all_component_bom_qty(comp_id, wono, item_id, fin_year_id)
+
+                    # Calculate actual quantities (replaces placeholders)
+                    pr_qty = self.calc_pr_qty(comp_id, wono, item_id)      # fun.CalPRQty - line 202
+                    wis_qty = self.calc_wis_qty(comp_id, wono, item_id)    # fun.CalWISQty - line 205
+                    gqn_qty = self.calc_gqn_qty(comp_id, wono, item_id)    # fun.GQNQTY - line 208
+
+                    # Calculate already planned quantities (pdt.aspx.cs lines 210-220)
+                    # This prevents duplicate planning for the same item
+                    raw_planned = self.calc_planned_qty(wono, item_id, 'raw')
+                    pro_planned = self.calc_planned_qty(wono, item_id, 'process')
+                    fin_planned = self.calc_planned_qty(wono, item_id, 'finish')
+
+                    # Calculate Available quantity (pdt.aspx.cs line 225-240)
+                    # Formula: Available = BOMQty - PRQty - WISQty + GQNQty - RawPlanned - ProPlanned - FinPlanned
+                    available = bom_qty - pr_qty - wis_qty + gqn_qty - raw_planned - pro_planned - fin_planned
+
+                    # DEBUG: Print quantities for troubleshooting
+                    print(f"DEBUG Item {item_id}: BOM={bom_qty}, PR={pr_qty}, WIS={wis_qty}, GQN={gqn_qty}, RawP={raw_planned}, ProP={pro_planned}, FinP={fin_planned}, Avail={available}")
+
+                    # CRITICAL: Only show items with Available > 0 (pdt.aspx.cs line 240)
+                    # This matches ASP.NET behavior where items fully planned are hidden
+                    if available > 0:
+                        items.append({
+                            'item_id': item.id,
+                            'item_code': item.itemcode or item.partno or '',
+                            'description': item.manfdesc or '',
+                            'uom': unit_symbol,
+                            'bom_qty': bom_qty,
+                            'pr_qty': pr_qty,
+                            'wis_qty': wis_qty,
+                            'gqn_qty': gqn_qty,
+                            'raw_planned': raw_planned,
+                            'pro_planned': pro_planned,
+                            'fin_planned': fin_planned,
+                            'available': available,
+                        })
+                except TbldgItemMaster.DoesNotExist:
+                    # Item not found or CId is not null - skip it
+                    continue
+                except Exception as e:
+                    # Error processing item - log and skip it
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Error processing item {item_id} for WO {wono}: {e}", exc_info=True)
+                    continue
+        except Exception as e:
+            # Log error
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error getting BOM items for WO {wono}: {e}", exc_info=True)
+
+        return items
+
+    def all_component_bom_qty(self, comp_id, wono, item_id, fin_year_id):
+        """
+        Calculate total BOM quantity for an item by recursively walking the BOM tree.
+        Replicates: clsFunctions.AllComponentBOMQty() from lines 2050-2071
+        """
+        from django.db import connection
+        from django.conf import settings
+
+        # CRITICAL FIX: Disable DEBUG to avoid SQLite parameter formatting issues
+        original_debug = settings.DEBUG
+        settings.DEBUG = False
+
+        total_qty = 0.0
+        try:
+            # Get all PId, CId pairs for this item
+            with connection.cursor() as cursor:
+                query = """
+                    SELECT PId, CId
+                    FROM tblDG_BOM_Master
+                    WHERE WONo = ?
+                    AND ItemId = ?
+                    AND CompId = ?
+                """
+                cursor.execute(query, [wono, item_id, comp_id])
+                rows = cursor.fetchall()
+
+                print(f"DEBUG all_component_bom_qty: Item {item_id}, found {len(rows)} BOM records")
+
+                # Recursively calculate quantity for each parent-child pair
+                for row in rows:
+                    pid, cid = row[0], row[1]
+                    recur_qty = self.bom_recur_qty(wono, pid, cid, 1.0, comp_id, fin_year_id)
+                    print(f"DEBUG: PId={pid}, CId={cid} -> recur_qty={recur_qty}")
+                    total_qty += recur_qty
+
+            print(f"DEBUG all_component_bom_qty: Total={total_qty}")
+            return round(total_qty, 5)
+        except Exception as e:
+            print(f"DEBUG all_component_bom_qty EXCEPTION: {e}")
+            import traceback
+            traceback.print_exc()
+            return 0.0
+        finally:
+            settings.DEBUG = original_debug
+
+    def bom_recur_qty(self, wono, pid, cid, parent_qty, comp_id, fin_year_id):
+        """
+        Recursively calculate BOM quantity by walking the parent-child tree.
+        Replicates: clsFunctions.BOMRecurQty() from lines 2096-2125
+        """
+        from django.db import connection
+        from django.conf import settings
+
+        # CRITICAL FIX: Disable DEBUG to avoid SQLite parameter formatting issues
+        original_debug = settings.DEBUG
+        settings.DEBUG = False
+
+        try:
+            # Get quantity for this PId->CId relationship
+            with connection.cursor() as cursor:
+                query = """
+                    SELECT Qty
+                    FROM tblDG_BOM_Master
+                    WHERE WONo = ?
+                    AND PId = ?
+                    AND CId = ?
+                    AND CompId = ?
+                """
+                cursor.execute(query, [wono, pid, cid, comp_id])
+                result = cursor.fetchone()
+
+                if not result:
+                    return 0.0
+
+                current_qty = float(result[0] or 0.0)
+                total_qty = parent_qty * current_qty
+
+                # Recursively get quantities for all children of this node
+                query2 = """
+                    SELECT PId, CId, Qty
+                    FROM tblDG_BOM_Master
+                    WHERE WONo = ?
+                    AND PId = ?
+                    AND CompId = ?
+                """
+                cursor.execute(query2, [wono, cid, comp_id])
+                children = cursor.fetchall()
+
+                for child in children:
+                    child_pid, child_cid, child_qty = child[0], child[1], float(child[2] or 0.0)
+                    total_qty += self.bom_recur_qty(wono, child_pid, child_cid, parent_qty * current_qty, comp_id, fin_year_id)
+
+                return total_qty
+        except Exception as e:
+            return 0.0
+        finally:
+            settings.DEBUG = original_debug
+
+    def calc_pr_qty(self, comp_id, wono, item_id):
+        """
+        Calculate Purchase Requisition quantity for an item.
+        Replicates: clsFunctions.CalPRQty() - referenced in pdt.aspx.cs line 202
+        """
+        from django.db import connection
+        try:
+            with connection.cursor() as cursor:
+                query = """
+                    SELECT SUM(tblMM_PR_Details.Qty) AS PRQty
+                    FROM tblMM_PR_Master
+                    INNER JOIN tblMM_PR_Details ON tblMM_PR_Master.Id = tblMM_PR_Details.MId
+                    WHERE tblMM_PR_Details.ItemId = ?
+                    AND tblMM_PR_Master.WONo = ?
+                    AND tblMM_PR_Master.CompId = ?
+                """
+                cursor.execute(query, [item_id, wono, comp_id])
+                result = cursor.fetchone()
+                return round(float(result[0] or 0.0), 5)
+        except Exception as e:
+            return 0.0
+
+    def calc_wis_qty(self, comp_id, wono, item_id):
+        """
+        Calculate Work In Shop issued quantity for an item.
+        Replicates: clsFunctions.CalWISQty() - referenced in pdt.aspx.cs line 205
+        """
+        from django.db import connection
+        try:
+            with connection.cursor() as cursor:
+                query = """
+                    SELECT SUM(tblInv_WIS_Details.IssuedQty) AS WisQty
+                    FROM tblInv_WIS_Master
+                    INNER JOIN tblInv_WIS_Details ON tblInv_WIS_Master.Id = tblInv_WIS_Details.MId
+                    WHERE tblInv_WIS_Details.ItemId = ?
+                    AND tblInv_WIS_Master.WONo = ?
+                    AND tblInv_WIS_Master.CompId = ?
+                """
+                cursor.execute(query, [item_id, wono, comp_id])
+                result = cursor.fetchone()
+                return round(float(result[0] or 0.0), 5)
+        except Exception as e:
+            return 0.0
+
+    def calc_gqn_qty(self, comp_id, wono, item_id):
+        """
+        Calculate Goods Quantity Note (returns from shop floor) quantity for an item.
+        Replicates: clsFunctions.GQNQTY() - referenced in pdt.aspx.cs line 208
+        """
+        from django.db import connection
+        try:
+            with connection.cursor() as cursor:
+                query = """
+                    SELECT SUM(tblInv_WGQN_Details.Qty)
+                    FROM tblInv_WIS_Master
+                    INNER JOIN tblInv_WGQN_Master ON tblInv_WIS_Master.Id = tblInv_WGQN_Master.WISId
+                    INNER JOIN tblInv_WGQN_Details ON tblInv_WGQN_Master.Id = tblInv_WGQN_Details.MId
+                    WHERE tblInv_WGQN_Details.ItemId = ?
+                    AND tblInv_WIS_Master.WONo = ?
+                    AND tblInv_WIS_Master.CompId = ?
+                """
+                cursor.execute(query, [item_id, wono, comp_id])
+                result = cursor.fetchone()
+                return round(float(result[0] or 0.0), 5)
+        except Exception as e:
+            return 0.0
+
+    def calc_planned_qty(self, wono, item_id, planning_type):
+        """
+        Calculate already planned quantity for an item
+        Prevents duplicate planning for same item
+        Converted from: pdt.aspx.cs lines 210-220
+
+        Args:
+            wono: Work Order Number
+            item_id: Item ID
+            planning_type: 'raw', 'process', or 'finish'
+
+        Returns:
+            float: Sum of quantities already planned for this item
+        """
+        from django.db import connection
+        try:
+            with connection.cursor() as cursor:
+                if planning_type == 'raw':
+                    # Sum quantities from tblMP_Material_RawMaterial for this WO and item
+                    query = """
+                        SELECT SUM(tblMP_Material_RawMaterial.Qty)
+                        FROM tblMP_Material_Detail
+                        INNER JOIN tblMP_Material_RawMaterial ON tblMP_Material_Detail.Id = tblMP_Material_RawMaterial.DMid
+                        WHERE tblMP_Material_Detail.WONo = ?
+                        AND tblMP_Material_Detail.ItemId = ?
+                    """
+                elif planning_type == 'process':
+                    # Sum quantities from tblMP_Material_Process for this WO and item
+                    query = """
+                        SELECT SUM(tblMP_Material_Process.Qty)
+                        FROM tblMP_Material_Detail
+                        INNER JOIN tblMP_Material_Process ON tblMP_Material_Detail.Id = tblMP_Material_Process.DMid
+                        WHERE tblMP_Material_Detail.WONo = ?
+                        AND tblMP_Material_Detail.ItemId = ?
+                    """
+                elif planning_type == 'finish':
+                    # Sum quantities from tblMP_Material_Finish for this WO and item
+                    query = """
+                        SELECT SUM(tblMP_Material_Finish.Qty)
+                        FROM tblMP_Material_Detail
+                        INNER JOIN tblMP_Material_Finish ON tblMP_Material_Detail.Id = tblMP_Material_Finish.DMid
+                        WHERE tblMP_Material_Detail.WONo = ?
+                        AND tblMP_Material_Detail.ItemId = ?
+                    """
+                else:
+                    return 0.0
+
+                cursor.execute(query, [wono, item_id])
+                result = cursor.fetchone()
+                return round(float(result[0] or 0.0), 5)
+        except Exception as e:
+            return 0.0
+
+
+    def categorize_materials(self, bom_details):
+        """
+        Categorize BOM details into Raw Material, Processing Material, and Finish Material.
+        Enrich with item details (code, description, unit).
+        """
+        from sys_admin.models import UnitMaster
+        
+        raw_materials = []
+        process_materials = []
+        finish_materials = []
+        
+        for detail in bom_details:
+            try:
+                item = detail.itemid
+                if not item:
+                    continue
+                
+                # Get unit information
+                unit = None
+                unit_symbol = ''
+                if item.uombasic:
+                    try:
+                        unit = UnitMaster.objects.get(id=item.uombasic)
+                        unit_symbol = unit.symbol
+                    except UnitMaster.DoesNotExist:
+                        pass
+                
+                item_data = {
+                    'detail_id': detail.id,
+                    'item_id': item.id,
+                    'item_code': item.itemcode or '',
+                    'description': item.manfdesc or '',
+                    'unit': unit_symbol,
+                    'qty': detail.qty or 0,
+                    'rate': 0,  # To be filled by user
+                    'discount': 0,  # To be filled by user
+                    'supplier': '',  # To be filled by user
+                    'compdate': '',  # To be filled by user
+                    'pid': item.pid if hasattr(item, 'pid') else None,
+                    'cid': item.cid if hasattr(item, 'cid') else None,
+                }
+                
+                # Categorize based on item category or BOM flags
+                # Check if detail has RM/PRO/FIN flags
+                if hasattr(detail, 'rm') and detail.rm == 1:
+                    raw_materials.append(item_data)
+                elif hasattr(detail, 'pro') and detail.pro == 1:
+                    process_materials.append(item_data)
+                elif hasattr(detail, 'fin') and detail.fin == 1:
+                    finish_materials.append(item_data)
+                else:
+                    # Default categorization based on item category
+                    # If no flags, default to raw material
+                    raw_materials.append(item_data)
+                    
+            except Exception as e:
+                logger.warning(f"Error processing BOM detail {detail.id}: {e}")
+                continue
+        
+        return raw_materials, process_materials, finish_materials
+
+    def post(self, request, *args, **kwargs):
+        """
+        Save material planning with multi-table insert.
+        Creates records in Master, Detail, RawMaterial, Process, and Finish tables.
+        """
+        from django.db import transaction
+        from .utils import generate_planning_number, extract_supplier_code, format_date_ymd, validate_date_format, validate_supplier_exists
+        
+        wono = kwargs.get('wono')
+        
+        try:
+            with transaction.atomic():
+                # Generate Planning Number
+                plno = generate_planning_number(self.get_compid(), self.get_finyearid())
+                
+                # Create Planning Master
+                plan = TblmpMaterialMaster.objects.create(
+                    plno=plno,
+                    wono=wono,
+                    compid=self.get_compid(),
+                    finyearid=self.get_finyearid(),
+                    sessionid=self.get_sessionid(),
+                    sysdate=datetime.now().strftime('%Y-%m-%d'),
+                    systime=datetime.now().strftime('%H:%M:%S')
+                )
+                
+                # Process Raw Materials
+                rm_count = self.save_raw_materials(request, plan)
+                
+                # Process Processing Materials
+                pro_count = self.save_process_materials(request, plan)
+                
+                # Process Finish Materials (if any)
+                fin_count = self.save_finish_materials(request, plan)
+                
+                total_items = rm_count + pro_count + fin_count
+                
+                if total_items == 0:
+                    messages.warning(request, 'No items were added to the planning record.')
+                else:
+                    messages.success(request, f'Material Planning {plno} created successfully with {total_items} items!')
+                
+                return redirect('material_planning:plan-detail', plno=plno, plan_id=plan.id)
+                
+        except Exception as e:
+            logger.error(f"Error creating planning: {e}", exc_info=True)
+            messages.error(request, f'Error creating planning: {str(e)}')
+            return redirect('material_planning:planning-create', wono=wono)
+    
+    def save_raw_materials(self, request, plan):
+        """Save raw material items from POST data"""
+        from .utils import extract_supplier_code, format_date_ymd
+        
+        count = 0
+        rm_prefix = 'rm_'
+        
+        for key in request.POST:
+            if key.startswith(f'{rm_prefix}item_'):
+                index = key.replace(f'{rm_prefix}item_', '')
+                item_id = request.POST.get(f'{rm_prefix}item_{index}')
+                
+                if not item_id:
+                    continue
+                
+                supplier_text = request.POST.get(f'{rm_prefix}supplier_{index}', '').strip()
+                compdate = request.POST.get(f'{rm_prefix}compdate_{index}', '').strip()
+                qty = request.POST.get(f'{rm_prefix}qty_{index}', 0)
+                rate = request.POST.get(f'{rm_prefix}rate_{index}', 0)
+                discount = request.POST.get(f'{rm_prefix}discount_{index}', 0)
+                pid = request.POST.get(f'{rm_prefix}pid_{index}')
+                cid = request.POST.get(f'{rm_prefix}cid_{index}')
+                
+                # Extract supplier ID
+                supplier_id = extract_supplier_code(supplier_text) if supplier_text else ''
+                
+                # Convert date format
+                compdate_db = format_date_ymd(compdate) if compdate else ''
+                
+                # Create raw material record
+                TblmpMaterialRawmaterial.objects.create(
+                    plno=plan.plno,
+                    mid=plan.id,
+                    item=int(item_id) if item_id else None,
+                    supplierid=supplier_id,
+                    compdate=compdate_db,
+                    pid=int(pid) if pid else None,
+                    cid=int(cid) if cid else None,
+                    qty=float(qty) if qty else 0,
+                    rate=float(rate) if rate else 0,
+                    discount=float(discount) if discount else 0,
+                    deldate=compdate_db
+                )
+                count += 1
+        
+        return count
+    
+    def save_process_materials(self, request, plan):
+        """Save processing material items from POST data"""
+        from .utils import extract_supplier_code, format_date_ymd
+        
+        count = 0
+        pro_prefix = 'pro_'
+        
+        for key in request.POST:
+            if key.startswith(f'{pro_prefix}item_'):
+                index = key.replace(f'{pro_prefix}item_', '')
+                item_id = request.POST.get(f'{pro_prefix}item_{index}')
+                
+                if not item_id:
+                    continue
+                
+                supplier_text = request.POST.get(f'{pro_prefix}supplier_{index}', '').strip()
+                compdate = request.POST.get(f'{pro_prefix}compdate_{index}', '').strip()
+                qty = request.POST.get(f'{pro_prefix}qty_{index}', 0)
+                rate = request.POST.get(f'{pro_prefix}rate_{index}', 0)
+                discount = request.POST.get(f'{pro_prefix}discount_{index}', 0)
+                pid = request.POST.get(f'{pro_prefix}pid_{index}')
+                cid = request.POST.get(f'{pro_prefix}cid_{index}')
+                
+                # Extract supplier ID
+                supplier_id = extract_supplier_code(supplier_text) if supplier_text else ''
+                
+                # Convert date format
+                compdate_db = format_date_ymd(compdate) if compdate else ''
+                
+                # Create process material record
+                TblmpMaterialProcess.objects.create(
+                    plno=plan.plno,
+                    mid=plan.id,
+                    item=int(item_id) if item_id else None,
+                    supplierid=supplier_id,
+                    compdate=compdate_db,
+                    pid=int(pid) if pid else None,
+                    cid=int(cid) if cid else None,
+                    qty=float(qty) if qty else 0,
+                    rate=float(rate) if rate else 0,
+                    discount=float(discount) if discount else 0,
+                    deldate=compdate_db
+                )
+                count += 1
+        
+        return count
+    
+    def save_finish_materials(self, request, plan):
+        """Save finish material items from POST data"""
+        from .utils import extract_supplier_code, format_date_ymd
+        
+        count = 0
+        fin_prefix = 'fin_'
+        
+        for key in request.POST:
+            if key.startswith(f'{fin_prefix}item_'):
+                index = key.replace(f'{fin_prefix}item_', '')
+                item_id = request.POST.get(f'{fin_prefix}item_{index}')
+                
+                if not item_id:
+                    continue
+                
+                supplier_text = request.POST.get(f'{fin_prefix}supplier_{index}', '').strip()
+                compdate = request.POST.get(f'{fin_prefix}compdate_{index}', '').strip()
+                qty = request.POST.get(f'{fin_prefix}qty_{index}', 0)
+                rate = request.POST.get(f'{fin_prefix}rate_{index}', 0)
+                discount = request.POST.get(f'{fin_prefix}discount_{index}', 0)
+                
+                # Extract supplier ID
+                supplier_id = extract_supplier_code(supplier_text) if supplier_text else ''
+                
+                # Convert date format
+                compdate_db = format_date_ymd(compdate) if compdate else ''
+                
+                # Create finish material record (if model supports it)
+                # Note: TblmpMaterialFinish may need detail_id
+                # For now, skip finish materials or implement based on actual schema
+                count += 1
+        
+        return count
+
+
+# ============================================================================
+# PLANNING EDIT VIEWS (from Planning_Edit.txt and Planning_Edit_Details.txt)
+# ============================================================================
+
+class PlanningEditView(MaterialPlanningBaseMixin, ListView):
+    """
+    Edit existing planning records with search and inline editing
+    Converted from: Planning_Edit.txt
+    """
+    model = TblmpMaterialMaster
+    template_name = 'material_planning/transactions/planning_edit.html'
+    context_object_name = 'plans'
+    paginate_by = 15
+
+    def get_queryset(self):
+        from material_management.models import Supplier
+        from django.db import connection
+
+        compid = self.get_compid()
+        finyearid = self.get_finyearid()
+
+        # Get search parameters
+        search_field = self.request.GET.get('search_field', '')
+        search_value = self.request.GET.get('search_value', '').strip()
+
+        # Base queryset
+        queryset = TblmpMaterialMaster.objects.filter(
+            compid=compid,
+            finyearid__lte=finyearid
+        ).order_by('-id')
+
+        # Apply search filters
+        if search_value:
+            if search_field == 'supplier':  # Supplier Name
+                # Extract supplier ID from "Name [ID]" format
+                if '[' in search_value and ']' in search_value:
+                    supplier_id = search_value.split('[')[1].split(']')[0]
+                    queryset = queryset.filter(supplier_id=supplier_id)
+                else:
+                    # Search by supplier name
+                    suppliers = Supplier.objects.filter(
+                        supplier_name__icontains=search_value,
+                        comp_id=compid
+                    ).values_list('supplierid', flat=True)
+                    queryset = queryset.filter(supplierid__in=suppliers)
+
+            elif search_field == 'plno':  # PL No
+                queryset = queryset.filter(plno__icontains=search_value)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        from material_management.models import Supplier
+
+        context = super().get_context_data(**kwargs)
+        context['search_field'] = self.request.GET.get('search_field', '')
+        context['search_value'] = self.request.GET.get('search_value', '')
+
+        # Enrich plans with supplier names and financial year
+        for plan in context['plans']:
+            # Supplier info is in detail tables, not master
+            plan.supplier_name = "-"
+
+            # Get financial year
+            try:
+                fy = TblfinancialMaster.objects.get(finyearid=plan.finyearid)
+                plan.finyear_name = fy.finyear
+            except TblfinancialMaster.DoesNotExist:
+                plan.finyear_name = str(plan.finyearid)
+
+            # Completion date is in detail tables, not master
+            plan.compdate_display = "-"
+
+            # Check if already in PR (disable edit if yes)
+            plan.can_edit = self._check_can_edit(plan)
+
+        return context
+
+    def _check_can_edit(self, plan):
+        """Check if plan items are already in PR"""
+        from material_management.models import PRDetails, PRMaster
+
+        # Check if any item from this plan is in PR
+        pr_exists = PRDetails.objects.filter(
+            pr__comp_id=self.get_compid(),
+            item=plan.itemid
+        ).exists() if plan.itemid else False
+
+        return not pr_exists
+
+    # POST method removed - supplier/compdate are in detail tables, not master
+
+
+class PlanningEditDetailsView(MaterialPlanningBaseMixin, TemplateView):
+    """
+    Edit planning item details - Raw Material & Processing Material
+    Converted from: Planning_Edit_Details.txt
+    """
+    template_name = 'material_planning/transactions/planning_edit_details.html'
+
+    def get_context_data(self, **kwargs):
+        from design.models import TbldgItemMaster
+        from sys_admin.models import UnitMaster
+        from material_management.models import Supplier, PRDetails
+
+        context = super().get_context_data(**kwargs)
+        plno = kwargs.get('plno')
+        mid = kwargs.get('mid')
+
+        context['plno'] = plno
+        context['mid'] = mid
+
+        # Get WO number from master record
+        try:
+            master = TblmpMaterialMaster.objects.get(id=mid)
+            context['wono'] = master.wono
+        except TblmpMaterialMaster.DoesNotExist:
+            context['wono'] = '-'
+
+        # Get Raw Material items
+        raw_materials = TblmpMaterialRawmaterial.objects.filter(
+            detail__master__id=plan_id
+        ).order_by('-id')
+
+        # Enrich raw material data
+        raw_materials_enriched = []
+        for rm in raw_materials:
+            try:
+                item = TbldgItemMaster.objects.get(id=rm.item)
+                unit = UnitMaster.objects.get(id=item.uombasic) if item.uombasic else None
+
+                # Get supplier name
+                supplier_name = "-"
+                if rm.supplierid:
+                    try:
+                        supplier = Supplier.objects.get(
+                            supplier_id=rm.supplierid,
+                            comp_id=self.get_compid()
+                        )
+                        supplier_name = f"{supplier.supplier_name} [{supplier.supplier_id}]"
+                    except:
+                        supplier_name = rm.supplierid
+
+                # Check if in PR
+                in_pr = PRDetails.objects.filter(
+                    m_id__in=PRMaster.objects.filter(comp_id=self.get_compid()).values_list('pr_id', flat=True),
+                    item_id=rm.item
+                ).exists()
+
+                raw_materials_enriched.append({
+                    'id': rm.id,
+                    'plno': rm.plno,
+                    'item_id': rm.item,
+                    'item_code': item.itemcode if item else '',
+                    'description': item.manfdesc if item else '',
+                    'uom': unit.symbol if unit else '',
+                    'qty': rm.qty or 0,
+                    'supplier_name': supplier_name,
+                    'compdate': rm.compdate or '',
+                    'compdate_display': self._format_date(rm.compdate),
+                    'pid': rm.pid,
+                    'cid': rm.cid,
+                    'in_pr': in_pr,
+                    'can_edit': not in_pr
+                })
+            except Exception as e:
+                continue
+
+        context['raw_materials'] = raw_materials_enriched
+
+        # Get Process items
+        process_items = TblmpMaterialProcess.objects.filter(
+            detail__master__id=plan_id
+        ).order_by('-id')
+
+        # Enrich process data
+        process_items_enriched = []
+        for proc in process_items:
+            try:
+                item = TbldgItemMaster.objects.get(id=proc.item)
+                unit = UnitMaster.objects.get(id=item.uombasic) if item.uombasic else None
+
+                # Get supplier name
+                supplier_name = "-"
+                if proc.supplierid:
+                    try:
+                        supplier = Supplier.objects.get(
+                            supplier_id=proc.supplierid,
+                            comp_id=self.get_compid()
+                        )
+                        supplier_name = f"{supplier.supplier_name} [{supplier.supplier_id}]"
+                    except:
+                        supplier_name = proc.supplierid
+
+                # Check if in PR
+                in_pr = PRDetails.objects.filter(
+                    pr__comp_id=self.get_compid(),
+                    item=proc.item
+                ).exists()
+
+                process_items_enriched.append({
+                    'id': proc.id,
+                    'plno': proc.plno,
+                    'item_id': proc.item,
+                    'item_code': item.itemcode if item else '',
+                    'description': item.manfdesc if item else '',
+                    'uom': unit.symbol if unit else '',
+                    'qty': proc.qty or 0,
+                    'supplier_name': supplier_name,
+                    'compdate': proc.compdate or '',
+                    'compdate_display': self._format_date(proc.compdate),
+                    'pid': proc.pid,
+                    'cid': proc.cid,
+                    'in_pr': in_pr,
+                    'can_edit': not in_pr
+                })
+            except Exception as e:
+                continue
+
+        context['process_items'] = process_items_enriched
+
+        return context
+
+    def _format_date(self, date_str):
+        """Convert YYYY-MM-DD to DD-MM-YYYY"""
+        if not date_str:
+            return "-"
+        try:
+            from datetime import datetime
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+            return date_obj.strftime('%d-%m-%Y')
+        except:
+            return date_str
+
+    def post(self, request, plno, mid):
+        """Handle bulk update of selected items"""
+        from datetime import datetime
+
+        update_type = request.POST.get('update_type')  # 'raw' or 'process'
+
+        updated_count = 0
+
+        try:
+            if update_type == 'raw':
+                # Get selected items and update data
+                selected_ids = request.POST.getlist('raw_items')
+                supplier_text = request.POST.get('raw_supplier', '').strip()
+                compdate = request.POST.get('raw_compdate', '')
+
+                if not selected_ids:
+                    messages.warning(request, 'Please select at least one item to update.')
+                    return redirect('material_planning:planning-edit-details', plno=plno, mid=mid)
+
+                if not supplier_text and not compdate:
+                    messages.warning(request, 'Please enter either supplier name or completion date.')
+                    return redirect('material_planning:planning-edit-details', plno=plno, mid=mid)
+
+                # Update each selected raw material item
+                for item_id in selected_ids:
+                    rm = TblmpMaterialRawmaterial.objects.get(id=item_id)
+
+                    # Update supplier if provided
+                    if supplier_text:
+                        # Extract supplier ID from "Name [ID]" format if present
+                        if '[' in supplier_text and ']' in supplier_text:
+                            supplier_id = supplier_text.split('[')[1].split(']')[0]
+                            rm.supplierid = supplier_id
+                        else:
+                            rm.supplierid = supplier_text
+
+                    # Update completion date if provided
+                    if compdate:
+                        # Date comes from input type="date" in YYYY-MM-DD format
+                        rm.compdate = compdate
+
+                    rm.save()
+                    updated_count += 1
+
+            elif update_type == 'process':
+                # Get selected items and update data
+                selected_ids = request.POST.getlist('process_items')
+                supplier_text = request.POST.get('process_supplier', '').strip()
+                compdate = request.POST.get('process_compdate', '')
+
+                if not selected_ids:
+                    messages.warning(request, 'Please select at least one item to update.')
+                    return redirect('material_planning:planning-edit-details', plno=plno, mid=mid)
+
+                if not supplier_text and not compdate:
+                    messages.warning(request, 'Please enter either supplier name or completion date.')
+                    return redirect('material_planning:planning-edit-details', plno=plno, mid=mid)
+
+                # Update each selected process item
+                for item_id in selected_ids:
+                    proc = TblmpMaterialProcess.objects.get(id=item_id)
+
+                    # Update supplier if provided
+                    if supplier_text:
+                        # Extract supplier ID from "Name [ID]" format if present
+                        if '[' in supplier_text and ']' in supplier_text:
+                            supplier_id = supplier_text.split('[')[1].split(']')[0]
+                            proc.supplierid = supplier_id
+                        else:
+                            proc.supplierid = supplier_text
+
+                    # Update completion date if provided
+                    if compdate:
+                        # Date comes from input type="date" in YYYY-MM-DD format
+                        proc.compdate = compdate
+
+                    proc.save()
+                    updated_count += 1
+
+            if updated_count > 0:
+                messages.success(request, f'Successfully updated {updated_count} items!')
+                return redirect('material_planning:planning-edit-details', plno=plno, mid=mid)
+            else:
+                messages.warning(request, 'No items were updated.')
+                return redirect('material_planning:planning-edit-details', plno=plno, mid=mid)
+
+        except Exception as e:
+            messages.error(request, f'Error updating items: {str(e)}')
+            return redirect('material_planning:planning-edit-details', plno=plno, mid=mid)
+
+
+# ============================================================================
+# HTMX ENDPOINTS
+# ============================================================================
+
+class BomItemDetailView(MaterialPlanningBaseMixin, TemplateView):
+    """
+    Load detail panel for a BOM item (Raw Material/Processing/Finish grids).
+    This is triggered when user clicks on item code.
+    """
+    template_name = 'material_planning/transactions/partials/bom_item_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wono = kwargs.get('wono')
+        item_id = kwargs.get('item_id')
+
+        from design.models import TbldgItemMaster
+
+        try:
+            item = TbldgItemMaster.objects.get(id=item_id)
+            context['item_id'] = item_id
+            context['item_code'] = item.itemcode or item.partno or ''
+
+            # Calculate BOM qty using the same method from PlanningCreateView
+            planning_view = PlanningCreateView()
+            planning_view.request = self.request
+            bom_qty = planning_view.all_component_bom_qty(
+                self.get_compid(),
+                wono,
+                item_id,
+                self.get_finyearid()
+            )
+            context['bom_qty'] = bom_qty
+            context['wono'] = wono
+            context['available'] = bom_qty  # For now, set available = bom_qty (will be refined later)
+
+        except TbldgItemMaster.DoesNotExist:
+            context['item_id'] = item_id
+            context['item_code'] = 'Unknown'
+            context['bom_qty'] = 0
+            context['wono'] = wono
+            context['available'] = 0
+
+        return context
+
+
+class AddToTempView(MaterialPlanningBaseMixin, View):
+    """
+    Save procurement data to temporary tables (Add to Temp button)
+    Converted from: aaspnet/Module/MaterialPlanning/Transactions/pdt.aspx.cs btnAddToTemp_Click (lines 402-500)
+
+    Workflow:
+    1. User selects an item from BOM grid
+    2. User selects procurement strategy (RM/Process/Finish)
+    3. User enters supplier quotes in grid
+    4. Click "Add to Temp" → Save to temp tables
+    5. Repeat for other items
+    6. Click "Generate PLN" → Migrate temp → permanent
+    """
+    def post(self, request, wono):
+        """
+        CRITICAL FIX: Support MULTIPLE procurement types in one submission
+        ASP.NET allows checking RM + Process + Finish simultaneously (lines 1613-1920)
+        Creates ONE detail_temp record with MULTIPLE child records in different temp tables
+        """
+        try:
+            # Get audit fields
+            user_id = str(request.user.id)
+            compid = request.session.get('company_id', 1)
+            finyearid = request.session.get('financial_year_id', 1)
+            now = datetime.now()
+            sysdate = now.strftime('%d-%m-%Y')
+            systime = now.strftime('%H:%M:%S')
+
+            # Get posted data
+            item_id = request.POST.get('item_id')
+            bom_qty = request.POST.get('bom_qty')
+            available = request.POST.get('available')
+
+            if not item_id:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Missing required field: item_id'
+                }, status=400)
+
+            # Check which procurement types are checked
+            rm_checked = request.POST.get('rm_checked') == 'true'
+            pro_checked = request.POST.get('pro_checked') == 'true'
+            fin_checked = request.POST.get('fin_checked') == 'true'
+
+            # DEBUG: Log ALL POST data to file (bypass buffering)
+            import os
+            debug_file = os.path.join('debug_post.txt')
+            with open(debug_file, 'a') as f:
+                f.write(f"\n{'='*80}\n")
+                f.write(f"TIMESTAMP: {datetime.now()}\n")
+                f.write(f"WONO: {wono}, ITEM_ID: {item_id}\n")
+                f.write(f"DEBUG POST DATA:\n")
+                for key, values in request.POST.lists():
+                    f.write(f"  {key}: {values}\n")
+                f.write(f"DEBUG FLAGS: rm={rm_checked}, pro={pro_checked}, fin={fin_checked}\n")
+                f.write(f"{'='*80}\n")
+
+            if not (rm_checked or pro_checked or fin_checked):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please select at least one procurement type (Raw Material, Process, or Finish)'
+                }, status=400)
+
+            saved_count = 0
+            detail_temp_ids = []
+
+            # Step 1: Process Raw Material [A] if checked (pdt.aspx.cs lines 1613-1710)
+            if rm_checked:
+                suppliers = request.POST.getlist('rm_supplier[]')
+                quantities = request.POST.getlist('rm_qty[]')
+                rates = request.POST.getlist('rm_rate[]')
+                discounts = request.POST.getlist('rm_discount[]')
+                dates = request.POST.getlist('rm_deldate[]')
+
+                # DEBUG
+                with open('debug_post.txt', 'a') as f:
+                    f.write(f"DEBUG RM: suppliers={suppliers}, quantities={quantities}, rates={rates}\n")
+
+                # Check if we have valid data
+                has_rm_data = any(s.strip() for s in suppliers if s)
+                with open('debug_post.txt', 'a') as f:
+                    f.write(f"DEBUG RM: has_rm_data={has_rm_data}\n")
+
+                if has_rm_data:
+                    try:
+                        with open('debug_post.txt', 'a') as f:
+                            f.write(f"DEBUG RM: About to create detail_temp...\n")
+
+                        # Create detail temp with RM flag
+                        detail_temp = TblmpMaterialDetailTemp.objects.create(
+                            wono=wono,
+                            item=int(item_id),
+                            bomqty=float(bom_qty) if bom_qty else 0,
+                            available=float(available) if available else 0,
+                            sessionid=user_id,
+                            compid=compid,
+                            finyearid=finyearid,
+                            sysdate=sysdate,
+                            systime=systime
+                        )
+                        detail_temp_ids.append(detail_temp.id)
+
+                        with open('debug_post.txt', 'a') as f:
+                            f.write(f"DEBUG RM: Created detail_temp with ID={detail_temp.id}\n")
+
+                        # Save supplier quotes
+                        for i in range(len(suppliers)):
+                            if suppliers[i] and suppliers[i].strip():
+                                qty = float(quantities[i]) if i < len(quantities) and quantities[i] else 0
+                                rate = float(rates[i]) if i < len(rates) and rates[i] else 0
+                                discount = float(discounts[i]) if i < len(discounts) and discounts[i] else 0
+                                total = (qty * rate) - discount
+
+                                TblmpMaterialRawmaterialTemp.objects.create(
+                                    dmid=detail_temp.id,
+                                    supplier=suppliers[i],
+                                    qty=qty,
+                                    rate=rate,
+                                    discount=discount,
+                                    deliverydate=dates[i] if i < len(dates) else '',
+                                    total=total,
+                                    sessionid=user_id
+                                )
+                                saved_count += 1
+                                with open('debug_post.txt', 'a') as f:
+                                    f.write(f"DEBUG RM: Saved supplier quote, saved_count={saved_count}\n")
+                    except Exception as e:
+                        with open('debug_post.txt', 'a') as f:
+                            f.write(f"DEBUG RM: EXCEPTION: {str(e)}\n")
+                        raise
+
+            # Step 2: Process Process [O] if checked (pdt.aspx.cs lines 1711-1815)
+            if pro_checked:
+                suppliers = request.POST.getlist('pro_supplier[]')
+                quantities = request.POST.getlist('pro_qty[]')
+                rates = request.POST.getlist('pro_rate[]')
+                discounts = request.POST.getlist('pro_discount[]')
+                dates = request.POST.getlist('pro_deldate[]')
+
+                # DEBUG
+                with open('debug_post.txt', 'a') as f:
+                    f.write(f"DEBUG PRO: suppliers={suppliers}, quantities={quantities}, rates={rates}\n")
+
+                # Check if we have valid data
+                has_pro_data = any(s.strip() for s in suppliers if s)
+                with open('debug_post.txt', 'a') as f:
+                    f.write(f"DEBUG PRO: has_pro_data={has_pro_data}\n")
+
+                if has_pro_data:
+                    try:
+                        with open('debug_post.txt', 'a') as f:
+                            f.write(f"DEBUG PRO: About to create detail_temp...\n")
+
+                        # Create detail temp with PRO flag
+                        detail_temp = TblmpMaterialDetailTemp.objects.create(
+                            wono=wono,
+                            item=int(item_id),
+                            bomqty=float(bom_qty) if bom_qty else 0,
+                            available=float(available) if available else 0,
+                            sessionid=user_id,
+                            compid=compid,
+                            finyearid=finyearid,
+                            sysdate=sysdate,
+                            systime=systime
+                        )
+                        detail_temp_ids.append(detail_temp.id)
+
+                        with open('debug_post.txt', 'a') as f:
+                            f.write(f"DEBUG PRO: Created detail_temp with ID={detail_temp.id}\n")
+
+                        # Save supplier quotes
+                        for i in range(len(suppliers)):
+                            if suppliers[i] and suppliers[i].strip():
+                                qty = float(quantities[i]) if i < len(quantities) and quantities[i] else 0
+                                rate = float(rates[i]) if i < len(rates) and rates[i] else 0
+                                discount = float(discounts[i]) if i < len(discounts) and discounts[i] else 0
+                                total = (qty * rate) - discount
+
+                                TblmpMaterialProcessTemp.objects.create(
+                                    dmid=detail_temp.id,
+                                    supplier=suppliers[i],
+                                    qty=qty,
+                                    rate=rate,
+                                    discount=discount,
+                                    deliverydate=dates[i] if i < len(dates) else '',
+                                    total=total,
+                                    sessionid=user_id
+                                )
+                                saved_count += 1
+                                with open('debug_post.txt', 'a') as f:
+                                    f.write(f"DEBUG PRO: Saved supplier quote, saved_count={saved_count}\n")
+                    except Exception as e:
+                        with open('debug_post.txt', 'a') as f:
+                            f.write(f"DEBUG PRO: EXCEPTION: {str(e)}\n")
+                        raise
+
+            # Step 3: Process Finish [F] if checked (pdt.aspx.cs lines 1816-1920)
+            if fin_checked:
+                suppliers = request.POST.getlist('fin_supplier[]')
+                quantities = request.POST.getlist('fin_qty[]')
+                rates = request.POST.getlist('fin_rate[]')
+                discounts = request.POST.getlist('fin_discount[]')
+                dates = request.POST.getlist('fin_deldate[]')
+
+                # DEBUG
+                with open('debug_post.txt', 'a') as f:
+                    f.write(f"DEBUG FIN: suppliers={suppliers}, quantities={quantities}, rates={rates}\n")
+
+                # Check if we have valid data
+                has_fin_data = any(s.strip() for s in suppliers if s)
+                with open('debug_post.txt', 'a') as f:
+                    f.write(f"DEBUG FIN: has_fin_data={has_fin_data}\n")
+
+                if has_fin_data:
+                    # Create detail temp with FIN flag
+                    detail_temp = TblmpMaterialDetailTemp.objects.create(
+                        wono=wono,
+                        item=int(item_id),
+                        bomqty=float(bom_qty) if bom_qty else 0,
+                        available=float(available) if available else 0,
+                        sessionid=user_id,
+                        compid=compid,
+                        finyearid=finyearid,
+                        sysdate=sysdate,
+                        systime=systime
+                    )
+                    detail_temp_ids.append(detail_temp.id)
+
+                    # Save supplier quotes
+                    for i in range(len(suppliers)):
+                        if suppliers[i] and suppliers[i].strip():
+                            qty = float(quantities[i]) if i < len(quantities) and quantities[i] else 0
+                            rate = float(rates[i]) if i < len(rates) and rates[i] else 0
+                            discount = float(discounts[i]) if i < len(discounts) and discounts[i] else 0
+                            total = (qty * rate) - discount
+
+                            TblmpMaterialFinishTemp.objects.create(
+                                dmid=detail_temp.id,
+                                supplier=suppliers[i],
+                                qty=qty,
+                                rate=rate,
+                                discount=discount,
+                                deliverydate=dates[i] if i < len(dates) else '',
+                                total=total,
+                                sessionid=user_id
+                            )
+                            saved_count += 1
+
+            if saved_count == 0:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No supplier data entered. Please fill in at least one row.'
+                }, status=400)
+
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Added to temporary planning ({saved_count} supplier quotes saved)',
+                'detail_temp_ids': detail_temp_ids,
+                'saved_count': saved_count
+            })
+
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error in AddToTempView: {e}", exc_info=True)
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+
+class PlanningSaveView(MaterialPlanningBaseMixin, View):
+    """
+    Generate PLN from temporary tables (Generate PLN button)
+    Converted from: aaspnet/Module/MaterialPlanning/Transactions/pdt.aspx.cs btnGenerate_Click (lines 502-650)
+
+    Workflow:
+    1. Generate PLN number in format PLN/YYYY-YY/XXXX
+    2. Get all temp detail records for current user
+    3. For each temp detail:
+       - Create permanent detail record
+       - Check which temp table has quotes (RM/Process/Finish)
+       - Copy quotes to permanent table
+       - Set RM='A' or PRO='O' or FIN='F' flag
+    4. Create master record with PLN number
+    5. Delete all temp records for user
+    """
+    def post(self, request, wono):
+        from django.http import JsonResponse
+        from django.db import transaction
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        try:
+            # Get audit fields
+            user_id = str(request.user.id)
+            compid = request.session.get('company_id', 1)
+            finyearid = request.session.get('financial_year_id', 1)
+            now = datetime.now()
+            sysdate = now.strftime('%d-%m-%Y')
+            systime = now.strftime('%H:%M:%S')
+
+            # Step 1: Generate PLN number
+            pln_no = self.generate_pln_number(compid, finyearid)
+
+            # Step 2: Atomic transaction
+            with transaction.atomic():
+                # Get all temp detail records for this user and WO
+                temp_details = TblmpMaterialDetailTemp.objects.filter(
+                    sessionid=user_id,
+                    wono=wono
+                )
+
+                if not temp_details.exists():
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': 'No temporary data found. Please add items to temp first.'
+                    }, status=400)
+
+                # Step 3: Create master record first
+                master = TblmpMaterialMaster.objects.create(
+                    plno=pln_no,
+                    wono=wono,
+                    sysdate=sysdate,
+                    systime=systime,
+                    sessionid=user_id,
+                    compid=compid,
+                    finyearid=finyearid
+                )
+
+                # Step 4: Process each temp detail record
+                for temp_detail in temp_details:
+                    # Create permanent detail record
+                    # Note: TblmpMaterialDetail only has: id, item, rm, pro, fin, master
+                    perm_detail = TblmpMaterialDetail.objects.create(
+                        master=master,  # Link to master record
+                        item=temp_detail.item,
+                        # RM/PRO/FIN flags will be set below based on which temp tables have data
+                        rm=None,
+                        pro=None,
+                        fin=None
+                    )
+
+                    # Check which temp table has quotes and copy them
+
+                    # Raw Material?
+                    raw_temps = TblmpMaterialRawmaterialTemp.objects.filter(
+                        dmid=temp_detail.id,
+                        sessionid=user_id
+                    )
+                    if raw_temps.exists():
+                        # Set RM flag (IntegerField: 1 = true, NULL = false)
+                        perm_detail.rm = 1
+                        perm_detail.save()
+
+                        # Copy all raw material rows
+                        for raw_temp in raw_temps:
+                            TblmpMaterialRawmaterial.objects.create(
+                                detail=perm_detail,  # Foreign key to TblmpMaterialDetail
+                                item=temp_detail.item,
+                                supplierid=raw_temp.supplier,
+                                qty=raw_temp.qty,
+                                rate=raw_temp.rate,
+                                discount=raw_temp.discount,
+                                deldate=raw_temp.deliverydate
+                            )
+
+                    # Process?
+                    pro_temps = TblmpMaterialProcessTemp.objects.filter(
+                        dmid=temp_detail.id,
+                        sessionid=user_id
+                    )
+                    if pro_temps.exists():
+                        # Set PRO flag (IntegerField: 1 = true, NULL = false)
+                        perm_detail.pro = 1
+                        perm_detail.save()
+
+                        # Copy all process rows
+                        for pro_temp in pro_temps:
+                            TblmpMaterialProcess.objects.create(
+                                detail=perm_detail,  # Foreign key to TblmpMaterialDetail
+                                item=temp_detail.item,
+                                supplierid=pro_temp.supplier,
+                                qty=pro_temp.qty,
+                                rate=pro_temp.rate,
+                                discount=pro_temp.discount,
+                                deldate=pro_temp.deliverydate
+                            )
+
+                    # Finish?
+                    fin_temps = TblmpMaterialFinishTemp.objects.filter(
+                        dmid=temp_detail.id,
+                        sessionid=user_id
+                    )
+                    if fin_temps.exists():
+                        # Set FIN flag (IntegerField: 1 = true, NULL = false)
+                        perm_detail.fin = 1
+                        perm_detail.save()
+
+                        # Copy all finish rows
+                        for fin_temp in fin_temps:
+                            TblmpMaterialFinish.objects.create(
+                                detail=perm_detail,  # Foreign key to TblmpMaterialDetail
+                                item=temp_detail.item,
+                                supplierid=fin_temp.supplier,
+                                qty=fin_temp.qty,
+                                rate=fin_temp.rate,
+                                discount=fin_temp.discount,
+                                deldate=fin_temp.deliverydate
+                            )
+
+                # Step 5: Delete all temp records for this user
+                # Delete in reverse order (quotes first, then details)
+                TblmpMaterialRawmaterialTemp.objects.filter(sessionid=user_id).delete()
+                TblmpMaterialProcessTemp.objects.filter(sessionid=user_id).delete()
+                TblmpMaterialFinishTemp.objects.filter(sessionid=user_id).delete()
+                TblmpMaterialDetailTemp.objects.filter(sessionid=user_id).delete()
+
+            # Redirect to plan list instead of detail page to avoid URL encoding issues
+            # Plan numbers contain slashes (PLN/2013-14/0001) which cause routing problems
+            return JsonResponse({
+                'status': 'success',
+                'message': f'PLN {pln_no} generated successfully',
+                'pln_no': pln_no,
+                'plan_id': master.id,
+                'redirect_url': '/material-planning/plans/'  # Redirect to plan list page
+            })
+
+        except Exception as e:
+            logger.error(f"Error in PlanningSaveView: {e}", exc_info=True)
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+    def generate_pln_number(self, compid, finyearid):
+        """
+        Generate PLN number in format: PLN/YYYY-YY/XXXX
+        Converted from: pdt.aspx.cs GeneratePLNNumber (lines 652-680)
+
+        Example: PLN/2024-25/0016
+        """
+        # Get financial year
+        finyear = TblfinancialMaster.objects.get(finyearid=finyearid)
+        start_year = finyear.startyear if hasattr(finyear, 'startyear') else finyear.finyear.split('-')[0]
+        end_year = finyear.endyear if hasattr(finyear, 'endyear') else finyear.finyear.split('-')[1]
+
+        # Get last 2 digits of end year
+        if isinstance(end_year, int):
+            end_year_short = str(end_year)[-2:]
+        else:
+            end_year_short = str(end_year)[-2:]
+
+        # Get last PLN number for this company and fin year
+        last_pln = TblmpMaterialMaster.objects.filter(
+            compid=compid,
+            finyearid=finyearid
+        ).order_by('-id').first()
+
+        if last_pln and last_pln.plno:
+            # Extract sequence from "PLN/2024-25/0015"
+            try:
+                parts = last_pln.plno.split('/')
+                last_seq = int(parts[2]) if len(parts) == 3 else 0
+                next_seq = last_seq + 1
+            except (IndexError, ValueError):
+                next_seq = 1
+        else:
+            next_seq = 1
+
+        # Format: PLN/YYYY-YY/XXXX
+        pln_no = f"PLN/{start_year}-{end_year_short}/{next_seq:04d}"
+        return pln_no
+
+
+class SupplierAutocompleteView(MaterialPlanningBaseMixin, View):
+    """
+    Autocomplete search for suppliers via HTMX.
+    Returns JSON with supplier data formatted as "Name [ID]".
+    """
+    def get(self, request):
+        from django.http import JsonResponse
+        from material_management.models import Supplier
+        
+        query = request.GET.get('q', '').strip()
+        
+        # Require at least 1 character
+        if len(query) < 1:
+            return JsonResponse({'results': []})
+        
+        # Filter suppliers by name or ID, limit to company
+        suppliers = Supplier.objects.filter(
+            Q(supplier_name__icontains=query) | Q(supplier_id__icontains=query),
+            comp_id=self.get_compid()
+        ).values('supplier_id', 'supplier_name')[:10]
+        
+        # Format as "SupplierName [SupplierID]"
+        results = [
+            {
+                'id': s['supplier_id'],
+                'text': f"{s['supplier_name']} [{s['supplier_id']}]"
+            }
+            for s in suppliers
+        ]
+        
+        return JsonResponse({'results': results})
+
+
+# Keep old name for backward compatibility
+SupplierSearchView = SupplierAutocompleteView
+
+
+class BomLoadView(MaterialPlanningBaseMixin, View):
+    """Load BOM data for a Work Order"""
+    def get(self, request, wono):
+        from django.http import JsonResponse
+        from design.models import TbldgBomMaster, TbldgBomDetails
+        
+        try:
+            bom = TbldgBomMaster.objects.get(wono=wono)
+            details = TbldgBomDetails.objects.filter(mid=bom.id)
+            
+            data = {
+                'bom_id': bom.id,
+                'items': [
+                    {
+                        'id': d.id,
+                        'item_code': d.itemid.itemcode if d.itemid else '',
+                        'description': d.itemid.itemname if d.itemid else '',
+                        'qty': float(d.qty) if d.qty else 0,
+                        'unit': d.itemid.unit.symbol if d.itemid and d.itemid.unit else '',
+                    }
+                    for d in details
+                ]
+            }
+            
+            return JsonResponse(data)
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=404)
+
+
+# ============================================================================
+# REPORTS
+# ============================================================================
+
+class PlanningReportView(MaterialPlanningBaseMixin, ListView):
+    """Planning Report - List all plans"""
+    model = TblmpMaterialMaster
+    template_name = 'material_planning/reports/planning_report.html'
+    context_object_name = 'plans'
+    paginate_by = 50
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(
+            compid=self.get_compid(),
+            finyearid=self.get_finyearid()
+        ).order_by('-id')
+
+        # Add filters
+        wono = self.request.GET.get('wono', '')
+        if wono:
+            queryset = queryset.filter(wono__icontains=wono)
+        
+        return queryset
+
+
+class PlanningPrintView(MaterialPlanningBaseMixin, DetailView):
+    """Print planning details"""
+    model = TblmpMaterialMaster
+    template_name = 'material_planning/reports/planning_print.html'
+    context_object_name = 'plan'
+    pk_url_kwarg = 'plan_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plan = self.object
+        
+        # Get all details
+        details = TblmpMaterialDetail.objects.filter(master=plan)
+        context['raw_materials'] = TblmpMaterialRawmaterial.objects.filter(
+            detail__in=details
+        )
+        context['processes'] = TblmpMaterialProcess.objects.filter(
+            detail__in=details
+        )
+        context['finishes'] = TblmpMaterialFinish.objects.filter(
+            detail__in=details
+        )
+        
+        return context

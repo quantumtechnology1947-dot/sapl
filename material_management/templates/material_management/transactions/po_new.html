@@ -1,0 +1,137 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}PO - New - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-2 py-2">
+    {% if messages %}
+    <div class="mb-2">
+        {% for message in messages %}
+        <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-2 py-1 rounded text-xs mb-1" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded shadow">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-3 py-2 rounded-t flex justify-between items-center">
+            <h1 class="text-white font-semibold text-sm">&nbsp;Purchase Order (PO) - Supplier Selection</h1>
+            <a href="{% url 'material_management:po-list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs transition">
+                <i class="fas fa-arrow-left mr-1"></i>Back to List
+            </a>
+        </div>
+
+        <!-- HTMX Tabs for PR/SPR -->
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+                <button
+                    hx-get="{% url 'material_management:po-new' %}?tab=pr"
+                    hx-target="#supplier-grid-container"
+                    hx-push-url="true"
+                    class="px-4 py-2 text-xs font-medium {% if active_tab == 'pr' %}border-b-2 border-blue-500 text-blue-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    &nbsp;&nbsp;PR&nbsp;&nbsp;
+                </button>
+                <button
+                    hx-get="{% url 'material_management:po-new' %}?tab=spr"
+                    hx-target="#supplier-grid-container"
+                    hx-push-url="true"
+                    class="px-4 py-2 text-xs font-medium {% if active_tab == 'spr' %}border-b-2 border-blue-500 text-blue-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                    &nbsp;&nbsp;SPR&nbsp;&nbsp;
+                </button>
+            </nav>
+        </div>
+
+        <div id="supplier-grid-container" class="p-2">
+            <!-- Search Section -->
+            <div class="mb-2 border-b border-gray-200 pb-2">
+                <form method="get" class="flex gap-2 items-end">
+                    <input type="hidden" name="tab" value="{{ active_tab }}">
+                    <div class="flex-1">
+                        <label class="block text-[10px] font-medium text-gray-700 mb-1">Search by Supplier Name or Code</label>
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search_query }}"
+                            placeholder="Enter supplier name or code..."
+                            class="w-full px-2 py-1 border border-gray-300 rounded text-[11px] focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    </div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-[11px] transition">
+                        <i class="fas fa-search mr-1"></i>Search
+                    </button>
+                    {% if search_query %}
+                    <a href="{% url 'material_management:po-new' %}?tab={{ active_tab }}" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-[11px] transition">
+                        <i class="fas fa-times mr-1"></i>Clear
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Supplier Grid -->
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-[8%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase tracking-tight">SN</th>
+                            <th class="w-[12%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase tracking-tight">Select</th>
+                            <th class="w-[60%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase tracking-tight">Supplier</th>
+                            <th class="w-[10%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase tracking-tight">Code</th>
+                            <th class="w-[10%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase tracking-tight">No. of Items</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for supplier in suppliers %}
+                        <tr class="hover:bg-blue-50 transition-colors">
+                            <td class="px-2 py-1.5 text-[11px] text-gray-900 text-right">{{ forloop.counter }}</td>
+                            <td class="px-2 py-1.5 text-[11px] text-center">
+                                {% if active_tab == 'spr' %}
+                                <a href="{% url 'material_management:po-spr-items' supplier.code %}"
+                                   class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-[10px] transition">
+                                   <i class="fas fa-hand-pointer mr-1"></i>Select
+                                </a>
+                                {% else %}
+                                <a href="{% url 'material_management:po-pr-items' supplier.code %}"
+                                   class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-[10px] transition">
+                                   <i class="fas fa-hand-pointer mr-1"></i>Select
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td class="px-2 py-1.5 text-[11px] text-gray-900">{{ supplier.name }}</td>
+                            <td class="px-2 py-1.5 text-[11px] text-gray-900 text-center">{{ supplier.code }}</td>
+                            <td class="px-2 py-1.5 text-[11px] text-gray-900 text-right font-medium">{{ supplier.item_count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-2 py-12 text-center text-gray-500">
+                                <div>
+                                    <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                    </svg>
+                                    <h3 class="mt-2 text-xs font-medium text-gray-900">No suppliers found</h3>
+                                    <p class="mt-1 text-[11px] text-gray-500">
+                                        {% if search_query %}
+                                        No suppliers match your search criteria with pending {% if active_tab == 'spr' %}SPR{% else %}PR{% endif %} items.
+                                        {% else %}
+                                        There are no suppliers with pending {% if active_tab == 'spr' %}SPR{% else %}PR{% endif %} items to convert to PO.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

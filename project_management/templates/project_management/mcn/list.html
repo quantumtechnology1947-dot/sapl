@@ -1,0 +1,211 @@
+{% extends "core/base.html" %}
+
+{% block title %}Material Credit Notes - Cortex ERP{% endblock %}
+{% block page_title %}Material Credit Notes (MCN){% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <h2 class="text-sm font-semibold text-gray-800">Material Credit Note (MCN)</h2>
+                <p class="text-xs text-gray-600">Select a Work Order below to create or edit MCN</p>
+            </div>
+            <div class="flex gap-2 items-center">
+                <a href="{% url 'project_management:mcn-new' %}"
+                   class="px-4 py-1.5 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    New MCN
+                </a>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                    {{ work_orders|length }} Open Work Orders
+                </span>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <form method="get" class="grid grid-cols-3 gap-2 items-end">
+            <!-- Search Field Type -->
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Search By:</label>
+                <select name="search_field"
+                        class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="1" {% if search_field == '1' %}selected{% endif %}>WO No</option>
+                    <option value="0" {% if search_field == '0' %}selected{% endif %}>Customer</option>
+                    <option value="2" {% if search_field == '2' %}selected{% endif %}>Project Title</option>
+                </select>
+            </div>
+
+            <!-- Search Value -->
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Search Value:</label>
+                <input type="text"
+                       name="search_value"
+                       value="{{ search_value }}"
+                       placeholder="Enter search text..."
+                       class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+
+            <!-- Search Button -->
+            <div>
+                <button type="submit"
+                        class="w-full px-4 py-1.5 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors inline-flex items-center justify-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Search
+                </button>
+            </div>
+        </form>
+
+        {% if search_value %}
+        <div class="mt-2">
+            <a href="{% url 'project_management:mcn-list' %}"
+               class="text-xs text-gray-600 hover:text-gray-800 underline">
+                Clear Search
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Work Orders Table -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="w-[6%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                        <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">WO No</th>
+                        <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Date</th>
+                        <th class="w-[30%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Project Title</th>
+                        <th class="w-[25%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Customer Name</th>
+                        <th class="w-[10%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Code</th>
+                        <th class="w-[7%] px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">MCN</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for wo in work_orders %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900 text-right">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                            {% if wo.has_mcn %}
+                                <a href="{% url 'project_management:mcn-update' wo.mcn_id %}"
+                                   class="text-green-600 hover:text-green-800 font-medium">
+                                    {{ wo.wono }}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'project_management:mcn-create' %}?wono={{ wo.wono }}"
+                                   class="text-blue-600 hover:text-blue-800 font-medium">
+                                    {{ wo.wono }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">
+                            {{ wo.date }}
+                        </td>
+                        <td class="px-2 py-2 text-[11px] truncate" title="{{ wo.project_title }}">
+                            {% if wo.has_mcn %}
+                                <a href="{% url 'project_management:mcn-update' wo.mcn_id %}"
+                                   class="text-green-600 hover:text-green-800">
+                                    {{ wo.project_title }}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'project_management:mcn-create' %}?wono={{ wo.wono }}"
+                                   class="text-blue-600 hover:text-blue-800">
+                                    {{ wo.project_title }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 text-[11px] truncate" title="{{ wo.customer_name }}">
+                            {% if wo.has_mcn %}
+                                <a href="{% url 'project_management:mcn-update' wo.mcn_id %}"
+                                   class="text-green-600 hover:text-green-800">
+                                    {{ wo.customer_name }}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'project_management:mcn-create' %}?wono={{ wo.wono }}"
+                                   class="text-blue-600 hover:text-blue-800">
+                                    {{ wo.customer_name }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600 text-center">
+                            {{ wo.customer_code }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-center">
+                            {% if wo.has_mcn %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-800">
+                                    {{ wo.mcn_no }}
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">
+                                    -
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-4 py-12 text-center text-gray-500 text-sm">
+                            No work orders found.
+                            {% if search_value %}
+                            Try adjusting your search criteria.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-4 bg-blue-50 border border-blue-200 rounded p-3">
+        <div class="flex">
+            <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <div class="text-xs text-blue-800">
+                <p class="font-semibold mb-2">Material Credit Note (MCN) Workflow:</p>
+                <div class="space-y-2">
+                    <div>
+                        <p class="font-medium mb-1">✓ Creating New MCN:</p>
+                        <ol class="list-decimal list-inside ml-2 space-y-1">
+                            <li>Find the Work Order in the table below (use search if needed)</li>
+                            <li>Click the <span class="text-blue-600 font-medium">Blue WO Number</span> (Work Orders without MCN)</li>
+                            <li>Fill in MCN details for the selected Work Order</li>
+                            <li>Save to create the new MCN</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <p class="font-medium mb-1">✓ Editing Existing MCN:</p>
+                        <ol class="list-decimal list-inside ml-2 space-y-1">
+                            <li>Find the Work Order with existing MCN (shown in last column with green badge)</li>
+                            <li>Click the <span class="text-green-600 font-medium">Green WO Number</span></li>
+                            <li>Modify MCN details as needed</li>
+                            <li>Save changes to update the MCN</li>
+                        </ol>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-blue-300">
+                        <p class="font-medium">✓ Search & Filter:</p>
+                        <p class="ml-2">Use the dropdown above to search by <strong>WO Number</strong>, <strong>Customer Name</strong>, or <strong>Project Title</strong> to quickly find specific Work Orders</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

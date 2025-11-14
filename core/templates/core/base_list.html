@@ -1,0 +1,131 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load table_extras %}
+
+{% block title %}{% block list_title %}{{ model_name }} List{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    {# Breadcrumbs #}
+    {% if show_breadcrumbs|default:True %}
+    <div class="mb-4">
+        {% if breadcrumbs %}
+            {% include 'core/components/breadcrumbs.html' with breadcrumbs=breadcrumbs %}
+        {% else %}
+            {% include 'core/components/breadcrumbs.html' with breadcrumbs=default_breadcrumbs %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# Header Section #}
+    <div class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-base font-bold text-gray-900">
+                    {% block page_header %}{{ model_name }} List{% endblock %}
+                </h1>
+                {% block page_description %}
+                <p class="mt-2 text-sm text-gray-700">
+                    Manage all {{ model_name|lower }} records
+                </p>
+                {% endblock %}
+            </div>
+            <div class="mt-4 sm:mt-0">
+                {% block header_actions %}
+                {% if create_url %}
+                <a href="{% url create_url %}"
+                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sap-blue hover:bg-sap-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sap-blue">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Add New {% block create_button_text %}{{ model_name }}{% endblock %}
+                </a>
+                {% endif %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    {# Messages/Alerts #}
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+            {% include 'core/components/alert.html' with alert_type=message.tags alert_message=message %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Search and Filters Section #}
+    {% if show_search|default:True %}
+    <div class="mb-4">
+        <div class="bg-white shadow rounded p-4">
+            <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+                {# Search Bar #}
+                <div class="flex-1">
+                    {% include 'core/components/search_bar.html' with search_url=search_url search_placeholder=search_placeholder %}
+                </div>
+
+                {# Additional Filters #}
+                {% block additional_filters %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Results Container #}
+    <div id="{% if htmx_target_id %}{{ htmx_target_id }}{% else %}results{% endif %}" class="bg-white shadow rounded">
+        {% block list_content %}
+        {# Table Component #}
+        {% if object_list %}
+        <div id="table-container">
+            {% include 'core/components/table.html' with headers=table_headers rows=object_list %}
+        </div>
+
+        {# Pagination #}
+        {% if is_paginated %}
+        <div class="px-4 py-3 border-t border-gray-200">
+            {% include 'core/components/pagination.html' %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="p-8 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No {{ model_name|lower }} records</h3>
+            <p class="mt-1 text-sm text-gray-500">Get started by creating a new {{ model_name|lower }}.</p>
+            {% if create_url %}
+            <div class="mt-6">
+                <a href="{% url create_url %}"
+                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sap-blue hover:bg-sap-blue-dark">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Add New {{ model_name }}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endblock %}
+    </div>
+
+    {# Extra Content Section #}
+    {% block extra_content %}
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% block list_extra_js %}
+{% endblock %}
+{% endblock %}
+
+
+
+
+
+
+
+

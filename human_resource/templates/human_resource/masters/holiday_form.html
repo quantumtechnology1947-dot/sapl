@@ -1,0 +1,31 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Holiday - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Holiday{% endblock %}
+{% block form_action %}{% if object %}{% url 'human_resource:holiday-update' object.id %}{% else %}{% url 'human_resource:holiday-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'human_resource:holiday-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/date_input.html' with 
+        name="hdate"
+        label="Holiday Date"
+        value=object.hdate
+        required=True
+    %}
+    
+    {% include 'core/components/forms/text_input.html' with 
+        name="title"
+        label="Holiday Title"
+        value=object.title
+        required=True
+        placeholder="e.g., Independence Day, Diwali"
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

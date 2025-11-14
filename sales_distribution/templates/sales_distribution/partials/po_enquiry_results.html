@@ -1,0 +1,50 @@
+{# HTMX partial: Search results table for Customer PO enquiry selection #}
+{# Matches ASP.NET CustPO_New.aspx GridView structure exactly #}
+<table class="w-full text-xs border-collapse">
+    <thead>
+        <tr class="bg-gray-50 border-b border-gray-300">
+            <th class="px-3 py-2 text-xs font-semibold text-gray-700 text-right border-r border-gray-300" class="w-[5%]">SN</th>
+            <th class="px-3 py-2 text-xs font-semibold text-gray-700 text-center border-r border-gray-300" class="w-[8%]">Fin Yrs</th>
+            <th class="px-3 py-2 text-xs font-semibold text-gray-700 text-left border-r border-gray-300" class="w-[35%]">Customer Name</th>
+            <th class="px-3 py-2 text-xs font-semibold text-gray-700 text-center border-r border-gray-300" class="w-[10%]">Code</th>
+            <th class="px-3 py-2 text-xs font-semibold text-gray-700 text-center border-r border-gray-300" class="w-[12%]">Enquiry No</th>
+            <th class="px-3 py-2 text-xs font-semibold text-gray-700 text-center border-r border-gray-300" class="w-[10%]">Gen Date</th>
+            <th class="px-3 py-2 text-xs font-semibold text-gray-700 text-left" class="w-[20%]">Gen By</th>
+        </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+        {% for enquiry in enquiries %}
+        <tr class="hover:bg-gray-50 border-b border-gray-200">
+            <td class="px-3 py-2 text-xs text-gray-900 text-right border-r border-gray-200">{{ forloop.counter }}</td>
+            <td class="px-3 py-2 text-xs text-gray-700 text-center border-r border-gray-200">{{ enquiry.finyear_name }}</td>
+            <td class="px-3 py-2 text-xs text-gray-900 text-left border-r border-gray-200">{{ enquiry.customername }}</td>
+            <td class="px-3 py-2 text-xs text-gray-700 text-center border-r border-gray-200">{{ enquiry.customerid }}</td>
+            <td class="px-3 py-2 text-xs text-center border-r border-gray-200">
+                {# Enquiry No as hyperlink (matching ASP.NET HyperLinkField) #}
+                <a href="{% url 'sales_distribution:po-create-detail' enquiry.enqid %}"
+                   class="text-blue-600 hover:text-blue-800 hover:underline font-medium">
+                    {{ enquiry.enqid }}
+                </a>
+            </td>
+            <td class="px-3 py-2 text-xs text-gray-700 text-center border-r border-gray-200">{{ enquiry.sysdate }}</td>
+            <td class="px-3 py-2 text-xs text-gray-700 text-left">{{ enquiry.generated_by }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="px-6 py-16 text-center border-b border-gray-200">
+                <span class="text-red-700 font-bold text-base">No data to display !</span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+

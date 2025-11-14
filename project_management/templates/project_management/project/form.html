@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Project{% endblock %}
+{% block content %}
+<div class="mb-6"><h2 class="text-sm font-bold">{% if object %}Edit{% else %}Create{% endif %} Project Planning</h2></div>
+<div class="bg-white rounded border border-gray-200 p-4">
+<form method="post" enctype="multipart/form-data" class="space-y-4">{% csrf_token %}
+<div><label class="block text-xs font-medium mb-1">Work Order Number *</label>
+<input type="text" name="wono" value="{{ form.wono.value|default:'' }}" required class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full"></div>
+<div><label class="block text-xs font-medium mb-1">Upload File</label>
+<input type="file" name="filedata" class="h-8 px-3 text-xs border border-gray-300 rounded w-full"></div>
+{% if object.has_file %}<div class="bg-blue-50 p-3 rounded"><p class="text-xs text-blue-800">Current file: <strong>{{ object.filename }}</strong></p></div>{% endif %}
+<div class="flex justify-end gap-2">
+<a href="{% url 'project_management:project-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Cancel</a>
+<button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-purple text-white hover:bg-sap-purple-hover transition-colors">{% if object %}Update{% else %}Create{% endif %}</button>
+</div></form></div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+{% extends 'mis/base.html' %}
+{% block title %}Delete Time Code{% endblock %}
+{% block content %}
+<div class="mb-6"><h2 class="text-sm font-bold">Delete Budget Code Time</h2></div>
+<div class="bg-white rounded border border-gray-200 p-6">
+    <p class="mb-4">Are you sure you want to delete: <strong>{{ object }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'mis:budget-code-time-list' %}" class="px-6 py-2 border rounded">Cancel</a>
+            <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

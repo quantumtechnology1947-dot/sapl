@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+{% block title %}Status - {{ status.wono }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between"><div><h2 class="text-sm font-bold">Status Details</h2></div>
+<div class="space-x-2"><a href="{% url 'project_management:status-update' status.id %}" class="bg-gray-600 text-white px-4 py-2 rounded">Edit</a>
+<a href="{% url 'project_management:status-list' %}" class="bg-gray-500 text-white px-4 py-2 rounded">Back</a></div></div>
+<div class="bg-white rounded border border-gray-200 p-6">
+<div class="space-y-4">
+<div><p class="text-sm text-gray-600">Serial Number</p><p class="font-medium text-lg">{{ status.srno }}</p></div>
+<div><p class="text-sm text-gray-600">Work Order Number</p><p class="font-medium text-lg">{{ status.wono }}</p></div>
+<div><p class="text-sm text-gray-600">Activities</p><p class="mt-2 text-gray-900">{{ status.activities }}</p></div>
+</div></div>
+{% endblock %}
+
+
+
+
+
+
+
+

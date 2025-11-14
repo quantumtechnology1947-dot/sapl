@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Intercom Extension Master - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200">
+        <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-gray-800">Intercom Extension Master</h1>
+            <button
+                hx-get="{% url 'human_resource:intercom-ext-create' %}"
+                hx-target="#form-container"
+                hx-swap="innerHTML"
+                class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition text-sm">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add New
+                </span>
+            </button>
+        </div>
+
+        <div id="form-container" class="px-6 py-4 bg-gray-50"></div>
+
+        <div class="px-6 py-4">
+            <div id="table-container">
+                {% include 'human_resource/partials/intercom_ext_list_partial.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

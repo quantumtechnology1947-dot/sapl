@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+{% block title %}{% if object %}Edit{% else %}Record{% endif %} Attendance{% endblock %}
+{% block content %}
+<div class="mb-6"><h2 class="text-sm font-bold">{% if object %}Edit{% else %}Record{% endif %} Attendance</h2></div>
+<div class="bg-white rounded border border-gray-200 p-4">
+<form method="post" class="space-y-4">{% csrf_token %}
+<div class="grid grid-cols-2 gap-4">
+<div><label class="block text-xs font-medium mb-1">Date *</label><input type="date" name="onsitedate" value="{{ form.onsitedate.value|default:'' }}" required class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full"></div>
+<div><label class="block text-xs font-medium mb-1">Employee ID *</label><input type="text" name="empid" value="{{ form.empid.value|default:'' }}" required class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full"></div>
+<div><label class="block text-xs font-medium mb-1">Shift *</label><select name="shift" required class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full">
+<option value="1">Day Shift</option><option value="2">Night Shift</option><option value="3">General</option></select></div>
+<div><label class="block text-xs font-medium mb-1">Status *</label><select name="status" required class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full">
+<option value="1">Present</option><option value="0">Absent</option></select></div>
+<div><label class="block text-xs font-medium mb-1">Location</label><input type="text" name="onsite" value="{{ form.onsite.value|default:'' }}" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full"></div>
+<div><label class="block text-xs font-medium mb-1">From Time</label><input type="time" name="fromtime" value="{{ form.fromtime.value|default:'' }}" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full"></div>
+<div><label class="block text-xs font-medium mb-1">To Time</label><input type="time" name="totime" value="{{ form.totime.value|default:'' }}" class="h-8 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue w-full"></div>
+</div>
+<div class="flex justify-end gap-2 pt-4">
+<a href="{% url 'project_management:attendance-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Cancel</a>
+<button type="submit" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-orange text-white hover:bg-sap-orange-hover transition-colors">{% if object %}Update{% else %}Record{% endif %}</button>
+</div></form></div>
+{% endblock %}
+
+
+
+
+
+
+
+

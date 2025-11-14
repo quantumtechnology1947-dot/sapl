@@ -1,0 +1,117 @@
+{% extends "core/base.html" %}
+
+{% block title %}Stock List - Cortex ERP{% endblock %}
+{% block page_title %}Stock List{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Stock List</h2>
+                <p class="text-sm text-gray-600 mt-1">Current stock levels across all locations</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'reports:dashboard' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back
+                </a>
+                <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    Print
+                </button>
+                <a href="{% url 'reports:export-excel' 'stock-list' %}?{{ request.GET.urlencode }}" 
+                   class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Excel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <!-- Search Bar Component -->
+{% include 'core/components/search_bar.html' with placeholder='Search by item code or name...' %}
+
+    <!-- Stock Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="w-24 px-3 py-2 text-left text-xs font-semibold text-gray-700">Item Code</th>
+                        <th class="w-48 px-3 py-2 text-left text-xs font-semibold text-gray-700">Item Name</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Location</th>
+                        <th class="w-20 px-3 py-2 text-left text-xs font-semibold text-gray-700">Unit</th>
+                        <th class="w-24 px-3 py-2 text-right text-xs font-semibold text-gray-700">Quantity</th>
+                        <th class="w-24 px-3 py-2 text-right text-xs font-semibold text-gray-700">Reorder Level</th>
+                        <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Last Updated</th>
+                        <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for stock in stock_items %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors print:whitespace-normal">
+                        <td class="w-24 px-3 py-2 text-xs font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ stock.item.itemcode }}">
+                            {{ stock.item.itemcode }}
+                        </td>
+                        <td class="w-48 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ stock.item.itemname }}">
+                            {{ stock.item.itemname }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" 
+                            title="{{ stock.location.name|default:'' }}">
+                            {{ stock.location.name|default:"-" }}
+                        </td>
+                        <td class="w-20 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ stock.item.unit.name|default:"-" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-right text-gray-700">
+                            {{ stock.quantity|floatformat:2 }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-xs text-right text-gray-700">
+                            {{ stock.item.reorder_level|floatformat:2|default:"0.00" }}
+                        </td>
+                        <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                            {{ stock.last_updated|date:"d-m-Y H:i"|default:"-" }}
+                        </td>
+                        <td class="w-24 px-3 py-2 text-center text-xs">
+                            {% if stock.quantity <= 0 %}
+                            <span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-800">Out of Stock</span>
+                            {% elif stock.quantity <= stock.item.reorder_level %}
+                            <span class="px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-800">Low Stock</span>
+                            {% else %}
+                            <span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">In Stock</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=8 title="No stock data found" message="Try adjusting your filters." %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        {% include "core/components/tables/pagination.html" with page_obj=page_obj %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

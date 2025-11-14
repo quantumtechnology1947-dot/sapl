@@ -1,0 +1,34 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Payment Terms - Cortex ERP{% endblock %}
+{% block form_header %}{% if object %}Edit{% else %}Add{% endif %} Payment Terms{% endblock %}
+{% block back_url %}{% url 'accounts:payment-terms-list' %}{% endblock %}
+{% block cancel_url %}{% url 'accounts:payment-terms-list' %}{% endblock %}
+
+{% block form_sections %}
+    <div class="p-4 space-y-6">
+        {# Payment Terms Information #}
+        <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2">Payment Terms Information</h3>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Payment Terms <span class="text-red-500">*</span>
+                </label>
+                {{ form.terms }}
+                {% if form.terms.errors %}
+                    <p class="text-red-500 text-xs">{{ form.terms.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-gray-500">Examples: Net 30 Days, 50% Advance + 50% on Delivery, Cash on Delivery (COD), Net 60 Days</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+

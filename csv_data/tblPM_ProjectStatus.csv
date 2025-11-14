@@ -1,0 +1,25 @@
+﻿Id,SrNo,WONo,Activities
+1,1,1,Study of Customers Requirements
+2,2,1,Take Inputs data from Customer
+3,3,1,Proposal of Scheme Options
+4,4,1, 	Estimate with commercial terms
+5,5,1,LOI & advance from Customer
+6,6,1,Concept Design
+7,7,1,PO from Customer
+8,8,1,DAP( Design Approval)
+9,9,1,Payment against DAP
+10,11,1,Design Output
+11,11,1, 	Bought out Purchasing
+12,12,1,Mechanical Assembly
+13,13,1,Mechanical Assembly
+14,14,1, 	Electrical interfacing 
+15,15,1,Try-outs at SAPL by SAPL
+16,16,1,Inspection/ Certification
+17,17,1,Finishing
+18,18,1,Packing
+19,19,1,Documentation
+20,20,1,Dispatch
+21,21,1,Site Readyness
+22,22,1,Installation
+23,23,1, Training
+24,24,1,Handover

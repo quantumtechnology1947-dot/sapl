@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+{% block title %}Storage Report{% endblock %}
+{% block content %}
+<div class="mb-6"><h2 class="text-sm font-bold">Document Storage Report</h2></div>
+<div class="bg-white rounded border border-gray-200 p-6 mb-6">
+    <div class="grid grid-cols-2 gap-4">
+        <div><p class="text-gray-600">Total Documents</p><p class="text-sm font-bold">{{ total_documents }}</p></div>
+        <div><p class="text-gray-600">Total Storage</p><p class="text-sm font-bold text-blue-600">{{ total_size_mb }} MB</p></div>
+    </div>
+</div>
+<div class="bg-white rounded border border-gray-200 p-6">
+    <h3 class="text-lg font-semibold mb-4">Storage by Module</h3>
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Module</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Document Count</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Storage (MB)</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Percentage</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for storage in module_storage %}
+            <tr>
+                <td class="px-6 py-4 text-sm font-medium">{{ storage.module }}</td>
+                <td class="px-6 py-4 text-sm">{{ storage.count }}</td>
+                <td class="px-6 py-4 text-sm font-bold text-blue-600">{{ storage.size_mb }}</td>
+                <td class="px-6 py-4 text-sm">{% if total_size_mb > 0 %}{{ storage.size_mb|floatformat:2|mul:100|div:total_size_mb|floatformat:1 }}%{% else %}0%{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No data available</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

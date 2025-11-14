@@ -1,0 +1,96 @@
+{% extends "core/base.html" %}
+
+{% block title %}Material Return Quality Note - New - Cortex ERP{% endblock %}
+{% block page_title %}Material Return Quality Note - New{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Page Header -->
+    {% include 'core/components/layout/page_header.html' with title="Material Return Quality Note [MRQN] - New" breadcrumbs=breadcrumbs %}
+
+    <!-- Search Section -->
+    <div class="bg-white border border-gray-200 rounded p-3 mb-4">
+        <form method="get" class="flex items-center gap-2">
+            {% include 'core/components/forms/select_input.html' with name="search_by" id="searchBySelect" value=request.GET.search_by options=search_options onchange="toggleSearchFields()" inline=True %}
+
+            <div x-data="{ show: {% if not request.GET.search_by or request.GET.search_by == '0' %}true{% else %}false{% endif %} }" x-show="show">
+                {% include 'core/components/forms/text_input.html' with name="search_value" id="txtMrn" value=request.GET.search_value placeholder="Enter MRN No..." inline=True %}
+            </div>
+
+            <div class="w-64" x-data="{ show: {% if request.GET.search_by == '1' %}true{% else %}false{% endif %} }" x-show="show">
+                {% include 'core/components/forms/text_input.html' with name="search_value" id="txtEmpName" value=request.GET.search_value placeholder="Enter Employee Name..." inline=True %}
+            </div>
+
+            {% include 'core/components/buttons/primary.html' with text="Search" type="submit" size="compact" %}
+        </form>
+    </div>
+
+    <!-- MRN Records Table -->
+    <div class="bg-white border border-gray-200 rounded w-full lg:w-3/5">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-xs">
+                <thead class="bg-gray-50">
+                    <tr class="h-8">
+                        {% include 'core/components/tables/table_header.html' with text="SN" align="right" width="w-[7%]" %}
+                        {% include 'core/components/tables/table_header.html' with text="" align="center" width="w-[7%]" %}
+                        {% include 'core/components/tables/table_header.html' with text="Fin Year" align="center" width="w-[12%]" %}
+                        {% include 'core/components/tables/table_header.html' with text="MRN No" align="center" width="w-[12%]" %}
+                        {% include 'core/components/tables/table_header.html' with text="Date" align="center" width="w-[12%]" %}
+                        {% include 'core/components/tables/table_header.html' with text="Gen. By" align="left" width="w-[50%]" %}
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for mrn in mrn_records %}
+                    <tr class="h-8 hover:bg-gray-50">
+                        <td class="px-3 py-1 text-right text-gray-600">{{ forloop.counter }}</td>
+                        <td class="px-3 py-1 text-center">
+                            <a href="{% url 'quality_control:mrqn-create-details' %}?mrn_id={{ mrn.id }}&mrn_no={{ mrn.mrnno }}&fy_id={{ mrn.finyearid }}"
+                                class="text-sap-blue hover:text-sap-blue-dark hover:underline">
+                                Select
+                            </a>
+                        </td>
+                        <td class="px-3 py-1 text-center text-gray-700">{{ mrn.finyear_name|default:"-" }}</td>
+                        <td class="px-3 py-1 text-center text-gray-700">{{ mrn.mrnno|default:"-" }}</td>
+                        <td class="px-3 py-1 text-center text-gray-700">{{ mrn.sysdate|default:"-" }}</td>
+                        <td class="px-3 py-1 text-left text-gray-700">{{ mrn.generated_by|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-3 py-8 text-center">
+                            {% include 'core/components/tables/table_empty.html' with message="No data to display!" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleSearchFields() {
+        const searchBy = document.getElementById('searchBySelect').value;
+        const txtMrn = document.getElementById('txtMrn');
+        const txtEmpName = document.getElementById('txtEmpName');
+
+        if (searchBy === '0') {
+            txtMrn.closest('[x-data]').setAttribute('x-show', 'true');
+            txtEmpName.closest('[x-data]').setAttribute('x-show', 'false');
+        } else {
+            txtMrn.closest('[x-data]').setAttribute('x-show', 'false');
+            txtEmpName.closest('[x-data]').setAttribute('x-show', 'true');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleSearchFields();
+    });
+</script>
+{% endblock %}
+
+
+
+
+
+
+

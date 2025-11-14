@@ -1,0 +1,94 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Vehicle {{ vehicle.vehicleno }} - Inventory{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Vehicle: {{ vehicle.vehicleno }}</h1>
+                <p class="text-sm text-gray-600 mt-1">Vehicle details and trip history</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:vehicle-trip-create' vehicle.vehicleid %}" 
+                   class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-md transition-colors">Record Trip</a>
+                <a href="{% url 'inventory:vehicle-history' vehicle.vehicleid %}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">Full History</a>
+                <a href="{% url 'inventory:vehicle-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">Back</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Vehicle Information</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between"><dt class="text-sm font-medium text-gray-600">Vehicle Number:</dt><dd class="text-sm text-gray-900 font-semibold">{{ vehicle.vehicleno }}</dd></div>
+                <div class="flex justify-between"><dt class="text-sm font-medium text-gray-600">Vehicle Name:</dt><dd class="text-sm text-gray-900">{{ vehicle.vehiclename|default:"-" }}</dd></div>
+                <div class="flex justify-between"><dt class="text-sm font-medium text-gray-600">Registration:</dt><dd class="text-sm text-gray-900">{{ vehicle.registrationno|default:"-" }}</dd></div>
+                <div class="flex justify-between"><dt class="text-sm font-medium text-gray-600">Model:</dt><dd class="text-sm text-gray-900">{{ vehicle.model|default:"-" }}</dd></div>
+                <div class="flex justify-between"><dt class="text-sm font-medium text-gray-600">Capacity:</dt><dd class="text-sm text-gray-900">{{ vehicle.capacity|default:"-" }}</dd></div>
+            </dl>
+        </div>
+
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Owner Information</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between"><dt class="text-sm font-medium text-gray-600">Owner Type:</dt><dd><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if vehicle.ownertype == 'Company' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">{{ vehicle.ownertype|default:"N/A" }}</span></dd></div>
+                <div class="flex justify-between"><dt class="text-sm font-medium text-gray-600">Owner Name:</dt><dd class="text-sm text-gray-900">{{ vehicle.ownername|default:"-" }}</dd></div>
+            </dl>
+        </div>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Trip Statistics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center"><p class="text-sm text-gray-600">Total Distance</p><p class="text-sm font-bold text-amber-700">{{ total_distance|floatformat:2 }} KM</p></div>
+            <div class="text-center"><p class="text-sm text-gray-600">Total Fuel</p><p class="text-sm font-bold text-amber-700">{{ total_fuel|floatformat:2 }} L</p></div>
+            <div class="text-center"><p class="text-sm text-gray-600">Avg Efficiency</p><p class="text-sm font-bold text-amber-700">{{ avg_efficiency|floatformat:2 }} KM/L</p></div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 bg-amber-50 border-b border-amber-100"><h2 class="text-lg font-semibold text-amber-900">Recent Trips (Last 10)</h2></div>
+        {% if trips %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Distance (KM)</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Fuel (L)</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Efficiency</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Driver</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for trip in trips %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ trip.tripdate|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{{ trip.distance|floatformat:2 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{{ trip.fuelconsumed|floatformat:2 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">{{ trip.fuelefficiency|floatformat:2 }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ trip.drivername|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-12 text-center"><p class="text-gray-500">No trips recorded yet</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

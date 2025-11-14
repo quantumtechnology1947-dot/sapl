@@ -1,0 +1,81 @@
+<form method="post" action="{% url 'inventory:mrs-create' %}">
+    {% csrf_token %}
+    <table class="w-full border-collapse text-xs">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="border border-gray-300 px-2 py-2 text-left">SN</th>
+                <th class="border border-gray-300 px-2 py-2 text-center">Delete</th>
+                <th class="border border-gray-300 px-2 py-2 text-left">Item Code</th>
+                <th class="border border-gray-300 px-2 py-2 text-left">Description</th>
+                <th class="border border-gray-300 px-2 py-2 text-center">UOM</th>
+                <th class="border border-gray-300 px-2 py-2 text-right">Stk Qty</th>
+                <th class="border border-gray-300 px-2 py-2 text-center">BGGroup</th>
+                <th class="border border-gray-300 px-2 py-2 text-center">WONo</th>
+                <th class="border border-gray-300 px-2 py-2 text-right">Req. Qty</th>
+                <th class="border border-gray-300 px-2 py-2 text-left">Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if cart_items %}
+                {% for item in cart_items %}
+                <tr class="hover:bg-gray-50">
+                    <td class="border border-gray-300 px-2 py-1 text-center">{{ forloop.counter }}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">
+                        <button type="button"
+                                hx-post="{% url 'inventory:mrs-remove-from-cart' %}"
+                                hx-vals='{"item_index": "{{ forloop.counter0 }}"}'
+                                hx-target="#cart-grid"
+                                class="text-red-600 hover:text-red-800 font-medium">
+                            Delete
+                        </button>
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1">{{ item.item_code }}</td>
+                    <td class="border border-gray-300 px-2 py-1">{{ item.item_desc|truncatewords:10 }}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">{{ item.uom }}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-right">{{ item.stock_qty|floatformat:2 }}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">
+                        {% if item.dept_id %}
+                            {{ item.dept_name|default:item.dept_id }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">
+                        {% if item.wono %}
+                            {{ item.wono }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1 text-right">{{ item.req_qty|floatformat:3 }}</td>
+                    <td class="border border-gray-300 px-2 py-1">{{ item.remarks|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr class="empty-state">
+                    <td colspan="10" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <svg class="h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <p class="text-sm">No items in cart. Please add items from the Item Master tab.</p>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+        {% if cart_items %}
+        <tfoot>
+            <tr>
+                <td colspan="10" class="border border-gray-300 px-4 py-3 text-right bg-gray-50">
+                    <button type="submit"
+                            onclick="return confirm('Are you sure you want to generate MRS with {{ cart_items|length }} item(s)?')"
+                            class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded text-sm">
+                        Generate MRS
+                    </button>
+                </td>
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</form>

@@ -1,0 +1,22 @@
+﻿ModId,ModName,DashBoardPage
+0,Select,-
+1,System Administration,Dashboard.aspx
+2,Sales And Distribution,Dashboard.aspx
+3,Design,Dashboard.aspx
+4,Material Planning,Dashboard.aspx
+5,Daily Reporting System,Dashboard.aspx
+6,Material Management,Dashboard.aspx
+7,Project Management,Dashboard.aspx
+8,SubContract Out,Dashboard.aspx
+9,Inventory,Dashboard.aspx
+10,Quality Control,Dashboard.aspx
+11,Accounts,Dashboard.aspx
+12,HR,Dashboard.aspx
+13,MROffice,Dashboard.aspx
+14,MIS,Dashboard.aspx
+15,Machinery,Dashboard.aspx
+16,Scheduler,Dashboard.aspx
+17,Syssupport,DashBord_Credentials.aspx
+18,Report,Dashboard.aspx
+19,VISITOR,Dashboard.aspx
+20,ASSET,Dashboard.aspx

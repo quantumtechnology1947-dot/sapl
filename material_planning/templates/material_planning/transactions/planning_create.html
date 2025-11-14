@@ -1,0 +1,411 @@
+{% extends "core/base.html" %}
+
+{% block title %}Material Planning - Create - Cortex ERP{% endblock %}
+{% block page_title %}Material Planning - New{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-semibold text-gray-800">Material Planning - New</h2>
+                <p class="text-xs text-gray-600 mt-1">
+                    WO No: <span class="font-medium text-blue-600">{{ wono }}</span>
+                    {% if next_plno %}| Next PL No: <span class="font-medium text-green-600">{{ next_plno }}</span>{% endif %}
+                </p>
+            </div>
+            <a href="{% url 'material_planning:planning-search' %}"
+               class="px-4 py-1.5 border border-gray-300 rounded text-sm hover:bg-gray-50 transition-colors">
+                ← Back
+            </a>
+        </div>
+    </div>
+
+    {% if not has_bom %}
+    <!-- No BOM Data Error -->
+    <div class="bg-red-50 border border-red-200 rounded p-6 text-center">
+        <svg class="w-12 h-12 text-red-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <p class="text-gray-700 font-medium">No BOM data found for Work Order {{ wono }}</p>
+        <p class="text-sm text-gray-600 mt-2">Please create BOM in Design module first before creating material planning.</p>
+        <div class="mt-4">
+            <a href="{% url 'material_planning:planning-search' %}"
+               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                Back to Search
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <!-- Material Planning Form -->
+    <form method="post" id="planning-form">
+        {% csrf_token %}
+        
+        <!-- Raw Material Section -->
+        {% if raw_materials %}
+        <div class="bg-white rounded border border-gray-200 mb-4 overflow-hidden">
+            <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-800">Raw Material ({{ raw_materials|length }} items)</h3>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-[4%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                            <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                            <th class="w-[25%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                            <th class="w-[6%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Unit</th>
+                            <th class="w-[8%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Qty</th>
+                            <th class="w-[8%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Rate</th>
+                            <th class="w-[8%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Discount</th>
+                            <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Supplier</th>
+                            <th class="w-[11%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Comp Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for material in raw_materials %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">
+                                {{ forloop.counter }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                                {{ material.item_code }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px] truncate" title="{{ material.description }}">
+                                {{ material.description }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ material.unit }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-right text-gray-900">
+                                <input type="number" 
+                                       name="rm_qty_{{ forloop.counter0 }}"
+                                       value="{{ material.qty }}"
+                                       step="0.01"
+                                       class="w-full px-1 py-1 text-[11px] text-right border border-gray-300 rounded">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <input type="number" 
+                                       name="rm_rate_{{ forloop.counter0 }}"
+                                       value="{{ material.rate }}"
+                                       step="0.01"
+                                       placeholder="0.00"
+                                       class="w-full px-1 py-1 text-[11px] text-right border border-gray-300 rounded">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <input type="number" 
+                                       name="rm_discount_{{ forloop.counter0 }}"
+                                       value="{{ material.discount }}"
+                                       step="0.01"
+                                       placeholder="0.00"
+                                       class="w-full px-1 py-1 text-[11px] text-right border border-gray-300 rounded">
+                            </td>
+                            <td class="px-2 py-2 text-[11px]">
+                                <input type="text" 
+                                       name="rm_supplier_{{ forloop.counter0 }}"
+                                       value="{{ material.supplier }}"
+                                       placeholder="Supplier Name [ID]"
+                                       class="w-full px-2 py-1 text-[11px] border border-gray-300 rounded supplier-autocomplete"
+                                       data-index="rm_{{ forloop.counter0 }}">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <input type="text" 
+                                       name="rm_compdate_{{ forloop.counter0 }}"
+                                       value="{{ material.compdate }}"
+                                       placeholder="DD-MM-YYYY"
+                                       class="w-full px-2 py-1 text-[11px] border border-gray-300 rounded flatpickr">
+                            </td>
+                            <!-- Hidden fields for item data -->
+                            <input type="hidden" name="rm_item_{{ forloop.counter0 }}" value="{{ material.item_id }}">
+                            <input type="hidden" name="rm_pid_{{ forloop.counter0 }}" value="{{ material.pid }}">
+                            <input type="hidden" name="rm_cid_{{ forloop.counter0 }}" value="{{ material.cid }}">
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Processing Material Section -->
+        {% if process_materials %}
+        <div class="bg-white rounded border border-gray-200 mb-4 overflow-hidden">
+            <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-800">Processing Material ({{ process_materials|length }} items)</h3>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-[4%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                            <th class="w-[10%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                            <th class="w-[25%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                            <th class="w-[6%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Unit</th>
+                            <th class="w-[8%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Qty</th>
+                            <th class="w-[8%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Rate</th>
+                            <th class="w-[8%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Discount</th>
+                            <th class="w-[20%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Supplier</th>
+                            <th class="w-[11%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Comp Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for material in process_materials %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">
+                                {{ forloop.counter }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                                {{ material.item_code }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px] truncate" title="{{ material.description }}">
+                                {{ material.description }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ material.unit }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-right text-gray-900">
+                                <input type="number" 
+                                       name="pro_qty_{{ forloop.counter0 }}"
+                                       value="{{ material.qty }}"
+                                       step="0.01"
+                                       class="w-full px-1 py-1 text-[11px] text-right border border-gray-300 rounded">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <input type="number" 
+                                       name="pro_rate_{{ forloop.counter0 }}"
+                                       value="{{ material.rate }}"
+                                       step="0.01"
+                                       placeholder="0.00"
+                                       class="w-full px-1 py-1 text-[11px] text-right border border-gray-300 rounded">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <input type="number" 
+                                       name="pro_discount_{{ forloop.counter0 }}"
+                                       value="{{ material.discount }}"
+                                       step="0.01"
+                                       placeholder="0.00"
+                                       class="w-full px-1 py-1 text-[11px] text-right border border-gray-300 rounded">
+                            </td>
+                            <td class="px-2 py-2 text-[11px]">
+                                <input type="text" 
+                                       name="pro_supplier_{{ forloop.counter0 }}"
+                                       value="{{ material.supplier }}"
+                                       placeholder="Supplier Name [ID]"
+                                       class="w-full px-2 py-1 text-[11px] border border-gray-300 rounded supplier-autocomplete"
+                                       data-index="pro_{{ forloop.counter0 }}">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <input type="text" 
+                                       name="pro_compdate_{{ forloop.counter0 }}"
+                                       value="{{ material.compdate }}"
+                                       placeholder="DD-MM-YYYY"
+                                       class="w-full px-2 py-1 text-[11px] border border-gray-300 rounded flatpickr">
+                            </td>
+                            <!-- Hidden fields for item data -->
+                            <input type="hidden" name="pro_item_{{ forloop.counter0 }}" value="{{ material.item_id }}">
+                            <input type="hidden" name="pro_pid_{{ forloop.counter0 }}" value="{{ material.pid }}">
+                            <input type="hidden" name="pro_cid_{{ forloop.counter0 }}" value="{{ material.cid }}">
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Finish Material Section -->
+        {% if finish_materials %}
+        <div class="bg-white rounded border border-gray-200 mb-4 overflow-hidden">
+            <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-800">Finish Material ({{ finish_materials|length }} items)</h3>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-[4%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                            <th class="w-[12%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                            <th class="w-[30%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                            <th class="w-[8%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Unit</th>
+                            <th class="w-[10%] px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Qty</th>
+                            <th class="w-[22%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Supplier</th>
+                            <th class="w-[14%] px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Del Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for material in finish_materials %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">
+                                {{ forloop.counter }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] font-medium text-blue-600">
+                                {{ material.item_code }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px] truncate" title="{{ material.description }}">
+                                {{ material.description }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                                {{ material.unit }}
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px] text-right text-gray-900">
+                                {{ material.qty }}
+                            </td>
+                            <td class="px-2 py-2 text-[11px]">
+                                <input type="text" 
+                                       name="fin_supplier_{{ forloop.counter0 }}"
+                                       value="{{ material.supplier }}"
+                                       placeholder="Supplier Name [ID]"
+                                       class="w-full px-2 py-1 text-[11px] border border-gray-300 rounded supplier-autocomplete"
+                                       data-index="fin_{{ forloop.counter0 }}">
+                            </td>
+                            <td class="px-2 py-2 whitespace-nowrap text-[11px]">
+                                <input type="text" 
+                                       name="fin_compdate_{{ forloop.counter0 }}"
+                                       value="{{ material.compdate }}"
+                                       placeholder="DD-MM-YYYY"
+                                       class="w-full px-2 py-1 text-[11px] border border-gray-300 rounded flatpickr">
+                            </td>
+                            <!-- Hidden fields for item data -->
+                            <input type="hidden" name="fin_item_{{ forloop.counter0 }}" value="{{ material.item_id }}">
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded border border-gray-200 p-3">
+            <div class="flex justify-center gap-3">
+                <a href="{% url 'material_planning:planning-search' %}"
+                   class="px-6 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="px-6 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors">
+                    Save Planning
+                </button>
+            </div>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.min.css">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup supplier autocomplete for all supplier input fields
+    const supplierInputs = document.querySelectorAll('.supplier-autocomplete');
+
+    supplierInputs.forEach(function(input) {
+        let timeout = null;
+        let currentResults = [];
+        let selectedIndex = -1;
+
+        // Create results container
+        const resultsContainer = document.createElement('div');
+        resultsContainer.className = 'absolute z-50 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto hidden';
+        resultsContainer.style.marginTop = '2px';
+        input.parentElement.style.position = 'relative';
+        input.parentElement.appendChild(resultsContainer);
+
+        // Input event handler
+        input.addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+
+            if (query.length < 1) {
+                resultsContainer.innerHTML = '';
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            // Debounce
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                // Fetch suppliers
+                fetch(`/material-planning/api/supplier-autocomplete/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        currentResults = data.results || [];
+                        selectedIndex = -1;
+
+                        if (currentResults.length > 0) {
+                            resultsContainer.innerHTML = currentResults.map((item, index) =>
+                                `<div class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-xs supplier-result" data-index="${index}" data-value="${item.text}">
+                                    ${item.text}
+                                </div>`
+                            ).join('');
+                            resultsContainer.classList.remove('hidden');
+
+                            // Add click handlers
+                            resultsContainer.querySelectorAll('.supplier-result').forEach(function(resultEl) {
+                                resultEl.addEventListener('click', function() {
+                                    input.value = this.getAttribute('data-value');
+                                    resultsContainer.classList.add('hidden');
+                                });
+                            });
+                        } else {
+                            resultsContainer.innerHTML = '<div class="px-3 py-2 text-xs text-gray-500">No suppliers found</div>';
+                            resultsContainer.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching suppliers:', error);
+                    });
+            }, 300);
+        });
+
+        // Keyboard navigation
+        input.addEventListener('keydown', function(e) {
+            const results = resultsContainer.querySelectorAll('.supplier-result');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
+                updateSelection(results);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, 0);
+                updateSelection(results);
+            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                e.preventDefault();
+                results[selectedIndex].click();
+            } else if (e.key === 'Escape') {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+
+        function updateSelection(results) {
+            results.forEach((el, index) => {
+                if (index === selectedIndex) {
+                    el.classList.add('bg-blue-100');
+                } else {
+                    el.classList.remove('bg-blue-100');
+                }
+            });
+        }
+
+        // Click outside to close
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !resultsContainer.contains(e.target)) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

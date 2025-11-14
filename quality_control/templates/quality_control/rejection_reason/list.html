@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+
+{% block title %}Rejection Reasons - Cortex ERP{% endblock %}
+{% block page_title %}Rejection Reasons{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <!-- Toolbar -->
+    {% include 'core/components/tables/table_toolbar.html' with create_url=create_url create_text="Add Reason" %}
+
+    <!-- Table -->
+    {% include 'core/components/tables/data_table.html' with headers=table_headers rows=reasons empty_message="No rejection reasons found" empty_description="Get started by creating a new rejection reason" create_url=create_url create_text="Add Reason" %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

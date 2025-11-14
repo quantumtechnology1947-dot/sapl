@@ -1,0 +1,171 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-4xl">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-base font-bold text-gray-800">{{ page_title }}</h1>
+        <a href="{% url 'sys_admin:financial_year_list' %}" 
+           class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md transition duration-200">
+            <i class="fas fa-arrow-left mr-2"></i>Back to List
+        </a>
+    </div>
+
+    <!-- Financial Year Details -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Financial Year Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Company</label>
+                <p class="text-lg text-gray-900">{{ company.companyname|default:"N/A" }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Financial Year</label>
+                <p class="text-lg text-gray-900">{{ financial_year.finyear }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">From Date</label>
+                <p class="text-lg text-gray-900">{{ financial_year.finyearfrom }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">To Date</label>
+                <p class="text-lg text-gray-900">{{ financial_year.finyearto }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-1">Status</label>
+                {% if financial_year.is_closed %}
+                    <span class="px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">
+                        Closed
+                    </span>
+                {% else %}
+                    <span class="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">
+                        Open
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Year-End Closing Information -->
+    {% if previous_year %}
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6">
+            <h2 class="text-xl font-semibold text-blue-900 mb-4">
+                <i class="fas fa-info-circle mr-2"></i>Year-End Closing Operations
+            </h2>
+            
+            <p class="text-blue-800 mb-4">
+                The following operations will be performed when you confirm:
+            </p>
+
+            <ul class="space-y-2 text-blue-800">
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-3"></i>
+                    <span><strong>Clone Item Master Data:</strong> All inventory items from {{ previous_year.finyear }} will be archived</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-3"></i>
+                    <span><strong>Update Opening Balances:</strong> Closing quantities will become opening quantities for {{ financial_year.finyear }}</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-3"></i>
+                    <span><strong>Carry Forward User Access:</strong> User permissions will be copied to the new year</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-3"></i>
+                    <span><strong>Close Previous Year:</strong> {{ previous_year.finyear }} will be marked as closed</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-3"></i>
+                    <span><strong>Reset Transaction Numbers:</strong> All transaction sequences will start from 1</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-3"></i>
+                    <span><strong>Carry Forward Partial Transactions:</strong> Pending transactions will be moved to new year</span>
+                </li>
+            </ul>
+
+            <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-800">
+                            <strong>Warning:</strong> This operation cannot be undone. Please ensure all data for {{ previous_year.finyear }} is finalized before proceeding.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <form method="post" id="year-end-closing-form">
+            {% csrf_token %}
+            <div class="flex justify-end space-x-3">
+                <a href="{% url 'sys_admin:financial_year_list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition duration-200">
+                    Cancel
+                </a>
+                <button type="submit" 
+                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition duration-200"
+                        onclick="return confirm('Are you sure you want to proceed with year-end closing? This operation cannot be undone.');">
+                    <i class="fas fa-check mr-2"></i>Confirm and Execute Year-End Closing
+                </button>
+            </div>
+        </form>
+    {% else %}
+        <div class="bg-green-50 border-l-4 border-green-500 p-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-500 text-sm"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-medium text-green-900 mb-2">Financial Year Created Successfully!</h3>
+                    <p class="text-green-800">
+                        This is the first financial year for {{ company.companyname }}. No year-end closing operations are required.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{% url 'sys_admin:financial_year_list' %}" 
+                           class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition duration-200 inline-block">
+                            <i class="fas fa-arrow-left mr-2"></i>Return to Financial Year List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded p-8 max-w-md">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mb-4"></div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Processing Year-End Closing...</h3>
+            <p class="text-gray-600 text-center">Please wait while we execute the year-end closing operations. This may take a few moments.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('year-end-closing-form')?.addEventListener('submit', function() {
+    document.getElementById('loading-overlay').classList.remove('hidden');
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

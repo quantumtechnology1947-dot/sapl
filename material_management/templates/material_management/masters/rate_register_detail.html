@@ -1,0 +1,127 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Rate Details - Item {{ item_id }} - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
+            <h1 class="text-white font-semibold text-lg">&nbsp;Rate Register - Item {{ item_id }}</h1>
+            <a href="{% url 'material_management:rate-register-list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition">
+                ← Back to Search
+            </a>
+        </div>
+
+        <div class="p-4 border-b border-gray-200">
+            <form method="get" class="flex gap-4 items-end">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Supplier</label>
+                    <input type="text" name="supplier" value="{{ supplier_filter }}" placeholder="Enter supplier name..." class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition">Filter</button>
+                {% if supplier_filter %}
+                <a href="{% url 'material_management:rate-register-detail' item_id %}" class="bg-gray-500 text-white px-4 py-2 rounded-md text-sm hover:bg-gray-600 transition">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <form method="post" id="rateForm">
+            {% csrf_token %}
+            <div class="p-4">
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700 w-20">Set Min</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700 w-16">SN</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">PO Number</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">Supplier</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-xs font-medium text-gray-700">Rate</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-xs font-medium text-gray-700">Discount %</th>
+                                <th class="border border-gray-300 px-3 py-2 text-right text-xs font-medium text-gray-700">Amount</th>
+                                <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rate in enriched_rates %}
+                            <tr class="hover:bg-gray-50 {% if rate.flag == 1 %}bg-green-50{% endif %}">
+                                <td class="border border-gray-300 px-3 py-2 text-center text-sm">
+                                    <input type="radio" name="selected_rate" value="{{ rate.id }}"
+                                           {% if rate.flag == 1 %}checked{% endif %}
+                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                </td>
+                                <td class="border border-gray-300 px-3 py-2 text-right text-sm">{{ forloop.counter }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-sm">{{ rate.po_no|default:"-" }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-sm">{{ rate.supplier_name|default:"-" }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-right text-sm font-medium">₹ {{ rate.rate|floatformat:2|default:"0.00" }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-right text-sm">{{ rate.discount|floatformat:2|default:"0.00" }}%</td>
+                                <td class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold">₹ {{ rate.amount|floatformat:2|default:"0.00" }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-sm">{{ rate.sys_date|default:"-" }}</td>
+                            </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="border border-gray-300 px-3 py-12 text-center text-gray-500">
+                                <div>
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No rates found</h3>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        {% if supplier_filter %}
+                                        No rates found for this supplier. Try clearing the filter.
+                                        {% else %}
+                                        No rate history available for this item yet.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-4 border-t border-gray-200 flex justify-center">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm font-medium transition">
+                    Set Minimum Rate
+                </button>
+            </div>
+
+            {% if is_paginated %}
+            <div class="mt-4 flex items-center justify-between">
+                <div class="text-sm text-gray-700">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries
+                </div>
+                <div class="flex space-x-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?page=1{% if supplier_filter %}&supplier={{ supplier_filter }}{% endif %}" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if supplier_filter %}&supplier={{ supplier_filter }}{% endif %}" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Previous</a>
+                    {% endif %}
+                    <span class="px-3 py-1 border border-blue-500 bg-blue-50 rounded text-sm">{{ page_obj.number }}</span>
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if supplier_filter %}&supplier={{ supplier_filter }}{% endif %}" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Next</a>
+                    <a href="?page={{ paginator.num_pages }}{% if supplier_filter %}&supplier={{ supplier_filter }}{% endif %}" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">Last</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+                <p class="text-sm text-blue-700">
+                    <strong>Note:</strong> This shows all historical rates for Item {{ item_id }} from Purchase Orders (PO), Purchase Requisitions (PR), and Special Purpose Requisitions (SPR). Select a rate and click "Set Minimum Rate" to mark it as the preferred rate for this item. Rows with green background indicate the currently set minimum rate.
+                </p>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

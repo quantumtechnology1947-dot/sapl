@@ -1,0 +1,35 @@
+<tr id="reason-row-{{ reason.id }}" class="bg-yellow-50 border-b">
+    <td class="px-4 py-2 text-center text-sm">-</td>
+    <td colspan="3" class="px-4 py-2">
+        <form hx-post="{% url 'design:ecn-reason-edit' reason.id %}"
+              hx-target="#reason-row-{{ reason.id }}"
+              hx-swap="outerHTML"
+              class="flex gap-3 items-start">
+            {% csrf_token %}
+            <div class="flex-1">
+                <input type="text" name="types" value="{{ reason.types }}" required
+                       placeholder="Enter ECN reason description"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit"
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors whitespace-nowrap">
+                Update
+            </button>
+            <button type="button"
+                    hx-get="{% url 'design:ecn-reason-list' %}"
+                    hx-target="#reason-row-{{ reason.id }}"
+                    hx-swap="outerHTML"
+                    class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-md transition-colors whitespace-nowrap">
+                Cancel
+            </button>
+        </form>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

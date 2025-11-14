@@ -1,0 +1,66 @@
+{% extends "daily_report_system/base.html" %}
+
+{% block title %}Dashboard - Daily Reporting System{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-base font-bold text-gray-800">Daily Reporting System Dashboard</h1>
+    <p class="text-gray-600">Project planning and tracking system</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+    <div class="bg-white p-6 rounded border border-gray-200">
+        <div class="text-base font-bold text-blue-600">{{ total_projects }}</div>
+        <div class="text-gray-600">Total Projects</div>
+    </div>
+    <div class="bg-white p-6 rounded border border-gray-200">
+        <div class="text-base font-bold text-green-600">{{ total_designs }}</div>
+        <div class="text-gray-600">Design Plans</div>
+    </div>
+    <div class="bg-white p-6 rounded border border-gray-200">
+        <div class="text-base font-bold text-purple-600">{{ total_manufacturing }}</div>
+        <div class="text-gray-600">Manufacturing Plans</div>
+    </div>
+    <div class="bg-white p-6 rounded border border-gray-200">
+        <div class="text-base font-bold text-orange-600">{{ total_vendor_plans }}</div>
+        <div class="text-gray-600">Vendor Plans</div>
+    </div>
+    <div class="bg-white p-6 rounded border border-gray-200">
+        <div class="text-base font-bold text-red-600">{{ total_activities }}</div>
+        <div class="text-gray-600">Total Activities</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded border border-gray-200">
+        <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+        <div class="space-y-2">
+            <a href="{% url 'daily_report_system:design-plan-create' %}" class="block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">New Design Plan</a>
+            <a href="{% url 'daily_report_system:manufacturing-plan-create' %}" class="block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">New Manufacturing Plan</a>
+            <a href="{% url 'daily_report_system:vendor-plan-create' %}" class="block bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">New Vendor Plan</a>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded border border-gray-200">
+        <h2 class="text-xl font-bold mb-4">Recent Projects</h2>
+        <div class="space-y-2">
+            {% for project in recent_projects %}
+                <div class="border-b pb-2">
+                    <div class="font-semibold">WO: {{ project.wono }}</div>
+                    <div class="text-sm text-gray-600">{{ project.sysdate }}</div>
+                </div>
+            {% empty %}
+                <p class="text-gray-500">No projects found</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

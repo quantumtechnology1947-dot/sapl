@@ -1,0 +1,87 @@
+﻿Id,SessionId,CompId,FinYearId,Subject,Description,Start,End,ModuleId,RecurrenceRule,RecurrenceParentId,Reminder
+4,Sapl0015,1,1,materil list for wo N0006 ,,2013-05-14 05:00:00,2013-05-14 05:30:00,1,,,
+5,Sapl0015,1,1,Site Work intry For ERP,,2013-05-14 06:00:00,2013-05-14 06:30:00,1,,,
+6,Sapl0015,1,1,Assly Material F l ,,2013-05-14 07:00:00,2013-05-14 07:30:00,1,,,
+9,Sapl0023,1,1,Deadline of Mahindra & Mahindra Main Line Fixture Design...,,2013-06-29 21:00:00,2013-06-30 21:00:00,1,,,"BEGIN:VALARM
+TRIGGER:-PT5M
+X-TELERIK-UID:f52f52c7-f7fb-4933-baca-d67304b6d581
+END:VALARM
+
+"
+10,Sapl0040,1,1,,,2013-07-03 21:00:00,2013-07-04 21:00:00,1,,,
+12,sapl0161,1,1,Swajit engineering - PO follow up,,2013-10-09 21:00:00,2013-10-09 22:00:00,1,,,
+14,Sapl0082,1,1,crane checking,motor brake is ok,2013-10-10 16:00:00,2013-10-10 17:00:00,1,,,
+15,Sapl0082,1,1,4'' sander repair  Armichair carban  brash ,,2013-10-11 07:00:00,2013-10-11 08:00:00,1,,,
+16,Sapl0082,1,1,filler vmc atc work complite,,2013-10-09 14:00:00,2013-10-09 15:00:00,1,,,
+17,Sapl0063,1,1,pl,-----,2013-10-18 09:00:00,2013-10-18 10:30:00,1,,,"BEGIN:VALARM
+TRIGGER:-PT5M
+X-TELERIK-UID:04ce87c4-e95d-4262-a2be-6f251061fcdf
+END:VALARM
+
+"
+18,Sapl0082,1,1,crane work,,2013-11-09 07:00:00,2013-11-09 08:00:00,1,,,
+19,Sapl0082,1,1,machine shop power point cable work comp.,,2013-11-09 13:00:00,2013-11-09 14:00:00,1,,,
+20,Sapl0082,1,1,secumu milling machine tsl 8x70 motor brash change,,2013-11-10 11:00:00,2013-11-10 12:00:00,1,,,
+21,Sapl0082,1,1,spot welding gun balensing work,,2013-11-10 14:00:00,2013-11-10 15:00:00,1,,,
+22,Sapl0082,1,1,spot welding gun work,,2013-11-11 07:00:00,2013-11-11 08:00:00,1,,,
+23,Sapl0082,1,1,genset diesel level ok mainteanase work sheet comp. ,,2013-11-11 08:00:00,2013-11-11 09:00:00,1,,,
+24,Sapl0082,1,1,5'' sander carban brash change,,2013-11-09 08:00:00,2013-11-09 09:00:00,1,,,
+25,Sapl0082,1,1,boge make compresor piston change,,2013-11-01 13:00:00,2013-11-01 14:00:00,1,,,
+26,Sapl0082,1,1,flame cut machine software problem,,2013-11-08 07:00:00,2013-11-08 08:00:00,1,,,
+27,Sapl0082,1,1,height master ffc strip (cable) damage brake,,2013-11-08 10:00:00,2013-11-08 11:00:00,1,,,
+28,Sapl0055,1,1,Personal Meeting,,2013-12-30 21:00:00,2013-12-31 21:00:00,1,,,
+29,sapl0146,1,1,Rs. 1314  Returned to Account  against IOU of Mr. Tanaji Sawant For N0015 mtrl unloading.dt 18.12.13,Rs. 1314  Returned to Account  against IOU of Mr. Tanaji Sawant For N0015 mtrl unloading.dt 18.12.13,2013-12-24 13:00:00,2013-12-24 14:00:00,1,,,
+30,sapl0194,1,1,I have to go for opening of bank Account.,,2014-01-23 10:00:00,2014-01-23 11:00:00,1,,,
+31,Sapl0040,1,1,SCISSOR LIFT ASSLY,,2014-01-28 21:00:00,2014-01-28 22:00:00,1,,,
+32,sapl0019,1,2,htsr,,2014-08-04 21:00:00,2014-08-04 22:00:00,1,,,
+33,Sapl0015,1,2,Prod. Mom 1 pm Wo. no. N0080,,2014-08-07 21:00:00,2014-08-07 22:00:00,1,,,
+34,Sapl0015,1,2,"sujal b""day",,2014-08-28 21:00:00,2014-08-28 22:00:00,1,,,
+36,sapl0018,1,2,SAPL,"Working on Mahindra project..
+Regarding points observed during provving..P405..",2014-12-22 06:00:00,2014-12-22 07:00:00,1,,,
+42,Sapl0025,1,3,,,2015-09-07 06:00:00,2015-09-07 06:30:00,1,,,
+43,Sapl0053,1,3,8.30 am to 5.30 pm,,2016-01-14 21:00:00,2016-01-15 21:00:00,1,,,
+44,sapl0242,1,4,MSKH Seating Systems Pvt.Ltd.  Chakan,,2016-09-10 07:00:00,2016-09-10 08:00:00,1,,,
+47,Sapl0207,1,5,sapl plant II working,"Kaka & Ugale -chequer plate 3mm(2nos)& 8mm sheet cutting. 
+Rajendra ,Anand & Sambaji -work on sgs tertiary conveyor leg 3rd  set fabrication.
+Ambadas sir -fc mahindra base plate & other part wo.no,N0163  .
+Chavan , Khaire & Ashis -Painting auger conveyor parts.
+Ganesh-Bandsaw ismc cutting tertiary conveyor leg.
+",2017-08-27 21:00:00,2017-08-28 21:00:00,1,,,
+48,sapl0018,1,5,Working On Mahindra Plenum Fixtures..,"WO.NO.N0163
+Mahindra Tucker welding fixture-Working on points observed during buy off process.",2017-09-20 21:00:00,2017-09-20 22:00:00,1,,,
+49,sapl0018,1,5,Working on Mahindra Project,,2017-09-24 21:00:00,2017-09-25 21:00:00,1,,,
+54,sapl0001,1,6,test,,2018-09-24 21:30:00,2018-09-24 22:00:00,1,,,
+55,Sapl0290,1,6,"Atlas base deburr & primer &paint& riser to mill & paint
+cummins load assit assly req pin & bush
+Technospan rollers & brg & circlip
+184 shortages
+",,2018-12-28 21:00:00,2018-12-29 21:00:00,1,,,
+57,Sapl0307,1,7,Twin Cylinder send to Party,,2019-04-30 14:00:00,2019-04-30 15:00:00,1,,,
+58,Sapl0299,1,7,3) FOLLOW UP WITH QUALITY DEPT FOR PINION TAKEN IT GOT REJECTED TOLD TO PRAVIN SIR AND SHUBHANGI MAM.,,2019-06-29 06:00:00,2019-06-29 07:00:00,1,,,
+59,Sapl0299,1,7,1) ROLLERS 19 NUMBER RECEIVED 20NOS UNLOADED BY STORE. 2) PINS AT LATHE M/C REQUIRED CARBIDE TOOL REQUIREMENT GIVEN TO VINIT PURCHASE DEPT YESTERDAY BUT NOT RECEIVED TILL DATE.,,2019-06-29 05:00:00,2019-06-29 06:00:00,1,,,
+60,Sapl0299,1,7,4) LOAD BUSH TO MAKAR AND SHAFTS TO BLACKODISING. 5) FOLLOW UP FOR NEW PROJECT 200WO WITH PROD DEPT.,,2019-06-29 07:00:00,2019-06-29 08:00:00,1,,,
+61,Sapl0299,1,7,"1) Two men at work of parafitwall. 2)Flamecut machine problem so machine under maintenance,all bases plates cutdown. 3) Anil sirs machine working on base RFA-20 holeplan. 4)Machine shop working on small parts. 4) Fabrication team working on joining of plate to base and joining of channels of other base. 5)Bendsaw working on cutting of channels.",,2019-07-02 05:00:00,2019-07-02 06:00:00,1,,,
+62,sapl0307,1,7,,,2019-07-11 00:00:00,2019-07-11 01:00:00,1,,,
+65,sapl0287,1,7,,,2019-12-12 23:00:00,2019-12-12 23:30:00,1,,,
+66,sapl0282,1,7,GA & Material status,"Update all GA of units 653 & 654 , check for status of parts and plan for assembly
+Include all bought out & manufacturing parts , 
+Arrange bought out and standard parts in proper appropriate racks",2019-12-28 11:00:00,2019-12-28 12:00:00,,,,
+67,Sapl0001,1,7,ERP,,2019-12-28 11:00:00,2019-12-29 11:00:00,1,,,"BEGIN:VALARM
+TRIGGER:-PT5M
+X-TELERIK-UID:a15b121f-9105-4c10-a18e-6f668e1f4b9a
+END:VALARM
+
+"
+68,sapl0282,1,7,Update GA,GA & Assembly plan,2019-12-28 11:30:00,2019-12-28 21:00:00,1,,,"BEGIN:VALARM
+TRIGGER:-PT5M
+X-TELERIK-UID:2019755e-2a92-419c-a150-e495aff397bf
+END:VALARM
+
+"
+69,sapl0282,1,7,ERP,CHECK,2019-12-28 11:00:00,2019-12-28 11:30:00,1,,,"BEGIN:VALARM
+TRIGGER:-PT5M
+X-TELERIK-UID:67ef2bb9-d38e-4b57-ada3-52d206cbace8
+END:VALARM
+
+"
+72,sapl0334,1,8,SAGS Review meeting with LM and GE,Discussion on order of long lead items/sanders with spongy covering/blade sample from LM and other technical details from GE for finalizing design for prototype manufacturing.,2021-02-07 21:00:00,2021-02-08 21:00:00,1,,,

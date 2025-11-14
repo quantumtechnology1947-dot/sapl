@@ -1,0 +1,87 @@
+{% extends "core/base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} WO Sub-Category - Cortex ERP{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Edit{% else %}Add New{% endif %} Work Order Sub-Category{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">
+                    {% if form.instance.pk %}Edit Sub-Category{% else %}Add New Sub-Category{% endif %}
+                </h2>
+                <p class="text-sm text-gray-600 mt-1">
+                    {% if form.instance.pk %}Update sub-category information{% else %}Enter sub-category details{% endif %}
+                </p>
+            </div>
+            <a href="{% url 'sales_distribution:wo-subcategory-list' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md transition-colors">
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form method="post" class="bg-white rounded border border-gray-200 p-6">
+        {% csrf_token %}
+        
+        <div class="space-y-6">
+            <!-- Category -->
+            <div class="space-y-2">
+                <label for="{{ form.cid.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Category <span class="text-red-500">*</span>
+                </label>
+                {{ form.cid }}
+                {% if form.cid.errors %}
+                <p class="text-red-500 text-sm">{{ form.cid.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Sub-Category Name -->
+            <div class="space-y-2">
+                <label for="{{ form.scname.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Sub-Category Name <span class="text-red-500">*</span>
+                </label>
+                {{ form.scname }}
+                {% if form.scname.errors %}
+                <p class="text-red-500 text-sm">{{ form.scname.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Symbol -->
+            <div class="space-y-2">
+                <label for="{{ form.symbol.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Symbol <span class="text-red-500">*</span>
+                </label>
+                {{ form.symbol }}
+                <p class="text-gray-500 text-xs">Enter exactly 1 character</p>
+                {% if form.symbol.errors %}
+                <p class="text-red-500 text-sm">{{ form.symbol.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex gap-4 justify-end mt-6 pt-6 border-t">
+            <a href="{% url 'sales_distribution:wo-subcategory-list' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                Cancel
+            </a>
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                {% if form.instance.pk %}Update{% else %}Create{% endif %} Sub-Category
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,221 @@
+{% comment %}
+Component: Date Input with Flatpickr
+Purpose: Compact date input field with calendar picker, SAP Fiori styling
+Requirements: 5.1, 9.1-9.10
+
+Parameters:
+  - label (optional): Field label text
+  - name (required): Input name attribute
+  - value (optional): Current date value (YYYY-MM-DD format)
+  - required (optional): Boolean for required field
+  - placeholder (optional): Placeholder text (default: "Select date")
+  - help_text (optional): Helper text below input
+  - error (optional): Error message to display
+  - inline (optional): Boolean for inline layout (default: False)
+  - readonly (optional): Boolean for read-only state
+  - disabled (optional): Boolean for disabled state
+  - min_date (optional): Minimum selectable date (YYYY-MM-DD)
+  - max_date (optional): Maximum selectable date (YYYY-MM-DD)
+  - date_format (optional): Display format (default: "Y-m-d")
+  - enable_time (optional): Boolean to enable time selection
+  - class (optional): Additional CSS classes
+
+Usage:
+  {% include 'core/components/forms/date_input.html' with
+    label="Start Date"
+    name="start_date"
+    value=form.start_date.value
+    required=True
+    placeholder="Select start date"
+  %}
+{% endcomment %}
+
+<div class="{% if not inline %}mb-2{% else %}inline-block{% endif %}">
+    {% if label %}
+    <label for="id_{{ name }}" class="block text-xs font-medium text-gray-700 mb-1">
+        {{ label }}
+        {% if required %}<span class="text-sap-red">*</span>{% endif %}
+    </label>
+    {% endif %}
+    
+    <div class="relative">
+        <input type="text" 
+               id="id_{{ name }}" 
+               name="{{ name }}"
+               value="{{ value|default:'' }}"
+               {% if required %}required{% endif %}
+               {% if disabled %}disabled{% endif %}
+               {% if readonly %}readonly{% endif %}
+               data-flatpickr
+               {% if min_date %}data-min-date="{{ min_date }}"{% endif %}
+               {% if max_date %}data-max-date="{{ max_date }}"{% endif %}
+               {% if date_format %}data-date-format="{{ date_format }}"{% else %}data-date-format="Y-m-d"{% endif %}
+               {% if enable_time %}data-enable-time="true"{% endif %}
+               class="w-full h-9 pl-3 pr-10 text-sm border border-gray-300 rounded 
+                      focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue
+                      {% if disabled or readonly %}bg-gray-50 cursor-not-allowed{% else %}bg-white{% endif %}
+                      {% if error %}border-sap-red{% endif %}
+                      {{ class|default:'' }}"
+               placeholder="{{ placeholder|default:'Select date' }}"
+               autocomplete="off">
+        
+        <!-- Calendar Icon -->
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+        </div>
+    </div>
+    
+    {% if help_text %}
+    <p class="mt-1 text-xs text-gray-500">{{ help_text }}</p>
+    {% endif %}
+    
+    {% if error %}
+    <p class="mt-1 text-xs text-sap-red flex items-center gap-1">
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        {{ error }}
+    </p>
+    {% endif %}
+</div>
+
+<script>
+    // Initialize Flatpickr on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeFlatpickr();
+    });
+    
+    // Re-initialize after HTMX swaps
+    document.addEventListener('htmx:afterSwap', function() {
+        initializeFlatpickr();
+    });
+    
+    function initializeFlatpickr() {
+        const dateInputs = document.querySelectorAll('[data-flatpickr]:not(.flatpickr-input)');
+        
+        dateInputs.forEach(function(input) {
+            const config = {
+                dateFormat: input.dataset.dateFormat || 'Y-m-d',
+                allowInput: true,
+                clickOpens: !input.disabled && !input.readOnly,
+                // Compact styling for SAP Fiori
+                static: false,
+                monthSelectorType: 'static',
+                prevArrow: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>',
+                nextArrow: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>',
+            };
+            
+            // Add min/max date constraints
+            if (input.dataset.minDate) {
+                config.minDate = input.dataset.minDate;
+            }
+            if (input.dataset.maxDate) {
+                config.maxDate = input.dataset.maxDate;
+            }
+            
+            // Enable time picker if specified
+            if (input.dataset.enableTime === 'true') {
+                config.enableTime = true;
+                config.dateFormat = input.dataset.dateFormat || 'Y-m-d H:i';
+                config.time_24hr = true;
+            }
+            
+            flatpickr(input, config);
+        });
+    }
+</script>
+
+<style>
+    /* Compact Flatpickr styling for SAP Fiori */
+    .flatpickr-calendar {
+        font-size: 0.875rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #E5E5E5;
+        border-radius: 0.25rem;
+    }
+    
+    .flatpickr-months {
+        padding: 0.5rem;
+    }
+    
+    .flatpickr-current-month {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #32363A;
+    }
+    
+    .flatpickr-weekdays {
+        height: 2rem;
+    }
+    
+    .flatpickr-weekday {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6A6D70;
+    }
+    
+    .flatpickr-day {
+        height: 2rem;
+        line-height: 2rem;
+        font-size: 0.75rem;
+        border-radius: 0.25rem;
+    }
+    
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange {
+        background: #0854A0;
+        border-color: #0854A0;
+    }
+    
+    .flatpickr-day.selected:hover,
+    .flatpickr-day.startRange:hover,
+    .flatpickr-day.endRange:hover {
+        background: #074A7E;
+        border-color: #074A7E;
+    }
+    
+    .flatpickr-day:hover:not(.selected):not(.startRange):not(.endRange) {
+        background: #F7F7F7;
+        border-color: #E5E5E5;
+    }
+    
+    .flatpickr-day.today {
+        border-color: #0854A0;
+    }
+    
+    .flatpickr-day.today:hover {
+        background: #F7F7F7;
+        border-color: #0854A0;
+    }
+    
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month {
+        padding: 0.25rem;
+        fill: #6A6D70;
+    }
+    
+    .flatpickr-months .flatpickr-prev-month:hover,
+    .flatpickr-months .flatpickr-next-month:hover {
+        fill: #0854A0;
+    }
+    
+    .flatpickr-time {
+        border-top: 1px solid #E5E5E5;
+    }
+    
+    .flatpickr-time input {
+        font-size: 0.875rem;
+    }
+</style>
+
+
+
+
+
+
+
+

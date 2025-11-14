@@ -1,0 +1,534 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Customer PO - {% if is_edit %}Edit{% else %}New{% endif %} - Cortex ERP{% endblock %}
+{% block page_title %}Customer PO - {% if is_edit %}Edit{% else %}New{% endif %}{% endblock %}
+
+{% block content %}
+
+<!-- Back to List Link -->
+<div class="mb-3">
+    <a href="{% url 'sales_distribution:po-list' %}" class="text-blue-600 hover:text-blue-900 text-sm">
+        ← Back to List
+    </a>
+</div>
+
+<form method="post" id="poForm" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <!-- Tab Container -->
+    <div class="bg-white border border-gray-300 shadow-sm">
+            <!-- Tab Headers -->
+            <div class="flex border-b border-gray-300 bg-gray-50">
+                <button type="button" 
+                        class="px-4 py-2 text-xs font-medium border-r border-gray-300 cursor-pointer transition-all
+                               bg-white border-b-2 border-sap-red font-semibold" 
+                        onclick="switchTab(0)" id="tab-0">
+                    Customer Details
+                </button>
+                <button type="button" 
+                        class="px-4 py-2 text-xs font-medium border-r border-gray-300 cursor-pointer transition-all
+                               bg-gray-50 hover:bg-gray-100" 
+                        onclick="switchTab(1)" id="tab-1">
+                    Goods Details
+                </button>
+                <button type="button" 
+                        class="px-4 py-2 text-xs font-medium cursor-pointer transition-all
+                               bg-gray-50 hover:bg-gray-100" 
+                        onclick="switchTab(2)" id="tab-2">
+                    Terms & Conditions
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            
+            <!-- Tab Panel 1: Customer Details -->
+            <div class="p-4" id="panel-0">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-2 align-top" class="w-[20%]">Name of Customer</td>
+                        <td class="px-2 py-2" class="w-[30%]">
+                            : <input type="text" name="customerid" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.customerid|default:'' }}" required>
+                        </td>
+                        <td class="px-2 py-2" class="w-[20%]"></td>
+                        <td class="px-2 py-2" class="w-[30%]"></td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2 align-top">Regd. Office Address</td>
+                        <td class="px-2 py-2" colspan="3">
+                            : <textarea name="customer_address" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                        rows="3" class="w-[95%]">{{ customer.regdaddress|default:'' }}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">Enquiry No</td>
+                        <td class="px-2 py-2">
+                            : <select name="enqid" class="px-2 py-1 border border-gray-300 rounded text-xs" class="w-[200px]">
+                                <option value="">Select</option>
+                                {% for enq in enquiries %}
+                                <option value="{{ enq.enqid }}" {% if po.enqid_id == enq.enqid %}selected{% endif %}>
+                                    ENQ-{{ enq.enqid }} - {{ enq.customername|default:"" }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="px-2 py-2">Quotation No.</td>
+                        <td class="px-2 py-2">
+                            : <select name="quotationno" class="px-2 py-1 border border-gray-300 rounded text-xs" class="w-[150px]">
+                                <option value="">Select</option>
+                                {% if quotations %}
+                                    {% for quot in quotations %}
+                                    <option value="{{ quot.id }}" {% if po.quotationno == quot.id %}selected{% endif %}>
+                                        {{ quot.quotationno }}
+                                    </option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">PO Received Date</td>
+                        <td class="px-2 py-2">
+                            : <input type="date" name="poreceiveddate" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[150px]" value="{{ po.poreceiveddate|default:'' }}">
+                        </td>
+                        <td class="px-2 py-2">PO Date</td>
+                        <td class="px-2 py-2">
+                            : <input type="date" name="podate" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[150px]" value="{{ po.podate|default:'' }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">PO No</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="pono" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[250px]" value="{{ po.pono|default:'' }}" required>
+                        </td>
+                        <td class="px-2 py-2">Our Vendor Code</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="vendorcode" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[250px]" value="{{ po.vendorcode|default:'' }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="px-2 py-3 text-right">
+                            <button type="button" onclick="switchTab(1)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-xs mr-2">
+                                Next
+                            </button>
+                            <button type="button" onclick="window.location.href='{% url 'sales_distribution:po-list' %}'" 
+                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-xs">
+                                Cancel
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Tab Panel 2: Goods Details -->
+            <div class="p-4 hidden" id="panel-2">
+                <table class="w-full text-xs mb-2">
+                    <tr>
+                        <td colspan="5" class="px-2 py-2">Description & Specification of goods</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4" class="px-2 py-2 align-top" class="w-[40%]">
+                            <textarea id="bulk_desc" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                      rows="4" class="w-[100%]"></textarea>
+                        </td>
+                        <td class="px-2 py-2" class="w-[15%]"></td>
+                        <td class="px-2 py-2" class="w-[15%]">Total Qty of goods</td>
+                        <td class="px-2 py-2" colspan="2">
+                            : <input type="number" id="bulk_totalqty" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[120px]" step="0.01">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2"></td>
+                        <td class="px-2 py-2">Rate per unit</td>
+                        <td class="px-2 py-2" colspan="2">
+                            : <input type="number" id="bulk_rate" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[120px]" step="0.01">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2"></td>
+                        <td class="px-2 py-2">Discount</td>
+                        <td class="px-2 py-2" colspan="2">
+                            : <input type="number" id="bulk_discount" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[120px]" step="0.01">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2"></td>
+                        <td class="px-2 py-2">Unit</td>
+                        <td class="px-2 py-2" colspan="2">
+                            : <select id="bulk_unit" class="px-2 py-1 border border-gray-300 rounded text-xs" class="w-[120px]">
+                                <option value="">Select</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.id }}">{{ unit.symbol }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="px-2 py-2">
+                            <button type="button" onclick="addDetailRow()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
+                                Submit
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs border-collapse" id="detailsTable">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[5%]">SN</th>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[30%]">Description</th>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[10%]">Unit</th>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[10%]">Qty</th>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[10%]">Rate</th>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[10%]">Discount(%)</th>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[15%]">Amount</th>
+                                <th class="border border-gray-300 px-2 py-1 text-center" class="w-[10%]">
+                                    <button type="button" onclick="addDetailRow()" class="text-blue-600 hover:text-blue-900 text-xs">
+                                        Edit
+                                    </button> | 
+                                    <button type="button" class="text-red-600 hover:text-red-900 text-xs">
+                                        Delete
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailsTableBody">
+                            {% if po_details %}
+                                {% for detail in po_details %}
+                                <tr data-index="{{ forloop.counter }}">
+                                    <td class="border border-gray-300 px-2 py-1 text-center">{{ forloop.counter }}</td>
+                                    <td class="border border-gray-300 px-2 py-1">
+                                        <input type="text" name="detail_itemdesc_{{ forloop.counter }}" 
+                                               class="w-full px-1 py-0 border-0 text-xs" value="{{ detail.itemdesc }}" required>
+                                    </td>
+                                    <td class="border border-gray-300 px-2 py-1">
+                                        <select name="detail_unit_{{ forloop.counter }}" class="w-full px-1 py-0 border-0 text-xs">
+                                            {% for unit in units %}
+                                            <option value="{{ unit.id }}" {% if detail.unit_id == unit.id %}selected{% endif %}>
+                                                {{ unit.symbol }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="border border-gray-300 px-2 py-1">
+                                        <input type="number" name="detail_totalqty_{{ forloop.counter }}" 
+                                               class="w-full px-1 py-0 border-0 text-xs detail-qty" step="0.01" 
+                                               value="{{ detail.totalqty }}" onchange="calculateAmount(this)">
+                                    </td>
+                                    <td class="border border-gray-300 px-2 py-1">
+                                        <input type="number" name="detail_rate_{{ forloop.counter }}" 
+                                               class="w-full px-1 py-0 border-0 text-xs detail-rate" step="0.01" 
+                                               value="{{ detail.rate }}" onchange="calculateAmount(this)">
+                                    </td>
+                                    <td class="border border-gray-300 px-2 py-1">
+                                        <input type="number" name="detail_discount_{{ forloop.counter }}" 
+                                               class="w-full px-1 py-0 border-0 text-xs detail-discount" step="0.01" 
+                                               value="{{ detail.discount }}" onchange="calculateAmount(this)">
+                                    </td>
+                                    <td class="border border-gray-300 px-2 py-1 text-right">
+                                        <input type="text" class="w-full px-1 py-0 border-0 text-xs detail-amount text-right" readonly 
+                                               value="{{ detail.totalqty|floatformat:2 }}">
+                                    </td>
+                                    <td class="border border-gray-300 px-2 py-1 text-center">
+                                        <button type="button" onclick="deleteRow(this)" class="text-red-600 hover:text-red-900 text-xs">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr class="no-data">
+                                    <td colspan="8" class="border border-gray-300 px-2 py-8 text-center text-gray-500">
+                                        No data to display!
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="px-2 py-3 text-right">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs mr-2">
+                        Submit
+                    </button>
+                    <button type="button" onclick="switchTab(2)" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-xs mr-2">
+                        Next
+                    </button>
+                    <button type="button" onclick="window.location.href='{% url 'sales_distribution:po-list' %}'" 
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-xs">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Panel 3: Terms & Conditions -->
+            <div class="p-4 hidden" id="panel-3">
+                <table class="w-full text-xs">
+                    <tr>
+                        <td class="px-2 py-2" class="w-[20%]">Payment Terms</td>
+                        <td class="px-2 py-2" class="w-[30%]">
+                            : <textarea name="paymentterms" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                        rows="2" class="w-[90%]">{{ po.paymentterms|default:'' }}</textarea>
+                        </td>
+                        <td class="px-2 py-2" class="w-[20%]">GST/IGST</td>
+                        <td class="px-2 py-2" class="w-[30%]">
+                            : <input type="text" name="vat" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.vat|default:'' }}" placeholder="igst 18%">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">Excise</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="excise" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.excise|default:'' }}">
+                        </td>
+                        <td class="px-2 py-2">Octroi</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="octroi" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.octroi|default:'' }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">Warranty</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="warrenty" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.warrenty|default:'' }}">
+                        </td>
+                        <td class="px-2 py-2">Insurance</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="insurance" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.insurance|default:'' }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">Transport</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="transport" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.transport|default:'' }}">
+                        </td>
+                        <td class="px-2 py-2">Note No</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="noteno" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.noteno|default:'' }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">Registration No</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="registrationno" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.registrationno|default:'' }}">
+                        </td>
+                        <td class="px-2 py-2">Freight</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="freight" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.freight|default:'' }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">CST</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="cst" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.cst|default:'' }}">
+                        </td>
+                        <td class="px-2 py-2">Validity</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="validity" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.validity|default:'' }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2">Other Charges</td>
+                        <td class="px-2 py-2">
+                            : <input type="text" name="othercharges" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]" value="{{ po.othercharges|default:'' }}">
+                        </td>
+                        <td class="px-2 py-2">Attachment</td>
+                        <td class="px-2 py-2">
+                            : <input type="file" name="attachment" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                     class="w-[90%]">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="px-2 py-2 align-top">Remarks</td>
+                        <td class="px-2 py-2" colspan="3">
+                            : <textarea name="remarks" class="px-2 py-1 border border-gray-300 rounded text-xs" 
+                                        rows="2" class="w-[95%]">{{ po.remarks|default:'' }}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="px-2 py-3 text-right">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs mr-2">
+                                {% if is_edit %}Update{% else %}Submit{% endif %}
+                            </button>
+                            <button type="button" onclick="window.location.href='{% url 'sales_distribution:po-list' %}'" 
+                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-xs">
+                                Cancel
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </form>
+
+{# Custom CSS removed - using Tailwind utility classes #}
+
+<script>
+let detailRowIndex = {{ po_details|length|default:0 }};
+let currentTab = 0;
+
+function switchTab(tabIndex) {
+    // Hide all panels
+    for (let i = 0; i < 3; i++) {
+        const panel = document.getElementById('panel-' + i);
+        if (panel) panel.classList.add('hidden');
+    }
+    
+    // Remove active styling from all buttons
+    for (let i = 0; i < 3; i++) {
+        const btn = document.getElementById('tab-' + i);
+        if (btn) {
+            btn.classList.remove('bg-white', 'border-b-2', 'border-sap-red', 'font-semibold');
+            btn.classList.add('bg-gray-50', 'hover:bg-gray-100');
+        }
+    }
+    
+    // Show selected panel and activate button
+    const selectedPanel = document.getElementById('panel-' + tabIndex);
+    const selectedBtn = document.getElementById('tab-' + tabIndex);
+    
+    if (selectedPanel) selectedPanel.classList.remove('hidden');
+    if (selectedBtn) {
+        selectedBtn.classList.remove('bg-gray-50', 'hover:bg-gray-100');
+        selectedBtn.classList.add('bg-white', 'border-b-2', 'border-sap-red', 'font-semibold');
+    }
+    
+    currentTab = tabIndex;
+}
+
+function addDetailRow() {
+    const tbody = document.getElementById('detailsTableBody');
+    const noDataRow = tbody.querySelector('.no-data');
+    if (noDataRow) {
+        noDataRow.remove();
+    }
+    
+    detailRowIndex++;
+    
+    const bulkDesc = document.getElementById('bulk_desc').value || '';
+    const bulkQty = document.getElementById('bulk_totalqty').value || '';
+    const bulkRate = document.getElementById('bulk_rate').value || '';
+    const bulkDiscount = document.getElementById('bulk_discount').value || '';
+    const bulkUnit = document.getElementById('bulk_unit').value || '';
+    
+    const row = document.createElement('tr');
+    row.setAttribute('data-index', detailRowIndex);
+    row.innerHTML = `
+        <td class="border border-gray-300 px-2 py-1 text-center">${detailRowIndex}</td>
+        <td class="border border-gray-300 px-2 py-1">
+            <input type="text" name="detail_itemdesc_${detailRowIndex}" 
+                   class="w-full px-1 py-0 border-0 text-xs" value="${bulkDesc}" required>
+        </td>
+        <td class="border border-gray-300 px-2 py-1">
+            <select name="detail_unit_${detailRowIndex}" class="w-full px-1 py-0 border-0 text-xs">
+                {% for unit in units %}
+                <option value="{{ unit.id }}">{{ unit.symbol }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="border border-gray-300 px-2 py-1">
+            <input type="number" name="detail_totalqty_${detailRowIndex}" 
+                   class="w-full px-1 py-0 border-0 text-xs detail-qty" step="0.01" 
+                   value="${bulkQty}" onchange="calculateAmount(this)">
+        </td>
+        <td class="border border-gray-300 px-2 py-1">
+            <input type="number" name="detail_rate_${detailRowIndex}" 
+                   class="w-full px-1 py-0 border-0 text-xs detail-rate" step="0.01" 
+                   value="${bulkRate}" onchange="calculateAmount(this)">
+        </td>
+        <td class="border border-gray-300 px-2 py-1">
+            <input type="number" name="detail_discount_${detailRowIndex}" 
+                   class="w-full px-1 py-0 border-0 text-xs detail-discount" step="0.01" 
+                   value="${bulkDiscount}" onchange="calculateAmount(this)">
+        </td>
+        <td class="border border-gray-300 px-2 py-1 text-right">
+            <input type="text" class="w-full px-1 py-0 border-0 text-xs detail-amount text-right" readonly>
+        </td>
+        <td class="border border-gray-300 px-2 py-1 text-center">
+            <button type="button" onclick="deleteRow(this)" class="text-red-600 hover:text-red-900 text-xs">
+                Delete
+            </button>
+        </td>
+    `;
+    
+    tbody.appendChild(row);
+    
+    // Set unit if bulk unit is selected
+    if (bulkUnit) {
+        row.querySelector(`select[name="detail_unit_${detailRowIndex}"]`).value = bulkUnit;
+    }
+    
+    // Calculate amount
+    calculateAmount(row.querySelector('.detail-qty'));
+    
+    // Clear bulk fields
+    document.getElementById('bulk_desc').value = '';
+    document.getElementById('bulk_totalqty').value = '';
+    document.getElementById('bulk_rate').value = '';
+    document.getElementById('bulk_discount').value = '';
+    document.getElementById('bulk_unit').value = '';
+}
+
+function deleteRow(btn) {
+    const row = btn.closest('tr');
+    row.remove();
+    
+    // Renumber rows
+    const tbody = document.getElementById('detailsTableBody');
+    const rows = tbody.querySelectorAll('tr:not(.no-data)');
+    
+    if (rows.length === 0) {
+        tbody.innerHTML = '<tr class="no-data"><td colspan="8" class="border border-gray-300 px-2 py-8 text-center text-gray-500">No data to display!</td></tr>';
+    } else {
+        rows.forEach((row, index) => {
+            row.querySelector('td:first-child').textContent = index + 1;
+        });
+    }
+}
+
+function calculateAmount(input) {
+    const row = input.closest('tr');
+    const qty = parseFloat(row.querySelector('.detail-qty').value) || 0;
+    const rate = parseFloat(row.querySelector('.detail-rate').value) || 0;
+    const discount = parseFloat(row.querySelector('.detail-discount').value) || 0;
+    
+    const amount = (qty * rate) - ((qty * rate * discount) / 100);
+    row.querySelector('.detail-amount').value = amount.toFixed(2);
+}
+
+// Calculate amounts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.detail-qty').forEach(input => {
+        calculateAmount(input);
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+

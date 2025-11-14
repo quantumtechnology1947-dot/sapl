@@ -1,0 +1,299 @@
+<!-- Line Items Tab Content -->
+<div class="space-y-4">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Select Items to Invoice</h3>
+        <div class="flex items-center space-x-4">
+            <button type="button" 
+                    class="text-sm text-blue-600 hover:text-blue-800"
+                    onclick="selectAllItems()">
+                <i class="fas fa-check-square mr-1"></i>
+                Select All
+            </button>
+            <button type="button" 
+                    class="text-sm text-gray-600 hover:text-gray-800"
+                    onclick="deselectAllItems()">
+                <i class="fas fa-square mr-1"></i>
+                Deselect All
+            </button>
+        </div>
+    </div>
+
+    {% if line_items %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                        Select
+                    </th>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                        Sr No
+                    </th>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Item Description
+                    </th>
+                    <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                        Unit
+                    </th>
+                    <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                        PO Qty
+                    </th>
+                    <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                        Invoiced
+                    </th>
+                    <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                        Remaining
+                    </th>
+                    <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-28">
+                        Rate
+                    </th>
+                    <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                        Invoice Qty
+                    </th>
+                    <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                        Amount
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for item in line_items %}
+                <tr class="hover:bg-gray-50 line-item-row" data-item-id="{{ item.po_detail_id }}">
+                    <td class="px-3 py-4 whitespace-nowrap text-center">
+                        <input type="checkbox" 
+                               class="item-checkbox form-checkbox h-5 w-5 text-blue-600"
+                               data-item-id="{{ item.po_detail_id }}"
+                               data-rate="{{ item.rate }}"
+                               data-remaining="{{ item.remaining_qty }}"
+                               onchange="toggleItemRow(this)">
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ item.sr_no }}
+                    </td>
+                    <td class="px-3 py-4 text-sm text-gray-900">
+                        <div class="font-medium">{{ item.item_name }}</div>
+                        {% if item.item_description %}
+                            <div class="text-xs text-gray-500 mt-1">{{ item.item_description }}</div>
+                        {% endif %}
+                        <div class="text-xs text-gray-400 mt-1">Item ID: {{ item.item_id }}</div>
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {{ item.unit_name }}
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                        {{ item.po_qty|floatformat:3 }}
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        {{ item.invoiced_qty|floatformat:3 }}
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-right font-medium text-blue-600">
+                        {{ item.remaining_qty|floatformat:3 }}
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                        ₹{{ item.rate|floatformat:2 }}
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap">
+                        <input type="number" 
+                               step="0.001"
+                               min="0"
+                               max="{{ item.remaining_qty }}"
+                               class="invoice-qty-input form-input text-right text-sm w-full"
+                               data-item-id="{{ item.po_detail_id }}"
+                               data-rate="{{ item.rate }}"
+                               placeholder="0.000"
+                               disabled
+                               onchange="calculateLineAmount(this)"
+                               oninput="calculateLineAmount(this)">
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-right font-medium">
+                        <span class="line-amount text-gray-900" data-item-id="{{ item.po_detail_id }}">
+                            ₹0.00
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-gray-50">
+                <tr>
+                    <td colspan="9" class="px-3 py-3 text-right text-sm font-semibold text-gray-900">
+                        Subtotal:
+                    </td>
+                    <td class="px-3 py-3 text-right text-sm font-bold text-blue-600">
+                        <span id="line-items-subtotal">₹0.00</span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Validation Messages -->
+    <div id="line-items-validation" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
+            <p class="text-red-800 text-sm" id="line-items-error"></p>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 mr-2 mt-1"></i>
+            <div class="text-sm text-blue-800">
+                <p class="font-medium mb-1">Instructions:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Select items by checking the checkbox in the first column</li>
+                    <li>Enter the quantity to invoice (must not exceed remaining quantity)</li>
+                    <li>Amount will be calculated automatically based on rate and quantity</li>
+                    <li>You must select at least one item to create an invoice</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <i class="fas fa-inbox text-gray-400 text-5xl mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Line Items Available</h3>
+        <p class="text-gray-600">All items from this purchase order have been fully invoiced.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Toggle item row enable/disable
+    function toggleItemRow(checkbox) {
+        const itemId = checkbox.dataset.itemId;
+        const row = checkbox.closest('tr');
+        const qtyInput = row.querySelector('.invoice-qty-input');
+        const remaining = parseFloat(checkbox.dataset.remaining);
+        
+        if (checkbox.checked) {
+            qtyInput.disabled = false;
+            qtyInput.value = remaining.toFixed(3);
+            qtyInput.focus();
+            row.classList.add('bg-blue-50');
+        } else {
+            qtyInput.disabled = true;
+            qtyInput.value = '';
+            row.classList.remove('bg-blue-50');
+        }
+        
+        calculateLineAmount(qtyInput);
+        updateSubtotal();
+    }
+    
+    // Calculate line amount
+    function calculateLineAmount(input) {
+        const itemId = input.dataset.itemId;
+        const rate = parseFloat(input.dataset.rate) || 0;
+        const qty = parseFloat(input.value) || 0;
+        const amount = rate * qty;
+        
+        const amountSpan = document.querySelector(`.line-amount[data-item-id="${itemId}"]`);
+        if (amountSpan) {
+            amountSpan.textContent = '₹' + amount.toFixed(2);
+        }
+        
+        updateSubtotal();
+    }
+    
+    // Update subtotal
+    function updateSubtotal() {
+        let subtotal = 0;
+        
+        document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+            const itemId = checkbox.dataset.itemId;
+            const row = checkbox.closest('tr');
+            const qtyInput = row.querySelector('.invoice-qty-input');
+            const rate = parseFloat(checkbox.dataset.rate) || 0;
+            const qty = parseFloat(qtyInput.value) || 0;
+            
+            subtotal += rate * qty;
+        });
+        
+        document.getElementById('line-items-subtotal').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('subtotal-display').textContent = '₹' + subtotal.toFixed(2);
+        
+        // Trigger total calculation
+        if (typeof calculateTotals === 'function') {
+            calculateTotals();
+        }
+    }
+    
+    // Select all items
+    function selectAllItems() {
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            if (!checkbox.checked) {
+                checkbox.checked = true;
+                toggleItemRow(checkbox);
+            }
+        });
+    }
+    
+    // Deselect all items
+    function deselectAllItems() {
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            if (checkbox.checked) {
+                checkbox.checked = false;
+                toggleItemRow(checkbox);
+            }
+        });
+    }
+    
+    // Validate line items before form submission
+    function validateLineItems() {
+        const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+        const validationDiv = document.getElementById('line-items-validation');
+        const errorMsg = document.getElementById('line-items-error');
+        
+        if (selectedItems.length === 0) {
+            errorMsg.textContent = 'Please select at least one item to invoice';
+            validationDiv.classList.remove('hidden');
+            return false;
+        }
+        
+        // Validate quantities
+        for (let checkbox of selectedItems) {
+            const row = checkbox.closest('tr');
+            const qtyInput = row.querySelector('.invoice-qty-input');
+            const qty = parseFloat(qtyInput.value) || 0;
+            const remaining = parseFloat(checkbox.dataset.remaining);
+            
+            if (qty <= 0) {
+                errorMsg.textContent = 'Invoice quantity must be greater than zero for all selected items';
+                validationDiv.classList.remove('hidden');
+                return false;
+            }
+            
+            if (qty > remaining) {
+                errorMsg.textContent = `Invoice quantity cannot exceed remaining quantity (${remaining.toFixed(3)})`;
+                validationDiv.classList.remove('hidden');
+                return false;
+            }
+        }
+        
+        validationDiv.classList.add('hidden');
+        return true;
+    }
+    
+    // Add form submission validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('invoice-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!validateLineItems()) {
+                    e.preventDefault();
+                    // Scroll to line items tab
+                    document.querySelector('[data-tab="line-items"]').click();
+                    return false;
+                }
+            });
+        }
+    });
+</script>
+
+
+
+
+
+
+
+

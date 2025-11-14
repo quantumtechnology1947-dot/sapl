@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIN - {{ gin.ginno }}</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+            @page { margin: 1cm; }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #000;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 10mm;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .header h2 {
+            margin: 5px 0 0 0;
+            font-size: 18px;
+            font-weight: normal;
+            color: #7c3aed;
+        }
+        
+        .document-title {
+            background-color: #7c3aed;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            padding: 5px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            width: 140px;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            flex: 1;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        table th {
+            background-color: #f3f4f6;
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        table td {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+        
+        table td.number {
+            text-align: right;
+        }
+        
+        table td.center {
+            text-align: center;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #f9fafb;
+        }
+        
+        .signatures {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .signature-box {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid #000;
+        }
+        
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #7c3aed;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .print-button:hover {
+            background-color: #6d28d9;
+        }
+        
+        .footer-note {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Button -->
+    <button onclick="window.print()" class="print-button no-print">
+        Print Document
+    </button>
+
+    <!-- Company Header -->
+    <div class="header">
+        <h1>{{ company_name|default:"Company Name" }}</h1>
+        <p style="margin: 5px 0;">{{ company_address|default:"Company Address" }}</p>
+        <p style="margin: 5px 0;">Phone: {{ company_phone|default:"Phone Number" }} | Email: {{ company_email|default:"Email" }}</p>
+    </div>
+
+    <!-- Document Title -->
+    <div class="document-title">
+        GOODS INWARD NOTE (GIN)
+    </div>
+
+    <!-- Master Information -->
+    <div class="info-section">
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">GIN Number:</span>
+                <span class="info-value"><strong>{{ gin.ginno }}</strong></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">PO Number:</span>
+                <span class="info-value">{{ gin.pono|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Challan Number:</span>
+                <span class="info-value">{{ gin.challanno|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Challan Date:</span>
+                <span class="info-value">{{ gin.challandate|date:"d-M-Y"|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Gate Entry No:</span>
+                <span class="info-value">{{ gin.gateentryno|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Gate Entry Date:</span>
+                <span class="info-value">{{ gin.gdate|date:"d-M-Y"|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Gate Entry Time:</span>
+                <span class="info-value">{{ gin.gtime|time:"H:i"|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Mode of Transport:</span>
+                <span class="info-value">{{ gin.modeoftransport|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Vehicle Number:</span>
+                <span class="info-value">{{ gin.vehicleno|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Items Table -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 40px;">SN</th>
+                <th>Item Code</th>
+                <th>Description</th>
+                <th style="width: 100px;" class="number">Inward Qty</th>
+                <th style="width: 100px;" class="number">Received Qty</th>
+                <th style="width: 100px;" class="number">Balance Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in gin_details %}
+            <tr>
+                <td class="center">{{ forloop.counter }}</td>
+                <td>{{ detail.acategoyid|default:"-" }}</td>
+                <td>{{ detail.asubcategoyid|default:"-" }}</td>
+                <td class="number">{{ detail.qty|floatformat:3 }}</td>
+                <td class="number">{{ detail.receivedqty|default:0|floatformat:3 }}</td>
+                <td class="number">
+                    {% with balance=detail.qty|add:detail.receivedqty|default:0|floatformat:"-3" %}
+                    {{ balance }}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=6 title="No records found" message="" %}
+                {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="3" style="text-align: right;">Total:</td>
+                <td class="number">{{ total_qty|floatformat:3 }}</td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- Footer Note -->
+    <div class="footer-note">
+        <strong>Note:</strong> This is a Goods Inward Note. Materials are pending quality inspection. 
+        Stock will be updated only after Goods Received Receipt (GRR) is created.
+    </div>
+
+    <!-- Signatures -->
+    <div class="signatures">
+        <div class="signature-box">
+            <strong>Prepared By</strong>
+        </div>
+        <div class="signature-box">
+            <strong>Checked By</strong>
+        </div>
+        <div class="signature-box">
+            <strong>Approved By</strong>
+        </div>
+    </div>
+
+    <!-- Print Info -->
+    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #6b7280;">
+        <p>Printed on: {{ now|date:"d-M-Y H:i" }}</p>
+        <p>GIN Number: {{ gin.ginno }}</p>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

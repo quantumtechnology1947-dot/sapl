@@ -1,0 +1,419 @@
+{% extends "core/base.html" %}
+
+{% block title %}Customer PO - New - Cortex ERP{% endblock %}
+{% block page_title %}Customer Purchase Order{% endblock %}
+
+{% block extra_head %}
+{# Alpine.js for minimal UI state (tabs only) - declarative, not imperative custom JS #}
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>
+    function showSuccessMessage(message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-500';
+        alertDiv.textContent = message;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => {
+            alertDiv.style.opacity = '0';
+            setTimeout(() => alertDiv.remove(), 500);
+        }, 3000);
+    }
+
+    function validateLineItems() {
+        const tbody = document.getElementById('line-items-tbody');
+        if (!tbody) {
+            alert('Error: Line items table not found.');
+            return false;
+        }
+
+        // Get all rows that are NOT the empty-row
+        const rows = tbody.querySelectorAll('tr');
+        let hasItems = false;
+
+        for (let row of rows) {
+            // Check if this is a real line item (has line-item- id prefix)
+            if (row.id && row.id.startsWith('line-item-')) {
+                hasItems = true;
+                break;
+            }
+        }
+
+        if (!hasItems) {
+            alert('Please add at least one line item before submitting the PO.');
+            // Switch to goods tab using Alpine.js
+            const container = document.querySelector('[x-data]');
+            if (container && container.__x) {
+                container.__x.$data.activeTab = 'goods';
+            }
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto" x-data="{ activeTab: 'customer' }">
+    {# Header #}
+    <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-800">New Customer Purchase Order</h2>
+            <a href="{% url 'sales_distribution:po-search' %}"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors">
+                Back to Search
+            </a>
+        </div>
+    </div>
+
+    {% if not enquiry %}
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+        <p class="text-sm text-red-700">Enquiry not found. Please go back and select a valid enquiry.</p>
+    </div>
+    {% else %}
+
+    {# Tabs Navigation #}
+    <div class="bg-white rounded-t-lg shadow-md">
+        <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+                <button @click="activeTab = 'customer'" type="button"
+                    :class="activeTab === 'customer' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="py-3 px-6 border-b-2 font-medium text-sm transition-colors">
+                    Customer Details
+                </button>
+                <button @click="activeTab = 'goods'" type="button"
+                    :class="activeTab === 'goods' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="py-3 px-6 border-b-2 font-medium text-sm transition-colors">
+                    Goods Details
+                </button>
+                <button @click="activeTab = 'terms'" type="button"
+                    :class="activeTab === 'terms' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="py-3 px-6 border-b-2 font-medium text-sm transition-colors">
+                    Terms & Conditions
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    {# Warning message for no line items #}
+    {% if not line_items %}
+    <div id="no-items-warning" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                    <strong>Note:</strong> Please add at least one line item in the "Goods Details" tab before
+                    submitting the PO.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="po-form">
+        {% csrf_token %}
+        <input type="hidden" name="enqid" value="{{ enquiry.enqid }}" />
+
+        {# Tab 1: Customer Details #}
+        <div x-show="activeTab === 'customer'" class="bg-white rounded-b-lg shadow-md p-6 space-y-4">
+            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Customer Information</h3>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Name of Customer</label>
+                    <p class="text-sm text-gray-900 font-medium">{{ enquiry.customername }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Enquiry No</label>
+                    <p class="text-sm text-gray-900 font-semibold">{{ enquiry.enqid }}</p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Registered Office Address</label>
+                <p class="text-sm text-gray-600">{{ enquiry.regdaddress|default:"-" }}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label for="quotation" class="block text-sm font-medium text-gray-700 mb-1">Quotation
+                        (Optional)</label>
+                    <select name="quotation" id="quotation"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Quotation</option>
+                        {% for quot in quotations %}
+                        <option value="{{ quot.id }}">QT-{{ quot.id }} - {{ quot.customerid }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label for="id_pono" class="block text-sm font-medium text-gray-700 mb-1">
+                        PO Number <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.pono }}
+                    {% if form.pono.errors %}<p class="text-red-500 text-sm mt-1">{{ form.pono.errors.0 }}</p>{% endif
+                    %}
+                </div>
+                <div>
+                    <label for="id_podate" class="block text-sm font-medium text-gray-700 mb-1">
+                        PO Date <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.podate }}
+                    {% if form.podate.errors %}<p class="text-red-500 text-sm mt-1">{{ form.podate.errors.0 }}</p>{%
+                    endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label for="id_poreceiveddate" class="block text-sm font-medium text-gray-700 mb-1">
+                        PO Received Date <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.poreceiveddate }}
+                    {% if form.poreceiveddate.errors %}<p class="text-red-500 text-sm mt-1">{{
+                        form.poreceiveddate.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="id_vendorcode" class="block text-sm font-medium text-gray-700 mb-1">
+                        Our Vendor Code <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.vendorcode }}
+                    {% if form.vendorcode.errors %}<p class="text-red-500 text-sm mt-1">{{ form.vendorcode.errors.0 }}
+                    </p>{% endif %}
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t">
+                <button @click="activeTab = 'goods'" type="button"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                    Next →
+                </button>
+                <a href="{% url 'sales_distribution:po-search' %}"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </div>
+
+        {# Tab 2: Goods Details #}
+        <div x-show="activeTab === 'goods'" class="bg-white rounded-b-lg shadow-md p-6 space-y-4" x-cloak>
+            <div class="flex items-center justify-between border-b pb-2">
+                <h3 class="text-lg font-semibold text-gray-800">Line Items</h3>
+                <div id="line-item-count" class="text-sm text-gray-600">
+                    <span class="font-medium">{{ line_items|length }}</span> item(s) added
+                </div>
+            </div>
+
+            {# Add Line Item Form #}
+            {% include 'sales_distribution/partials/po_line_item_form.html' with poid=enquiry.enqid units=units
+            enqid=enquiry.enqid %}
+
+            {# Line Items Table #}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                SN</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Description</th>
+                            <th
+                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Unit</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Qty</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Rate</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Discount</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Amount</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="line-items-tbody" class="bg-white divide-y divide-gray-200">
+                        {# Line items will be added here via HTMX #}
+                        {% if line_items %}
+                        {% for item in line_items %}
+                        {% include 'sales_distribution/partials/po_line_item_row.html' with poid=enquiry.enqid
+                        enqid=enquiry.enqid %}
+                        {% endfor %}
+                        {% else %}
+                        <tr id="empty-row" class="empty-row">
+                            <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">
+                                No line items added yet. Use the form above to add items.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t">
+                <button @click="activeTab = 'customer'" type="button"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    ← Previous
+                </button>
+                <button @click="activeTab = 'terms'" type="button"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                    Next →
+                </button>
+                <a href="{% url 'sales_distribution:po-search' %}"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </div>
+
+        {# Tab 3: Terms & Conditions #}
+        <div x-show="activeTab === 'terms'" class="bg-white rounded-b-lg shadow-md p-6 space-y-4" x-cloak>
+            <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Terms & Conditions</h3>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="col-span-2">
+                    <label for="id_paymentterms" class="block text-sm font-medium text-gray-700 mb-1">
+                        Payment Terms <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.paymentterms }}
+                    {% if form.paymentterms.errors %}<p class="text-red-500 text-sm mt-1">{{ form.paymentterms.errors.0
+                        }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_excise" class="block text-sm font-medium text-gray-700 mb-1">
+                        GST / Excise <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.excise }}
+                    {% if form.excise.errors %}<p class="text-red-500 text-sm mt-1">{{ form.excise.errors.0 }}</p>{%
+                    endif %}
+                </div>
+                <div>
+                    <label for="id_pf" class="block text-sm font-medium text-gray-700 mb-1">PF</label>
+                    {{ form.pf }}
+                    {% if form.pf.errors %}<p class="text-red-500 text-sm mt-1">{{ form.pf.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_vat" class="block text-sm font-medium text-gray-700 mb-1">VAT</label>
+                    {{ form.vat }}
+                    {% if form.vat.errors %}<p class="text-red-500 text-sm mt-1">{{ form.vat.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="id_cst" class="block text-sm font-medium text-gray-700 mb-1">CST</label>
+                    {{ form.cst }}
+                    {% if form.cst.errors %}<p class="text-red-500 text-sm mt-1">{{ form.cst.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_octroi" class="block text-sm font-medium text-gray-700 mb-1">Octroi</label>
+                    {{ form.octroi }}
+                    {% if form.octroi.errors %}<p class="text-red-500 text-sm mt-1">{{ form.octroi.errors.0 }}</p>{%
+                    endif %}
+                </div>
+                <div>
+                    <label for="id_freight" class="block text-sm font-medium text-gray-700 mb-1">Freight</label>
+                    {{ form.freight }}
+                    {% if form.freight.errors %}<p class="text-red-500 text-sm mt-1">{{ form.freight.errors.0 }}</p>{%
+                    endif %}
+                </div>
+
+                <div>
+                    <label for="id_warrenty" class="block text-sm font-medium text-gray-700 mb-1">Warranty</label>
+                    {{ form.warrenty }}
+                    {% if form.warrenty.errors %}<p class="text-red-500 text-sm mt-1">{{ form.warrenty.errors.0 }}</p>{%
+                    endif %}
+                </div>
+                <div>
+                    <label for="id_insurance" class="block text-sm font-medium text-gray-700 mb-1">Insurance</label>
+                    {{ form.insurance }}
+                    {% if form.insurance.errors %}<p class="text-red-500 text-sm mt-1">{{ form.insurance.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="id_transport" class="block text-sm font-medium text-gray-700 mb-1">Transport</label>
+                    {{ form.transport }}
+                    {% if form.transport.errors %}<p class="text-red-500 text-sm mt-1">{{ form.transport.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="id_validity" class="block text-sm font-medium text-gray-700 mb-1">Validity</label>
+                    {{ form.validity }}
+                    {% if form.validity.errors %}<p class="text-red-500 text-sm mt-1">{{ form.validity.errors.0 }}</p>{%
+                    endif %}
+                </div>
+
+                <div>
+                    <label for="id_noteno" class="block text-sm font-medium text-gray-700 mb-1">Note No</label>
+                    {{ form.noteno }}
+                    {% if form.noteno.errors %}<p class="text-red-500 text-sm mt-1">{{ form.noteno.errors.0 }}</p>{%
+                    endif %}
+                </div>
+                <div>
+                    <label for="id_registrationno" class="block text-sm font-medium text-gray-700 mb-1">Registration
+                        No</label>
+                    {{ form.registrationno }}
+                    {% if form.registrationno.errors %}<p class="text-red-500 text-sm mt-1">{{
+                        form.registrationno.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div>
+                    <label for="id_othercharges" class="block text-sm font-medium text-gray-700 mb-1">Other
+                        Charges</label>
+                    {{ form.othercharges }}
+                    {% if form.othercharges.errors %}<p class="text-red-500 text-sm mt-1">{{ form.othercharges.errors.0
+                        }}</p>{% endif %}
+                </div>
+                <div></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label for="attachment" class="block text-sm font-medium text-gray-700 mb-1">
+                        Attachment (Optional)
+                    </label>
+                    <input type="file" name="attachment" id="attachment" accept=".pdf,.jpg,.jpeg,.png"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                    <p class="text-xs text-gray-500 mt-1">PDF, JPG, JPEG, PNG (Max 10MB)</p>
+                </div>
+                <div></div>
+            </div>
+
+            <div>
+                <label for="id_remarks" class="block text-sm font-medium text-gray-700 mb-1">
+                    Remarks (Optional)
+                </label>
+                {{ form.remarks }}
+                {% if form.remarks.errors %}<p class="text-red-500 text-sm mt-1">{{ form.remarks.errors.0 }}</p>{% endif
+                %}
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t">
+                <button @click="activeTab = 'goods'" type="button"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    ← Previous
+                </button>
+                <button type="submit" onclick="return validateLineItems()"
+                    class="bg-green-600 hover:bg-green-700 text-white font-medium px-8 py-2 rounded-md shadow-sm transition-colors">
+                    Submit PO
+                </button>
+                <a href="{% url 'sales_distribution:po-search' %}"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+{% endblock %}

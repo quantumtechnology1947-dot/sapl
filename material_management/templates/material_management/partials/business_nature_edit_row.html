@@ -1,0 +1,50 @@
+<tr id="row-{{ business_nature.id }}" class="bg-yellow-50">
+    <td class="border border-gray-300 px-2 py-2 text-center" colspan="2">
+        <form hx-post="{% url 'material_management:business-nature-update' business_nature.id %}"
+              hx-target="#row-{{ business_nature.id }}"
+              hx-swap="outerHTML"
+              hx-on::after-request="if(event.detail.successful) showMessage('Record Updated', 'success');">
+            {% csrf_token %}
+            <button type="submit" 
+                    class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition mr-2">
+                Update
+            </button>
+            <button type="button"
+                    hx-get="{% url 'material_management:business-nature-list' %}"
+                    hx-target="#row-{{ business_nature.id }}"
+                    hx-select="#row-{{ business_nature.id }}"
+                    hx-swap="outerHTML"
+                    class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition">
+                Cancel
+            </button>
+        </form>
+    </td>
+    <td class="border border-gray-300 px-2 py-2 text-right text-sm w-16">
+        {{ forloop.counter }}
+    </td>
+    <td class="border border-gray-300 px-2 py-2">
+        <input type="text" 
+               name="nature" 
+               value="{{ business_nature.nature }}"
+               form="edit-form-{{ business_nature.id }}"
+               required
+               class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <span class="text-red-500 text-xs">*</span>
+    </td>
+</tr>
+
+<form id="edit-form-{{ business_nature.id }}"
+      hx-post="{% url 'material_management:business-nature-update' business_nature.id %}"
+      hx-target="#row-{{ business_nature.id }}"
+      hx-swap="outerHTML"
+      hx-on::after-request="if(event.detail.successful) showMessage('Record Updated', 'success');">
+    {% csrf_token %}
+</form>
+
+
+
+
+
+
+
+

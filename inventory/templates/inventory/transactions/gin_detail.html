@@ -1,0 +1,434 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}GIN Details - {{ gin.ginno }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-4 -mx-4 px-4 py-3">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Goods Inward Note - Edit Details</h1>
+                <p class="text-sm text-gray-600 mt-1">GIN No: <span class="font-semibold text-blue-600">{{ gin.ginno }}</span></p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:gin-print' gin.id %}"
+                   target="_blank"
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded text-xs transition-colors">
+                    Print
+                </a>
+                <a href="{% url 'inventory:gin-list' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-3 py-1.5 rounded text-xs transition-colors">
+                    Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Master Information - Compact SAP Fiori Style -->
+    <div class="bg-white rounded border border-gray-200 mb-4">
+        <div class="px-4 py-2 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 class="text-xs font-semibold text-gray-700">GIN Information</h2>
+            <button type="button" id="save-gin-master-btn" class="hidden px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors">
+                Save Changes
+            </button>
+        </div>
+        <div class="p-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-xs">
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">GIN No</label>
+                    <p class="mt-0.5 text-xs text-gray-900 font-semibold">{{ gin.ginno }}</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Challan Date</label>
+                    <p class="mt-0.5 text-xs text-gray-900">{{ gin.challandate|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Challan No</label>
+                    <p class="mt-0.5 text-xs text-gray-900">{{ gin.challanno|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Business Group</label>
+                    <p class="mt-0.5 text-xs text-gray-900">{{ business_group|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Supplier Name</label>
+                    <p class="mt-0.5 text-xs text-gray-900">{{ supplier_name|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">PO Date</label>
+                    <p class="mt-0.5 text-xs text-gray-900">{{ po_date|default:"-" }}</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Gate Entry <span class="text-red-500">*</span></label>
+                    <input type="text" id="gateentryno" value="{{ gin.gateentryno|default:'' }}"
+                           class="mt-0.5 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                           onchange="showSaveButton()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Date <span class="text-red-500">*</span></label>
+                    <input type="date" id="gdate" value="{{ gin.gdate|date:'Y-m-d' }}"
+                           class="mt-0.5 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                           onchange="showSaveButton()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Time <span class="text-red-500">*</span></label>
+                    <input type="time" id="gtime" value="{{ gin.gtime }}"
+                           class="mt-0.5 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                           onchange="showSaveButton()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Mode of Transport <span class="text-red-500">*</span></label>
+                    <input type="text" id="modeoftransport" value="{{ gin.modeoftransport|default:'' }}"
+                           class="mt-0.5 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                           onchange="showSaveButton()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-medium text-gray-500 uppercase">Vehicle No <span class="text-red-500">*</span></label>
+                    <input type="text" id="vehicleno" value="{{ gin.vehicleno|default:'' }}"
+                           class="mt-0.5 w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                           onchange="showSaveButton()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Items Table -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+            <table class="w-full border-collapse text-xs">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                    <tr class="border-b border-gray-200">
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">SN</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Action</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">GRR</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Image</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">Spec Sheet</th>
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Item Code</th>
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Description</th>
+                        <th class="px-2 py-2 text-center text-[10px] font-medium text-gray-500 uppercase">UOM</th>
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Category</th>
+                        <th class="px-2 py-2 text-left text-[10px] font-medium text-gray-500 uppercase">Sub-Cate</th>
+                        <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">PO Qty</th>
+                        <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Tot Recd Qty</th>
+                        <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Challan Qty</th>
+                        <th class="px-2 py-2 text-right text-[10px] font-medium text-gray-500 uppercase">Recd Qty</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    {% for detail in gin_details %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-gray-50 transition-colors" id="row-{{ detail.id }}">
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap text-[11px]">
+                            {% if not detail.has_grr and not detail.has_gsn %}
+                            <button type="button"
+                                    class="text-blue-600 hover:text-blue-900 text-[10px] font-medium edit-btn"
+                                    data-row-id="{{ detail.id }}"
+                                    onclick="editRow({{ detail.id }})">
+                                Edit
+                            </button>
+                            {% else %}
+                            <span class="text-gray-400 text-[10px]">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap text-[11px]">
+                            {% if detail.has_grr %}
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800">
+                                GRR
+                            </span>
+                            {% elif detail.has_gsn %}
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-orange-100 text-orange-800">
+                                GSN
+                            </span>
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap text-[11px]">
+                            {% if detail.has_image %}
+                            <a href="{% url 'inventory:item-image-download' detail.item_id %}"
+                               target="_blank"
+                               class="inline-block hover:opacity-70 transition-opacity"
+                               title="Download Image">
+                                <svg class="w-4 h-4 mx-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </a>
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap text-[11px]">
+                            {% if detail.has_spec %}
+                            <a href="{% url 'inventory:item-spec-download' detail.item_id %}"
+                               target="_blank"
+                               class="inline-block hover:opacity-70 transition-opacity"
+                               title="Download Spec Sheet">
+                                <svg class="w-4 h-4 mx-auto text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </a>
+                            {% else %}
+                            <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-900">
+                            {{ detail.item_code|default:"-" }}
+                        </td>
+                        <td class="px-2 py-2 text-[11px] text-gray-900" title="{{ detail.description }}">
+                            <div class="truncate max-w-xs">{{ detail.description|default:"-" }}</div>
+                        </td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap text-[11px] text-gray-600">
+                            {{ detail.uom|default:"-" }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                            {{ detail.category|default:"-" }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-[11px] text-gray-600">
+                            {{ detail.subcategory|default:"-" }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-right text-[11px] text-gray-900">
+                            {{ detail.po_qty|floatformat:3 }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-right text-[11px] text-gray-600">
+                            {{ detail.total_recd_qty|floatformat:3 }}
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-right text-[11px] text-gray-900 font-medium challan-qty-cell" data-detail-id="{{ detail.id }}">
+                            <span class="challan-qty-display">{{ detail.qty|floatformat:3 }}</span>
+                            <input type="number" step="0.001"
+                                   class="challan-qty-input hidden w-full px-1 py-0.5 text-right border border-gray-300 rounded text-[11px]"
+                                   value="{{ detail.qty }}"
+                                   data-original="{{ detail.qty }}">
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-right text-[11px] text-blue-600 font-semibold recd-qty-cell" data-detail-id="{{ detail.id }}">
+                            <span class="recd-qty-display">{{ detail.receivedqty|default:0|floatformat:3 }}</span>
+                            <input type="number" step="0.001"
+                                   class="recd-qty-input hidden w-full px-1 py-0.5 text-right border border-gray-300 rounded text-[11px]"
+                                   value="{{ detail.receivedqty|default:0 }}"
+                                   data-original="{{ detail.receivedqty|default:0 }}">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="14" class="px-6 py-16 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">No items found</h3>
+                            <p class="mt-1 text-sm text-gray-500">No GIN detail records available.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% if gin_details %}
+                <tfoot class="bg-gray-50 sticky bottom-0">
+                    <tr class="border-t-2 border-gray-300">
+                        <td colspan="12" class="px-2 py-2 text-xs font-semibold text-gray-900 text-right">
+                            Total:
+                        </td>
+                        <td class="px-2 py-2 text-xs font-bold text-gray-900 text-right">
+                            {{ total_challan_qty|floatformat:3 }}
+                        </td>
+                        <td class="px-2 py-2 text-xs font-bold text-blue-600 text-right">
+                            {{ total_received_qty|floatformat:3 }}
+                        </td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+let editingRowId = null;
+
+function editRow(detailId) {
+    // If already editing, cancel previous edit
+    if (editingRowId) {
+        cancelEdit(editingRowId);
+    }
+
+    const row = document.getElementById(`row-${detailId}`);
+    const editBtn = row.querySelector('.edit-btn');
+
+    // Show input fields, hide display spans
+    const challanQtyCell = row.querySelector('.challan-qty-cell');
+    const recdQtyCell = row.querySelector('.recd-qty-cell');
+
+    challanQtyCell.querySelector('.challan-qty-display').classList.add('hidden');
+    challanQtyCell.querySelector('.challan-qty-input').classList.remove('hidden');
+
+    recdQtyCell.querySelector('.recd-qty-display').classList.add('hidden');
+    recdQtyCell.querySelector('.recd-qty-input').classList.remove('hidden');
+
+    // Change button to Update/Cancel
+    editBtn.innerHTML = `
+        <button type="button" class="text-green-600 hover:text-green-900 text-[10px] font-medium mr-1" onclick="updateRow(${detailId})">Update</button>
+        <button type="button" class="text-gray-600 hover:text-gray-900 text-[10px] font-medium" onclick="cancelEdit(${detailId})">Cancel</button>
+    `;
+
+    editingRowId = detailId;
+}
+
+function cancelEdit(detailId) {
+    const row = document.getElementById(`row-${detailId}`);
+    const editBtn = row.querySelector('.edit-btn');
+
+    // Restore original values
+    const challanQtyCell = row.querySelector('.challan-qty-cell');
+    const recdQtyCell = row.querySelector('.recd-qty-cell');
+
+    const challanInput = challanQtyCell.querySelector('.challan-qty-input');
+    const recdInput = recdQtyCell.querySelector('.recd-qty-input');
+
+    challanInput.value = challanInput.dataset.original;
+    recdInput.value = recdInput.dataset.original;
+
+    // Hide input fields, show display spans
+    challanQtyCell.querySelector('.challan-qty-display').classList.remove('hidden');
+    challanInput.classList.add('hidden');
+
+    recdQtyCell.querySelector('.recd-qty-display').classList.remove('hidden');
+    recdInput.classList.add('hidden');
+
+    // Restore Edit button
+    editBtn.innerHTML = '<button type="button" class="text-blue-600 hover:text-blue-900 text-[10px] font-medium edit-btn" data-row-id="' + detailId + '" onclick="editRow(' + detailId + ')">Edit</button>';
+
+    editingRowId = null;
+}
+
+function updateRow(detailId) {
+    const row = document.getElementById(`row-${detailId}`);
+    const challanQtyInput = row.querySelector('.challan-qty-input');
+    const recdQtyInput = row.querySelector('.recd-qty-input');
+
+    const challanQty = parseFloat(challanQtyInput.value);
+    const recdQty = parseFloat(recdQtyInput.value);
+
+    // Validation
+    if (isNaN(challanQty) || challanQty < 0) {
+        alert('Please enter a valid Challan Quantity');
+        return;
+    }
+
+    if (isNaN(recdQty) || recdQty < 0) {
+        alert('Please enter a valid Received Quantity');
+        return;
+    }
+
+    if (recdQty > challanQty) {
+        alert('Received Quantity cannot exceed Challan Quantity');
+        return;
+    }
+
+    // Send update request
+    fetch(`/inventory/gin-detail/${detailId}/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            challan_qty: challanQty,
+            received_qty: recdQty
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update display values
+            const challanQtyDisplay = row.querySelector('.challan-qty-display');
+            const recdQtyDisplay = row.querySelector('.recd-qty-display');
+
+            challanQtyDisplay.textContent = challanQty.toFixed(3);
+            recdQtyDisplay.textContent = recdQty.toFixed(3);
+
+            // Update original data attributes
+            challanQtyInput.dataset.original = challanQty;
+            recdQtyInput.dataset.original = recdQty;
+
+            // Exit edit mode
+            cancelEdit(detailId);
+
+            // Reload page to update totals
+            location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update: ' + error.message);
+    });
+}
+
+// Show save button when master fields are modified
+function showSaveButton() {
+    document.getElementById('save-gin-master-btn').classList.remove('hidden');
+}
+
+// Save GIN master fields
+document.getElementById('save-gin-master-btn')?.addEventListener('click', function() {
+    const gateentryno = document.getElementById('gateentryno').value.trim();
+    const gdate = document.getElementById('gdate').value;
+    const gtime = document.getElementById('gtime').value;
+    const modeoftransport = document.getElementById('modeoftransport').value.trim();
+    const vehicleno = document.getElementById('vehicleno').value.trim();
+
+    // Validation
+    if (!gateentryno) {
+        alert('Gate Entry No is required');
+        return;
+    }
+    if (!gdate) {
+        alert('Date is required');
+        return;
+    }
+    if (!gtime) {
+        alert('Time is required');
+        return;
+    }
+    if (!modeoftransport) {
+        alert('Mode of Transport is required');
+        return;
+    }
+    if (!vehicleno) {
+        alert('Vehicle No is required');
+        return;
+    }
+
+    // Send update request
+    fetch(`/inventory/gin/{{ gin.id }}/update-master/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            gateentryno: gateentryno,
+            gdate: gdate,
+            gtime: gtime,
+            modeoftransport: modeoftransport,
+            vehicleno: vehicleno
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('GIN master information updated successfully');
+            document.getElementById('save-gin-master-btn').classList.add('hidden');
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update: ' + error.message);
+    });
+});
+</script>
+
+{% endblock %}

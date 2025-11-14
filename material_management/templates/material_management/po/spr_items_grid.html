@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SPR Items Grid</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+        }
+        
+        .grid-container {
+            width: 100%;
+            overflow: auto;
+        }
+        
+        .items-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+        }
+        
+        .items-grid th {
+            background: #D8D8D8;
+            border: 1px solid #7F7F7F;
+            padding: 4px 6px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+        }
+        
+        .items-grid td {
+            border: 1px solid #CBCBCB;
+            padding: 3px 5px;
+            white-space: nowrap;
+        }
+        
+        .items-grid tbody tr:nth-child(even) {
+            background: #F0F0F0;
+        }
+        
+        .items-grid tbody tr:hover {
+            background: #E8F4FF;
+        }
+        
+        .items-grid a {
+            color: #0000FF;
+            text-decoration: none;
+        }
+        
+        .items-grid a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #dc3545;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container">
+        <div id="loading" class="loading">Loading SPR items...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="no-data" class="no-data" style="display: none;">No SPR items found for this supplier</div>
+        
+        <table id="items-table" class="items-grid" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>SPR No</th>
+                    <th>WO No</th>
+                    <th>Item Code</th>
+                    <th>Description</th>
+                    <th>UOM</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Discount</th>
+                    <th>Del. Date</th>
+                    <th>A/c Head</th>
+                    <th>Dept</th>
+                </tr>
+            </thead>
+            <tbody id="items-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Get supplier code from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const supplierCode = urlParams.get('supplier');
+        
+        // Load SPR items
+        function loadItems() {
+            fetch(`/material-management/api/po/spr-items-grid/?supplier_code=${supplierCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data.error) {
+                        document.getElementById('error').textContent = 'Error: ' + data.error;
+                        document.getElementById('error').style.display = 'block';
+                        return;
+                    }
+                    
+                    if (!data.items || data.items.length === 0) {
+                        document.getElementById('no-data').style.display = 'block';
+                        return;
+                    }
+                    
+                    // Show table and populate rows
+                    document.getElementById('items-table').style.display = 'table';
+                    const tbody = document.getElementById('items-body');
+                    tbody.innerHTML = '';
+                    
+                    data.items.forEach(item => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td style="text-align: center;">
+                                <a href="#" onclick="selectItem(${JSON.stringify(item).replace(/"/g, '&quot;')}); return false;">Select</a>
+                            </td>
+                            <td style="text-align: center;">${item.SPRNo || ''}</td>
+                            <td style="text-align: center;">${item.WONo || ''}</td>
+                            <td style="text-align: center;">${item.ItemCode || ''}</td>
+                            <td>${item.PurchDesc || ''}</td>
+                            <td style="text-align: center;">${item.UOMPurch || ''}</td>
+                            <td style="text-align: right;">${formatNumber(item.Qty, 2)}</td>
+                            <td style="text-align: right;">${formatNumber(item.Rate, 2)}</td>
+                            <td style="text-align: right;">${formatNumber(item.Discount, 2)}</td>
+                            <td style="text-align: center;">${formatDate(item.DelDate)}</td>
+                            <td>${item.AcHead || ''}</td>
+                            <td>${item.Dept || ''}</td>
+                        `;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').textContent = 'Error loading items: ' + error.message;
+                    document.getElementById('error').style.display = 'block';
+                });
+        }
+        
+        function selectItem(item) {
+            // Call parent window's function to show modal
+            window.parent.showAddItemModal(item);
+        }
+        
+        function formatNumber(num, decimals) {
+            if (!num) return '0.00';
+            return parseFloat(num).toFixed(decimals);
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB');
+        }
+        
+        // Load items on page load
+        loadItems();
+    </script>
+</body>
+</html>

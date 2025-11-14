@@ -1,0 +1,206 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit{% else %}New{% endif %} Purchase Requisition - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
+            <h1 class="text-white font-semibold text-lg">&nbsp;{% if object %}Edit{% else %}New{% endif %} Purchase Requisition (PR)</h1>
+            <a href="{% url 'material_management:pr-list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition">
+                ← Back to List
+            </a>
+        </div>
+
+        {% if object %}
+        <!-- Read-Only PR Information (When Editing) -->
+        <div class="p-6 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-sm font-semibold text-gray-700 mb-4">PR Information</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                    <span class="text-gray-600 font-medium">PR No:</span>
+                    <span class="ml-2 text-gray-900">{{ object.pr_no }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600 font-medium">Date:</span>
+                    <span class="ml-2 text-gray-900">{{ object.sys_date|default:"-" }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600 font-medium">Time:</span>
+                    <span class="ml-2 text-gray-900">{{ object.sys_time|default:"-" }}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600 font-medium">Status:</span>
+                    <span class="ml-2">
+                        {% if object.status == 'Pending' %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                        {% elif object.status == 'Checked' %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Checked</span>
+                        {% elif object.status == 'Approved' %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Approved</span>
+                        {% elif object.status == 'Authorized' %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Authorized</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="post" class="p-6">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- PR Number -->
+                <div>
+                    <label for="id_pr_no" class="block text-sm font-medium text-gray-700 mb-1">
+                        PR Number <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="pr_no" id="id_pr_no" value="{{ form.pr_no.value|default:'' }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                           placeholder="e.g., 0001">
+                    {% if form.pr_no.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.pr_no.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Work Order Number -->
+                <div>
+                    <label for="id_wo_no" class="block text-sm font-medium text-gray-700 mb-1">
+                        Work Order No
+                    </label>
+                    <input type="text" name="wo_no" id="id_wo_no" value="{{ form.wo_no.value|default:'' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                           placeholder="e.g., N0279, T0042">
+                    {% if form.wo_no.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.wo_no.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">Optional: Link this PR to a Work Order</p>
+                </div>
+            </div>
+
+            <!-- Form Errors -->
+            {% if form.non_field_errors %}
+            <div class="mt-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Buttons -->
+            <div class="mt-6 flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+                <a href="{% url 'material_management:pr-list' %}"
+                   class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition">
+                    {% if object %}Update{% else %}Create{% endif %} PR
+                </button>
+            </div>
+        </form>
+
+        {% if object and pr_details %}
+        <!-- PR Line Items Table (When Editing) -->
+        <div class="p-6 border-t border-gray-200">
+            <h3 class="text-sm font-semibold text-gray-700 mb-4">PR Line Items ({{ pr_details|length }} supplier entries)</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gradient-to-b from-gray-200 to-gray-100">
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-800 w-12">SN</th>
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-bold text-gray-800">Item ID</th>
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-bold text-gray-800">Supplier</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-bold text-gray-800">Quantity</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-bold text-gray-800">Rate</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-bold text-gray-800">Discount %</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-bold text-gray-800">Net Rate</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-800">Delivery Date</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-bold text-gray-800">Amount</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-800">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detail in pr_details %}
+                        <tr class="hover:bg-blue-50">
+                            <td class="border border-gray-300 px-3 py-2 text-center text-sm">{{ forloop.counter }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-sm">{{ detail.item_id }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-sm font-medium">{{ detail.supplier_id|default:"-" }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono">{{ detail.qty|floatformat:3 }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono">{{ detail.rate|floatformat:2 }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono">{{ detail.discount|floatformat:2 }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono font-bold text-green-700">
+                                {% widthratio detail.rate 1 1 as rate_decimal %}
+                                {% widthratio detail.discount 100 rate_decimal as disc_amount %}
+                                {% widthratio rate_decimal 1 1 as net_rate %}
+                                {{ rate_decimal|add:disc_amount|floatformat:2 }}
+                            </td>
+                            <td class="border border-gray-300 px-3 py-2 text-center text-sm">{{ detail.del_date|default:"-" }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono font-bold text-blue-700">
+                                {% widthratio detail.qty 1 detail.rate as amount %}
+                                {{ amount|floatformat:2 }}
+                            </td>
+                            <td class="border border-gray-300 px-3 py-2 text-center text-sm">
+                                <button type="button" onclick="editPRDetail({{ detail.id }})"
+                                        class="text-blue-600 hover:text-blue-800 font-medium text-xs">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="bg-gray-50 font-bold">
+                            <td colspan="8" class="border border-gray-300 px-3 py-2 text-right text-sm">Total Amount:</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono text-lg text-blue-700">
+                                {% widthratio pr_details.0.qty 1 pr_details.0.rate as total %}
+                                {% for detail in pr_details %}
+                                {% widthratio detail.qty 1 detail.rate as item_total %}
+                                {% endfor %}
+                                {# This is simplified - proper calculation would need template tag #}
+                                -
+                            </td>
+                            <td class="border border-gray-300"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% elif object %}
+        <!-- No Line Items Message -->
+        <div class="p-6 border-t border-gray-200">
+            <div class="text-center py-8 text-gray-500">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No line items found</h3>
+                <p class="mt-1 text-sm text-gray-500">This PR doesn't have any line items yet.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not object %}
+        <!-- Info Note for New PR -->
+        <div class="p-6 border-t border-gray-200">
+            <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+                <p class="text-sm text-blue-700">
+                    <strong>Note:</strong> After creating the PR, you'll need to add line items (materials/items required) in the PR details page. The PR will be created with "Pending" status and will go through Check → Approve → Authorize workflow.
+                </p>
+            </div>
+
+            <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                <p class="text-sm text-yellow-700">
+                    <strong>Original Process:</strong> In the complete system, PRs are created from Work Orders in Material Planning. The system automatically pulls items from the BOM. For now, you can create a PR manually and add items later.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

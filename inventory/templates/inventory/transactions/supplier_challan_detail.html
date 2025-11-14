@@ -1,0 +1,173 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Supplier Challan {{ challan.supplierchallanno }} - Inventory{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Supplier Challan: {{ challan.supplierchallanno }}</h1>
+                <p class="text-sm text-gray-600 mt-1">Job work tracking details</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:supplier-challan-print' challan.supplierchallanid %}" 
+                   target="_blank"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Print
+                </a>
+                {% if total_balance > 0 %}
+                <a href="{% url 'inventory:supplier-challan-clear' challan.supplierchallanid %}" 
+                   class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Clear Challan
+                </a>
+                {% endif %}
+                <a href="{% url 'inventory:supplier-challan-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition-colors">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challan Details -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Master Details -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Challan Information</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Challan Number:</dt>
+                    <dd class="text-sm text-gray-900 font-semibold">{{ challan.supplierchallanno }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Date:</dt>
+                    <dd class="text-sm text-gray-900">{{ challan.supplierchallandate|date:"d/m/Y" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Supplier:</dt>
+                    <dd class="text-sm text-gray-900">{{ challan.supplierid.suppliername|default:"N/A" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Status:</dt>
+                    <dd><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ status_class }}">
+                        {{ status }}
+                    </span></dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Transport Details -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Transport Details</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Vehicle Number:</dt>
+                    <dd class="text-sm text-gray-900">{{ challan.vehicleno|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Driver Name:</dt>
+                    <dd class="text-sm text-gray-900">{{ challan.drivername|default:"-" }}</dd>
+                </div>
+                {% if challan.remarks %}
+                <div>
+                    <dt class="text-sm font-medium text-gray-600 mb-1">Remarks:</dt>
+                    <dd class="text-sm text-gray-900">{{ challan.remarks }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+
+    <!-- Item Details -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 bg-teal-50 border-b border-teal-100">
+            <h2 class="text-lg font-semibold text-teal-800">Item Details</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            SN
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Item Name
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Sent Qty
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Received Qty
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Balance Qty
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Remarks
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for detail in details %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {{ detail.itemid.itemname|default:"N/A" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                            {{ detail.qty|floatformat:3 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                            {{ detail.receivedqty|default:0|floatformat:3 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
+                            {% if detail.balanceqty > 0 %}
+                            <span class="text-orange-600">{{ detail.balanceqty|floatformat:3 }}</span>
+                            {% else %}
+                            <span class="text-green-600">0.000</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ detail.remarks|default:"-" }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="bg-gray-50">
+                    <tr>
+                        <td colspan="2" class="px-6 py-4 text-sm font-semibold text-gray-900 text-right">
+                            Total:
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-right">
+                            {{ total_sent|floatformat:3 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-right">
+                            {{ total_received|floatformat:3 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-right">
+                            {% if total_balance > 0 %}
+                            <span class="text-orange-600">{{ total_balance|floatformat:3 }}</span>
+                            {% else %}
+                            <span class="text-green-600">0.000</span>
+                            {% endif %}
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

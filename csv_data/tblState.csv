@@ -1,0 +1,48 @@
+﻿SId,StateName,CId
+1,VERIFY EDIT WORKS,1
+2,DJANGO UPDATE TEST,1
+3,Arunachal Pradesh,1
+4,Assam,1
+5,Bihar,1
+6,Chandigarh,1
+7,Chhattisgarh,1
+8,Dadra and Nagar Haveli,1
+9,Daman and Diu,1
+10,Delhi,1
+11,Goa,1
+12,Gujarat,1
+13,Haryana,1
+14,Himachal pradesh,1
+15,Jammu and Kashmir,1
+16,Jharkhand,1
+17,Karnataka,1
+18,Kerala,1
+19,Lakshadweep,1
+20,Madhya Pradesh,1
+21,Maharashtra,1
+22,Manipur,1
+23,Meghalaya,1
+24,Mizoram,1
+25,Nagaland,1
+26,Orissa,1
+27,Puducherry,1
+28,Punjab,1
+29,Rajasthan,1
+30,Sikkim,1
+31,Tamil Nadu,1
+32,Tripura,1
+33,Uttar Pradesh,1
+34,Uttarakhand,1
+35,West Bengal,1
+36,TEST UPDATE,4
+37,Lazio,4
+38,Lombardy,4
+39,Veneto,4
+40,Campania,4
+41,Piedmont,4
+42,Yamanashi,5
+44,Düsseldorf,6
+45,Shanghai,7
+46,Telangana,1
+47,Baden Württemberg,6
+48,Barcelona,8

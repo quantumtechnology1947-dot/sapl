@@ -1,0 +1,10 @@
+﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,CVFileName,CVSize,CVContentType,CVData,CVDate,CVName
+2,2022-03-25,3:30:27 PM,Sapl0322,1,9,IMG_20220314_174203.jpg,2339954,image/jpeg,,25-03-2022,grampanchayat tax recipts
+3,2022-03-25,3:36:45 PM,Sapl0322,1,9,,0,application/octet-stream,,,
+5,2022-03-28,4:12:32 PM,Sapl0322,1,9,Grampanchayat Tax bill.rar,2672583,application/octet-stream,,28-03-2022,Grampanchyatat Tax 
+6,2022-03-31,2:52:01 PM,Sapl0322,1,9,New WinRAR ZIP archive.zip,662136,application/zip,,05-04-2022,Prakash Lonkar Bill for the year 2021-22
+7,2022-03-31,3:09:04 PM,Sapl0322,1,9,Frontier Security services.zip,3111260,application/zip,,05-04-2022,Security services 
+8,2022-05-13,4:21:25 PM,Sapl0322,1,10,Shooes and other tools.xlsx,15671,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,,,
+9,2022-05-13,4:22:01 PM,Sapl0322,1,10,Shooes and other tools.xlsx,15671,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,,13-05-2022,shoes
+10,2022-05-31,4:06:32 PM,Sapl0322,1,10,May-2022.rar,1199070,application/octet-stream,,,
+11,2022-05-31,4:07:11 PM,Sapl0322,1,10,May-2022.rar,1199070,application/octet-stream,,31-05-2022,Notice

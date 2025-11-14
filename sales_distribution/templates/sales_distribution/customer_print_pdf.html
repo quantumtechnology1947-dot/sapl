@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Master - {{ customer.customerid }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm 1cm 1.5cm 1cm;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .header {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .company-name {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .company-info {
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .doc-title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: table-row;
+        }
+
+        .info-label {
+            display: table-cell;
+            width: 30%;
+            padding: 5px 10px 5px 0;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .info-value {
+            display: table-cell;
+            padding: 5px 0;
+            color: #333;
+        }
+
+        .section-header {
+            background-color: #2563eb;
+            color: white;
+            padding: 8px 10px;
+            font-weight: bold;
+            font-size: 11pt;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 8pt;
+            color: #888;
+            border-top: 1px solid #d1d5db;
+            padding-top: 10px;
+        }
+
+        .two-column {
+            display: table;
+            width: 100%;
+        }
+
+        .column {
+            display: table-cell;
+            width: 50%;
+            padding-right: 15px;
+            vertical-align: top;
+        }
+
+        .column:last-child {
+            padding-right: 0;
+            padding-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="company-name">{{ company_name }}</div>
+        <div class="company-info">
+            {{ company_address }}<br>
+            Phone: {{ company_phone }} | Email: {{ company_email }} | Web: {{ company_website }}
+        </div>
+    </div>
+
+    <!-- Document Title -->
+    <div class="doc-title">CUSTOMER MASTER</div>
+
+    <!-- Basic Information -->
+    <div class="section-header">CUSTOMER INFORMATION</div>
+    <div class="info-section">
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-label">Customer Code:</div>
+                <div class="info-value"><strong>{{ customer.customerid|default:"-" }}</strong></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Customer Name:</div>
+                <div class="info-value"><strong>{{ customer.customername|default:"-" }}</strong></div>
+            </div>
+            {% if customer.contactperson %}
+            <div class="info-row">
+                <div class="info-label">Contact Person:</div>
+                <div class="info-value">{{ customer.contactperson }}</div>
+            </div>
+            {% endif %}
+            {% if customer.contactno %}
+            <div class="info-row">
+                <div class="info-label">Contact Number:</div>
+                <div class="info-value">{{ customer.contactno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.email %}
+            <div class="info-row">
+                <div class="info-label">Email:</div>
+                <div class="info-value">{{ customer.email }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Registered Address -->
+    {% if customer.regdaddress or regdcity_name or regdstate_name or regdcountry_name %}
+    <div class="section-header">REGISTERED ADDRESS</div>
+    <div class="info-section">
+        <div class="info-grid">
+            {% if customer.regdaddress %}
+            <div class="info-row">
+                <div class="info-label">Address:</div>
+                <div class="info-value">{{ customer.regdaddress }}</div>
+            </div>
+            {% endif %}
+            <div class="info-row">
+                {% if regdcity_name %}
+                <div class="info-label">City:</div>
+                <div class="info-value">{{ regdcity_name }}</div>
+                {% endif %}
+            </div>
+            <div class="info-row">
+                {% if regdstate_name %}
+                <div class="info-label">State:</div>
+                <div class="info-value">{{ regdstate_name }}</div>
+                {% endif %}
+            </div>
+            <div class="info-row">
+                {% if regdcountry_name %}
+                <div class="info-label">Country:</div>
+                <div class="info-value">{{ regdcountry_name }}</div>
+                {% endif %}
+            </div>
+            {% if customer.regdpinno %}
+            <div class="info-row">
+                <div class="info-label">Pin Code:</div>
+                <div class="info-value">{{ customer.regdpinno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.regdcontactno %}
+            <div class="info-row">
+                <div class="info-label">Contact:</div>
+                <div class="info-value">{{ customer.regdcontactno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.regdfaxno %}
+            <div class="info-row">
+                <div class="info-label">Fax:</div>
+                <div class="info-value">{{ customer.regdfaxno }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Work Address -->
+    {% if customer.workaddress or workcity_name or workstate_name or workcountry_name %}
+    <div class="section-header">WORK ADDRESS</div>
+    <div class="info-section">
+        <div class="info-grid">
+            {% if customer.workaddress %}
+            <div class="info-row">
+                <div class="info-label">Address:</div>
+                <div class="info-value">{{ customer.workaddress }}</div>
+            </div>
+            {% endif %}
+            <div class="info-row">
+                {% if workcity_name %}
+                <div class="info-label">City:</div>
+                <div class="info-value">{{ workcity_name }}</div>
+                {% endif %}
+            </div>
+            <div class="info-row">
+                {% if workstate_name %}
+                <div class="info-label">State:</div>
+                <div class="info-value">{{ workstate_name }}</div>
+                {% endif %}
+            </div>
+            <div class="info-row">
+                {% if workcountry_name %}
+                <div class="info-label">Country:</div>
+                <div class="info-value">{{ workcountry_name }}</div>
+                {% endif %}
+            </div>
+            {% if customer.workpinno %}
+            <div class="info-row">
+                <div class="info-label">Pin Code:</div>
+                <div class="info-value">{{ customer.workpinno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.workcontactno %}
+            <div class="info-row">
+                <div class="info-label">Contact:</div>
+                <div class="info-value">{{ customer.workcontactno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.workfaxno %}
+            <div class="info-row">
+                <div class="info-label">Fax:</div>
+                <div class="info-value">{{ customer.workfaxno }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Material Delivery Address -->
+    {% if customer.materialdeladdress or materialdelcity_name or materialdelstate_name or materialdelcountry_name %}
+    <div class="section-header">MATERIAL DELIVERY ADDRESS</div>
+    <div class="info-section">
+        <div class="info-grid">
+            {% if customer.materialdeladdress %}
+            <div class="info-row">
+                <div class="info-label">Address:</div>
+                <div class="info-value">{{ customer.materialdeladdress }}</div>
+            </div>
+            {% endif %}
+            <div class="info-row">
+                {% if materialdelcity_name %}
+                <div class="info-label">City:</div>
+                <div class="info-value">{{ materialdelcity_name }}</div>
+                {% endif %}
+            </div>
+            <div class="info-row">
+                {% if materialdelstate_name %}
+                <div class="info-label">State:</div>
+                <div class="info-value">{{ materialdelstate_name }}</div>
+                {% endif %}
+            </div>
+            <div class="info-row">
+                {% if materialdelcountry_name %}
+                <div class="info-label">Country:</div>
+                <div class="info-value">{{ materialdelcountry_name }}</div>
+                {% endif %}
+            </div>
+            {% if customer.materialdelpinno %}
+            <div class="info-row">
+                <div class="info-label">Pin Code:</div>
+                <div class="info-value">{{ customer.materialdelpinno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.materialdelcontactno %}
+            <div class="info-row">
+                <div class="info-label">Contact:</div>
+                <div class="info-value">{{ customer.materialdelcontactno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.materialdelfaxno %}
+            <div class="info-row">
+                <div class="info-label">Fax:</div>
+                <div class="info-value">{{ customer.materialdelfaxno }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tax Information -->
+    {% if customer.tinvatno or customer.tincstno or customer.panno or customer.eccno %}
+    <div class="section-header">TAX INFORMATION</div>
+    <div class="info-section">
+        <div class="info-grid">
+            {% if customer.tinvatno %}
+            <div class="info-row">
+                <div class="info-label">TIN/VAT No:</div>
+                <div class="info-value">{{ customer.tinvatno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.tincstno %}
+            <div class="info-row">
+                <div class="info-label">TIN/CST No:</div>
+                <div class="info-value">{{ customer.tincstno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.panno %}
+            <div class="info-row">
+                <div class="info-label">PAN No:</div>
+                <div class="info-value">{{ customer.panno }}</div>
+            </div>
+            {% endif %}
+            {% if customer.eccno %}
+            <div class="info-row">
+                <div class="info-label">ECC No:</div>
+                <div class="info-value">{{ customer.eccno }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Additional Information -->
+    {% if customer.juridictioncode or customer.commissionurate or customer.divn or customer.range or customer.tdscode %}
+    <div class="section-header">ADDITIONAL INFORMATION</div>
+    <div class="info-section">
+        <div class="info-grid">
+            {% if customer.juridictioncode %}
+            <div class="info-row">
+                <div class="info-label">Jurisdiction Code:</div>
+                <div class="info-value">{{ customer.juridictioncode }}</div>
+            </div>
+            {% endif %}
+            {% if customer.commissionurate %}
+            <div class="info-row">
+                <div class="info-label">Commission Rate:</div>
+                <div class="info-value">{{ customer.commissionurate }}</div>
+            </div>
+            {% endif %}
+            {% if customer.divn %}
+            <div class="info-row">
+                <div class="info-label">Division:</div>
+                <div class="info-value">{{ customer.divn }}</div>
+            </div>
+            {% endif %}
+            {% if customer.range %}
+            <div class="info-row">
+                <div class="info-label">Range:</div>
+                <div class="info-value">{{ customer.range }}</div>
+            </div>
+            {% endif %}
+            {% if customer.tdscode %}
+            <div class="info-row">
+                <div class="info-label">TDS Code:</div>
+                <div class="info-value">{{ customer.tdscode }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if customer.remark %}
+    <div class="section-header">REMARKS</div>
+    <div class="info-section">
+        <p>{{ customer.remark }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Footer -->
+    <div class="footer">
+        <div>This is a computer-generated customer master document | {{ company_name }}</div>
+        <div>{{ company_website }} | {{ company_email }}</div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,285 @@
+{% extends "inventory/base.html" %}
+{% load static %}
+
+{% block title %}Goods Received Receipt [GRR] - Edit{% endblock %}
+
+{% block extra_head %}
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- SAP Fiori Header -->
+    <div class="bg-gradient-to-r from-gray-700 to-gray-600 text-white shadow-md mb-4 -mx-4 px-6 py-3 border-b-2 border-blue-500">
+        <h1 class="text-base font-semibold tracking-wide">Goods Received Receipt [GRR] - Edit</h1>
+    </div>
+
+    <!-- GRR Header Information - SAP Fiori Card Style -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-lg p-6 mb-4">
+        <div class="grid grid-cols-4 gap-6 mb-5 pb-5 border-b border-gray-200">
+            <div>
+                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">GRR No</label>
+                <p class="text-base font-bold text-gray-900 mt-1">{{ grr.grrno }}</p>
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">GIN No</label>
+                <p class="text-base font-bold text-gray-900 mt-1">{{ grr.ginno }}</p>
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Challan No</label>
+                <p class="text-base font-bold text-gray-900 mt-1">{{ challan_no|default:"-" }}</p>
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</label>
+                <p class="text-base font-bold text-gray-900 mt-1">{{ challan_date|default:"-" }}</p>
+            </div>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Supplier</label>
+            <p class="text-base font-bold text-gray-900 mt-1">{{ supplier_name|default:"-" }}</p>
+        </div>
+    </div>
+
+    <!-- GRR Details Table - SAP Fiori Style -->
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                    <tr>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            SN
+                        </th>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            
+                        </th>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Image
+                        </th>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Spec. Sheet
+                        </th>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Item Code
+                        </th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Description
+                        </th>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            UOM
+                        </th>
+                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            PO Qty
+                        </th>
+                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Inward Qty
+                        </th>
+                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Tot Reced Qty
+                        </th>
+                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
+                            Reced Qty
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100" id="grr-details-tbody">
+                    {% for detail in grr_details %}
+                    <tr class="hover:bg-blue-50 transition-colors" id="row-{{ detail.id }}">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center border-r border-gray-100">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center border-r border-gray-100">
+                            <button 
+                                type="button"
+                                onclick="editRow({{ detail.id }})"
+                                class="text-blue-600 hover:text-blue-800 font-semibold transition-colors hover:underline edit-btn"
+                                id="edit-btn-{{ detail.id }}"
+                            >
+                                Edit
+                            </button>
+                            <button 
+                                type="button"
+                                onclick="updateRow({{ detail.id }})"
+                                class="hidden text-green-600 hover:text-green-800 font-semibold transition-colors hover:underline update-btn"
+                                id="update-btn-{{ detail.id }}"
+                            >
+                                Update
+                            </button>
+                            <button 
+                                type="button"
+                                onclick="cancelEdit({{ detail.id }}, {{ detail.receivedqty }})"
+                                class="hidden text-gray-600 hover:text-gray-800 font-semibold transition-colors hover:underline ml-2 cancel-btn"
+                                id="cancel-btn-{{ detail.id }}"
+                            >
+                                Cancel
+                            </button>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center text-sm border-r border-gray-100">
+                            {% if detail.image_filename %}
+                                <a href="#" class="text-blue-600 hover:text-blue-800 hover:underline">{{ detail.image_filename }}</a>
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center text-sm border-r border-gray-100">
+                            {% if detail.spec_filename %}
+                                <a href="#" class="text-blue-600 hover:text-blue-800 hover:underline">{{ detail.spec_filename }}</a>
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900 text-center border-r border-gray-100">
+                            {{ detail.item_code|default:"-" }}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900 border-r border-gray-100">
+                            {{ detail.description|default:"-" }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 text-center border-r border-gray-100">
+                            {{ detail.uom|default:"-" }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-right font-mono border-r border-gray-100">
+                            {{ detail.po_qty|floatformat:3 }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-right font-mono border-r border-gray-100">
+                            {{ detail.inward_qty|floatformat:3 }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-right font-mono border-r border-gray-100">
+                            {{ detail.total_recd_qty|floatformat:3 }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-right font-mono">
+                            <span id="qty-display-{{ detail.id }}" class="font-semibold">{{ detail.receivedqty|floatformat:3 }}</span>
+                            <input 
+                                type="number" 
+                                step="0.001"
+                                id="qty-input-{{ detail.id }}"
+                                value="{{ detail.receivedqty }}"
+                                class="hidden w-28 px-3 py-1.5 border-2 border-blue-500 rounded-md text-right focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Action Buttons - SAP Fiori Style -->
+    <div class="mt-6 flex justify-center gap-3">
+        <a href="{% url 'inventory:grr-edit-list' %}" 
+           class="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 font-semibold px-10 py-2.5 rounded-md shadow-sm transition-all hover:shadow-md">
+            Cancel
+        </a>
+    </div>
+</div>
+
+<script>
+function editRow(detailId) {
+    // Hide display, show input
+    document.getElementById('qty-display-' + detailId).classList.add('hidden');
+    document.getElementById('qty-input-' + detailId).classList.remove('hidden');
+    
+    // Toggle buttons
+    document.getElementById('edit-btn-' + detailId).classList.add('hidden');
+    document.getElementById('update-btn-' + detailId).classList.remove('hidden');
+    document.getElementById('cancel-btn-' + detailId).classList.remove('hidden');
+}
+
+function cancelEdit(detailId, originalQty) {
+    // Reset input value
+    document.getElementById('qty-input-' + detailId).value = originalQty;
+    
+    // Show display, hide input
+    document.getElementById('qty-display-' + detailId).classList.remove('hidden');
+    document.getElementById('qty-input-' + detailId).classList.add('hidden');
+    
+    // Toggle buttons
+    document.getElementById('edit-btn-' + detailId).classList.remove('hidden');
+    document.getElementById('update-btn-' + detailId).classList.add('hidden');
+    document.getElementById('cancel-btn-' + detailId).classList.add('hidden');
+}
+
+function updateRow(detailId) {
+    const newQty = document.getElementById('qty-input-' + detailId).value;
+    
+    // Validate quantity
+    if (newQty === '' || isNaN(newQty) || parseFloat(newQty) < 0) {
+        alert('Please enter a valid quantity');
+        return;
+    }
+    
+    // Send HTMX request
+    fetch('{% url "inventory:grr-edit-detail" grr.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}',
+            'HX-Request': 'true'
+        },
+        body: 'detail_id=' + detailId + '&receivedqty=' + newQty
+    })
+    .then(response => {
+        if (response.ok) {
+            // Update display
+            document.getElementById('qty-display-' + detailId).textContent = parseFloat(newQty).toFixed(3);
+            
+            // Show display, hide input
+            document.getElementById('qty-display-' + detailId).classList.remove('hidden');
+            document.getElementById('qty-input-' + detailId).classList.add('hidden');
+            
+            // Toggle buttons
+            document.getElementById('edit-btn-' + detailId).classList.remove('hidden');
+            document.getElementById('update-btn-' + detailId).classList.add('hidden');
+            document.getElementById('cancel-btn-' + detailId).classList.add('hidden');
+            
+            // Show success message
+            showMessage('Received quantity updated successfully!', 'success');
+        } else {
+            response.text().then(text => {
+                showMessage(text || 'Error updating quantity', 'error');
+            });
+        }
+    })
+    .catch(error => {
+        showMessage('Error updating quantity: ' + error, 'error');
+    });
+}
+
+function showMessage(message, type) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'fixed top-20 right-6 px-6 py-4 rounded-lg shadow-2xl z-50 flex items-center gap-3 animate-slide-in ' + 
+        (type === 'success' ? 'bg-green-600 text-white border-l-4 border-green-800' : 'bg-red-600 text-white border-l-4 border-red-800');
+    
+    const icon = type === 'success' 
+        ? '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+        : '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+    
+    messageDiv.innerHTML = icon + '<span class="font-semibold">' + message + '</span>';
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateX(100%)';
+        messageDiv.style.transition = 'all 0.3s ease-out';
+        setTimeout(() => messageDiv.remove(), 300);
+    }, 3000);
+}
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slide-in {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    .animate-slide-in {
+        animation: slide-in 0.3s ease-out;
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

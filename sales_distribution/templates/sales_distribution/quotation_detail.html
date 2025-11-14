@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+
+{% block title %}Quotation Details - Cortex ERP{% endblock %}
+{% block page_title %}Quotation Details{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800">Quotation {{ quotation.quotationno }}</h2>
+                <p class="text-sm text-gray-600 mt-1">Date: {{ quotation.sysdate }}</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="{% url 'sales_distribution:quotation-edit' quotation.id %}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
+                    Edit
+                </a>
+                <a href="{% url 'sales_distribution:quotation-list' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md transition-colors">
+                    Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Quotation Information</h3>
+        <div class="grid grid-cols-2 gap-4">
+            <div><p class="text-sm text-gray-600">Customer ID</p><p class="font-semibold">{{ quotation.customerid }}</p></div>
+            <div><p class="text-sm text-gray-600">Enquiry</p><p class="font-semibold">ENQ-{{ quotation.enqid.enqid }}</p></div>
+            <div><p class="text-sm text-gray-600">Validity</p><p class="font-semibold">{{ quotation.validity|default:"-" }}</p></div>
+            <div><p class="text-sm text-gray-600">Warranty</p><p class="font-semibold">{{ quotation.warrenty|default:"-" }}</p></div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Line Items</h3>
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Qty</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Rate</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Discount</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                {% for item in line_items %}
+                <tr>
+                    <td class="px-4 py-2 text-sm">{{ item.itemdesc }}</td>
+                    <td class="px-4 py-2 text-sm text-right">{{ item.totalqty }}</td>
+                    <td class="px-4 py-2 text-sm">{{ item.unit.unitname }}</td>
+                    <td class="px-4 py-2 text-sm text-right">₹{{ item.rate }}</td>
+                    <td class="px-4 py-2 text-sm text-right">{{ item.discount|default:0 }}%</td>
+                    <td class="px-4 py-2 text-sm text-right font-semibold">₹{% widthratio item.totalqty 1 item.rate as amt %}{{ amt }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-4 py-12 text-center text-gray-500">No line items</td></tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-gray-50 font-semibold">
+                <tr><td colspan="5" class="px-4 py-2 text-right">Total:</td><td class="px-4 py-2 text-right">₹{{ total|floatformat:2 }}</td></tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Category - Design{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-2">
+    <!-- Page Header -->
+    {% include 'core/components/layout/page_header.html' with title=page_title subtitle=page_subtitle %}
+
+    <!-- Form -->
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <!-- Category Name -->
+            {% include 'core/components/forms/text_input.html' with label="Category Name" name="cname" value=form.cname.value required=True error=form.cname.errors.0 %}
+            
+            <!-- Symbol -->
+            {% include 'core/components/forms/text_input.html' with label="Symbol" name="symbol" value=form.symbol.value required=True error=form.symbol.errors.0 %}
+            
+            <!-- Has Sub-Category -->
+            {% include 'core/components/forms/checkbox.html' with label="Has Sub-Category" name="hassubcat" checked=form.hassubcat.value %}
+            
+            <!-- Form Actions -->
+            <div class="flex justify-end gap-2 pt-4 border-t border-gray-200">
+                <a href="{% url 'design:category-list' %}">
+                    {% include 'core/components/buttons/secondary.html' with text="Cancel" %}
+                </a>
+                {% include 'core/components/buttons/primary.html' with text=submit_text type="submit" %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,41 @@
+<tr id="buyer-{{ buyer.id }}" class="bg-blue-50">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ forloop.counter }}</td>
+    <td colspan="4" class="px-6 py-4">
+        <form hx-post="{% url 'material_management:buyer-update' buyer.id %}"
+              hx-target="#buyer-{{ buyer.id }}"
+              hx-swap="outerHTML"
+              class="grid grid-cols-12 gap-4">
+            {% csrf_token %}
+            <div class="col-span-2">
+                {{ form.category }}
+            </div>
+            <div class="col-span-3">
+                {{ form.nos }}
+            </div>
+            <div class="col-span-4">
+                {{ form.emp }}
+            </div>
+            <div class="col-span-3 flex gap-2">
+                <button type="submit"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
+                    Save
+                </button>
+                <button type="button"
+                        hx-get="{% url 'material_management:buyer-list' %}"
+                        hx-target="#buyer-{{ buyer.id }}"
+                        hx-swap="outerHTML"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md font-medium transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </td>
+</tr>
+
+
+
+
+
+
+
+

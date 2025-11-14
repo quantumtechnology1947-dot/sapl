@@ -1,0 +1,30 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} WO Category - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Work Order Category{% endblock %}
+{% block form_action %}{% if object %}{% url 'sales_distribution:wo-category-update' object.cid %}{% else %}{% url 'sales_distribution:wo-category-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'sales_distribution:wo-category-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="cname"
+        label="Category Name"
+        value=object.cname
+        required=True
+    %}
+    
+    {% include 'core/components/forms/textarea_input.html' with 
+        name="remark"
+        label="Remark"
+        value=object.remark
+        rows=3
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

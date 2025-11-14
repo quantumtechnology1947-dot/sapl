@@ -1,0 +1,23 @@
+{% extends 'core/patterns/form_page.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Business Type - Cortex ERP{% endblock %}
+{% block page_header %}{% if object %}Edit{% else %}Add{% endif %} Business Type{% endblock %}
+{% block form_action %}{% if object %}{% url 'material_management:business-type-update' object.id %}{% else %}{% url 'material_management:business-type-create' %}{% endif %}{% endblock %}
+{% block cancel_url %}{% url 'material_management:business-type-list' %}{% endblock %}
+
+{% block form_content %}
+    {% include 'core/components/forms/text_input.html' with 
+        name="type"
+        label="Business Type"
+        value=object.type
+        required=True
+    %}
+{% endblock %}
+
+
+
+
+
+
+
+

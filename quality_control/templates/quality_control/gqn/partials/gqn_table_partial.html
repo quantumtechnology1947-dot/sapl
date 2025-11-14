@@ -1,0 +1,107 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 text-xs">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 50px;">SN</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 100px;">Fin Year</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 100px;">GQN No</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 100px;">Date</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 100px;">GRR No</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 100px;">GIN No</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 100px;">PO No</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 250px;">Name of Supplier</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 120px;">Challan No</th>
+                <th class="px-4 py-2 text-left text-[10px] font-medium text-gray-500 uppercase whitespace-nowrap" style="min-width: 100px;">Date</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for gqn in gqns %}
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ forloop.counter }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.finyearname|default:"-" }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">
+                    <a href="{% url 'quality_control:gqn-detail' gqn.id %}" class="text-blue-600 hover:text-blue-800 hover:underline">
+                        {{ gqn.gqnno|default:"-" }}
+                    </a>
+                </td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.sysdate|default:"-" }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.grrno|default:"-" }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.ginno|default:"-" }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.pono|default:"-" }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.suppliername|default:"-" }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.challanno|default:"-" }}</td>
+                <td class="px-4 py-2 text-[11px] text-gray-900">{{ gqn.challandate|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" class="px-6 py-16 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No data to display !</h3>
+                    <p class="mt-1 text-sm text-gray-500">No GQN records found matching your search criteria.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination with HTMX -->
+{% if is_paginated %}
+<div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+    <div class="flex-1 flex justify-between sm:hidden">
+        {% if page_obj.has_previous %}
+        <button
+            hx-get="?page={{ page_obj.previous_page_number }}{% if request.GET.search_value %}&search_value={{ request.GET.search_value }}&search_by={{ request.GET.search_by }}{% endif %}"
+            hx-target="#gqn-table"
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Previous
+        </button>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <button
+            hx-get="?page={{ page_obj.next_page_number }}{% if request.GET.search_value %}&search_value={{ request.GET.search_value }}&search_by={{ request.GET.search_by }}{% endif %}"
+            hx-target="#gqn-table"
+            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Next
+        </button>
+        {% endif %}
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+            <p class="text-sm text-gray-700">
+                Showing <span class="font-medium">{{ page_obj.start_index }}</span> to <span class="font-medium">{{ page_obj.end_index }}</span> of <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+            </p>
+        </div>
+        <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                {% if page_obj.has_previous %}
+                <button
+                    hx-get="?page={{ page_obj.previous_page_number }}{% if request.GET.search_value %}&search_value={{ request.GET.search_value }}&search_by={{ request.GET.search_by }}{% endif %}"
+                    hx-target="#gqn-table"
+                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    Previous
+                </button>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <button
+                    hx-get="?page={{ page_obj.next_page_number }}{% if request.GET.search_value %}&search_value={{ request.GET.search_value }}&search_by={{ request.GET.search_by }}{% endif %}"
+                    hx-target="#gqn-table"
+                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    Next
+                </button>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+
+

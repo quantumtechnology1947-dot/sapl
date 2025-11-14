@@ -1,0 +1,79 @@
+{# Form for adding a new line item - matches ASP.NET layout #}
+{# NOTE: Using div instead of form to avoid nested forms issue #}
+<div class="bg-white border border-gray-300 rounded p-4 mb-4">
+    <h4 class="text-sm font-semibold text-gray-800 mb-3">Add Line Item</h4>
+
+    <div id="line-item-form-{{ poid }}" class="grid grid-cols-12 gap-4">
+        {% csrf_token %}
+
+        {# Description - takes up left side #}
+        <div class="col-span-5">
+            <label class="block text-xs font-medium text-gray-700 mb-1">
+                Description & Specification of goods <span class="text-red-500">*</span>
+            </label>
+            <textarea name="itemdesc" rows="4" required
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter item description and specifications"></textarea>
+        </div>
+
+        {# Fields - right side #}
+        <div class="col-span-7 grid grid-cols-2 gap-3">
+            <div class="col-span-2">
+                <label class="block text-xs font-medium text-gray-700 mb-1">
+                    Total Qty of goods <span class="text-red-500">*</span>
+                </label>
+                <input type="number" name="totalqty" step="0.001" min="0" required
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="0.000" />
+            </div>
+
+            <div class="col-span-2">
+                <label class="block text-xs font-medium text-gray-700 mb-1">
+                    Rate per unit <span class="text-red-500">*</span>
+                </label>
+                <input type="number" name="rate" step="0.01" min="0" required
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="0.00" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">
+                    Discount (%) <span class="text-red-500">*</span>
+                </label>
+                <input type="number" name="discount" step="0.01" min="0" max="100" value="0"
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="0.00" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">
+                    Unit <span class="text-red-500">*</span>
+                </label>
+                <select name="unit" required
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Select</option>
+                    {% for unit in units %}
+                    <option value="{{ unit.id }}">{{ unit.symbol }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-span-2 flex justify-end gap-2 mt-2">
+                <button type="button" hx-post="{% url 'sales_distribution:po-line-create' poid %}"
+                    hx-target="#line-items-tbody" hx-swap="beforeend" hx-include="#line-item-form-{{ poid }}"
+                    hx-on::before-request="console.log('HTMX: Sending request to add line item');"
+                    hx-on::after-request="console.log('HTMX: Response received', event.detail); if(event.detail.successful) { document.getElementById('line-item-form-{{ poid }}').querySelectorAll('input, textarea, select').forEach(el => { if(el.type !== 'hidden') el.value = ''; }); showSuccessMessage('Line item added successfully'); } else { alert('Error adding line item: ' + event.detail.xhr.responseText); }"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
+                    Add Item
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+

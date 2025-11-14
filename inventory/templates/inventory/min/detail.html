@@ -1,0 +1,116 @@
+{% extends 'core/base.html' %}
+
+{% block title %}MIN {{ min_obj.minno }}{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-sm font-bold text-gray-900">MIN: {{ min_obj.minno }}</h1>
+            <p class="text-gray-600">Material Issue Note Details</p>
+        </div>
+        <div class="flex space-x-2">
+            <a href="{% url 'inventory:min-list' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to List
+            </a>
+            <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors">
+                <i class="fas fa-print mr-2"></i>
+                Print
+            </button>
+        </div>
+    </div>
+
+    <!-- MIN Header -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">MIN Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">MIN Number</label>
+                <p class="text-gray-900 font-medium">{{ min_obj.minno }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Issue Date</label>
+                <p class="text-gray-900">{{ min_obj.issuedate }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">MRS Number</label>
+                <p class="text-gray-900 font-medium">{{ min_obj.mrsno }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Issued By</label>
+                <p class="text-gray-900">{{ min_obj.issuedby|default:"-" }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Received By</label>
+                <p class="text-gray-900">{{ min_obj.receivedby|default:"-" }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Status</label>
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    Issued
+                </span>
+            </div>
+            <div class="md:col-span-3">
+                <label class="block text-sm font-medium text-gray-500">Remarks</label>
+                <p class="text-gray-900">{{ min_obj.remarks|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issued Items -->
+    <div class="bg-white rounded border border-gray-200 p-6">
+        <h2 class="text-lg font-semibold mb-4">Issued Items</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sr No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Work Order</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Requested Qty</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Issued Qty</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for detail in min_details %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            Item ID: {{ detail.itemid }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ detail.wono|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                            {{ detail.reqqty|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                            {{ detail.issueqty|floatformat:2 }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ detail.remarks|default:"-" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                {% include 'core/components/empty_state.html' with in_table=True colspan=6 title="No records found" message="" %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

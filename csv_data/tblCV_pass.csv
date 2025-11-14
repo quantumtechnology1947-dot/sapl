@@ -1,0 +1,5 @@
+﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,GPNo,EmpId,Authorize,AuthorizedBy,AuthorizeDate,AuthorizeTime
+1,2022-01-30,11:11:56 AM,sapl0001,1,9,0001,sapl0001,0,,,
+2,2022-02-04,4:38:04 PM,sapl0001,1,9,0002,sapl0001,0,,,
+3,2022-03-14,9:45:31 AM,SAPL0001,1,9,0003,SAPL0001,0,,,
+4,2022-03-15,2:09:54 PM,SAPL0001,1,9,0004,SAPL0001,0,,,

@@ -1,0 +1,63 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Gate Pass Detail - HR Management{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-12">
+    <div class="bg-white border border-gray-200 rounded overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-sm font-bold text-gray-800">Gate Pass Details</h2>
+            <div class="flex gap-2">
+                <a href="{% url 'human_resource:gatepass-edit' gatepass.id %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                    <i class="fas fa-edit mr-2"></i>Edit
+                </a>
+                <a href="{% url 'human_resource:gatepass-list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+                    <i class="fas fa-arrow-left mr-2"></i>Back
+                </a>
+            </div>
+        </div>
+
+        <div class="px-6 py-4">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <dt class="font-semibold text-gray-700">Employee Name:</dt>
+                    <dd class="text-gray-900">{% if employee %}{{ employee.employeename }}{% else %}N/A{% endif %}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Bank Name:</dt>
+                    <dd class="text-gray-900">{{ gatepass.bankname|default:"N/A" }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Branch:</dt>
+                    <dd class="text-gray-900">{{ gatepass.branch|default:"N/A" }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Loan Amount:</dt>
+                    <dd class="text-gray-900">{{ gatepass.amount|floatformat:2|default:"0.00" }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Monthly Installment:</dt>
+                    <dd class="text-gray-900">{{ gatepass.installment|floatformat:2|default:"0.00" }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">From Date:</dt>
+                    <dd class="text-gray-900">{{ gatepass.fromdate|default:"N/A" }}</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">To Date:</dt>
+                    <dd class="text-gray-900">{{ gatepass.todate|default:"N/A" }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

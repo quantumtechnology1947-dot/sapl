@@ -1,0 +1,23 @@
+<tr id="vehicle-{{ vehicle.id }}" class="hover:bg-gray-50 transition-colors" data-row-id="{{ vehicle.id }}">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 row-sn">{{ forloop.counter }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ vehicle.vehicalname }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ vehicle.vehicalno|default:"-" }}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button hx-get="{% url 'inventory:vehicle-master-edit' vehicle.id %}"
+                hx-target="#vehicle-{{ vehicle.id }}"
+                hx-swap="outerHTML"
+                hx-confirm="Are you sure you want to Update this record?"
+                hx-on::after-request="recalculateRowNumbers()"
+                class="text-blue-600 hover:text-blue-900 transition mr-3">
+            Edit
+        </button>
+        <button hx-delete="{% url 'inventory:vehicle-master-delete' vehicle.id %}"
+                hx-target="#vehicle-{{ vehicle.id }}"
+                hx-swap="outerHTML"
+                hx-confirm="Are you sure you want to delete this vehicle?"
+                hx-on::after-request="recalculateRowNumbers()"
+                class="text-red-600 hover:text-red-900 transition">
+            Delete
+        </button>
+    </td>
+</tr>

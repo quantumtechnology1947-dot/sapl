@@ -1,0 +1,35 @@
+﻿Id,UnitName,Symbol,EffectOnInvoice
+1,Numbers,NOS,0
+2,Kilograms,KGS,0
+3,Meter,MTR,0
+4,Liter,LIT,0
+5,MiliLiter,ML,0
+6,Milimeter,MM,0
+7,Centimeter,CM,0
+8,Feet,FT,0
+9,Set,SET,1
+10,Brass,BRS,0
+11,Jobs,JOB,0
+12,Miligram,MG,0
+13,Gram,GM,0
+14,Loose,LOOSE,0
+15,Lot,LOT,0
+16,EA,EA,0
+17,Lump Sum,LUMPSUM,0
+18,Cubic Meter,CUM,0
+19,Hours,HRS,0
+20,Running Meter,RMT,0
+21,Metric Ton,MT,0
+22,Square Meter,SQM,0
+23,Piece,PCS,0
+24,SQCM,SQCM,0
+25,AU,AU,0
+26,PCE,PCE,0
+30,Days,DAYS,0
+31,Coil,CL,0
+32,Square Feet,Sq.ft.,0
+33,Month,MONTH,0
+34,Roller,ROLL,0
+36,Square Inch,Sq.inch,0
+37,Pairs,PAIRS,0
+38,Test Unit Modified,TST,1

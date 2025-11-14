@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quality Control{% endblock %} - Cortex ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white border border-gray-200 mb-6">
+        <div class="max-w-full mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-sm font-bold text-gray-800">Quality Control</h1>
+                <div class="space-x-4">
+                    <a href="{% url 'quality_control:dashboard' %}" class="text-blue-600 hover:text-blue-800">Dashboard</a>
+                    <a href="{% url 'quality_control:gqn-list' %}" class="text-blue-600 hover:text-blue-800">GQN</a>
+                    <a href="{% url 'quality_control:mrqn-list' %}" class="text-blue-600 hover:text-blue-800">MRQN</a>
+                    <a href="{% url 'quality_control:rejection-reason-list' %}" class="text-blue-600 hover:text-blue-800">Rejection Reasons</a>
+                    <a href="/" class="text-gray-600 hover:text-gray-800">Home</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-full mx-auto px-6 py-12">
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-100 border border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-400 text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-700 px-4 py-3 rounded mb-2">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
+
+
+
+
+
+
+
+

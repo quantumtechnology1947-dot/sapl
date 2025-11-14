@@ -1,0 +1,279 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Work Order Release - {{ wo_no }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900">Work Order Release</h1>
+                <p class="mt-1 text-sm text-gray-600">WO No: {{ wo_no }} | Customer: {{ customer_name }}</p>
+            </div>
+            <a href="{% url 'sales_distribution:wo-release-list' %}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                Back to List
+            </a>
+        </div>
+    </div>
+
+    <!-- Work Order Info Card -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-3">Work Order Information</h2>
+        <div class="grid grid-cols-4 gap-4">
+            <div>
+                <p class="text-xs text-gray-500">Customer Name</p>
+                <p class="text-sm font-medium text-gray-900">{{ customer_name|default:'-' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">Enquiry No</p>
+                <p class="text-sm font-medium text-gray-900">{{ enquiry_no|default:'-' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">PO No</p>
+                <p class="text-sm font-medium text-gray-900">{{ po_no|default:'-' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500">WO No</p>
+                <p class="text-sm font-medium text-gray-900">{{ wo_no|default:'-' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Release Form -->
+    <form method="post" action="{% url 'sales_distribution:wo-release-submit' work_order.id %}" id="releaseForm">
+        {% csrf_token %}
+
+        <!-- Products Table -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-6">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-sm font-semibold text-gray-900">Products for Release</h2>
+            </div>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-10">
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200 w-12">
+                            <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200 w-32">To Release Qty</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200 w-32">Item Code</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Description</th>
+                        <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 border-r border-gray-200 w-24">Qty</th>
+                        <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 border-r border-gray-200 w-24">Released Qty</th>
+                        <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 w-24">Remain Qty</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for product in products %}
+                    <tr class="border-b hover:bg-gray-50/30 transition-colors h-10" data-remain-qty="{{ product.remain_qty }}">
+                        <td class="px-3 py-2 text-xs border-r border-gray-100">
+                            {% if product.show_controls %}
+                            <input type="checkbox" name="product_selected[]" value="{{ product.id }}" class="product-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            {% endif %}
+                            <input type="hidden" name="product_id[]" value="{{ product.id }}">
+                        </td>
+                        <td class="px-3 py-2 border-r border-gray-100">
+                            {% if product.show_controls %}
+                            <input type="number"
+                                   name="to_release_qty[]"
+                                   step="0.001"
+                                   min="0"
+                                   max="{{ product.remain_qty }}"
+                                   value="0"
+                                   class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 to-release-input"
+                                   placeholder="0.000">
+                            {% else %}
+                            <input type="hidden" name="to_release_qty[]" value="0">
+                            <span class="text-gray-400 text-xs">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-900 border-r border-gray-100">
+                            {{ product.itemcode|default:'-' }}
+                            <input type="hidden" name="item_code[]" value="{{ product.itemcode }}">
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-900 border-r border-gray-100">{{ product.description|default:'-' }}</td>
+                        <td class="px-3 py-2 text-xs text-gray-900 text-right border-r border-gray-100">{{ product.qty|floatformat:3 }}</td>
+                        <td class="px-3 py-2 text-xs text-gray-900 text-right border-r border-gray-100">{{ product.released_qty|floatformat:3 }}</td>
+                        <td class="px-3 py-2 text-xs font-medium text-right
+                            {% if product.remain_qty > 0 %}text-green-600{% else %}text-gray-400{% endif %}">
+                            {{ product.remain_qty|floatformat:3 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-3 py-8 text-center text-sm text-gray-500">
+                            No products found for this work order
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Email Recipients Table -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-6">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-sm font-semibold text-gray-900">Email Notification Recipients</h2>
+                <p class="text-xs text-gray-600 mt-1">Select employees to receive release notification</p>
+            </div>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-10">
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200 w-12">
+                            <input type="checkbox" id="selectAllEmails" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200 w-24">Emp ID</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Employee Name</th>
+                        <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Email</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for employee in eligible_employees %}
+                    <tr class="border-b hover:bg-gray-50/30 transition-colors h-10">
+                        <td class="px-3 py-2 text-xs border-r border-gray-100">
+                            <input type="checkbox" name="email_recipients[]" value="{{ employee.empid }}" class="email-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-900 border-r border-gray-100">{{ employee.empid }}</td>
+                        <td class="px-3 py-2 text-xs text-gray-900 border-r border-gray-100">{{ employee.employeename }}</td>
+                        <td class="px-3 py-2 text-xs text-gray-900">{{ employee.emailid1|default:'-' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-3 py-8 text-center text-sm text-gray-500">
+                            No eligible employees found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex items-center justify-end gap-3">
+            <a href="{% url 'sales_distribution:wo-release-list' %}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                Cancel
+            </a>
+            <button type="submit" id="submitBtn" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Submit Release
+            </button>
+        </div>
+    </form>
+
+    <!-- Release History -->
+    {% if release_history %}
+    <div class="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-sm font-semibold text-gray-900">Release History</h2>
+        </div>
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-200 h-10">
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200 w-24">WR No</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200">Item Code</th>
+                    <th class="px-3 py-2 text-right text-xs font-semibold text-gray-700 border-r border-gray-200 w-32">Issued Qty</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700 border-r border-gray-200 w-28">Date</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Released By</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for release in release_history %}
+                <tr class="border-b h-10">
+                    <td class="px-3 py-2 text-xs text-gray-900 border-r border-gray-100">{{ release.wrno }}</td>
+                    <td class="px-3 py-2 text-xs text-gray-900 border-r border-gray-100">{{ release.itemid }}</td>
+                    <td class="px-3 py-2 text-xs text-gray-900 text-right border-r border-gray-100">{{ release.issuedqty|floatformat:3 }}</td>
+                    <td class="px-3 py-2 text-xs text-gray-900 border-r border-gray-100">{{ release.sysdate }}</td>
+                    <td class="px-3 py-2 text-xs text-gray-900">{{ release.sessionid }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for form validation and interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Select All Products
+    const selectAll = document.getElementById('selectAll');
+    const productCheckboxes = document.querySelectorAll('.product-checkbox');
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            productCheckboxes.forEach(cb => cb.checked = this.checked);
+        });
+    }
+
+    // Select All Emails
+    const selectAllEmails = document.getElementById('selectAllEmails');
+    const emailCheckboxes = document.querySelectorAll('.email-checkbox');
+
+    if (selectAllEmails) {
+        selectAllEmails.addEventListener('change', function() {
+            emailCheckboxes.forEach(cb => cb.checked = this.checked);
+        });
+    }
+
+    // Form Validation
+    const form = document.getElementById('releaseForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate at least one product with quantity
+            const releaseInputs = document.querySelectorAll('.to-release-input');
+            let hasValidRelease = false;
+            let validationErrors = [];
+
+            releaseInputs.forEach(function(input, index) {
+                const qty = parseFloat(input.value) || 0;
+                const row = input.closest('tr');
+                const remainQty = parseFloat(row.dataset.remainQty) || 0;
+                const itemCode = row.querySelector('input[name="item_code[]"]').value;
+
+                if (qty > 0) {
+                    hasValidRelease = true;
+
+                    // Validate quantity doesn't exceed remaining
+                    if (qty > remainQty) {
+                        validationErrors.push(`Item ${itemCode}: Cannot release ${qty.toFixed(3)}. Only ${remainQty.toFixed(3)} remaining.`);
+                    }
+                }
+            });
+
+            if (!hasValidRelease) {
+                alert('Please enter at least one quantity to release.');
+                return false;
+            }
+
+            if (validationErrors.length > 0) {
+                alert('Validation Errors:\n\n' + validationErrors.join('\n'));
+                return false;
+            }
+
+            // Confirm submission
+            if (confirm('Do you really want to release this Work Order?')) {
+                form.submit();
+            }
+        });
+    }
+
+    // Auto-fill remain qty when checkbox is clicked
+    productCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                const row = this.closest('tr');
+                const remainQty = parseFloat(row.dataset.remainQty) || 0;
+                const input = row.querySelector('.to-release-input');
+                if (input && remainQty > 0) {
+                    input.value = remainQty.toFixed(3);
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

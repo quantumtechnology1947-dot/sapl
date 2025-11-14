@@ -1,0 +1,46 @@
+{% extends 'mis/base.html' %}
+{% block title %}MIS Dashboard{% endblock %}
+{% block content %}
+<div class="mb-4"><h2 class="text-sm font-bold">MIS Dashboard</h2></div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white p-4 rounded border border-gray-200"><h3 class="text-gray-600 text-xs">Budget Codes</h3><p class="text-sm font-bold text-sap-blue">{{ total_budget_codes }}</p></div>
+    <div class="bg-white p-4 rounded border border-gray-200"><h3 class="text-gray-600 text-xs">Time Codes</h3><p class="text-sm font-bold text-sap-green">{{ total_budget_codes_time }}</p></div>
+    <div class="bg-white p-4 rounded border border-gray-200"><h3 class="text-gray-600 text-xs">Categories</h3><p class="text-sm font-bold text-sap-purple">{{ total_categories }}</p></div>
+    <div class="bg-white p-4 rounded border border-gray-200"><h3 class="text-gray-600 text-xs">Sub-Categories</h3><p class="text-sm font-bold text-sap-orange">{{ total_subcategories }}</p></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <h3 class="text-sm font-semibold mb-3">Recent Budget Codes</h3>
+        <div class="space-y-2">
+            {% for code in recent_budget_codes %}
+            <div class="border-l-4 border-sap-blue pl-3 py-1"><a href="{% url 'mis:budget-code-detail' code.id %}" class="text-xs text-sap-blue hover:underline">{{ code }}</a></div>
+            {% empty %}
+            <p class="text-xs text-gray-500">No budget codes yet</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white rounded border border-gray-200 p-4">
+        <h3 class="text-sm font-semibold mb-3">Recent Categories</h3>
+        <div class="space-y-2">
+            {% for cat in recent_categories %}
+            <div class="border-l-4 border-sap-purple pl-3 py-1"><a href="{% url 'mis:budget-hrs-category-detail' cat.id %}" class="text-xs text-sap-purple hover:underline">{{ cat }}</a></div>
+            {% empty %}
+            <p class="text-xs text-gray-500">No categories yet</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <a href="{% url 'mis:budget-code-create' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-hover transition-colors text-center">Create Budget Code</a>
+    <a href="{% url 'mis:budget-hrs-category-create' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-purple text-white hover:bg-sap-purple-hover transition-colors text-center">Create Category</a>
+    <a href="{% url 'mis:budget-report' %}" class="inline-flex items-center justify-center gap-2 h-8 px-3 text-xs font-medium rounded bg-sap-green text-white hover:bg-sap-green-hover transition-colors text-center">View Reports</a>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

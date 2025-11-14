@@ -1,0 +1,93 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Business Group Budget Detail - {{ business_group.name }}{% endblock %}
+
+{% block content %}
+<!-- SAP S/4 HANA Inspired Design -->
+<div class="h-screen flex flex-col bg-gray-50">
+
+    <!-- Header Section -->
+    <div class="bg-white border-b border-gray-300 px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-lg font-semibold text-gray-900">Business Group Budget Detail</h1>
+                <p class="text-xs text-gray-600 mt-0.5">{{ business_group.name }} ({{ business_group.symbol|default:"-" }})</p>
+            </div>
+            <button type="button"
+                    onclick="window.location.href='{% url 'mis:business_group_budget' %}'"
+                    class="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-400 rounded hover:bg-gray-50 transition-colors">
+                Back to List
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 overflow-hidden px-4 py-3">
+
+        <!-- Budget Records Table -->
+        <div class="bg-white border border-gray-300 rounded shadow-sm h-full flex flex-col">
+
+            <!-- Table Header -->
+            <div class="px-4 py-2 border-b border-gray-300 bg-[#FAFAFA]">
+                <h2 class="text-sm font-semibold text-gray-900">Budget Allocation Records</h2>
+                <p class="text-xs text-gray-600 mt-0.5">{{ budget_records|length }} record(s) found</p>
+            </div>
+
+            <!-- Table Container -->
+            <div class="flex-1 overflow-auto">
+                <table class="w-full text-xs border-collapse">
+                    <thead class="bg-[#FAFAFA] sticky top-0 z-10">
+                        <tr class="border-b border-gray-300">
+                            <th class="w-[60px] px-3 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">SN</th>
+                            <th class="w-[60px] px-3 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">CK</th>
+                            <th class="w-[120px] px-3 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">Date</th>
+                            <th class="w-[100px] px-3 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">Time</th>
+                            <th class="w-20 px-3 py-2 text-center font-semibold text-gray-700 border-r border-gray-200">FY</th>
+                            <th class="w-[150px] px-3 py-2 text-right font-semibold text-gray-700">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in budget_records %}
+                        <tr class="border-b border-gray-200 hover:bg-blue-50/40 transition-colors">
+                            <td class="px-3 py-2 text-center text-gray-700 border-r border-gray-200">{{ forloop.counter }}</td>
+                            <td class="px-3 py-2 text-center border-r border-gray-200">
+                                <input type="checkbox" class="rounded border-gray-400">
+                            </td>
+                            <td class="px-3 py-2 text-center text-gray-900 border-r border-gray-200">{{ record.sysdate|default:"-" }}</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-r border-gray-200">{{ record.systime|default:"-" }}</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-r border-gray-200">{{ record.finyearid|default:"-" }}</td>
+                            <td class="px-3 py-2 text-right font-medium text-gray-900">{{ record.amount|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <h3 class="text-sm font-medium text-gray-700">No Budget Records Found</h3>
+                                    <p class="text-xs text-gray-500 mt-1">No budget allocations have been made for this business group yet.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        <!-- Total Row -->
+                        {% if budget_records %}
+                        <tr class="bg-[#F5F5F5] border-t-2 border-gray-400 font-semibold sticky bottom-0">
+                            <td colspan="5" class="px-3 py-2 text-right text-gray-900">Total:</td>
+                            <td class="px-3 py-2 text-right text-gray-900">{{ total_amount|floatformat:2 }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

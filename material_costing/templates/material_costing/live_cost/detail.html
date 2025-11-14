@@ -1,0 +1,37 @@
+{% extends 'material_costing/base.html' %}
+{% block title %}Live Cost - {{ cost.livecostno }}{% endblock %}
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-sm font-bold text-gray-900">Live Cost Details</h2>
+        <p class="mt-1 text-sm text-gray-600">Cost No: {{ cost.livecostno }}</p>
+    </div>
+    <div class="space-x-2">
+        <a href="{% url 'material_costing:live-cost-update' cost.id %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Edit</a>
+        <a href="{% url 'material_costing:live-cost-list' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Back to List</a>
+    </div>
+</div>
+<div class="bg-white rounded border border-gray-200 p-6 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Cost Breakdown</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div><p class="text-sm text-gray-600">Cost Number</p><p class="font-medium">{{ cost.livecostno }}</p></div>
+        <div><p class="text-sm text-gray-600">Item ID</p><p class="font-medium">{{ cost.itemid|default:'N/A' }}</p></div>
+        <div><p class="text-sm text-gray-600">Date</p><p class="font-medium">{{ cost.sysdate }}</p></div>
+        <div><p class="text-sm text-gray-600">Raw Material</p><p class="font-medium">{{ cost.rawmaterial|default:'0' }}</p></div>
+        <div><p class="text-sm text-gray-600">Process</p><p class="font-medium">{{ cost.process|default:'0' }}</p></div>
+        <div><p class="text-sm text-gray-600">Finish</p><p class="font-medium">{{ cost.finish|default:'0' }}</p></div>
+        <div><p class="text-sm text-gray-600">Overhead</p><p class="font-medium">{{ cost.overhead|default:'0' }}</p></div>
+        <div><p class="text-sm text-gray-600">Labour</p><p class="font-medium">{{ cost.labour|default:'0' }}</p></div>
+        <div><p class="text-sm text-gray-600">Wastage %</p><p class="font-medium">{{ cost.wastage|default:'0' }}</p></div>
+        <div class="md:col-span-3 border-t pt-4"><p class="text-sm text-gray-600">Total Cost</p><p class="text-sm font-bold text-blue-600">{{ cost.total_cost }}</p></div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

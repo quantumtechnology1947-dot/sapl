@@ -1,0 +1,71 @@
+{% extends "core/base.html" %}
+
+{% block title %}Item Master - Cortex ERP{% endblock %}
+{% block page_title %}Item Master{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between gap-4">
+            <h2 class="text-sm font-semibold text-gray-800">Item Master</h2>
+
+            <div class="flex items-center gap-3 flex-1 justify-end">
+                <!-- Item Code Search -->
+                <input type="text" name="search_itemcode" value="{{ search_itemcode }}"
+                    placeholder="Search by item code..."
+                    hx-get="{% url 'design:item-list' %}"
+                    hx-trigger="input changed delay:500ms, search"
+                    hx-target="#item-table"
+                    hx-include="[name='search_desc'], [name='category']"
+                    class="w-48 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+                <!-- Description Search -->
+                <input type="text" name="search_desc" value="{{ search_desc }}"
+                    placeholder="Search by description..."
+                    hx-get="{% url 'design:item-list' %}"
+                    hx-trigger="input changed delay:500ms, search"
+                    hx-target="#item-table"
+                    hx-include="[name='search_itemcode'], [name='category']"
+                    class="w-48 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+                <!-- Category Filter -->
+                <select name="category"
+                    hx-get="{% url 'design:item-list' %}"
+                    hx-trigger="change"
+                    hx-target="#item-table"
+                    hx-include="[name='search_itemcode'], [name='search_desc']"
+                    class="w-40 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.cid }}" {% if selected_category == cat.cid|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.cname }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <a href="{% url 'design:item-create' %}"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm transition-colors inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Item
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div id="item-table" class="bg-white rounded border border-gray-200 overflow-hidden">
+        {% include 'design/partials/item_list_partial.html' %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

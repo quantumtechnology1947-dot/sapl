@@ -1,0 +1,302 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.userid %}Edit{% else %}Add New{% endif %} Employee - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200">
+        <div class="border-b border-gray-200 px-6 py-4">
+            <h1 class="text-xl font-semibold text-gray-800">
+                {% if form.instance.userid %}Edit Employee{% else %}Add New Employee{% endif %}
+            </h1>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="px-6 py-4">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                <p class="text-red-800 font-semibold">Please correct the following errors:</p>
+                <ul class="list-disc list-inside text-red-700 text-sm mt-2">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Tab Navigation -->
+            <div x-data="{ activeTab: 'official' }" class="mt-4">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8">
+                        <button type="button" @click="activeTab = 'official'"
+                                :class="activeTab === 'official' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Official Info
+                        </button>
+                        <button type="button" @click="activeTab = 'personal'"
+                                :class="activeTab === 'personal' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Personal Info
+                        </button>
+                        <button type="button" @click="activeTab = 'education'"
+                                :class="activeTab === 'education' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Education & Experience
+                        </button>
+                        <button type="button" @click="activeTab = 'others'"
+                                :class="activeTab === 'others' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Others
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="mt-6">
+                    <!-- Official Info Tab -->
+                    <div x-show="activeTab === 'official'" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.offerid.label }}</label>
+                                {{ form.offerid }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.empid.label }}</label>
+                                {{ form.empid }}
+                                <p class="text-xs text-gray-500 mt-1">Auto-generated if left blank</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.title.label }}</label>
+                                {{ form.title }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.employeename.label }} <span class="text-red-500">*</span></label>
+                                {{ form.employeename }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.swapcardno.label }}</label>
+                                {{ form.swapcardno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.department.label }}</label>
+                                {{ form.department }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.bggroup.label }}</label>
+                                {{ form.bggroup }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.designation.label }}</label>
+                                {{ form.designation }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.grade.label }}</label>
+                                {{ form.grade }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.directorsname.label }}</label>
+                                {{ form.directorsname }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.depthead.label }}</label>
+                                {{ form.depthead }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.groupleader.label }}</label>
+                                {{ form.groupleader }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.mobileno.label }}</label>
+                                {{ form.mobileno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.contactno.label }}</label>
+                                {{ form.contactno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.companyemail.label }}</label>
+                                {{ form.companyemail }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.emailid1.label }}</label>
+                                {{ form.emailid1 }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.extensionno.label }}</label>
+                                {{ form.extensionno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.joiningdate.label }}</label>
+                                {{ form.joiningdate }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.resignationdate.label }}</label>
+                                {{ form.resignationdate }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.photodata.label }}</label>
+                                {{ form.photodata }}
+                                <p class="text-xs text-gray-500 mt-1">Max 2MB, Image files only</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Info Tab -->
+                    <div x-show="activeTab === 'personal'" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.permanentaddress.label }}</label>
+                                {{ form.permanentaddress }}
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.correspondenceaddress.label }}</label>
+                                {{ form.correspondenceaddress }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.emailid2.label }}</label>
+                                {{ form.emailid2 }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.dateofbirth.label }}</label>
+                                {{ form.dateofbirth }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.gender.label }}</label>
+                                {{ form.gender }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.martialstatus.label }}</label>
+                                {{ form.martialstatus }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.bloodgroup.label }}</label>
+                                {{ form.bloodgroup }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.height.label }}</label>
+                                {{ form.height }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.weight.label }}</label>
+                                {{ form.weight }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.physicallyhandycapped.label }}</label>
+                                {{ form.physicallyhandycapped }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.religion.label }}</label>
+                                {{ form.religion }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.cast.label }}</label>
+                                {{ form.cast }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Education & Experience Tab -->
+                    <div x-show="activeTab === 'education'" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.educationalqualification.label }}</label>
+                                {{ form.educationalqualification }}
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.additionalqualification.label }}</label>
+                                {{ form.additionalqualification }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.lastcompanyname.label }}</label>
+                                {{ form.lastcompanyname }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.workingduration.label }}</label>
+                                {{ form.workingduration }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.totalexperience.label }}</label>
+                                {{ form.totalexperience }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.currentctc.label }}</label>
+                                {{ form.currentctc }}
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.cvdata.label }}</label>
+                                {{ form.cvdata }}
+                                <p class="text-xs text-gray-500 mt-1">Max 5MB, PDF or Word documents only</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Others Tab -->
+                    <div x-show="activeTab === 'others'" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.bankaccountno.label }}</label>
+                                {{ form.bankaccountno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.pfno.label }}</label>
+                                {{ form.pfno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.panno.label }}</label>
+                                {{ form.panno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.passportno.label }}</label>
+                                {{ form.passportno }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.expirydate.label }}</label>
+                                {{ form.expirydate }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.wr.label }}</label>
+                                {{ form.wr }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.da.label }}</label>
+                                {{ form.da }}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.custlogin.label }}</label>
+                                {{ form.custlogin }}
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.additionalinformation.label }}</label>
+                                {{ form.additionalinformation }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+                <a href="{% if form.instance.userid %}{% url 'human_resource:employee-detail' form.instance.userid %}{% else %}{% url 'human_resource:employee-list' %}{% endif %}"
+                   class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition text-sm">
+                    Cancel
+                </a>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition text-sm">
+                    {% if form.instance.userid %}Update Employee{% else %}Save Employee{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

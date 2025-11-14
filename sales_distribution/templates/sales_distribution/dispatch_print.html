@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dispatch Advice - {{ dispatch.dano }}{% endblock %}
+{% block page_title %}Dispatch Advice{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded border border-gray-200 p-8 print:shadow-none">
+        <div class="text-center mb-8">
+            <h1 class="text-base font-bold text-gray-900">DISPATCH ADVICE</h1>
+            <p class="text-lg text-gray-600 mt-2">DA No: {{ dispatch.dano }}</p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div>
+                <h3 class="font-semibold text-gray-800 mb-2">Dispatch Details</h3>
+                <p class="text-sm text-gray-600">WR Number: {{ dispatch.wrno }}</p>
+                <p class="text-sm text-gray-600">WR ID: {{ dispatch.wrid }}</p>
+                <p class="text-sm text-gray-600">Item ID: {{ dispatch.itemid }}</p>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-800 mb-2">Quantity Details</h3>
+                <p class="text-sm text-gray-600">Issued Qty: {{ dispatch.issuedqty }}</p>
+                <p class="text-sm text-gray-600">Dispatch Qty: {{ dispatch.dispatchqty }}</p>
+            </div>
+        </div>
+        
+        <div class="mb-8">
+            <h3 class="font-semibold text-gray-800 mb-2">Charges & Vehicle</h3>
+            <p class="text-sm text-gray-600">Freight Charges: {{ dispatch.freightcharges|default:"-" }}</p>
+            <p class="text-sm text-gray-600">Vehicle By: {{ dispatch.vehicleby|default:"-" }}</p>
+            <p class="text-sm text-gray-600">Octroi Charges: {{ dispatch.octroicharges|default:"-" }}</p>
+        </div>
+        
+        <div class="flex gap-4 justify-end mt-8 print:hidden">
+            <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md">Print</button>
+            <a href="{% url 'sales_distribution:dispatch-list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-md">Back</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

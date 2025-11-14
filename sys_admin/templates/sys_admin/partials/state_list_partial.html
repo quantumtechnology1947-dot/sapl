@@ -1,0 +1,35 @@
+<div class="bg-white rounded border border-gray-200 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Country Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">State Name</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"></th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for state in states %}
+                {% include 'sys_admin/partials/state_row.html' %}
+            {% empty %}
+            {% include 'core/components/empty_state.html' with
+                in_table=True
+                colspan=4
+                icon_path="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                title="No states found"
+                message="Click 'Add State' to create one."
+            %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% include 'core/components/tables/pagination.html' with page_obj=page_obj is_paginated=is_paginated htmx_enabled=True htmx_target="#state-table" %}
+</div>
+
+
+
+
+
+
+
+

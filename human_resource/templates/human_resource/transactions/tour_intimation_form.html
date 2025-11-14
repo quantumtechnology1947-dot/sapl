@@ -1,0 +1,140 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Tour Intimation - HR Management{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-12">
+    <div class="bg-white border border-gray-200 rounded overflow-hidden">
+        <!-- Header -->
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-sm font-bold text-gray-800">
+                {% if object %}Edit Tour Intimation{% else %}Create New Tour Intimation{% endif %}
+            </h2>
+        </div>
+
+        <!-- Form -->
+        <form method="post" class="px-6 py-6">
+            {% csrf_token %}
+
+            <!-- Display form errors -->
+            {% if form.errors %}
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                <strong>Please correct the following errors:</strong>
+                <ul class="list-disc ml-5 mt-2">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Employee and Basic Information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.empid.label }}</label>
+                    {{ form.empid }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.type.label }}</label>
+                    {{ form.type }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.wono.label }}</label>
+                    {{ form.wono }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.bggroupid.label }}</label>
+                    {{ form.bggroupid }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.projectname.label }}</label>
+                    {{ form.projectname }}
+                </div>
+            </div>
+
+            <!-- Tour Dates -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.tourstartdate.label }}</label>
+                    {{ form.tourstartdate }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.tourstarttime.label }}</label>
+                    {{ form.tourstarttime }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.tourenddate.label }}</label>
+                    {{ form.tourenddate }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.tourendtime.label }}</label>
+                    {{ form.tourendtime }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.noofdays.label }}</label>
+                    {{ form.noofdays }}
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.nameaddressserprovider.label }}</label>
+                    {{ form.nameaddressserprovider }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.contactperson.label }}</label>
+                    {{ form.contactperson }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.contactno.label }}</label>
+                    {{ form.contactno }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.email.label }}</label>
+                    {{ form.email }}
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.placeoftourcountry.label }}</label>
+                    {{ form.placeoftourcountry }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.placeoftourstate.label }}</label>
+                    {{ form.placeoftourstate }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.placeoftourcity.label }}</label>
+                    {{ form.placeoftourcity }}
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-4">
+                <a href="{% url 'human_resource:tour-intimation-list' %}"
+                   class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition duration-200">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition duration-200">
+                    {% if object %}Update{% else %}Create{% endif %} Tour Intimation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

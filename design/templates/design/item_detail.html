@@ -1,0 +1,193 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Item Details - {{ item.itemcode }} - Design{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2 max-w-6xl">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Item Details</h1>
+                <p class="text-sm text-gray-600 mt-1">{{ item.itemcode }}</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'design:item-edit' item.id %}" 
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                    Edit Item
+                </a>
+                <a href="{% url 'design:item-list' %}" 
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Information -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Basic Information -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">Basic Information</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Item Code:</dt>
+                    <dd class="text-sm text-gray-900 font-semibold">{{ item.itemcode }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Part Number:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.partno|default:"-" }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-600 mb-1">Description:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.manfdesc|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Category:</dt>
+                    <dd class="text-sm text-gray-900">{{ category.cname|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Sub-Category:</dt>
+                    <dd class="text-sm text-gray-900">{{ subcategory.scname|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Unit:</dt>
+                    <dd class="text-sm text-gray-900">{{ unit.unitname|default:"-" }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Quantity Information -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">Quantity Information</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Stock Quantity:</dt>
+                    <dd class="text-sm text-gray-900 font-semibold">{{ item.stockqty|floatformat:2 }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Min Order Quantity:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.minorderqty|floatformat:2|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Min Stock Quantity:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.minstockqty|floatformat:2|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Opening Balance Date:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.openingbaldate|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Opening Balance Qty:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.openingbalqty|floatformat:2|default:"-" }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">Additional Information</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Process:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.process|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Class:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.class_field|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Lead Days:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.leaddays|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Inspection Days:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.inspectiondays|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Location:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.location|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">HSN Code:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.hsncode|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Excise:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.excise|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Import/Local:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.importlocal|default:"-" }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- System Information -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">System Information</h2>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Created Date:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.sysdate|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">Created Time:</dt>
+                    <dd class="text-sm text-gray-900">{{ item.systime|default:"-" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm font-medium text-gray-600">BOM References:</dt>
+                    <dd class="text-sm text-gray-900">
+                        {% if bom_count > 0 %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {{ bom_count }} BOM(s)
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Not used in BOMs
+                        </span>
+                        {% endif %}
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 bg-white rounded border border-gray-200 p-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800">Actions</h2>
+                <p class="text-sm text-gray-600 mt-1">Manage this item</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'design:item-edit' item.id %}" 
+                   class="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                    Edit Item
+                </a>
+                {% if bom_count == 0 %}
+                <button hx-delete="{% url 'design:item-delete' item.id %}"
+                        hx-confirm="Are you sure you want to delete item {{ item.itemcode }}?"
+                        class="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                    Delete Item
+                </button>
+                {% else %}
+                <button disabled
+                        class="bg-gray-300 text-gray-500 font-medium px-6 py-2 rounded-md cursor-not-allowed"
+                        title="Cannot delete item used in BOMs">
+                    Delete Item
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

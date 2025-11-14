@@ -1,0 +1,19 @@
+<select name="{{ field_prefix }}city"
+        id="id_{{ field_prefix }}city"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+    <option value="">Select</option>
+    {% for city in cities %}
+    <option value="{% if use_names %}{{ city.cityname }}{% else %}{{ city.cityid }}{% endif %}">{{ city.cityname }}</option>
+    {% endfor %}
+</select>
+
+
+
+
+
+
+
+
+
+

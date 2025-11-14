@@ -1,0 +1,288 @@
+{% extends "core/base.html" %}
+
+{% block title %}Search Results - Cortex ERP{% endblock %}
+{% block page_title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Search Header -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800">Search Results</h2>
+                {% if search_query %}
+                <p class="text-sm text-gray-600 mt-1">
+                    Found <span class="font-medium text-blue-600">{{ total_results }}</span> result{{ total_results|pluralize }} for "{{ search_query }}"
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Search Form -->
+            <form method="get" class="flex gap-2">
+                <input type="text"
+                       name="q"
+                       value="{{ search_query }}"
+                       placeholder="Search across all modules..."
+                       class="w-96 px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       autofocus>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm transition-colors">
+                    <svg class="inline-block w-4 h-4 mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if not search_query or search_query|length < 2 %}
+    <!-- Empty State -->
+    <div class="bg-white rounded border border-gray-200 p-12 text-center">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">Universal Search</h3>
+        <p class="mt-2 text-sm text-gray-600">Enter at least 2 characters to search across all Sales & Distribution modules</p>
+        <ul class="mt-4 text-sm text-gray-600 text-left max-w-md mx-auto">
+            <li class="flex items-center mt-2">
+                <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Customers & Enquiries
+            </li>
+            <li class="flex items-center mt-2">
+                <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Quotations & Purchase Orders
+            </li>
+            <li class="flex items-center mt-2">
+                <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Work Orders, Releases & Dispatches
+            </li>
+            <li class="flex items-center mt-2">
+                <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Categories & Sub-categories
+            </li>
+        </ul>
+    </div>
+    {% elif total_results == 0 %}
+    <!-- No Results State -->
+    <div class="bg-white rounded border border-gray-200 p-12 text-center">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No results found</h3>
+        <p class="mt-2 text-sm text-gray-600">No matches found for "{{ search_query }}". Try different keywords.</p>
+    </div>
+    {% else %}
+    <!-- Results Grid -->
+    <div class="space-y-4">
+        {% if results.customers %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-blue-50 px-4 py-2 border-b border-blue-100">
+                <h3 class="text-sm font-semibold text-blue-900">Customers ({{ results.customers|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for customer in results.customers %}
+                <a href="{% url 'sales_distribution:customer-print' customer.salesid %}" class="block px-4 py-3 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ customer.customername }}</p>
+                            <p class="text-xs text-gray-600">Code: {{ customer.customercode|default:"-" }} | Contact: {{ customer.regdcontactno|default:"-" }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.enquiries %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-green-50 px-4 py-2 border-b border-green-100">
+                <h3 class="text-sm font-semibold text-green-900">Enquiries ({{ results.enquiries|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for enquiry in results.enquiries %}
+                <a href="{% url 'sales_distribution:enquiry-detail' enquiry.enqid %}" class="block px-4 py-3 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ enquiry.customername }}</p>
+                            <p class="text-xs text-gray-600">{{ enquiry.enquiryfor|truncatewords:10 }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.quotations %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-purple-50 px-4 py-2 border-b border-purple-100">
+                <h3 class="text-sm font-semibold text-purple-900">Quotations ({{ results.quotations|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for quotation in results.quotations %}
+                <a href="{% url 'sales_distribution:quotation-detail' quotation.id %}" class="block px-4 py-3 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ quotation.quotationno }}</p>
+                            <p class="text-xs text-gray-600">Customer: {{ quotation.enqid.customername|default:"-" }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.pos %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-yellow-50 px-4 py-2 border-b border-yellow-100">
+                <h3 class="text-sm font-semibold text-yellow-900">Purchase Orders ({{ results.pos|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for po in results.pos %}
+                <a href="{% url 'sales_distribution:po-detail' po.poid %}" class="block px-4 py-3 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ po.pono }}</p>
+                            <p class="text-xs text-gray-600">Customer: {{ po.enqid.customername|default:"-" }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.workorders %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-red-50 px-4 py-2 border-b border-red-100">
+                <h3 class="text-sm font-semibold text-red-900">Work Orders ({{ results.workorders|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for wo in results.workorders %}
+                <a href="{% url 'sales_distribution:workorder-detail' wo.id %}" class="block px-4 py-3 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ wo.wono }}</p>
+                            <p class="text-xs text-gray-600">PO: {{ wo.pono|default:"-" }} | Customer: {{ wo.customerid }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.releases %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-indigo-50 px-4 py-2 border-b border-indigo-100">
+                <h3 class="text-sm font-semibold text-indigo-900">Releases ({{ results.releases|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for release in results.releases %}
+                <div class="px-4 py-3">
+                    <p class="text-sm font-medium text-gray-900">{{ release.wrno }}</p>
+                    <p class="text-xs text-gray-600">WO: {{ release.wono }} | Item: {{ release.itemid }} | Qty: {{ release.issuedqty }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.dispatches %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-pink-50 px-4 py-2 border-b border-pink-100">
+                <h3 class="text-sm font-semibold text-pink-900">Dispatches ({{ results.dispatches|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for dispatch in results.dispatches %}
+                <div class="px-4 py-3">
+                    <p class="text-sm font-medium text-gray-900">{{ dispatch.dano }}</p>
+                    <p class="text-xs text-gray-600">WR: {{ dispatch.wrno }} | Item: {{ dispatch.itemid }} | Qty: {{ dispatch.dispatchqty }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.categories %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-teal-50 px-4 py-2 border-b border-teal-100">
+                <h3 class="text-sm font-semibold text-teal-900">WO Categories ({{ results.categories|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for category in results.categories %}
+                <a href="{% url 'sales_distribution:wo-category-edit' category.cid %}" class="block px-4 py-3 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ category.cname }}</p>
+                            <p class="text-xs text-gray-600">Symbol: {{ category.symbol }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.subcategories %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="bg-cyan-50 px-4 py-2 border-b border-cyan-100">
+                <h3 class="text-sm font-semibold text-cyan-900">WO Sub-Categories ({{ results.subcategories|length }})</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for subcategory in results.subcategories %}
+                <a href="{% url 'sales_distribution:wo-subcategory-edit' subcategory.scid %}" class="block px-4 py-3 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ subcategory.scname }}</p>
+                            <p class="text-xs text-gray-600">Symbol: {{ subcategory.symbol }}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

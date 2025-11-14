@@ -1,0 +1,77 @@
+<div class="overflow-x-auto">
+    <table class="w-full border-collapse">
+        <thead>
+            <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">GST Rate</th>
+                <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Rate Value</th>
+                <th class="w-20 px-3 py-2 text-center text-xs font-semibold text-gray-700">CGST</th>
+                <th class="w-20 px-3 py-2 text-center text-xs font-semibold text-gray-700">SGST</th>
+                <th class="w-20 px-3 py-2 text-center text-xs font-semibold text-gray-700">IGST</th>
+                <th class="w-48 px-3 py-2 text-left text-xs font-semibold text-gray-700">HSN Applicable</th>
+                <th class="w-32 px-3 py-2 text-left text-xs font-semibold text-gray-700">Effective From</th>
+                <th class="w-24 px-3 py-2 text-center text-xs font-semibold text-gray-700">Status</th>
+                <th class="w-32 px-3 py-2 text-center text-xs font-semibold text-gray-700">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for gst in gst_rates %}
+            <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors">
+                <td class="w-32 px-3 py-2 text-xs font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">{{ gst.gstrate|default:"-" }}</td>
+                <td class="w-24 px-3 py-2 text-xs font-bold text-sap-blue text-center">{{ gst.ratevalue|floatformat:2 }}%</td>
+                <td class="w-20 px-3 py-2 text-xs text-gray-900 text-center">{{ gst.cgstrate|floatformat:2 }}%</td>
+                <td class="w-20 px-3 py-2 text-xs text-gray-900 text-center">{{ gst.sgstrate|floatformat:2 }}%</td>
+                <td class="w-20 px-3 py-2 text-xs text-gray-900 text-center">{{ gst.igstrate|floatformat:2 }}%</td>
+                <td class="w-48 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis"
+                    title="{{ gst.hsnapplicable|default:'' }}">{{ gst.hsnapplicable|default:"-" }}</td>
+                <td class="w-32 px-3 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">{{ gst.effectivefrom|default:"-" }}</td>
+                <td class="w-24 px-3 py-2 text-center text-xs">
+                    {% if gst.live == 1 %}
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                    {% else %}
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-800">Inactive</span>
+                    {% endif %}
+                </td>
+                <td class="w-32 px-3 py-2 text-center text-xs">
+                    <div class="flex items-center justify-center gap-2">
+                        <a href="{% url 'sys_admin:gst-master-detail' gst.id %}"
+                           class="text-sap-blue hover:underline"
+                           title="View Details">View</a>
+                        <a href="{% url 'sys_admin:gst-master-edit' gst.id %}"
+                           class="text-sap-green hover:underline"
+                           title="Edit">Edit</a>
+                        <form method="post"
+                              action="{% url 'sys_admin:gst-master-delete' gst.id %}"
+                              class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="text-sap-red hover:underline"
+                                    title="Deactivate"
+                                    onclick="return confirm('Deactivate GST rate {{ gst.gstrate }}?')">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+                {% include 'core/components/empty_state.html' with
+                    in_table=True
+                    colspan=9
+                    icon_path="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    title="No GST rates found"
+                    message="Get started by creating a new GST rate."
+                %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'core/components/tables/pagination.html' with page_obj=page_obj is_paginated=is_paginated htmx_enabled=True htmx_target="#gst-master-table" %}
+
+
+
+
+
+
+
+

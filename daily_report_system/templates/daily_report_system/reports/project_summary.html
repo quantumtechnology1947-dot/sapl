@@ -1,0 +1,23 @@
+{% extends "daily_report_system/base.html" %}
+{% block content %}
+<h1 class="text-sm font-bold mb-6">Project Summary</h1>
+<div class="grid grid-cols-5 gap-4 mb-6">
+    <div class="bg-blue-100 p-4 rounded"><div class="text-sm font-bold">{{ summary.total_projects }}</div><div>Projects</div></div>
+    <div class="bg-green-100 p-4 rounded"><div class="text-sm font-bold">{{ summary.total_designs }}</div><div>Designs</div></div>
+    <div class="bg-purple-100 p-4 rounded"><div class="text-sm font-bold">{{ summary.total_manufacturing }}</div><div>Manufacturing</div></div>
+    <div class="bg-orange-100 p-4 rounded"><div class="text-sm font-bold">{{ summary.total_vendor }}</div><div>Vendor</div></div>
+    <div class="bg-red-100 p-4 rounded"><div class="text-sm font-bold">{{ summary.total_hardware }}</div><div>Hardware</div></div>
+</div>
+<div class="bg-white rounded shadow p-6">
+    <h2 class="text-xl font-bold mb-4">Recent Projects</h2>
+    {% for project in recent_projects %}<div class="border-b pb-2 mb-2">{{ project.wono }} - {{ project.sysdate }}</div>{% endfor %}
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

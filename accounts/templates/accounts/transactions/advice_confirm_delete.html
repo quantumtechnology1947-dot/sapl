@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Delete Advice Payment{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="max-w-2xl mx-auto">
+        <!-- Warning Card -->
+        <div class="bg-white rounded border border-gray-200 p-6">
+            <div class="flex items-center mb-6">
+                <svg class="h-12 w-12 text-red-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                    <h2 class="text-sm font-bold text-gray-900">Confirm Deletion</h2>
+                    <p class="text-sm text-gray-600 mt-1">This action cannot be undone</p>
+                </div>
+            </div>
+
+            <!-- Advice Details -->
+            <div class="bg-gray-50 rounded p-4 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-3">Advice Payment Details</h3>
+                <dl class="grid grid-cols-2 gap-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Advice Number</dt>
+                        <dd class="text-sm text-gray-900">{{ object.adno }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Pay To</dt>
+                        <dd class="text-sm text-gray-900">{{ object.payto|default:"-" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Cheque No</dt>
+                        <dd class="text-sm text-gray-900">{{ object.chequeno|default:"-" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Cheque Date</dt>
+                        <dd class="text-sm text-gray-900">{{ object.chequedate|default:"-" }}</dd>
+                    </div>
+                </dl>
+
+                {% if advice_details %}
+                <div class="mt-4 border-t border-gray-200 pt-4">
+                    <p class="text-sm text-gray-600">This advice has <strong>{{ advice_details.count }}</strong> payment detail(s) that will also be deleted.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Confirmation -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="flex justify-end gap-3">
+                    <a href="{% url 'accounts:advice-list' %}"
+                       class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">
+                        Delete Advice
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

@@ -1,0 +1,70 @@
+{% extends "core/base.html" %}
+
+{% block title %}ECN Unlock - Cortex ERP{% endblock %}
+{% block page_title %}ECN Unlock{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Compact Header -->
+    <div class="bg-white rounded border border-gray-200 p-3 mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <h2 class="text-sm font-semibold text-gray-800">ECN Unlock - Work Orders</h2>
+        </div>
+
+        <!-- Search Form -->
+        <form hx-get="{% url 'design:ecn-wo-list' %}"
+              hx-target="#wo-table-container"
+              hx-swap="innerHTML"
+              class="flex flex-wrap gap-2 items-end">
+
+            <!-- Search Type -->
+            <select name="search_type"
+                    id="search_type"
+                    class="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="0" {% if search_type == '0' %}selected{% endif %}>Customer Name</option>
+                <option value="1" {% if search_type == '1' %}selected{% endif %}>WO No</option>
+            </select>
+
+            <!-- Search Value -->
+            <input type="text"
+                   name="search_value"
+                   value="{{ search_value }}"
+                   placeholder="Search..."
+                   class="flex-1 min-w-[200px] px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <!-- WO Category -->
+            <select name="wo_category"
+                    class="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Categories</option>
+                {% for category in wo_categories %}
+                <option value="{{ category.cid }}" {% if wo_category == category.cid|stringformat:"s" %}selected{% endif %}>
+                    {{ category.symbol }} - {{ category.cname }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Search Button -->
+            <button type="submit"
+                    class="px-4 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors inline-flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Search
+            </button>
+        </form>
+    </div>
+
+    <!-- Work Orders Table -->
+    <div id="wo-table-container" class="bg-white rounded border border-gray-200 overflow-hidden">
+        {% include 'design/partials/ecn_wo_list_partial.html' %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

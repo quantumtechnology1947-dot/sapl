@@ -1,0 +1,199 @@
+﻿Id,MId,OfferMId,Perticulars,Qty,Amount,IncludesIn
+1,92,143,Ptax ded,1.0,175.0,2
+2,128,66,Performance Incentive,1.0,3000.0,3
+3,129,68,Performance Incentive,1.0,3000.0,3
+4,130,35,Performance Incentive,1.0,1225.0,3
+5,132,32,Performance Incentive,1.0,2000.0,3
+6,133,215,Performance Incentive,1.0,1500.0,3
+7,134,215,Performance Incentive,1.0,1500.0,3
+8,135,224,Performance Incentive,1.0,1300.0,3
+9,136,232,Performance Incentive,1.0,1300.0,3
+10,137,232,Performance Incentive,1.0,1300.0,3
+11,138,215,Performance Incentive,1.0,1500.0,3
+12,139,215,Performance Incentive,1.0,1500.0,3
+13,140,215,Performance Incentive,1.0,1500.0,3
+14,141,215,Performance Incentive,1.0,1500.0,3
+15,142,215,Performance Incentive,1.0,1500.0,3
+16,143,224,Performance Incentive,1.0,1300.0,3
+17,145,224,Performance Incentive,1.0,1300.0,3
+18,146,224,Performance Incentive,1.0,1300.0,3
+19,147,224,Performance Incentive,1.0,1300.0,3
+20,149,82,Performance Incentive,1.0,1800.0,3
+21,149,82,Performance Incentive,1.0,5400.0,3
+22,150,68,	Performance Incentive,1.0,3600.0,3
+23,151,30,Performance Incentive,1.0,3000.0,3
+24,152,30,Performance Incentive,1.0,3000.0,3
+25,153,233,Performance Incentive,1.0,3000.0,3
+26,154,247,Performance Incentive,1.0,1800.0,3
+27,155,19,Performance Incentive,1.0,3600.0,3
+28,156,113,Performance Incentive,1.0,4200.0,3
+29,157,97,Performance Incentive,1.0,3600.0,3
+30,158,111,Performance Incentive,1.0,4200.0,3
+31,159,82,Performance Incentive,1.0,5400.0,3
+32,160,76,Performance Incentive,1.0,5400.0,3
+33,161,9,Performance Incentive,1.0,5100.0,3
+34,162,9,Performance Incentive,1.0,5100.0,3
+35,163,9,Performance Incentive,1.0,5100.0,3
+36,164,109,Performance Incentive,1.0,3900.0,3
+37,165,116,Performance Incentive,1.0,3600.0,3
+38,166,107,Performance Incentive,1.0,660.0,3
+39,167,214,Performance Incentive,1.0,3000.0,3
+40,168,100,Performance Incentive,1.0,4200.0,3
+41,169,27,Performance Incentive,1.0,10000.0,3
+42,170,215,Performance Incentive,1.0,6000.0,3
+43,171,215,Performance Incentive,1.0,6000.0,3
+44,172,215,Performance Incentive,1.0,6000.0,3
+45,173,242,Performance Incentive,1.0,3600.0,3
+46,174,5,Performance Incentive,1.0,4500.0,3
+47,175,224,Performance Incentive,1.0,4200.0,3
+48,176,215,Performance Incentive,1.0,6000.0,3
+49,177,233,Performance Incentive,1.0,3000.0,3
+50,178,233,Performance Incentive,1.0,3000.0,3
+51,179,233,Performance Incentive,1.0,3000.0,3
+52,181,207,Performance incentive,1.0,3600.0,1
+53,182,207,Performance incentive,1.0,3600.0,1
+54,183,61,Performance Incentive,1.0,5100.0,3
+55,184,247,Performance Incentive,1.0,1800.0,3
+56,185,68,	Performance Incentive,1.0,3600.0,3
+57,186,49,Performance Incentive,1.0,500.0,3
+58,187,49,Performance Incentive,1.0,2400.0,3
+59,188,90,Performance incentive,1.0,2600.0,3
+60,189,90,Performance incentive,1.0,2600.0,3
+61,190,90,Performance incentive,1.0,2600.0,3
+62,191,90,Performance incentive,1.0,2600.0,3
+63,192,68,	Performance Incentive,1.0,3600.0,3
+64,193,68,	Performance Incentive,1.0,3600.0,3
+65,194,68,	Performance Incentive,1.0,3600.0,3
+66,195,68,	Performance Incentive,1.0,3600.0,3
+67,196,68,	Performance Incentive,1.0,3600.0,3
+68,197,158,Performance Incentive,1.0,3100.0,3
+69,199,27,Performance Incentive,1.0,10000.0,3
+70,199,27,Medical Reimbursement,1.0,1250.0,1
+71,202,251,Performance incentive ,1.0,1820.0,3
+72,203,251,Performance incentive ,1.0,1820.0,3
+73,204,251,Performance incentive ,1.0,1820.0,3
+74,205,251,Performance incentive ,1.0,1820.0,3
+75,206,251,Performance incentive ,1.0,1820.0,3
+76,207,251,Performance incentive ,1.0,1820.0,3
+77,208,251,Performance incentive ,1.0,1820.0,3
+78,210,260,Performance incentive,1.0,1820.0,3
+79,211,27,Performance Incentive,1.0,10000.0,3
+80,211,27,Medical Reimbursement,1.0,1250.0,1
+81,212,112,Performance Incentive,1.0,4500.0,3
+82,213,27,Medical Reimbursement,1.0,1250.0,1
+83,213,27,Petrol Allowance,1.0,4000.0,3
+84,213,27,Performance Incentive,1.0,6000.0,3
+85,214,27,Medical Reimbursement,1.0,1250.0,1
+86,214,27,Petrol Allowance,1.0,4000.0,3
+87,214,27,Performance Incentive,1.0,6000.0,3
+88,215,27,Medical Reimbursement,1.0,1250.0,1
+89,215,27,Petrol Allowance,1.0,4000.0,3
+90,215,27,Performance Incentive,1.0,10000.0,3
+91,216,27,Medical Reimbursement,1.0,1250.0,1
+92,216,27,Petrol Allowance,1.0,4000.0,3
+93,216,27,Performance Incentive,1.0,10000.0,3
+94,217,35,Performance Incentive,1.0,6700.0,3
+95,218,27,Medical Reimbursement,1.0,1250.0,1
+96,218,27,Petrol Allowance,1.0,4000.0,3
+97,218,27,Performance Incentive,1.0,6000.0,3
+98,219,264,Performance Incentive,1.0,1820.0,3
+99,220,264,Performance Incentive,1.0,1820.0,3
+100,221,269,Performance Incentive,1.0,2500.0,3
+101,222,283,Performance incentive,1.0,4360.0,3
+102,223,270,Performance incentive,1.0,1500.0,3
+103,224,76,Performance Incentive,1.0,7975.0,3
+104,225,76,Performance Incentive,1.0,7975.0,3
+105,226,273,Performance incentive,1.0,2000.0,3
+106,227,111,Performance Incentive,1.0,5515.0,3
+107,228,108,Performance Incentive,1.0,5955.0,3
+108,229,214,Performance Incentive,1.0,4745.0,3
+109,230,49,Performance Incentive,1.0,5740.0,3
+110,231,82,Performance Incentive,1.0,9700.0,3
+111,232,82,Performance Incentive,1.0,9700.0,3
+112,233,279,Performance Incentive,1.0,2600.0,3
+113,234,279,Performance Incentive,1.0,2600.0,3
+114,235,279,Performance Incentive,1.0,2600.0,3
+115,236,279,Performance Incentive,1.0,4525.0,3
+116,237,279,Performance Incentive,1.0,4525.0,3
+117,238,105,Performance Incentive,1.0,5700.0,3
+118,239,106,Performance Incentive,1.0,5400.0,3
+119,240,106,Performance Incentive,1.0,5400.0,3
+120,241,106,Performance Incentive,1.0,5400.0,3
+121,242,106,Performance Incentive,1.0,6920.0,3
+122,243,106,Performance Incentive,1.0,6920.0,3
+123,244,107,Performance Incentive,1.0,5435.0,3
+124,245,107,Performance Incentive,1.0,5435.0,3
+125,246,107,Performance Incentive,1.0,4200.0,3
+126,247,107,Performance Incentive,1.0,4200.0,3
+127,248,9,Performance Incentive,1.0,5100.0,3
+128,248,9,Petrol Allowance,1.0,1200.0,3
+129,249,82,Performance Incentive,1.0,9700.0,3
+130,250,82,Performance Incentive,1.0,9700.0,3
+131,251,82,Performance Incentive,1.0,9700.0,3
+132,252,49,Performance Incentive,1.0,5740.0,3
+133,253,107,Performance Incentive,1.0,5435.0,3
+134,254,107,Performance Incentive,1.0,5435.0,3
+135,255,30,Performance Incentive,1.0,7836.0,3
+136,256,233,Performance Incentive,1.0,3000.0,3
+137,257,233,Performance Incentive,1.0,10100.0,3
+138,258,280,Performance Incentive,1.0,4685.0,3
+139,259,9,Performance Incentive,1.0,9165.0,3
+140,259,9,Petrol Allowance,1.0,1200.0,3
+141,260,16,Performance Incentive,1.0,9000.0,3
+142,261,269,Performance Incentive,1.0,6900.0,3
+143,262,275,Performance Incentive,1.0,4600.0,3
+144,263,22,Performance Incentive,1.0,8460.0,3
+145,263,22,Petrol Allowance,1.0,1200.0,3
+146,265,1,PI,1.0,2000.0,4
+147,267,347,3300,1.0,3300.0,4
+148,268,347,3300,1.0,3300.0,4
+149,269,349,2700,1.0,2700.0,1
+150,270,350,2500,1.0,2500.0,4
+151,271,350,3300,1.0,3300.0,4
+152,272,348,2500,1.0,2500.0,4
+154,274,358,1000,1.0,1000.0,4
+155,275,76,Performance Incentive,1.0,7975.0,3
+156,276,100,Performance Incentive,1.0,5900.0,3
+157,277,100,Performance Incentive,1.0,5900.0,3
+158,278,105,Performance Incentive,1.0,5700.0,3
+159,279,112,Performance Incentive,1.0,4500.0,3
+160,280,112,Performance Incentive,1.0,4500.0,3
+161,281,112,Performance Incentive,1.0,6325.0,3
+162,282,113,Performance Incentive,1.0,5890.0,3
+163,283,113,Performance Incentive,1.0,5890.0,3
+164,284,372,4500,1.0,4500.0,4
+165,285,366,4250,1.0,4250.0,4
+166,286,109,Performance Incentive,1.0,5435.0,3
+167,287,109,Performance Incentive,1.0,5700.0,3
+168,288,111,Performance Incentive,1.0,5515.0,3
+169,289,295,Performance Incentive,1.0,5675.0,3
+170,290,295,Performance Incentive,1.0,5675.0,3
+171,291,353,5000,1.0,5000.0,4
+172,292,353,4200,1.0,4200.0,4
+173,293,347,3300,1.0,3300.0,4
+174,294,350,3300,1.0,3300.0,4
+176,296,100,Performance Incentive,1.0,6100.0,3
+177,297,113,Performance Incentive,1.0,6100.0,3
+178,298,341,5000,1.0,3000.0,4
+179,299,349,4100,1.0,4100.0,1
+180,300,112,Performance Incentive,1.0,6300.0,3
+181,301,105,Performance Incentive,1.0,6600.0,3
+182,302,107,Performance Incentive,1.0,5435.0,3
+183,303,111,Performance Incentive,1.0,6415.0,3
+184,304,111,Performance Incentive,1.0,6415.0,3
+185,305,111,Performance Incentive,1.0,6415.0,3
+186,306,295,Performance Incentive,1.0,6575.0,3
+187,307,106,Performance Incentive,1.0,7820.0,3
+188,308,341,4500,1.0,4500.0,4
+189,309,349,4100,1.0,4100.0,1
+190,309,349,4100,1.0,4100.0,4
+191,312,109,Performance Incentive,1.0,5700.0,3
+192,313,105,Performance Incentive,1.0,7200.0,3
+193,314,375,2800,1.0,2800.0,4
+194,315,373,2800,1.0,2800.0,4
+196,317,112,Performance Incentive,1.0,6325.0,3
+197,318,106,Performance Incentive,1.0,8020.0,3
+198,319,105,Performance Incentive,1.0,7000.0,3
+199,320,295,Performance Incentive,1.0,6275.0,3
+200,321,111,Performance Incentive,1.0,5915.0,3
+201,322,348,3300,1.0,3300.0,4

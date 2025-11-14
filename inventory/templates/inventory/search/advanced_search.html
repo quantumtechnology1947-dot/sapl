@@ -1,0 +1,163 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Advanced Search - Inventory{% endblock %}
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Advanced Search</h1>
+                <p class="text-sm text-gray-600 mt-1">Search with multiple criteria</p>
+            </div>
+            {% if results %}
+            <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors">
+                Print Results
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Search Criteria</h2>
+        <form method="get">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Transaction Type</label>
+                    <select name="transaction_type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All Types</option>
+                        <option value="MRS" {% if transaction_type == 'MRS' %}selected{% endif %}>Material Requisition (MRS)</option>
+                        <option value="MIN" {% if transaction_type == 'MIN' %}selected{% endif %}>Material Issue (MIN)</option>
+                        <option value="MRN" {% if transaction_type == 'MRN' %}selected{% endif %}>Material Return (MRN)</option>
+                        <option value="GIN" {% if transaction_type == 'GIN' %}selected{% endif %}>Goods Inward (GIN)</option>
+                        <option value="GRR" {% if transaction_type == 'GRR' %}selected{% endif %}>Goods Receipt (GRR)</option>
+                        <option value="MCN" {% if transaction_type == 'MCN' %}selected{% endif %}>Material Credit Note (MCN)</option>
+                        <option value="Challan" {% if transaction_type == 'Challan' %}selected{% endif %}>Challan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Item</label>
+                    <select name="item_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All Items</option>
+                        {% for item in items %}
+                        <option value="{{ item.itemid }}" {% if item_id == item.itemid|stringformat:"s" %}selected{% endif %}>
+                            {{ item.itemname }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Supplier</label>
+                    <select name="supplier_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All Suppliers</option>
+                        {% for supplier in suppliers %}
+                        <option value="{{ supplier.supplierid }}" {% if supplier_id == supplier.supplierid|stringformat:"s" %}selected{% endif %}>
+                            {{ supplier.suppliername }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                    <input type="date" name="start_date" value="{{ start_date }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                    <input type="date" name="end_date" value="{{ end_date }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    {% if results %}
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">
+                Search Results ({{ total_results }} found)
+            </h3>
+        </div>
+
+        {% for type, type_results in grouped_results.items %}
+        <div class="border-b border-gray-200 last:border-b-0">
+            <div class="px-6 py-3 bg-blue-50">
+                <h4 class="font-semibold text-blue-900">{{ type }} ({{ type_results|length }})</h4>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Number</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Details</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for result in type_results %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ forloop.counter }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                                <a href="{{ result.url }}" class="hover:text-blue-800">{{ result.number }}</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ result.date|date:"d/m/Y" }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ result.details }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                <a href="{{ result.url }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif transaction_type or item_id or start_date or end_date or supplier_id %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-lg font-medium text-yellow-800">No Results Found</h3>
+                <p class="mt-2 text-sm text-yellow-700">
+                    No transactions found matching your criteria. Try adjusting your search filters.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Links -->
+    <div class="mt-6 text-center">
+        <a href="{% url 'inventory:global-search' %}" class="text-blue-600 hover:text-blue-800 font-medium">
+            ← Back to Global Search
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

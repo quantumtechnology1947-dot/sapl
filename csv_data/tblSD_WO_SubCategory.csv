@@ -1,0 +1,17 @@
+﻿SCId,SysDate,SysTime,CompId,FinYearId,SessionId,CId,SCName,Symbol
+2,2013-04-01,09:28:26 AM,1,1,Sapl0002,35,Welding & Inspection Fixtures,F
+4,2013-04-03,2:20:39 PM,1,1,Sapl0001,35,Conveyor System,C
+5,2013-04-03,2:20:50 PM,1,1,Sapl0001,35,Material Handling System,H
+6,2013-04-03,2:21:07 PM,1,1,Sapl0001,34,Gunrail System,G
+7,2013-04-03,2:21:16 PM,1,1,Sapl0001,34,Manipulator,M
+8,2013-04-03,2:21:39 PM,1,1,Sapl0001,34,Grippers,R
+9,2013-04-03,2:21:47 PM,1,1,Sapl0001,34,EMS,E
+10,2013-04-03,2:21:55 PM,1,1,Sapl0001,34,Jib Cranes,J
+11,2013-04-03,2:22:03 PM,1,1,Sapl0001,34,Scissor Lifts,L
+12,2013-04-03,2:22:35 PM,1,1,Sapl0001,38,Base Frame,F
+13,2013-04-03,2:22:44 PM,1,1,Sapl0001,38,Trolleys,T
+14,2013-04-03,2:22:54 PM,1,1,Sapl0001,38,Child Parts,P
+15,2013-04-03,2:23:10 PM,1,1,Sapl0001,43,System Integration,I
+16,2013-04-03,2:23:21 PM,1,1,Sapl0001,43,Control Panel,P
+17,2013-04-03,2:23:29 PM,1,1,Sapl0001,43,Robotic  Integration,R
+18,2013-04-03,2:23:40 PM,1,1,Sapl0001,43,Inversion System,V

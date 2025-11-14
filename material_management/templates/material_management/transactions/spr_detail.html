@@ -1,0 +1,132 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}SPR Details - {{ spr.spr_no }} - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-purple-700 to-purple-800 px-4 py-3 rounded-t-lg flex justify-between items-center">
+            <h1 class="text-white font-semibold text-lg">&nbsp;Special Purpose Requisition (SPR) - {{ spr.spr_no }}</h1>
+            <a href="{% url 'material_management:spr-list' %}"
+                class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded text-sm transition">
+                ← Back to List
+            </a>
+        </div>
+
+        <!-- SPR Master Details -->
+        <div class="p-6 border-b border-gray-200">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">SPR Information</h3>
+                    <div class="space-y-2">
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">SPR No:</span>
+                            <span class="text-sm text-gray-900">{{ spr.spr_no }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">Created By:</span>
+                            <span class="text-sm text-gray-900">{{ created_by|default:"-" }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">Date:</span>
+                            <span class="text-sm text-gray-900">{{ spr.sys_date|default:"-" }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">Time:</span>
+                            <span class="text-sm text-gray-900">{{ spr.sys_time|default:"-" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Status Information</h3>
+                    <div class="space-y-2">
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">Status:</span>
+                            <span class="text-sm">
+                                {% if spr.status == 'Pending' %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
+                                {% elif spr.status == 'Checked' %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Checked</span>
+                                {% elif spr.status == 'Approved' %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Approved</span>
+                                {% elif spr.status == 'Authorized' %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Authorized</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">Checked:</span>
+                            <span class="text-sm text-gray-900">{{ spr.checked|yesno:"Yes,No,-" }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">Approved:</span>
+                            <span class="text-sm text-gray-900">{{ spr.approve|yesno:"Yes,No,-" }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="text-sm font-medium text-gray-600 w-32">Authorized:</span>
+                            <span class="text-sm text-gray-900">{{ spr.authorize|yesno:"Yes,No,-" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPR Details/Items -->
+        <div class="p-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-4">SPR Line Items</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700 w-12">SN</th>
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">Item ID</th>
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">Supplier</th>
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">WO No</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-medium text-gray-700">Quantity</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-medium text-gray-700">Rate</th>
+                            <th class="border border-gray-300 px-3 py-2 text-right text-xs font-medium text-gray-700">Discount %</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Delivery Date</th>
+                            <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detail in spr_details %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm">{{ forloop.counter }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-sm">{{ detail.item_id }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-sm">{{ detail.supplier_id|default:"-" }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-sm">{{ detail.wo_no|default:"-" }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono">{{ detail.qty|floatformat:3 }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono">{{ detail.rate|floatformat:2 }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-right text-sm font-mono">{{ detail.discount|floatformat:2 }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-center text-sm">{{ detail.del_date|default:"-" }}</td>
+                            <td class="border border-gray-300 px-3 py-2 text-sm">{{ detail.remarks|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="border border-gray-300 px-3 py-8 text-center text-gray-500">
+                                <p>No line items found for this SPR.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                <a href="{% url 'material_management:spr-update' spr.spr_id %}"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition">
+                    Edit SPR
+                </a>
+                <a href="{% url 'material_management:spr-delete' spr.spr_id %}"
+                    onclick="return confirm('Are you sure you want to delete this SPR?')"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition">
+                    Delete SPR
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

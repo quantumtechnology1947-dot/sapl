@@ -1,0 +1,191 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Employee Detail - {{ employee.employeename }} - Cortex ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white rounded border border-gray-200">
+        <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-semibold text-gray-800">{{ employee.title }} {{ employee.employeename }}</h1>
+                <p class="text-sm text-gray-500">Employee ID: {{ employee.empid }}</p>
+            </div>
+            <div class="flex space-x-2">
+                <a href="{% url 'human_resource:employee-edit' employee.userid %}"
+                   class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition text-sm">
+                    Edit
+                </a>
+                <a href="{% url 'human_resource:employee-delete' employee.userid %}"
+                   class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm"
+                   onclick="return confirm('Are you sure you want to delete this employee?')">
+                    Delete
+                </a>
+                <a href="{% url 'human_resource:employee-list' %}"
+                   class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition text-sm">
+                    Back to List
+                </a>
+            </div>
+        </div>
+
+        <div class="px-6 py-4">
+            <!-- Employee Photo -->
+            <div class="flex items-start mb-6">
+                <div class="flex-shrink-0 mr-6">
+                    {% if employee.photodata %}
+                    <img src="data:{{ employee.photocontenttype }};base64,{{ employee.photodata|stringformat:'s' }}"
+                         alt="{{ employee.employeename }}"
+                         class="h-32 w-32 rounded object-cover border-2 border-gray-300">
+                    {% else %}
+                    <div class="h-32 w-32 rounded bg-blue-500 flex items-center justify-center text-white text-lg font-bold">
+                        {{ employee.employeename|first|upper }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold mb-2">Quick Info</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500">Department</p>
+                            <p class="font-medium">{{ department_name.description|default:"-" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Designation</p>
+                            <p class="font-medium">{{ designation_name.type|default:"-" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Mobile</p>
+                            <p class="font-medium">{{ employee.mobileno|default:"-" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Email</p>
+                            <p class="font-medium">{{ employee.companyemail|default:employee.emailid1|default:"-" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabbed Content -->
+            <div x-data="{ activeTab: 'official' }" class="mt-6">
+                <!-- Tab Headers -->
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8">
+                        <button @click="activeTab = 'official'"
+                                :class="activeTab === 'official' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Official Info
+                        </button>
+                        <button @click="activeTab = 'personal'"
+                                :class="activeTab === 'personal' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Personal Info
+                        </button>
+                        <button @click="activeTab = 'education'"
+                                :class="activeTab === 'education' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Education & Experience
+                        </button>
+                        <button @click="activeTab = 'others'"
+                                :class="activeTab === 'others' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                            Others
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="mt-6">
+                    <!-- Official Info Tab -->
+                    <div x-show="activeTab === 'official'" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div><label class="text-sm text-gray-500">Offer ID:</label><p class="font-medium">{{ employee.offerid|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Employee ID:</label><p class="font-medium">{{ employee.empid|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Name:</label><p class="font-medium">{{ employee.title }} {{ employee.employeename|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Swap Card No:</label><p class="font-medium">{{ swapcard_name.swapcardno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Department:</label><p class="font-medium">{{ department_name.description|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Business Group:</label><p class="font-medium">{{ bggroup_name.name|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Directors Name:</label><p class="font-medium">{{ employee.directorsname|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Dept Head:</label><p class="font-medium">{{ employee.depthead|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Group Leader:</label><p class="font-medium">{{ employee.groupleader|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Designation:</label><p class="font-medium">{{ designation_name.type|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Grade:</label><p class="font-medium">{{ grade_name.description|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Mobile No:</label><p class="font-medium">{{ employee.mobileno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Contact No:</label><p class="font-medium">{{ employee.contactno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Company Email:</label><p class="font-medium">{{ employee.companyemail|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Personal Email:</label><p class="font-medium">{{ employee.emailid1|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Extension No:</label><p class="font-medium">{{ employee.extensionno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Joining Date:</label><p class="font-medium">{{ employee.joiningdate|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Resignation Date:</label><p class="font-medium">{{ employee.resignationdate|default:"-" }}</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Info Tab -->
+                    <div x-show="activeTab === 'personal'" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="col-span-2"><label class="text-sm text-gray-500">Permanent Address:</label><p class="font-medium">{{ employee.permanentaddress|default:"-" }}</p></div>
+                            <div class="col-span-2"><label class="text-sm text-gray-500">Correspondence Address:</label><p class="font-medium">{{ employee.correspondenceaddress|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Alternate Email:</label><p class="font-medium">{{ employee.emailid2|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Date of Birth:</label><p class="font-medium">{{ employee.dateofbirth|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Gender:</label><p class="font-medium">{{ employee.gender|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Marital Status:</label><p class="font-medium">{{ employee.martialstatus|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Blood Group:</label><p class="font-medium">{{ employee.bloodgroup|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Height:</label><p class="font-medium">{{ employee.height|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Weight:</label><p class="font-medium">{{ employee.weight|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Physically Handicapped:</label><p class="font-medium">{{ employee.physicallyhandycapped|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Religion:</label><p class="font-medium">{{ employee.religion|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Caste:</label><p class="font-medium">{{ employee.cast|default:"-" }}</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Education & Experience Tab -->
+                    <div x-show="activeTab === 'education'" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="col-span-2"><label class="text-sm text-gray-500">Educational Qualification:</label><p class="font-medium">{{ employee.educationalqualification|default:"-" }}</p></div>
+                            <div class="col-span-2"><label class="text-sm text-gray-500">Additional Qualification:</label><p class="font-medium">{{ employee.additionalqualification|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Last Company:</label><p class="font-medium">{{ employee.lastcompanyname|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Working Duration:</label><p class="font-medium">{{ employee.workingduration|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Total Experience:</label><p class="font-medium">{{ employee.totalexperience|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Current CTC:</label><p class="font-medium">{{ employee.currentctc|default:"-" }}</p></div>
+                            <div class="col-span-2">
+                                <label class="text-sm text-gray-500">CV:</label>
+                                {% if employee.cvdata %}
+                                <div class="mt-2">
+                                    <p class="font-medium">{{ employee.cvfilename }}</p>
+                                    <p class="text-sm text-gray-500">Size: {{ employee.cvsize }} bytes</p>
+                                    <a href="#" class="text-blue-600 hover:text-blue-800 text-sm">Download CV</a>
+                                </div>
+                                {% else %}
+                                <p class="font-medium">No CV uploaded</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Others Tab -->
+                    <div x-show="activeTab === 'others'" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div><label class="text-sm text-gray-500">Bank Account No:</label><p class="font-medium">{{ employee.bankaccountno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">PF No:</label><p class="font-medium">{{ employee.pfno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">PAN No:</label><p class="font-medium">{{ employee.panno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Passport No:</label><p class="font-medium">{{ employee.passportno|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Expiry Date:</label><p class="font-medium">{{ employee.expirydate|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">WR:</label><p class="font-medium">{{ employee.wr|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">DA:</label><p class="font-medium">{{ employee.da|default:"-" }}</p></div>
+                            <div><label class="text-sm text-gray-500">Customer Login:</label><p class="font-medium">{{ employee.custlogin|default:"-" }}</p></div>
+                            <div class="col-span-2"><label class="text-sm text-gray-500">Additional Information:</label><p class="font-medium">{{ employee.additionalinformation|default:"-" }}</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

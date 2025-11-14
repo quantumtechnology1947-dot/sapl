@@ -1,0 +1,91 @@
+{% extends "core/base.html" %}
+
+{% block title %}Work Order Release - Cortex ERP{% endblock %}
+{% block page_title %}Work Order - Release{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between mb-2">
+        <!-- Search Form -->
+        <form method="get" class="flex items-center gap-2">
+            <select name="search_type" class="h-8 px-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue">
+                <option value="">Select Search Type</option>
+                <option value="customer" {% if request.GET.search_type == 'customer' %}selected{% endif %}>Customer Name</option>
+                <option value="enquiry" {% if request.GET.search_type == 'enquiry' %}selected{% endif %}>Enquiry No</option>
+                <option value="po" {% if request.GET.search_type == 'po' %}selected{% endif %}>PO No</option>
+                <option value="wo" {% if request.GET.search_type == 'wo' %}selected{% endif %}>WO No</option>
+            </select>
+            <input type="text" name="search_value" value="{{ request.GET.search_value }}"
+                placeholder="Search..."
+                class="h-8 w-56 px-3 text-xs border border-gray-300 rounded focus:outline-none focus:border-sap-blue focus:ring-1 focus:ring-sap-blue" />
+            <button type="submit" class="inline-flex items-center h-8 px-3 text-xs font-medium rounded bg-sap-blue text-white hover:bg-sap-blue-dark focus:outline-none focus:ring-2 focus:ring-sap-blue/30 transition-colors">
+                <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Search
+            </button>
+        </form>
+    </div>
+
+    <!-- SAP Fiori Table -->
+    <div class="bg-white border border-gray-200 rounded">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200 h-8">
+                        <th class="px-2 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[3%]">SN</th>
+                        <th class="px-2 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[10%]">Fin Yrs</th>
+                        <th class="px-2 py-2 text-left text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[24%]">CustomerName</th>
+                        <th class="px-2 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[7%]">Code</th>
+                        <th class="px-2 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[9%]">Enquiry No</th>
+                        <th class="px-2 py-2 text-left text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[14%]">PO No</th>
+                        <th class="px-2 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[9%]">WO No</th>
+                        <th class="px-2 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[12%]">Gen. Date</th>
+                        <th class="px-2 py-2 text-left text-xs font-semibold text-gray-700 whitespace-nowrap" class="w-[12%]">Gen. By</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for wo in workorders %}
+                    <tr class="border-b border-gray-200 h-8 hover:bg-blue-50/30 transition-colors cursor-pointer group">
+                        <td class="px-2 py-2 text-center text-xs text-gray-700 whitespace-nowrap" class="w-[3%]">{{ forloop.counter }}</td>
+                        <td class="px-2 py-2 text-center text-xs text-gray-700 whitespace-nowrap" class="w-[10%]">{{ wo.FinYear|default:"-" }}</td>
+                        <td class="px-2 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" class="w-[24%]" title="{{ wo.CustomerName }}">{{ wo.CustomerName|default:"-" }}</td>
+                        <td class="px-2 py-2 text-center text-xs text-gray-700 whitespace-nowrap" class="w-[7%]">{{ wo.Code|default:"-" }}</td>
+                        <td class="px-2 py-2 text-center text-xs text-gray-700 whitespace-nowrap" class="w-[9%]">{{ wo.EnquiryNo|default:"-" }}</td>
+                        <td class="px-2 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" class="w-[14%]">{{ wo.PONo|default:"-" }}</td>
+                        <td class="px-2 py-2 text-center text-xs whitespace-nowrap" class="w-[9%]">
+                            <a href="{% url 'sales_distribution:release-detail' wo.Id %}" 
+                               class="text-sap-blue hover:text-sap-blue-dark hover:underline font-medium transition-colors">
+                                {{ wo.WONo }}
+                            </a>
+                        </td>
+                        <td class="px-2 py-2 text-center text-xs text-gray-700 whitespace-nowrap" class="w-[12%]">{{ wo.GenDate|default:"-" }}</td>
+                        <td class="px-2 py-2 text-xs text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" class="w-[12%]" title="{{ wo.GenBy }}">{{ wo.GenBy|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    {% include 'core/components/empty_state.html' with
+                        in_table=True
+                        colspan=9
+                        icon_path="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        title="No work orders found"
+                        message="Try adjusting your search criteria"
+                    %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'core/components/pagination.html' with page_obj=page_obj %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
