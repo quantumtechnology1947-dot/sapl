@@ -642,13 +642,17 @@ class PoLineItemDeleteView(LoginRequiredMixin, View):
                 </div>
             </div>
             '''
+            # Prepare escaped strings outside f-string (backslashes not allowed in f-string expressions)
+            escaped_empty_row = empty_row.replace("'", "\\'")
+            escaped_warning_banner = warning_banner.replace("`", "\\`").replace("'", "\\'")
+
             script = f'''
             <script>
-                document.getElementById("line-items-tbody").innerHTML = '{empty_row.replace("'", "\\'")}';
+                document.getElementById("line-items-tbody").innerHTML = '{escaped_empty_row}';
                 const warningContainer = document.querySelector('[x-show="activeTab === \\'goods\\'"]');
                 if (warningContainer && !document.getElementById('no-items-warning')) {{
                     const warningDiv = document.createElement('div');
-                    warningDiv.innerHTML = `{warning_banner.replace("`", "\\`").replace("'", "\\'")}`;
+                    warningDiv.innerHTML = `{escaped_warning_banner}`;
                     warningContainer.insertBefore(warningDiv.firstElementChild, warningContainer.firstElementChild);
                 }}
             </script>
