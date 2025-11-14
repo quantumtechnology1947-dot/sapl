@@ -75,43 +75,55 @@ class AccountsDashboardView(CompanyFinancialYearMixin, LoginRequiredMixin, Templ
         context['bank_balance'] = Decimal('150000.00')  # TODO: Calculate from bank accounts
         context['receivables'] = Decimal('75000.00')  # TODO: Calculate from customer invoices
         context['payables'] = Decimal('50000.00')  # TODO: Calculate from supplier bills
-        
+
         # Recent Transactions (last 10)
         recent_vouchers = []
-        
-        # Bank vouchers
-        bank_vouchers = TblaccBankvoucherPaymentMaster.objects.all().order_by('-id')[:5]
-        for v in bank_vouchers:
-            recent_vouchers.append({
-                'date': v.sysdate,
-                'type': 'Bank Payment',
-                'number': v.bvpno,
-                'amount': v.payamt,
-                'party': v.payto
-            })
-        
-        # Cash vouchers
-        cash_vouchers = TblaccCashvoucherPaymentMaster.objects.all().order_by('-id')[:5]
-        for v in cash_vouchers:
-            recent_vouchers.append({
-                'date': v.sysdate,
-                'type': 'Cash Payment',
-                'number': v.cvpno,
-                'amount': 0,  # TODO: Calculate total
-                'party': v.paidto
-            })
-        
+
+        try:
+            # Bank vouchers
+            bank_vouchers = TblaccBankvoucherPaymentMaster.objects.all().order_by('-id')[:5]
+            for v in bank_vouchers:
+                try:
+                    recent_vouchers.append({
+                        'date': getattr(v, 'sysdate', ''),
+                        'type': 'Bank Payment',
+                        'number': getattr(v, 'bvpno', ''),
+                        'amount': getattr(v, 'payamt', 0),
+                        'party': getattr(v, 'payto', '')
+                    })
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        try:
+            # Cash vouchers
+            cash_vouchers = TblaccCashvoucherPaymentMaster.objects.all().order_by('-id')[:5]
+            for v in cash_vouchers:
+                try:
+                    recent_vouchers.append({
+                        'date': getattr(v, 'sysdate', ''),
+                        'type': 'Cash Payment',
+                        'number': getattr(v, 'cvpno', ''),
+                        'amount': 0,  # TODO: Calculate total
+                        'party': getattr(v, 'paidto', '')
+                    })
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
         # Sort by date and limit to 10
-        recent_vouchers.sort(key=lambda x: x['date'] if x['date'] else '', reverse=True)
+        recent_vouchers.sort(key=lambda x: x.get('date', ''), reverse=True)
         context['recent_transactions'] = recent_vouchers[:10]
-        
+
         # Monthly Income vs Expenses (for chart)
         context['monthly_data'] = {
             'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             'income': [50000, 55000, 52000, 60000, 58000, 65000],
             'expenses': [40000, 42000, 38000, 45000, 43000, 48000]
         }
-        
+
         # Top 5 Debtors
         context['top_debtors'] = [
             {'name': 'Customer A', 'amount': Decimal('25000.00')},
@@ -120,7 +132,7 @@ class AccountsDashboardView(CompanyFinancialYearMixin, LoginRequiredMixin, Templ
             {'name': 'Customer D', 'amount': Decimal('10000.00')},
             {'name': 'Customer E', 'amount': Decimal('5000.00')},
         ]
-        
+
         # Top 5 Creditors
         context['top_creditors'] = [
             {'name': 'Supplier X', 'amount': Decimal('20000.00')},
@@ -129,16 +141,30 @@ class AccountsDashboardView(CompanyFinancialYearMixin, LoginRequiredMixin, Templ
             {'name': 'Supplier W', 'amount': Decimal('5000.00')},
             {'name': 'Supplier V', 'amount': Decimal('3000.00')},
         ]
-        
+
         # Pending Authorizations
-        context['pending_authorizations'] = TblaccBillbookingMaster.objects.filter(
-            authorize=0
-        ).count()
-        
+        try:
+            context['pending_authorizations'] = TblaccBillbookingMaster.objects.filter(
+                authorize=0
+            ).count()
+        except Exception:
+            context['pending_authorizations'] = 0
+
         # Voucher Counts
-        context['bank_voucher_count'] = TblaccBankvoucherPaymentMaster.objects.count()
-        context['cash_voucher_count'] = TblaccCashvoucherPaymentMaster.objects.count()
-        context['journal_entry_count'] = TblaccContraEntry.objects.count()
+        try:
+            context['bank_voucher_count'] = TblaccBankvoucherPaymentMaster.objects.count()
+        except Exception:
+            context['bank_voucher_count'] = 0
+
+        try:
+            context['cash_voucher_count'] = TblaccCashvoucherPaymentMaster.objects.count()
+        except Exception:
+            context['cash_voucher_count'] = 0
+
+        try:
+            context['journal_entry_count'] = TblaccContraEntry.objects.count()
+        except Exception:
+            context['journal_entry_count'] = 0
 
         return context
 
