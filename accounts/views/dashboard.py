@@ -11,6 +11,7 @@ from django.shortcuts import render
 from django.db import transaction, models
 from django.contrib import messages
 from datetime import datetime
+from decimal import Decimal
 
 # Import core mixins for standardized view behavior
 from core.mixins import (
