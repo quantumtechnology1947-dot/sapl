@@ -1,21 +1,8 @@
 """
-# Note: This test file covers 27 .aspx files in inventory/Reports:
-# - ABCAnalysisABC.aspx
-# - ABCAnalysis_Details.aspx
-# - ABCAnalysis_DetailsABC.aspx
-# - ABCAnalysis_DetailsS.aspx
-# - Dashboard.aspx
-# - InwardOutwardRegister.aspx
-# - Moving_NonMoving_Items.aspx
-# - Moving_NonMoving_Items_Details.aspx
-# - Report.aspx
-# - SSStock_Statement.aspx
-# ... and 17 more files
-
-Playwright test for Inventory Reports
-ASP.NET Source: Module/Inventory/Reports/ABCAnalysisABC.aspx
-Django App: inventory
-Category: Reports
+Playwright test for Quality_Control Root
+ASP.NET Source: Module/QualityControl/Dashboard.aspx
+Django App: quality_control
+Category: Root
 """
 import pytest
 from playwright.sync_api import Page, expect
@@ -32,24 +19,24 @@ def authenticated_page(page: Page):
     return page
 
 
-class TestInventoryReports:
-    """Test suite for Inventory Reports"""
+class TestQualityControlRoot:
+    """Test suite for Quality_Control Root"""
 
     def test_list_view_loads(self, authenticated_page: Page):
         """Test that the list view loads successfully"""
         # TODO: Navigate to the list view
-        authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/")
+        authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/")
 
         # TODO: Verify page loads
-        expect(authenticated_page).to_have_title(re.compile(r"Inventory Reports", re.IGNORECASE))
+        expect(authenticated_page).to_have_title(re.compile(r"Quality_Control Root", re.IGNORECASE))
 
         # TODO: Verify key elements are present
-        # expect(authenticated_page.locator("h1")).to_contain_text("Inventory Reports")
+        # expect(authenticated_page.locator("h1")).to_contain_text("Quality_Control Root")
 
     def test_create_new_record(self, authenticated_page: Page):
         """Test creating a new record"""
         # TODO: Navigate to create view
-        authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/create/")
+        authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/create/")
 
         # TODO: Fill form fields
         # authenticated_page.fill("#id_field_name", "Test Value")
@@ -64,7 +51,7 @@ class TestInventoryReports:
         """Test editing an existing record"""
         # TODO: Create a test record first or use existing one
         # TODO: Navigate to edit view
-        # authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/1/edit/")
+        # authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/1/edit/")
 
         # TODO: Modify field
         # authenticated_page.fill("#id_field_name", "Updated Value")
@@ -79,7 +66,7 @@ class TestInventoryReports:
         """Test deleting a record"""
         # TODO: Create a test record first
         # TODO: Navigate to list view
-        # authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/")
+        # authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/")
 
         # TODO: Click delete button
         # authenticated_page.click("button.delete-btn")
@@ -93,7 +80,7 @@ class TestInventoryReports:
     def test_search_functionality(self, authenticated_page: Page):
         """Test search/filter functionality"""
         # TODO: Navigate to list view
-        # authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/")
+        # authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/")
 
         # TODO: Enter search term
         # authenticated_page.fill("#search", "test search")
@@ -106,7 +93,7 @@ class TestInventoryReports:
     def test_htmx_partial_update(self, authenticated_page: Page):
         """Test HTMX partial page updates"""
         # TODO: Navigate to page with HTMX
-        # authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/")
+        # authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/")
 
         # TODO: Trigger HTMX request
         # authenticated_page.click("#htmx-trigger")
@@ -117,7 +104,7 @@ class TestInventoryReports:
     def test_form_validation(self, authenticated_page: Page):
         """Test form validation"""
         # TODO: Navigate to create form
-        # authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/create/")
+        # authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/create/")
 
         # TODO: Submit empty form
         # authenticated_page.click("button[type=submit]")
@@ -128,7 +115,7 @@ class TestInventoryReports:
     def test_pagination(self, authenticated_page: Page):
         """Test pagination if applicable"""
         # TODO: Navigate to list view with many records
-        # authenticated_page.goto("http://localhost:8000/inventory/inventory_reports/")
+        # authenticated_page.goto("http://localhost:8000/quality_control/quality_control_root/")
 
         # TODO: Verify pagination controls
         # expect(authenticated_page.locator(".pagination")).to_be_visible()

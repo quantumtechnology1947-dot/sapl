@@ -94,11 +94,10 @@ Thumbs.db
 # ============================================================================
 # Project-Specific
 # ============================================================================
-# Test scripts in root/module directories (not in tests/ directory)
-# Allow test_*.py in tests/ directory
-/test_*.py
-*/test_*.py
-!tests/**/*.py
+# Test scripts (optional - remove if you want to commit them)
+# NOTE: Proper test files in tests/ directory ARE tracked
+test_*.py
+!tests/**/test_*.py
 check_*.py
 create_*.py
 verify_*.py
