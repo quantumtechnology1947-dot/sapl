@@ -103,10 +103,10 @@ urlpatterns = [
     # WIS (Work Instruction Sheet)
     path('wis/', views.WISListView.as_view(), name='wis-list'),
     path('wis/create/', views.WISCreateView.as_view(), name='wis-create'),
-    path('wis/<int:wisid>/', views.WISDetailView.as_view(), name='wis-detail'),
-    path('wis/<int:wisid>/release/', views.WISReleaseView.as_view(), name='wis-release'),
-    path('wis/<int:wisid>/actual-run/', views.WISActualRunView.as_view(), name='wis-actual-run'),
-    path('wis/<int:wisid>/print/', views.WISPrintView.as_view(), name='wis-print'),
+    path('wis/<int:pk>/', views.WISDetailView.as_view(), name='wis-detail'),
+    path('wis/<int:pk>/release/', views.WISReleaseView.as_view(), name='wis-release'),
+    path('wis/<int:pk>/actual-run/', views.WISActualRunView.as_view(), name='wis-actual-run'),
+    path('wis/<int:pk>/print/', views.WISPrintView.as_view(), name='wis-print'),
     
     # Item Location
     path('item-location/', views.ItemLocationListView.as_view(), name='item-location-list'),
