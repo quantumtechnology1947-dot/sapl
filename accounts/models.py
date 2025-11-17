@@ -155,6 +155,52 @@ class TblaccAdvicePaymentMaster(models.Model):
         db_table = 'tblACC_Advice_Payment_Master'
 
 
+class TblaccAdvicePaymentTemp(models.Model):
+    """
+    Temporary table for Advice Payment data entry (session-based).
+    Used for Advance, Salary, and Others payment types.
+    Converted from: aspnet/Module/Accounts/Transactions/Advice.aspx
+    NOTE: This table is managed=False because it exists in production DB.
+    """
+    id = models.AutoField(db_column='Id', primary_key=True)
+    proformainvno = models.TextField(db_column='ProformaInvNo', blank=True, null=True)
+    invdate = models.TextField(db_column='InvDate', blank=True, null=True)
+    pono = models.TextField(db_column='PONo', blank=True, null=True)
+    amount = models.FloatField(db_column='Amount', blank=True, null=True)
+    particular = models.TextField(db_column='Particular', blank=True, null=True)
+    withingroup = models.TextField(db_column='WithinGroup', blank=True, null=True)
+    wono = models.TextField(db_column='WONo', blank=True, null=True)
+    bg = models.IntegerField(db_column='BG', blank=True, null=True)
+    pvevno = models.IntegerField(db_column='PVEVNO', blank=True, null=True)
+    billagainst = models.TextField(db_column='BillAgainst', blank=True, null=True)
+    types = models.IntegerField(db_column='Types', blank=True, null=True)  # 1=Advance, 2=Salary, 3=Others, 4=Creditors
+    compid = models.IntegerField(db_column='CompId')
+    sessionid = models.TextField(db_column='SessionId')
+
+    class Meta:
+        managed = False
+        db_table = 'tblACC_Advice_Payment_Temp'
+
+
+class TblaccAdvicePaymentCreditorTemp(models.Model):
+    """
+    Separate temporary table specifically for Creditors payment (Type=4).
+    This is different from TblaccAdvicePaymentTemp!
+    Stores selected bill bookings before final save.
+    Converted from: aspnet/Module/Accounts/Transactions/Advice.aspx.cs
+    """
+    id = models.AutoField(db_column='Id', primary_key=True)
+    compid = models.IntegerField(db_column='CompId')
+    sessionid = models.TextField(db_column='SessionId')
+    pvevno = models.IntegerField(db_column='PVEVNO')  # Bill Booking ID
+    billagainst = models.TextField(db_column='BillAgainst')  # Narration/Description
+    amount = models.FloatField(db_column='Amount')
+
+    class Meta:
+        managed = False
+        db_table = 'tblACC_Advice_Payment_Creditor_Temp'
+
+
 class TblaccAsset(models.Model):
     id = models.AutoField(db_column='Id', primary_key=True)  # Field name made lowercase.
     category = models.TextField(db_column='Category', blank=True, null=True)  # Field name made lowercase.
@@ -1415,3 +1461,32 @@ class TblwarrentyMaster(models.Model):
 
     def __str__(self):
         return self.terms or ''
+
+
+class AccPolicy(models.Model):
+    """
+    Accounting Policy Documents
+    Converted from: aaspnet/Module/Accounts/Transactions/ACC_POLICY.aspx
+    Stores uploaded policy documents with file metadata and binary data
+    """
+    id = models.AutoField(db_column='Id', primary_key=True)
+    sysdate = models.CharField(db_column='SysDate', max_length=50)
+    systime = models.CharField(db_column='SysTime', max_length=50)
+    sessionid = models.CharField(db_column='SessionId', max_length=50, blank=True, null=True)
+    compid = models.IntegerField(db_column='CompId', blank=True, null=True)
+    finyearid = models.IntegerField(db_column='FinYearId', blank=True, null=True)
+    cvfilename = models.TextField(db_column='CVFileName', blank=True, null=True)
+    cvsize = models.TextField(db_column='CVSize', blank=True, null=True)
+    cvcontenttype = models.TextField(db_column='CVContentType', blank=True, null=True)
+    cvdata = models.BinaryField(db_column='CVData', blank=True, null=True)
+    cvdate = models.CharField(db_column='CVDate', max_length=50, blank=True, null=True)
+    cvname = models.TextField(db_column='CVName', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tblACC_POLICY'
+        verbose_name = 'Accounting Policy'
+        verbose_name_plural = 'Accounting Policies'
+
+    def __str__(self):
+        return f"{self.cvname or 'Policy'} - {self.cvdate or ''}"

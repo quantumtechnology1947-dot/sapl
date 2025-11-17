@@ -1,4 +1,4 @@
-﻿Id,TIMId,SysDate,SysTime,SessionId,CompId,FinYearId,TVNo,AmtBalTowardsCompany,AmtBalTowardsEmployee
+Id,TIMId,SysDate,SysTime,SessionId,CompId,FinYearId,TVNo,AmtBalTowardsCompany,AmtBalTowardsEmployee
 9,31,2013-12-18,7:17:19 PM,Sapl0174,1,1,0001,0.0,1329.0
 10,35,2013-12-18,7:22:22 PM,Sapl0174,1,1,0002,0.0,0.0
 11,36,2013-12-18,7:26:46 PM,Sapl0174,1,1,0003,0.0,0.0

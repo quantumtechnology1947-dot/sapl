@@ -1,4 +1,4 @@
-﻿Id,MId,BillNo,BillDate,PONo,PODate,Particulars,WONo,BGGroup,AcHead,Amount,BudgetCode,PVEVNo
+Id,MId,BillNo,BillDate,PONo,PODate,Particulars,WONo,BGGroup,AcHead,Amount,BudgetCode,PVEVNo
 1,77,-,2013-06-29,,,kothrud to sapl,NA,2,26,210.0,0,
 2,77,-,2013-06-29,,,kothrud to sapl,NA,2,16,180.0,0,
 3,78,-,2013-06-29,,,kothrud to sapl,NA,2,26,175.0,0,

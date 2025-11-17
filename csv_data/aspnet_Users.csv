@@ -1,4 +1,4 @@
-﻿UserId,UserName,LoweredUserName,MobileAlias,IsAnonymous,LastActivityDate,CompId,FinYearId,Ownerpassword,ApplicationId
+UserId,UserName,LoweredUserName,MobileAlias,IsAnonymous,LastActivityDate,CompId,FinYearId,Ownerpassword,ApplicationId
 7D164CDA-0F11-41D6-A3B0-62C5A05548CA,Administrator,administrator,,False,2012-10-04 04:57:41.247000,,,,C95F9494-9804-471C-B1C1-A091168DA06F
 E1DF4865-4A5E-4764-86A7-63C4DF95EFA9,Sapl0001,sapl0001,,False,2023-03-03 03:52:25.467000,1,1,xaaN60qR7j1zQS3b0kQlqw==,C95F9494-9804-471C-B1C1-A091168DA06F
 9F3E34B7-FA2B-4E38-A27C-ACAECD425899,Sapl0002,sapl0002,,False,2023-03-02 12:52:49.250000,1,1,,C95F9494-9804-471C-B1C1-A091168DA06F

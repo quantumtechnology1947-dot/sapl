@@ -1,4 +1,4 @@
-﻿CId,SysDate,SysTime,CompId,FinYearId,SessinId,CName,Symbol,HasSubCat
+CId,SysDate,SysTime,CompId,FinYearId,SessinId,CName,Symbol,HasSubCat
 1,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Flats,IS Angles, Channels, Beams, Sq.Tubes, Rec. Tubes,Al. Extrusions,Round Bars, Tubes, Seamless Tubes, M S Plate",A,0
 2,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Bearings, LM Rails, LM Blocks, Guide Bars, PAP Bush, Asob,Ball Screws,Ball Nuts, Lead Screws, Lead Nuts",B,0
 3,2013-04-01,10:41:46 AM,1,1,Sapl0001,"Pulleys, Gears, Chains, Wire Ropes, Dschakles,Rope Attachements, Belts, Rack, Pinion, Gears, Couplings, Springs,O-Rings, Seals",C,0

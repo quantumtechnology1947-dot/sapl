@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Service Tax Invoice - {{ invoice.invoiceno }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .info-section { margin-bottom: 20px; }
+        .info-label { font-weight: bold; display: inline-block; width: 150px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .totals { margin-top: 20px; text-align: right; }
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 5px;">Print</button>
+        <button onclick="window.close()" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; cursor: pointer; border-radius: 5px; margin-left: 10px;">Close</button>
+    </div>
+
+    <div class="header">
+        <h1>SERVICE TAX INVOICE</h1>
+        <p><strong>Invoice No:</strong> {{ invoice.invoiceno }}</p>
+        <p><strong>Date:</strong> {{ invoice.dateofissueinvoice }}</p>
+    </div>
+
+    <div class="info-section">
+        <h3>Buyer Details:</h3>
+        <p><span class="info-label">Name:</span> {{ invoice.buyer_name }}</p>
+        <p><span class="info-label">Address:</span> {{ invoice.buyer_add }}</p>
+        <p><span class="info-label">Phone:</span> {{ invoice.buyer_ph }}</p>
+        <p><span class="info-label">Email:</span> {{ invoice.buyer_email }}</p>
+        <p><span class="info-label">TIN:</span> {{ invoice.buyer_tin }}</p>
+    </div>
+
+    <div class="info-section">
+        <h3>Consignee Details:</h3>
+        <p><span class="info-label">Name:</span> {{ invoice.cong_name }}</p>
+        <p><span class="info-label">Address:</span> {{ invoice.cong_add }}</p>
+        <p><span class="info-label">Phone:</span> {{ invoice.cong_ph }}</p>
+        <p><span class="info-label">Email:</span> {{ invoice.cong_email }}</p>
+    </div>
+
+    <div class="info-section">
+        <h3>Invoice Items:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Item ID</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in details %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ detail.itemid }}</td>
+                    <td>{{ detail.qty }}</td>
+                    <td>{{ detail.rate }}</td>
+                    <td>{{ detail.qty|floatformat:2 }} × {{ detail.rate|floatformat:2 }} = {{ detail.qty|multiply:detail.rate|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="totals">
+        {% if invoice.servicetax %}
+        <p><strong>Service Tax ({{ invoice.servicetax }}%):</strong> </p>
+        {% endif %}
+        {% if invoice.addamt %}
+        <p><strong>Addition:</strong> {{ invoice.addamt }}</p>
+        {% endif %}
+        {% if invoice.deduction %}
+        <p><strong>Deduction:</strong> {{ invoice.deduction }}</p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 50px;">
+        <p><strong>PO No:</strong> {{ invoice.pono|default:"-" }}</p>
+        <p><strong>WO No:</strong> {{ invoice.wono|default:"-" }}</p>
+    </div>
+</body>
+</html>

@@ -384,9 +384,10 @@
                     <a href="{% url 'inventory:mrn-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Material Return Note [MRN]</a>
                     <a href="{% url 'inventory:wis-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Work Issue Slip [WIS]</a>
                     <a href="{% url 'inventory:wis-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Release WIS</a>
+                    <a href="{% url 'inventory:wis-dryrun-entry' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Dry Run</a>
                     <a href="{% url 'inventory:supplier-challan-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Supplier Challan</a>
                     <a href="{% url 'inventory:customer-challan-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Customer Challan</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Closing Stock</a>
+                    <a href="{% url 'inventory:closing-stock' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Closing Stock</a>
                 </div>
             </div>
             <!-- Reports Submenu -->
@@ -486,9 +487,8 @@
                 </button>
                 <div x-show="openSubmenu === 'acc-master'" x-collapse class="ml-3 mt-1 space-y-1 max-h-64 overflow-y-auto scrollbar-hide">
                     <a href="{% url 'accounts:acchead-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Account Heads</a>
-                    {# TODO: Implement GST views #}
-                    {# <a href="{% url 'accounts:gst-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">CGST/IGST</a> #}
-                    {# <a href="{% url 'accounts:gst-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">SGST</a> #}
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">CGST/IGST</a>
+                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">SGST</a>
                     <a href="{% url 'accounts:excisable-commodity-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Excisable Commodity</a>
                     <a href="{% url 'accounts:warrenty-terms-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Warrenty Terms</a>
                     <a href="{% url 'accounts:payment-terms-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Payment Terms</a>
@@ -509,26 +509,18 @@
                     </svg>
                 </button>
                 <div x-show="openSubmenu === 'acc-trans'" x-collapse class="ml-3 mt-1 space-y-1 max-h-64 overflow-y-auto scrollbar-hide">
-                    <a href="{% url 'accounts:proforma-invoice-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Proforma Invoice</a>
-                    {# TODO: Fix invoice_urls and implement invoice views #}
-                    {# <a href="{% url 'accounts:invoices:invoice-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Sales Invoice</a> #}
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Services Invoice</a>
-                    <a href="{% url 'accounts:contra-entry-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Contra</a>
-                    <a href="{% url 'accounts:debit-note-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Debit Note</a>
-                    <a href="{% url 'accounts:credit-note-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Credit Note</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">IOU Payment/Receipt</a>
+                    <a href="{% url 'accounts:sales_invoice_list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Sales Invoice</a>
+                    <a href="{% url 'accounts:iou-payment-receipt' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">IOU Payment/Receipt</a>
                     <a href="{% url 'accounts:bill-booking-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bill Booking</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Authorize Bill Booking</a>
-                    <a href="{% url 'accounts:cash-voucher-payment-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Cash Voucher Payment</a>
-                    <a href="{% url 'accounts:cash-voucher-receipt-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Cash Voucher Receipt</a>
-                    <a href="{% url 'accounts:bank-voucher-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bank Voucher</a>
-                    <a href="{% url 'accounts:journal-entry-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Journal Entry</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Tour Voucher</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Creditors/Debitors</a>
+                    <a href="{% url 'accounts:bill-booking-authorize-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Authorize Bill Booking</a>
+                    <a href="{% url 'accounts:policy-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Policy Documents</a>
+                    <a href="{% url 'accounts:cash-voucher-payment-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Cash Voucher</a>
+                    <a href="{% url 'accounts:bank-voucher-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Payment/Receipt Voucher</a>
+                    <a href="{% url 'accounts:advice' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Advice</a>
+                    <a href="{% url 'accounts:creditors-debitors' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Creditors/Debitors</a>
                     <a href="{% url 'accounts:bank-reconciliation-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Bank Reconciliation</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Mail Merge</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Loan Master</a>
-                    <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Capital Master</a>
+                    <a href="{% url 'accounts:balance-sheet' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Balance Sheet</a>
+                    <a href="{% url 'accounts:asset-register-list' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Asset Register</a>
                 </div>
             </div>
             <!-- Report Submenu -->
@@ -541,11 +533,6 @@
                     </svg>
                 </button>
                 <div x-show="openSubmenu === 'acc-report'" x-collapse class="ml-3 mt-1 space-y-1">
-                    <a href="{% url 'accounts:balance-sheet' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Balance Sheet</a>
-                    <a href="{% url 'accounts:profit-loss' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Profit & Loss</a>
-                    <a href="{% url 'accounts:trial-balance' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Trial Balance</a>
-                    <a href="{% url 'accounts:ledger' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Ledger</a>
-                    <a href="{% url 'accounts:aging-report' %}" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Aging Report</a>
                     <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Sales Register</a>
                     <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Purchase Register</a>
                     <a href="#" class="block px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-gray-700 rounded">Pending For Invoice</a>

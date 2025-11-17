@@ -1,0 +1,26 @@
+<tbody id="advanceGridBody">
+    {% if temp_advance %}
+        {% for item in temp_advance %}
+        <tr>
+            <td class="grid-cell"><input type="text" value="{{ item.piinvno }}" readonly></td>
+            <td class="grid-cell"><input type="date" value="{{ item.pidate|date:'Y-m-d' }}" readonly></td>
+            <td class="grid-cell"><input type="text" value="{{ item.pono }}" readonly></td>
+            <td class="grid-cell"><input type="text" value="{{ item.amt }}" style="text-align: right;" readonly></td>
+            <td class="grid-cell"><input type="text" value="{{ item.particulars }}" readonly></td>
+            <td class="grid-cell" style="text-align: center;">
+                <button type="button"
+                        hx-post="{% url 'accounts:advice-delete-temp' item.id %}"
+                        hx-target="#advanceGridBody"
+                        hx-swap="outerHTML"
+                        style="border: none; background: none; color: red; font-weight: bold; cursor: pointer;">
+                    X
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="6" class="grid-cell empty-row">No items added yet. Click Insert to add proforma invoice details.</td>
+        </tr>
+    {% endif %}
+</tbody>

@@ -32,6 +32,8 @@ from .min import (
 from .mrn import (
     MRNListView,
     MRNCreateView,
+    MRNAddToCartView,
+    MRNRemoveFromCartView,
     MRNDetailView,
     MRNDeleteView,
     MRNPrintView,
@@ -127,6 +129,8 @@ from .vehicle import (
 # WIS (Work Instruction Sheet)
 from .wis import (
     WISListView,
+    WISReleaseWOView,
+    WISStopWOView,
     WISCreateView,
     WISDetailView,
     WISReleaseView,
@@ -137,6 +141,11 @@ from .wis import (
     AutoWISTimeScheduleUpdateView,
     AutoWISTimeScheduleDeleteView,
     AutoWISTimeScheduleRowView,
+    # Dry Run views
+    WISDryRunEntryView,
+    WISDryRunAssemblyView,
+    WISDryRunMaterialView,
+    WISExecuteActualRunView,
 )
 
 # Item Location
@@ -154,7 +163,6 @@ from .reports import (
     MCNDeleteView,
     MCNPrintView,
     ClosingStockView,
-    ClosingStockReportView,
     OutwardRegisterView,
     StockStatementView,
     ABCAnalysisView,
@@ -195,6 +203,8 @@ __all__ = [
     # MRN
     'MRNListView',
     'MRNCreateView',
+    'MRNAddToCartView',
+    'MRNRemoveFromCartView',
     'MRNDetailView',
     'MRNDeleteView',
     'MRNPrintView',
@@ -279,6 +289,10 @@ __all__ = [
     'AutoWISTimeScheduleUpdateView',
     'AutoWISTimeScheduleDeleteView',
     'AutoWISTimeScheduleRowView',
+    'WISDryRunEntryView',
+    'WISDryRunAssemblyView',
+    'WISDryRunMaterialView',
+    'WISExecuteActualRunView',
     # Item Location
     'ItemLocationListView',
     'ItemLocationCreateView',
@@ -290,7 +304,6 @@ __all__ = [
     'MCNDeleteView',
     'MCNPrintView',
     'ClosingStockView',
-    'ClosingStockReportView',
     'OutwardRegisterView',
     'StockStatementView',
     'ABCAnalysisView',

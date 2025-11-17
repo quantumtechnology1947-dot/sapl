@@ -1,0 +1,954 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Advice - Accounts{% endblock %}
+
+{% block content %}
+<style>
+    /* Remove all modern styling and use classic ASP.NET look */
+    body {
+        font-family: Verdana, Arial, sans-serif;
+        font-size: 8pt;
+    }
+
+    .aspnet-page {
+        background-color: #ece9d8;
+        padding: 0;
+        margin: 0;
+    }
+
+    .header-table {
+        width: 100%;
+        background-color: #5d7b9d;
+        border: 1px solid #5d7b9d;
+    }
+
+    .header-cell {
+        color: white;
+        font-weight: bold;
+        font-size: 10pt;
+        padding: 3px 5px;
+    }
+
+    .main-tabs {
+        margin-top: 2px;
+        border-bottom: 1px solid #999999;
+    }
+
+    .main-tab {
+        display: inline-block;
+        padding: 4px 12px;
+        margin-right: 2px;
+        background-color: #ece9d8;
+        border: 1px solid #999999;
+        border-bottom: none;
+        font-size: 8pt;
+        font-weight: bold;
+        cursor: pointer;
+        color: #000;
+    }
+
+    .main-tab.active {
+        background-color: white;
+        border-bottom: 1px solid white;
+        margin-bottom: -1px;
+    }
+
+    .tab-content-wrapper {
+        border: 1px solid #999999;
+        border-top: none;
+        background-color: white;
+        padding: 8px;
+        display: none;
+    }
+
+    .tab-content-wrapper.active {
+        display: block;
+    }
+
+    .sub-tabs {
+        margin-bottom: 8px;
+        border-bottom: 1px solid #cccccc;
+    }
+
+    .sub-tab {
+        display: inline-block;
+        padding: 3px 10px;
+        margin-right: 1px;
+        background-color: #f0f0f0;
+        border: 1px solid #cccccc;
+        border-bottom: none;
+        font-size: 8pt;
+        cursor: pointer;
+        color: #000;
+    }
+
+    .sub-tab.active {
+        background-color: white;
+        font-weight: bold;
+        border-bottom: 1px solid white;
+        margin-bottom: -1px;
+    }
+
+    .sub-content {
+        padding: 5px 0;
+        display: none;
+    }
+
+    .sub-content.active {
+        display: block;
+    }
+
+    .form-table {
+        font-size: 8pt;
+        margin-bottom: 8px;
+    }
+
+    .form-table td {
+        padding: 2px 3px;
+    }
+
+    .form-label {
+        font-weight: bold;
+        width: 120px;
+    }
+
+    .form-input, .form-select {
+        font-size: 8pt;
+        padding: 1px 2px;
+        border: 1px solid #7f9db9;
+    }
+
+    .grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8pt;
+        border: 1px solid #999999;
+    }
+
+    .grid-header {
+        background-color: #d3d3d3;
+        font-weight: bold;
+        padding: 3px;
+        border: 1px solid #999999;
+        text-align: left;
+    }
+
+    .grid-cell {
+        border: 1px solid #999999;
+        padding: 2px;
+    }
+
+    .grid-cell input {
+        width: 100%;
+        border: none;
+        font-size: 8pt;
+        padding: 1px;
+    }
+
+    .grid-footer {
+        background-color: #f0f0f0;
+        padding: 4px;
+        border: 1px solid #999999;
+        text-align: center;
+    }
+
+    .btn-insert, .btn-proceed, .btn-search {
+        background-color: #d32f2f;
+        color: white;
+        border: 1px solid #b71c1c;
+        padding: 3px 12px;
+        font-size: 8pt;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-insert:hover, .btn-proceed:hover, .btn-search:hover {
+        background-color: #b71c1c;
+    }
+
+    .empty-row {
+        text-align: center;
+        color: #666;
+        padding: 8px;
+    }
+
+    .center-btn {
+        text-align: center;
+        margin-top: 8px;
+    }
+</style>
+
+<div class="aspnet-page">
+    <!-- Header Bar -->
+    <table class="header-table" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="header-cell">&nbsp;Advice</td>
+        </tr>
+    </table>
+
+    <!-- Main Tabs -->
+    <div class="main-tabs">
+        <span class="main-tab {% if active_tab == 'payment' %}active{% endif %}" onclick="showMainTab('payment')">Payment</span>
+        <span class="main-tab {% if active_tab == 'receipt' %}active{% endif %}" onclick="showMainTab('receipt')">Receipt</span>
+    </div>
+
+    <!-- Payment Tab Content -->
+    <div id="paymentTab" class="tab-content-wrapper {% if active_tab == 'payment' %}active{% endif %}">
+        <!-- Sub Tabs -->
+        <div class="sub-tabs">
+            <span class="sub-tab {% if active_subtab == 'advance' %}active{% endif %}" onclick="showSubTab('advance')">Advance</span>
+            <span class="sub-tab {% if active_subtab == 'creditors' %}active{% endif %}" onclick="showSubTab('creditors')">Creditors</span>
+            <span class="sub-tab {% if active_subtab == 'salary' %}active{% endif %}" onclick="showSubTab('salary')">Salary</span>
+            <span class="sub-tab {% if active_subtab == 'others' %}active{% endif %}" onclick="showSubTab('others')">Others</span>
+        </div>
+
+        <!-- Advance Sub-Tab -->
+        <div id="advanceSubTab" class="sub-content {% if active_subtab == 'advance' %}active{% endif %}">
+            <table class="form-table" cellpadding="2" cellspacing="0">
+                <tr>
+                    <td class="form-label">Payment Against:</td>
+                    <td>Advance</td>
+                </tr>
+                <tr>
+                    <td class="form-label">Pay To:</td>
+                    <td>
+                        <select class="form-select" id="drptype" name="pay_to_type" style="width: 100px;">
+                            <option value="0">Select</option>
+                            <option value="1">Employee</option>
+                            <option value="2">Customer</option>
+                            <option value="3">Supplier</option>
+                        </select>
+                        <input type="text" class="form-input" id="txtPayTo" name="pay_to_name" placeholder="Enter name" style="width: 250px; margin-left: 3px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Cheque No./D.D.No.:</td>
+                    <td><input type="text" class="form-input" id="txtChequeNo" name="cheque_no" style="width: 150px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Cheque Date:</td>
+                    <td><input type="date" class="form-input" id="txtChequeDate" name="cheque_date" style="width: 150px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Drawn On:</td>
+                    <td>
+                        <select class="form-select" id="drpBank" name="bank_id" style="width: 250px;">
+                            <option value="">Select Bank</option>
+                            {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Payable At:</td>
+                    <td><input type="text" class="form-input" id="txtPayAt" name="payable_at" style="width: 250px;"></td>
+                </tr>
+            </table>
+
+            <!-- Message Area -->
+            <div id="advanceMessage" style="margin-bottom: 5px; padding: 5px; display: none; font-size: 8pt;"></div>
+
+            <table class="grid-table" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="grid-header" style="width: 150px;">Proforma Invoice No</th>
+                        <th class="grid-header" style="width: 80px;">Date</th>
+                        <th class="grid-header" style="width: 100px;">PONo</th>
+                        <th class="grid-header" style="width: 100px; text-align: right;">Amount</th>
+                        <th class="grid-header">Particulars</th>
+                        <th class="grid-header" style="width: 40px; text-align: center;">Del</th>
+                    </tr>
+                </thead>
+                {% include 'accounts/transactions/partials/advice_advance_grid.html' %}
+                <tfoot>
+                    <tr>
+                        <td class="grid-cell"><input type="text" id="txtProformaInvNo" name="proforma_inv_no" class="form-input" placeholder="PI Number" required style="width: 100%;"></td>
+                        <td class="grid-cell"><input type="date" id="txtProformaDate" name="date" class="form-input" required style="width: 100%;"></td>
+                        <td class="grid-cell"><input type="text" id="txtPONo" name="po_no" class="form-input" placeholder="PO No" style="width: 100%;"></td>
+                        <td class="grid-cell"><input type="number" id="txtAmount" name="amount" class="form-input" placeholder="Amount" step="0.01" required style="width: 100%; text-align: right;"></td>
+                        <td class="grid-cell"><input type="text" id="txtParticulars" name="particulars" class="form-input" placeholder="Particulars" style="width: 100%;"></td>
+                        <td class="grid-cell" style="text-align: center;">
+                            <button type="button" class="btn-insert"
+                                    hx-post="{% url 'accounts:advice-insert-temp' %}"
+                                    hx-include="[name='proforma_inv_no'], [name='date'], [name='po_no'], [name='amount'], [name='particulars']"
+                                    hx-target="#advanceGridBody"
+                                    hx-swap="outerHTML"
+                                    onclick="return validateAdvanceInsert();">
+                                Insert
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="center-btn">
+                <button type="button" class="btn-proceed"
+                        hx-post="{% url 'accounts:advice-proceed' %}"
+                        hx-include="[name='pay_to_type'], [name='pay_to_name'], [name='cheque_no'], [name='cheque_date'], [name='bank_id'], [name='payable_at']"
+                        hx-swap="none"
+                        onclick="return validateAdvanceProceed();">
+                    Proceed
+                </button>
+            </div>
+        </div>
+
+        <!-- Creditors Sub-Tab -->
+        <div id="creditorsSubTab" class="sub-content {% if active_subtab == 'creditors' %}active{% endif %}">
+            <table class="form-table" cellpadding="2" cellspacing="0">
+                <tr>
+                    <td class="form-label">Payment Against:</td>
+                    <td>Creditors</td>
+                </tr>
+                <tr>
+                    <td class="form-label">Pay To (Supplier):</td>
+                    <td>
+                        <input type="text" class="form-input" id="txtSupplierName" name="supplier_name" 
+                               placeholder="Type to search supplier..." 
+                               list="supplierList"
+                               hx-get="{% url 'accounts:advice-autocomplete' %}?type=3&format=html"
+                               hx-trigger="keyup changed delay:300ms"
+                               hx-target="#supplierList"
+                               hx-swap="innerHTML"
+                               hx-vals='js:{q: document.getElementById("txtSupplierName").value}'
+                               autocomplete="off"
+                               style="width: 250px;">
+                        <datalist id="supplierList">
+                            <!-- Autocomplete options will be loaded here -->
+                        </datalist>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Cheque No./D.D.No.:</td>
+                    <td><input type="text" class="form-input" id="txtChequeNoCreditor" name="cheque_no" style="width: 150px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Cheque Date:</td>
+                    <td><input type="date" class="form-input" id="txtChequeDateCreditor" name="cheque_date" style="width: 150px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Drawn On:</td>
+                    <td>
+                        <select class="form-select" id="drpBankCreditor" name="bank_id" style="width: 250px;">
+                            <option value="">Select Bank</option>
+                            {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Payable At:</td>
+                    <td><input type="text" class="form-input" id="txtPayAtCreditor" name="payable_at" style="width: 250px;"></td>
+                </tr>
+            </table>
+
+            <!-- Search Button -->
+            <div style="margin-bottom: 5px; margin-top: 8px;">
+                <button type="button" class="btn-search"
+                        hx-post="{% url 'accounts:advice-creditors-search' %}"
+                        hx-include="[name='supplier_name']"
+                        hx-target="#creditorSearchResults"
+                        hx-swap="innerHTML"
+                        onclick="return validateCreditorSearch();">
+                    Search Bill Bookings
+                </button>
+            </div>
+
+            <!-- Search Results Grid -->
+            <div id="creditorSearchResults" style="margin-bottom: 8px;">
+                <table class="grid-table" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th class="grid-header" style="width: 30px; text-align: center;">
+                                <input type="checkbox" id="selectAllBills" onclick="toggleSelectAllBills()">
+                            </th>
+                            <th class="grid-header" style="width: 90px;">PVEV No</th>
+                            <th class="grid-header" style="width: 70px;">PONo</th>
+                            <th class="grid-header" style="width: 90px;">Bill No</th>
+                            <th class="grid-header" style="width: 80px;">Bill Date</th>
+                            <th class="grid-header" style="width: 100px;">Against Bill</th>
+                            <th class="grid-header" style="width: 85px; text-align: right;">Actual Amt</th>
+                            <th class="grid-header" style="width: 85px; text-align: right;">Paid Amt</th>
+                            <th class="grid-header" style="width: 85px; text-align: right;">Bal Amt</th>
+                            <th class="grid-header" style="width: 85px; text-align: right;">Amount</th>
+                            <th class="grid-header">Narration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="11" class="grid-cell empty-row">Enter supplier name and click Search</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add to Temp Button -->
+            <div style="margin-bottom: 8px;">
+                <button type="button" class="btn-insert"
+                        id="btnAddToTemp"
+                        hx-post="{% url 'accounts:advice-creditors-add-temp' %}"
+                        hx-include="#creditorSearchResults [type='checkbox']:checked, #creditorSearchResults input[type='number'], #creditorSearchResults input[type='text']"
+                        hx-target="#creditorTempGrid"
+                        hx-swap="innerHTML"
+                        onclick="return validateBillSelection();">
+                    Add Selected Bills to Temp
+                </button>
+            </div>
+
+            <!-- Selected Bills (Temp) Grid -->
+            <div id="creditorTempGrid">
+                {% include 'accounts/transactions/partials/advice_creditors_temp_grid.html' %}
+            </div>
+
+            <div class="center-btn" style="margin-top: 10px;">
+                <button type="button" class="btn-proceed"
+                        hx-post="{% url 'accounts:advice-creditors-proceed' %}"
+                        hx-include="[name='supplier_name'], [name='cheque_no'], [name='cheque_date'], [name='bank_id'], [name='payable_at']"
+                        hx-swap="none"
+                        onclick="return validateCreditorProceed();">
+                    Proceed
+                </button>
+            </div>
+        </div>
+
+        <!-- Salary Sub-Tab -->
+        <div id="salarySubTab" class="sub-content {% if active_subtab == 'salary' %}active{% endif %}">
+            <table class="form-table" cellpadding="2" cellspacing="0">
+                <tr>
+                    <td class="form-label">Payment Against:</td>
+                    <td class="form-value">Salary</td>
+                    <td class="form-label">Pay To (Employee):</td>
+                    <td>
+                        <input type="text" id="txtPayToSalary" name="pay_to_salary" class="form-input" placeholder="Enter employee name" style="width: 250px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Cheque No./D.D.No.:</td>
+                    <td>
+                        <input type="text" id="txtChequeNoSalary" name="cheque_no_salary" class="form-input" style="width: 150px;">
+                    </td>
+                    <td class="form-label">Cheque Date:</td>
+                    <td>
+                        <input type="date" id="txtChequeDateSalary" name="cheque_date_salary" class="form-input" style="width: 150px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Drawn On:</td>
+                    <td>
+                        <select id="drpBankSalary" name="bank_id_salary" class="form-select" style="width: 250px;">
+                            <option value="">Select Bank</option>
+                            {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="form-label">Payable At:</td>
+                    <td>
+                        <input type="text" id="txtPayableAtSalary" name="payable_at_salary" class="form-input" style="width: 150px;">
+                    </td>
+                </tr>
+            </table>
+
+            <div id="salaryMessage" style="margin-bottom: 5px; padding: 5px; display: none; font-size: 8pt;"></div>
+
+            <table class="grid-table" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="grid-header">Employee</th>
+                        <th class="grid-header" style="width: 150px;">Amount</th>
+                        <th class="grid-header">Particulars</th>
+                        <th class="grid-header" style="width: 40px; text-align: center;">Del</th>
+                    </tr>
+                </thead>
+                <tbody id="salaryGridBody">
+                    {% if temp_salary %}
+                        {% for item in temp_salary %}
+                        <tr>
+                            <td class="grid-cell"><input type="text" value="{{ item.empname }}" readonly></td>
+                            <td class="grid-cell"><input type="text" value="{{ item.amt }}" style="text-align: right;" readonly></td>
+                            <td class="grid-cell"><input type="text" value="{{ item.particulars }}" readonly></td>
+                            <td class="grid-cell" style="text-align: center;">
+                                <button type="button"
+                                        hx-post="{% url 'accounts:advice-salary-delete-temp' item.id %}"
+                                        hx-target="#salaryGridBody"
+                                        hx-swap="outerHTML"
+                                        style="border: none; background: none; color: red; font-weight: bold; cursor: pointer;">
+                                    X
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="grid-cell empty-row">No salary entries yet. Click Insert to add employees.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="grid-cell">
+                            <input type="text" id="txtEmployeeSalary" name="employee_salary" class="form-input" placeholder="Employee Name" style="width: 100%;">
+                        </td>
+                        <td class="grid-cell">
+                            <input type="number" id="txtAmountSalary" name="amount_salary" class="form-input" placeholder="Amount" step="0.01" style="width: 100%; text-align: right;">
+                        </td>
+                        <td class="grid-cell">
+                            <input type="text" id="txtParticularsSalary" name="particulars_salary" class="form-input" placeholder="Particulars" style="width: 100%;">
+                        </td>
+                        <td class="grid-cell" style="text-align: center;">
+                            <button type="button" class="btn-insert"
+                                    hx-post="{% url 'accounts:advice-salary-insert-temp' %}"
+                                    hx-include="[name='employee_salary'], [name='amount_salary'], [name='particulars_salary']"
+                                    hx-target="#salaryGridBody"
+                                    hx-swap="outerHTML">
+                                Insert
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="center-btn">
+                <button type="button" class="btn-proceed"
+                        hx-post="{% url 'accounts:advice-salary-proceed' %}"
+                        hx-include="[name='pay_to_salary'], [name='cheque_no_salary'], [name='cheque_date_salary'], [name='bank_id_salary'], [name='payable_at_salary']"
+                        hx-swap="none">
+                    Proceed
+                </button>
+            </div>
+        </div>
+
+        <!-- Others Sub-Tab -->
+        <div id="othersSubTab" class="sub-content {% if active_subtab == 'others' %}active{% endif %}">
+            <table class="form-table" cellpadding="2" cellspacing="0">
+                <tr>
+                    <td class="form-label">Work Order:</td>
+                    <td><input type="text" class="form-input" id="txtWorkOrder" name="work_order_others" style="width: 250px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Business Group:</td>
+                    <td>
+                        <select class="form-select" id="drpBusinessGroup" name="business_group_others" style="width: 250px;">
+                            <option value="">Select Business Group</option>
+                            <!-- Business groups will be loaded dynamically -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Pay To:</td>
+                    <td><input type="text" class="form-input" id="txtPayToOthers" name="pay_to_others" style="width: 250px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Cheque No./D.D.No.:</td>
+                    <td><input type="text" class="form-input" id="txtChequeNoOthers" name="cheque_no_others" style="width: 150px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Cheque Date:</td>
+                    <td><input type="date" class="form-input" id="txtChequeDateOthers" name="cheque_date_others" style="width: 150px;"></td>
+                </tr>
+                <tr>
+                    <td class="form-label">Drawn On:</td>
+                    <td>
+                        <select class="form-select" id="drpBankOthers" name="bank_id_others" style="width: 250px;">
+                            <option value="">Select Bank</option>
+                            {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">Payable At:</td>
+                    <td><input type="text" class="form-input" id="txtPayableAtOthers" name="payable_at_others" style="width: 250px;"></td>
+                </tr>
+            </table>
+
+            <table class="grid-table" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="grid-header" style="width: 40px; text-align: center;">Sr</th>
+                        <th class="grid-header">Particulars</th>
+                        <th class="grid-header" style="width: 120px; text-align: right;">Amount</th>
+                        <th class="grid-header" style="width: 40px; text-align: center;">Del</th>
+                    </tr>
+                </thead>
+                {% include 'accounts/transactions/partials/advice_others_grid.html' %}
+                <tfoot>
+                    <tr>
+                        <td class="grid-cell" style="text-align: center;">-</td>
+                        <td class="grid-cell">
+                            <input type="text" id="txtParticularsOthers" name="particulars_others" class="form-input" placeholder="Particulars" style="width: 100%;">
+                        </td>
+                        <td class="grid-cell">
+                            <input type="number" id="txtAmountOthers" name="amount_others" class="form-input" placeholder="Amount" step="0.01" style="width: 100%; text-align: right;">
+                        </td>
+                        <td class="grid-cell" style="text-align: center;">
+                            <button type="button" class="btn-insert"
+                                    hx-post="{% url 'accounts:advice-others-insert-temp' %}"
+                                    hx-include="[name='particulars_others'], [name='amount_others']"
+                                    hx-target="#othersGridBody"
+                                    hx-swap="outerHTML">
+                                Insert
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="center-btn">
+                <button type="button" class="btn-proceed"
+                        hx-post="{% url 'accounts:advice-others-proceed' %}"
+                        hx-include="[name='work_order_others'], [name='business_group_others'], [name='pay_to_others'], [name='cheque_no_others'], [name='cheque_date_others'], [name='bank_id_others'], [name='payable_at_others']"
+                        hx-swap="none">
+                    Proceed
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Tab Content -->
+    <div id="receiptTab" class="tab-content-wrapper {% if active_tab == 'receipt' %}active{% endif %}">
+        <table class="form-table" cellpadding="2" cellspacing="0">
+            <tr>
+                <td class="form-label">Receipt From:</td>
+                <td><input type="text" class="form-input" id="txtReceiptFrom" style="width: 250px;"></td>
+            </tr>
+            <tr>
+                <td class="form-label">Amount:</td>
+                <td><input type="text" class="form-input" id="txtReceiptAmount" style="width: 150px;"></td>
+            </tr>
+            <tr>
+                <td class="form-label">Cheque No./D.D.No.:</td>
+                <td><input type="text" class="form-input" id="txtReceiptChequeNo" style="width: 150px;"></td>
+            </tr>
+            <tr>
+                <td class="form-label">Cheque Date:</td>
+                <td><input type="date" class="form-input" id="txtReceiptChequeDate" style="width: 150px;"></td>
+            </tr>
+            <tr>
+                <td class="form-label">Drawn On:</td>
+                <td>
+                    <select class="form-select" id="drpReceiptBank" style="width: 250px;">
+                        <option value="">Select Bank</option>
+                        {% for bank in banks %}
+                        <option value="{{ bank.id }}">{{ bank.name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="form-label">Payable At:</td>
+                <td><input type="text" class="form-input" id="txtReceiptPayAt" style="width: 250px;"></td>
+            </tr>
+        </table>
+
+        <table class="grid-table" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <th class="grid-header" style="width: 40px; text-align: center;">Sr</th>
+                    <th class="grid-header">Particulars</th>
+                    <th class="grid-header" style="width: 120px; text-align: right;">Amount</th>
+                    <th class="grid-header" style="width: 40px; text-align: center;">Del</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4" class="grid-cell empty-row">No items added yet. Click Insert to add receipt details.</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="grid-footer">
+                        <button class="btn-insert">Insert</button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="center-btn">
+            <button class="btn-proceed">Proceed</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showMainTab(tabName) {
+    // Hide all main tabs
+    document.getElementById('paymentTab').classList.remove('active');
+    document.getElementById('receiptTab').classList.remove('active');
+
+    // Remove active class from all main tab buttons
+    const mainButtons = document.querySelectorAll('.main-tab');
+    mainButtons.forEach(btn => btn.classList.remove('active'));
+
+    // Show selected tab and activate button
+    if (tabName === 'payment') {
+        document.getElementById('paymentTab').classList.add('active');
+        event.target.classList.add('active');
+    } else {
+        document.getElementById('receiptTab').classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // Update URL parameter
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabName);
+    window.history.pushState({}, '', url);
+}
+
+function showSubTab(subTabName) {
+    // Hide all sub-tabs
+    document.getElementById('advanceSubTab').classList.remove('active');
+    document.getElementById('creditorsSubTab').classList.remove('active');
+    document.getElementById('salarySubTab').classList.remove('active');
+    document.getElementById('othersSubTab').classList.remove('active');
+
+    // Remove active class from all sub-tab buttons
+    const subButtons = document.querySelectorAll('.sub-tab');
+    subButtons.forEach(btn => btn.classList.remove('active'));
+
+    // Show selected sub-tab and activate button
+    document.getElementById(subTabName + 'SubTab').classList.add('active');
+    event.target.classList.add('active');
+
+    // Update URL parameter
+    const url = new URL(window.location);
+    url.searchParams.set('subtab', subTabName);
+    window.history.pushState({}, '', url);
+}
+
+// Validation for Advance Insert
+function validateAdvanceInsert() {
+    const piNo = document.getElementById('txtProformaInvNo').value.trim();
+    const piDate = document.getElementById('txtProformaDate').value;
+    const amount = document.getElementById('txtAmount').value;
+
+    if (!piNo) {
+        showMessage('advanceMessage', 'Please enter Proforma Invoice Number', 'error');
+        return false;
+    }
+    if (!piDate) {
+        showMessage('advanceMessage', 'Please enter Date', 'error');
+        return false;
+    }
+    if (!amount || parseFloat(amount) <= 0) {
+        showMessage('advanceMessage', 'Please enter valid Amount', 'error');
+        return false;
+    }
+    return true;
+}
+
+// Validation for Advance Proceed
+function validateAdvanceProceed() {
+    const payToType = document.getElementById('drptype').value;
+    const payToName = document.getElementById('txtPayTo').value.trim();
+    const chequeNo = document.getElementById('txtChequeNo').value.trim();
+    const chequeDate = document.getElementById('txtChequeDate').value;
+    const bankId = document.getElementById('drpBank').value;
+    const payAt = document.getElementById('txtPayAt').value.trim();
+
+    if (payToType === '0') {
+        showMessage('advanceMessage', 'Please select Pay To type', 'error');
+        return false;
+    }
+    if (!payToName) {
+        showMessage('advanceMessage', 'Please enter Pay To name', 'error');
+        return false;
+    }
+    if (!chequeNo) {
+        showMessage('advanceMessage', 'Please enter Cheque No./D.D.No.', 'error');
+        return false;
+    }
+    if (!chequeDate) {
+        showMessage('advanceMessage', 'Please enter Cheque Date', 'error');
+        return false;
+    }
+    if (!bankId) {
+        showMessage('advanceMessage', 'Please select Bank', 'error');
+        return false;
+    }
+    if (!payAt) {
+        showMessage('advanceMessage', 'Please enter Payable At', 'error');
+        return false;
+    }
+    return true;
+}
+
+// Show message
+function showMessage(elementId, message, type) {
+    const msgEl = document.getElementById(elementId);
+    msgEl.textContent = message;
+    msgEl.style.display = 'block';
+    msgEl.style.backgroundColor = type === 'error' ? '#ffdddd' : '#ddffdd';
+    msgEl.style.color = type === 'error' ? '#cc0000' : '#006600';
+    msgEl.style.border = '1px solid ' + (type === 'error' ? '#cc0000' : '#006600');
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        msgEl.style.display = 'none';
+    }, 5000);
+}
+
+// Clear input fields after insert
+function clearAdvanceInputs() {
+    document.getElementById('txtProformaInvNo').value = '';
+    document.getElementById('txtProformaDate').value = '';
+    document.getElementById('txtPONo').value = '';
+    document.getElementById('txtAmount').value = '';
+    document.getElementById('txtParticulars').value = '';
+}
+
+// HTMX event handlers
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.pathInfo.requestPath.includes('advice-insert-temp')) {
+        if (evt.detail.successful) {
+            clearAdvanceInputs();
+            showMessage('advanceMessage', 'Item added successfully', 'success');
+        } else {
+            showMessage('advanceMessage', 'Failed to add item', 'error');
+        }
+    } else if (evt.detail.pathInfo.requestPath.includes('advice-proceed')) {
+        if (evt.detail.successful) {
+            const response = JSON.parse(evt.detail.xhr.responseText);
+            if (response.success) {
+                showMessage('advanceMessage', response.message, 'success');
+                // Clear all inputs after successful save
+                clearAdvanceInputs();
+                document.getElementById('drptype').value = '0';
+                document.getElementById('txtPayTo').value = '';
+                document.getElementById('txtChequeNo').value = '';
+                document.getElementById('txtChequeDate').value = '';
+                document.getElementById('drpBank').value = '';
+                document.getElementById('txtPayAt').value = '';
+                // Reload the page to refresh the grid
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                showMessage('advanceMessage', response.error || 'Failed to save', 'error');
+            }
+        } else {
+            const response = evt.detail.xhr.responseText;
+            try {
+                const jsonResp = JSON.parse(response);
+                showMessage('advanceMessage', jsonResp.error || 'Failed to save', 'error');
+            } catch (e) {
+                showMessage('advanceMessage', 'Failed to save advice', 'error');
+            }
+        }
+    }
+});
+
+// ===== CREDITORS SUB-TAB FUNCTIONS =====
+
+function validateCreditorSearch() {
+    const supplierName = document.getElementById('txtSupplierName').value.trim();
+    if (!supplierName) {
+        alert('Please enter supplier name');
+        return false;
+    }
+    return true;
+}
+
+function toggleSelectAllBills() {
+    const selectAll = document.getElementById('selectAllBills');
+    const checkboxes = document.querySelectorAll('.bill-checkbox');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+function validateBillSelection() {
+    const checked = document.querySelectorAll('.bill-checkbox:checked');
+    if (checked.length === 0) {
+        alert('Please select at least one bill');
+        return false;
+    }
+    return true;
+}
+
+function validateCreditorProceed() {
+    const supplierName = document.getElementById('txtSupplierName').value.trim();
+    const chequeNo = document.getElementById('txtChequeNoCreditor').value.trim();
+    const chequeDate = document.getElementById('txtChequeDateCreditor').value;
+    const bank = document.getElementById('drpBankCreditor').value;
+    const payableAt = document.getElementById('txtPayAtCreditor').value.trim();
+
+    if (!supplierName) {
+        alert('Please select supplier');
+        return false;
+    }
+    if (!chequeNo) {
+        alert('Please enter Cheque No');
+        return false;
+    }
+    if (!chequeDate) {
+        alert('Please select Cheque Date');
+        return false;
+    }
+    if (!bank) {
+        alert('Please select Bank');
+        return false;
+    }
+    if (!payableAt) {
+        alert('Please enter Payable At');
+        return false;
+    }
+
+    return confirm('Are you sure you want to proceed with this creditor payment?');
+}
+
+// Handle Creditor Proceed response
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.elt.classList.contains('btn-proceed') &&
+        evt.detail.pathInfo.requestPath.includes('creditors-proceed')) {
+        if (evt.detail.successful) {
+            try {
+                const jsonResp = JSON.parse(evt.detail.xhr.responseText);
+                if (jsonResp.success) {
+                    alert(jsonResp.message);
+                    // Clear form and reload
+                    document.getElementById('txtSupplierName').value = '';
+                    document.getElementById('txtChequeNoCreditor').value = '';
+                    document.getElementById('txtChequeDateCreditor').value = '';
+                    document.getElementById('drpBankCreditor').value = '';
+                    document.getElementById('txtPayAtCreditor').value = '';
+                    // Clear search results
+                    document.getElementById('creditorSearchResults').innerHTML = `
+                        <table class="grid-table" cellpadding="0" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="grid-header" style="width: 30px; text-align: center;">
+                                        <input type="checkbox" id="selectAllBills" onclick="toggleSelectAllBills()">
+                                    </th>
+                                    <th class="grid-header" style="width: 90px;">PVEV No</th>
+                                    <th class="grid-header" style="width: 70px;">PONo</th>
+                                    <th class="grid-header" style="width: 90px;">Bill No</th>
+                                    <th class="grid-header" style="width: 80px;">Bill Date</th>
+                                    <th class="grid-header" style="width: 100px;">Against Bill</th>
+                                    <th class="grid-header" style="width: 85px; text-align: right;">Actual Amt</th>
+                                    <th class="grid-header" style="width: 85px; text-align: right;">Paid Amt</th>
+                                    <th class="grid-header" style="width: 85px; text-align: right;">Bal Amt</th>
+                                    <th class="grid-header" style="width: 85px; text-align: right;">Amount</th>
+                                    <th class="grid-header">Narration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="11" class="grid-cell empty-row">Enter supplier name and click Search</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    location.reload();  // Reload to clear temp table
+                } else {
+                    alert('Error: ' + (jsonResp.error || 'Failed to save'));
+                }
+            } catch (e) {
+                alert('Failed to save creditor payment');
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}

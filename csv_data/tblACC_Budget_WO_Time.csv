@@ -1,4 +1,4 @@
-﻿Id,CompId,SysDate,SysTime,SessionId,FinYearId,WONo,EquipId,HrsBudgetCat,HrsBudgetSubCat,Hour,BudgetAmtHrs,BudgetCodeId
+Id,CompId,SysDate,SysTime,SessionId,FinYearId,WONo,EquipId,HrsBudgetCat,HrsBudgetSubCat,Hour,BudgetAmtHrs,BudgetCodeId
 13,1,2017-03-31,2:06:22 PM,Sapl0002,4,N0159,51787,3,9,500.0,,
 14,1,2017-03-31,2:07:01 PM,Sapl0002,4,N0159,51959,2,2,500.0,,
 15,1,2017-08-17,4:47:11 PM,Sapl0001,5,N0157,53193,2,1,100.0,,

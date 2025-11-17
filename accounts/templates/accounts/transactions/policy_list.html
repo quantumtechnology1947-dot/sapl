@@ -1,0 +1,141 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Policy Documents{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6">
+        <div class="px-4 py-4">
+            <h1 class="text-sm font-bold text-gray-800">DOCUMENTS</h1>
+            <p class="text-sm text-gray-600 mt-1">Upload and manage accounting policy documents</p>
+        </div>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Upload New Document</h2>
+        <form method="post" action="{% url 'accounts:policy-upload' %}" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- File Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select File</label>
+                    {{ form.file_upload }}
+                    {% if form.file_upload.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.file_upload.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-gray-500">Supported: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG</p>
+                </div>
+
+                <!-- Remark -->
+                <div>
+                    <label for="{{ form.cvname.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Remark</label>
+                    {{ form.cvname }}
+                    {% if form.cvname.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.cvname.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Date -->
+                <div>
+                    <label for="{{ form.cvdate.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    {{ form.cvdate }}
+                    {% if form.cvdate.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.cvdate.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-6">
+                <button type="submit"
+                        class="bg-red-600 hover:bg-red-700 text-white px-8 py-2 rounded-md">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Documents Table -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sr No.</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remark</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date of File</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File Name</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for policy in policies %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ policy.cvname|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ policy.cvdate|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <a href="{% url 'accounts:policy-download' policy.id %}"
+                               class="text-blue-600 hover:text-blue-900 hover:underline">
+                                {{ policy.cvfilename }}
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-16 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <svg class="h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <p class="text-lg font-medium">No documents uploaded yet</p>
+                                <p class="text-sm mt-1">Upload your first policy document to get started</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Showing <span class="font-medium">{{ page_obj.start_index }}</span> to
+                        <span class="font-medium">{{ page_obj.end_index }}</span> of
+                        <span class="font-medium">{{ paginator.count }}</span> results
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            Previous
+                        </a>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"
+                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            Next
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

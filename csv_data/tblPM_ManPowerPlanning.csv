@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,Date,WONo,Dept,Types,AmendmentNo
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,Date,WONo,Dept,Types,AmendmentNo
 26,2022-02-08,9:20:07 AM,sapl0001,1,9,Sapl0070,2022-02-08,S0201,0,1,0
 28,2022-03-26,12:06:58 PM,SAPL0001,1,9,Sapl0018,2022-03-26,S0202,0,1,0
 31,2022-03-29,9:41:18 AM,sapl0054,1,9,Sapl0049,2022-03-29,S0203,0,1,0

@@ -1,4 +1,4 @@
-﻿Id,ItemId,SupplierId,Qty,Rate,Discount,DelDate,DMid
+Id,ItemId,SupplierId,Qty,Rate,Discount,DelDate,DMid
 12673,58449,J021,4.0,92.5,0.0,2018-04-19,24701
 12674,58458,J021,1.0,35.0,0.0,2018-04-19,24702
 12675,59300,S098,2.0,1200.0,0.0,2018-04-21,24705

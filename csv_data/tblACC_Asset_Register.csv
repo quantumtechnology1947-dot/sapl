@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,MId,DId,ACategoyId,ASubCategoyId,AssetNo
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,MId,DId,ACategoyId,ASubCategoyId,AssetNo
 1,2015-03-31,1:54:12 PM,Sapl0054,1,2,4965,16093,2,1,0001
 2,2015-03-31,1:57:31 PM,Sapl0054,1,2,4966,16094,2,1,0002
 3,2015-03-31,1:57:41 PM,Sapl0054,1,2,4967,16095,2,1,0003

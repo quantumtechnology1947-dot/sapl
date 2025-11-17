@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,FMonth,Increment,ReleaseFlag,ChequeNo,ChequeNoDate,BankId,EmpDirect,TransNo
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,FMonth,Increment,ReleaseFlag,ChequeNo,ChequeNoDate,BankId,EmpDirect,TransNo
 41,2013-10-09,12:38:47 PM,Sapl0001,1,1,Sapl0055,9,0,0,,,,,0
 42,2013-10-10,12:34:33 PM,Sapl0173,1,1,Sapl0059,9,0,0,,,,,0
 43,2013-10-28,2:43:31 PM,Sapl0173,1,1,Sapl0063,9,0,0,,,,,0

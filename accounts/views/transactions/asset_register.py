@@ -33,7 +33,7 @@ from ...models import (
     TblaccBillbookingMaster, TblaccBillbookingDetails, TblaccBillbookingAttachMaster,
     TblaccBank, TblpackingMaster, TblaccContraEntry,
     TblaccCurrencyMaster, TblaccTdscodeMaster, TblvatMaster, TblwarrentyMaster,
-    TblaccAssetRegister, TblaccDebitnote,
+    TblaccAssetRegister, TblaccAssetCategory, TblaccDebitnote,
     # Simple lookup masters
     TblaccIntresttype, TblaccInvoiceagainst, TblaccIouReasons, TblaccLoantype,
     TblaccPaidtype, TblaccPaymentmode, TblaccReceiptagainst, TblaccTourexpencesstype,

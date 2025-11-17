@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,WONo,BOMId,PId,CId,ItemId,Qty,Description,UOM,AmdNo
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,WONo,BOMId,PId,CId,ItemId,Qty,Description,UOM,AmdNo
 1,2013-04-25,12:21:34 PM,1,1,Sapl0006,N0006,320,1,116,10422,1.0,,0,0
 2,2013-04-29,1:47:27 PM,1,1,Sapl0006,T0003,70,0,1,10600,2.0,Electrical control panel,1,0
 3,2013-04-29,1:47:49 PM,1,1,Sapl0006,T0003,70,0,1,10600,3.0,Electrical control panel,1,1

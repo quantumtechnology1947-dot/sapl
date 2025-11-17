@@ -1,4 +1,4 @@
-﻿Id,EquipId,Category,SubCategory,PlannedDesc,ActualDesc,Hour,MId
+Id,EquipId,Category,SubCategory,PlannedDesc,ActualDesc,Hour,MId
 24,86759,2,1,TEST,TEST,5.0,26
 26,87306,2,2,Y,Y,10.0,28
 35,14066,2,2,cross trolley assembly,,2.0,31

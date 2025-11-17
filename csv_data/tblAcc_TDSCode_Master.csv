@@ -1,4 +1,4 @@
-﻿Id,SectionNo,NatureOfPayment,PaymentRange,PayToIndividual,Others,WithOutPAN
+Id,SectionNo,NatureOfPayment,PaymentRange,PayToIndividual,Others,WithOutPAN
 1,193,Interest on Debentures,5000.0,10.0,10.0,20.0
 2,194,Deemed Dividend,0.0,10.0,10.0,20.0
 3,194 A,Interest by banks (Other than interest on securities),10000.0,10.0,10.0,20.0

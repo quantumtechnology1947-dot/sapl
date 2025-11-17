@@ -30,7 +30,7 @@ from .models import (
     TblexciseserMaster, TblexcisecommodityMaster, TblvatMaster,
     TblfreightMaster, TbloctroiMaster, TblaccIntresttype,
     TblaccLoantype, TblaccPaidtype, TblaccInvoiceagainst,
-    TblaccIouReasons, TblwarrentyMaster
+    TblaccIouReasons, TblwarrentyMaster, AccPolicy
 )
 from sys_admin.models import Tblcountry, Tblstate, Tblcity
 
@@ -2134,3 +2134,163 @@ class IOUReasonsForm(forms.ModelForm):
 # Note: InvoiceForm and InvoiceDetailForm from invoice_forms.py were already
 # present in the main forms.py file, so they are not duplicated here
 # ============================================================================
+
+
+# ============================================================================
+# Creditors/Debitors Forms
+# Converted from ASP.NET CreditorsDebitors.aspx
+# ============================================================================
+
+from .models import TblaccCreditorsMaster, TblaccDebitorsMaster
+
+
+class CreditorForm(forms.ModelForm):
+    """
+    Form for Creditor (Supplier) opening balance management.
+    Converted from: aspnet/Module/Accounts/Transactions/CreditorsDebitors.aspx
+    """
+
+    class Meta:
+        model = TblaccCreditorsMaster
+        fields = ['supplierid', 'openingamt']
+
+        widgets = {
+            'supplierid': HTMXSelect(attrs={
+                'placeholder': 'Select Supplier',
+                'hx-get': '/accounts/api/supplier-details/',
+                'hx-trigger': 'change',
+                'hx-target': '#supplier-info'
+            }),
+            'openingamt': TailwindNumberInput(attrs={
+                'placeholder': 'Enter opening amount',
+                'step': '0.01',
+                'min': '0'
+            }),
+        }
+
+        labels = {
+            'supplierid': 'Supplier Name',
+            'openingamt': 'Opening Amount',
+        }
+
+    def clean_openingamt(self):
+        """Validate opening amount is not negative."""
+        openingamt = self.cleaned_data.get('openingamt')
+        if openingamt and openingamt < 0:
+            raise forms.ValidationError('Opening amount cannot be negative.')
+        return openingamt
+
+
+class DebitorForm(forms.ModelForm):
+    """
+    Form for Debitor (Customer) opening balance management.
+    Converted from: aspnet/Module/Accounts/Transactions/CreditorsDebitors.aspx
+    """
+
+    class Meta:
+        model = TblaccDebitorsMaster
+        fields = ['customerid', 'openingamt']
+
+        widgets = {
+            'customerid': HTMXSelect(attrs={
+                'placeholder': 'Select Customer',
+                'hx-get': '/accounts/api/customer-details/',
+                'hx-trigger': 'change',
+                'hx-target': '#customer-info'
+            }),
+            'openingamt': TailwindNumberInput(attrs={
+                'placeholder': 'Enter opening amount',
+                'step': '0.01',
+                'min': '0'
+            }),
+        }
+
+        labels = {
+            'customerid': 'Customer Name',
+            'openingamt': 'Opening Amount',
+        }
+
+    def clean_openingamt(self):
+        """Validate opening amount is not negative."""
+        openingamt = self.cleaned_data.get('openingamt')
+        if openingamt and openingamt < 0:
+            raise forms.ValidationError('Opening amount cannot be negative.')
+        return openingamt
+
+
+class DateRangeFilterForm(forms.Form):
+    """
+    Form for filtering creditors/debitors transactions by date range.
+    Used in detail views for filtering transaction history.
+    """
+
+    from_date = forms.DateField(
+        required=False,
+        widget=TailwindDateInput(attrs={
+            'placeholder': 'From Date'
+        }),
+        label='From Date'
+    )
+
+    to_date = forms.DateField(
+        required=False,
+        widget=TailwindDateInput(attrs={
+            'placeholder': 'To Date'
+        }),
+        label='To Date'
+    )
+
+    def clean(self):
+        """Validate date range."""
+        cleaned_data = super().clean()
+        from_date = cleaned_data.get('from_date')
+        to_date = cleaned_data.get('to_date')
+
+        if from_date and to_date:
+            if from_date > to_date:
+                raise forms.ValidationError('From date cannot be after to date.')
+
+        return cleaned_data
+
+
+# ============================================================================
+# SECTION 5: POLICY DOCUMENTS
+# ============================================================================
+
+class PolicyForm(forms.ModelForm):
+    """
+    Form for Accounting Policy Documents Upload
+    Converted from: aaspnet/Module/Accounts/Transactions/ACC_POLICY.aspx
+    """
+    # File upload field
+    file_upload = forms.FileField(
+        required=True,
+        widget=forms.FileInput(attrs={
+            'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none',
+            'accept': '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png'
+        }),
+        label='Select File'
+    )
+
+    class Meta:
+        model = AccPolicy
+        fields = ['cvname', 'cvdate']
+        widgets = {
+            'cvname': TailwindTextInput(attrs={
+                'placeholder': 'Enter remark/description',
+                'maxlength': '200'
+            }),
+            'cvdate': TailwindDateInput(attrs={
+                'placeholder': 'dd-mm-yyyy'
+            }),
+        }
+        labels = {
+            'cvname': 'Remark',
+            'cvdate': 'Date',
+        }
+
+    def clean_cvdate(self):
+        cvdate = self.cleaned_data.get('cvdate')
+        if cvdate:
+            return cvdate.strftime('%d-%m-%Y') if hasattr(cvdate, 'strftime') else cvdate
+        return cvdate

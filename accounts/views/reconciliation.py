@@ -31,7 +31,7 @@ from ..models import (
     TblaccBankvoucherPaymentMaster, TblaccBankvoucherPaymentDetails,
     TblaccProformainvoiceMaster, TblaccProformainvoiceDetails,
     TblaccBillbookingMaster, TblaccBillbookingDetails, TblaccBillbookingAttachMaster,
-    TblaccBank, TblpackingMaster, TblaccContraEntry,
+    TblaccBank, TblaccBankamtMaster, TblpackingMaster, TblaccContraEntry,
     TblaccCurrencyMaster, TblaccTdscodeMaster, TblvatMaster, TblwarrentyMaster,
     TblaccAssetRegister, TblaccDebitnote,
     # Simple lookup masters
@@ -39,6 +39,9 @@ from ..models import (
     TblaccPaidtype, TblaccPaymentmode, TblaccReceiptagainst, TblaccTourexpencesstype,
     TblexcisecommodityMaster, TblexciseserMaster, TblfreightMaster, TbloctroiMaster,
 )
+
+# Import services
+from ..services import ReconciliationService
 
 # Import GST views
 # TODO: Implement GST views
@@ -292,37 +295,61 @@ class BankChargesAddView(CompanyFinancialYearMixin, LoginRequiredMixin, CreateVi
 
         return HttpResponseRedirect(reverse_lazy('accounts:bank-reconciliation', kwargs={'bank_id': bank_id}))
 
-class BankReconciliationListView(BaseListViewMixin, ListView):
+class BankReconciliationListView(CompanyFinancialYearMixin, LoginRequiredMixin, TemplateView):
     """
-    List all banks with reconciliation status.
+    List all banks with opening and closing amounts for reconciliation.
+    Matches ASP.NET BankReconciliation_New.aspx
 
     Requirements: 9.1
     """
-    model = TblaccBank
     template_name = 'accounts/reconciliation/bank_list.html'
-    context_object_name = 'banks'
-    search_fields = ['bankname', 'accountno']
-    partial_template_name = 'accounts/partials/bank_list_partial.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Add reconciliation status for each bank
-        for bank in context['banks']:
-            summary = ReconciliationService.calculate_reconciliation_summary(
-                bank_id=bank.id,
-                as_of_date=datetime.now().strftime('%Y-%m-%d'),
-                company_id=self.get_compid(),
-                financial_year_id=self.get_finyearid()
-            )
-            bank.unreconciled_count = (
-                summary['payments']['count_unreconciled'] +
-                summary['receipts']['count_unreconciled']
-            )
-            bank.unreconciled_amount = (
-                summary['payments']['unreconciled'] +
-                summary['receipts']['unreconciled']
-            )
+        company_id = self.get_compid()
+        financial_year_id = self.get_finyearid()
+
+        # Get all banks with their amounts
+        banks_data = []
+
+        # Get banks (excluding Cash which has OrdNo=0)
+        banks = TblaccBank.objects.filter(ordno__gt=0).order_by('ordno')
+
+        # Always include Cash first
+        cash_bank = TblaccBank.objects.filter(ordno=0).first()
+        if cash_bank:
+            # Get cash amounts from BankAmt_Master
+            cash_amt = TblaccBankamtMaster.objects.filter(
+                bankid=cash_bank.id,
+                compid=company_id,
+                finyearid=financial_year_id
+            ).first()
+
+            banks_data.append({
+                'id': cash_bank.id,
+                'trans': 'Cash',
+                'opamt': cash_amt.amt if cash_amt else 0,
+                'clamt': cash_amt.amt if cash_amt else 0,  # TODO: Calculate closing based on transactions
+            })
+
+        # Add other banks
+        for idx, bank in enumerate(banks, start=2):
+            # Get bank amounts from BankAmt_Master
+            bank_amt = TblaccBankamtMaster.objects.filter(
+                bankid=bank.id,
+                compid=company_id,
+                finyearid=financial_year_id
+            ).first()
+
+            banks_data.append({
+                'id': bank.id,
+                'trans': bank.name,
+                'opamt': bank_amt.amt if bank_amt else 0,
+                'clamt': bank_amt.amt if bank_amt else 0,  # TODO: Calculate closing based on transactions
+            })
+
+        context['banks_data'] = banks_data
 
         return context
 

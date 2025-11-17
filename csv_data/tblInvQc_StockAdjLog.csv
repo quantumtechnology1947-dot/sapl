@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,LogNo,TransType,TransNo,ItemId,Qty
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,LogNo,TransType,TransNo,ItemId,Qty
 13,2013-05-29,2:17:18 PM,1,1,Sapl0052,0001,2,0102,4509,4.0
 14,2013-05-30,9:14:38 AM,1,1,Sapl0052,0002,2,0107,4509,4.0
 15,2013-05-30,9:21:32 AM,1,1,Sapl0052,0003,2,0107,4509,4.0

@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,BankName,Branch,Amount,Installment,fromDate,ToDate
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,BankName,Branch,Amount,Installment,fromDate,ToDate
 14,2017-05-13,3:06:57 PM,Sapl0061,1,5,Sapl0070,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,0.0,0.0,2012-11-30,2017-11-30
 16,2015-01-20,12:26:33 PM,sapl0061,1,2,Sapl0071,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,35000.0,2330.0,2008-09-01,2015-12-31
 17,2013-10-09,12:20:27 PM,Sapl0001,1,1,Sapl0055,Bhagini Nivedita Sahkari Bank,Sahkar Nagar,0.0,0.0,2008-09-01,2013-09-30

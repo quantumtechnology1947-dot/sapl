@@ -1,4 +1,4 @@
-﻿Id,BVPNo,SysDate,SysTime,CompId,SessionId,FinYearId,Type,ECSType,PayTo,ChequeNo,ChequeDate,Bank,PayAt,PayAtCountry,PayAtState,PayAtCity,PayAmt,AddAmt,TransactionType,PaidType,NameOnCheque,LoanType,IntrestType
+Id,BVPNo,SysDate,SysTime,CompId,SessionId,FinYearId,Type,ECSType,PayTo,ChequeNo,ChequeDate,Bank,PayAt,PayAtCountry,PayAtState,PayAtCity,PayAmt,AddAmt,TransactionType,PaidType,NameOnCheque,LoanType,IntrestType
 13,0001,2013-11-27,11:46:44,1,Sapl0003,1,4,3,E004,180711,2013-04-10,5,,1,21,405,144384.0,0.0,4,E004,,0,0
 15,0002,2013-11-27,12:02:28,1,Sapl0003,1,4,3,P002,036506,2013-10-25,3,,1,21,405,0.0,0.0,4,P002,,0,0
 16,0003,2013-11-27,12:08:58,1,Sapl0003,1,4,3,P002,186310,2013-07-05,5,,1,21,405,83567.0,0.0,4,P002,,0,0

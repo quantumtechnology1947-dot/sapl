@@ -1,0 +1,292 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Sales Invoice - New{% endblock %}
+
+{% block page_title %}Sales Invoice - New{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">Sales Invoice - New</h1>
+        <a href="{% url 'accounts:sales_invoice_list' %}" 
+           class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition">
+            ← Back to List
+        </a>
+    </div>
+
+    <!-- Search Form -->
+    <div class="bg-white rounded shadow-sm border border-gray-200 mb-6">
+        <div class="p-4">
+            <form method="get" class="flex gap-4 items-end">
+                <div>
+                    <label for="search_type" class="block text-xs font-medium text-gray-700 mb-1">Search By</label>
+                    <select name="search_type" 
+                            id="searchType"
+                            class="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-sap-blue"
+                            onchange="toggleSearchFields()">
+                        <option value="0" {% if search_type == '0' %}selected{% endif %}>Customer Name</option>
+                        <option value="1" {% if search_type == '1' %}selected{% endif %}>PO No</option>
+                    </select>
+                </div>
+                
+                <div class="flex-1" id="customerNameDiv" {% if search_type == '1' %}style="display:none;"{% endif %}>
+                    <label for="customer_name" class="block text-xs font-medium text-gray-700 mb-1">Customer Name</label>
+                    <input type="text" 
+                           class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-sap-blue" 
+                           id="customer_name" name="customer_name" value="{{ customer_name }}"
+                           placeholder="Search by customer name...">
+                </div>
+                
+                <div class="flex-1" id="poNoDiv" {% if search_type == '0' %}style="display:none;"{% endif %}>
+                    <label for="po_no" class="block text-xs font-medium text-gray-700 mb-1">PO Number</label>
+                    <input type="text" 
+                           class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-sap-blue" 
+                           id="po_no" name="po_no" value="{{ po_no }}"
+                           placeholder="Search by PO number...">
+                </div>
+                
+                <div>
+                    <button type="submit" 
+                            class="px-6 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition">
+                        Search
+                    </button>
+                </div>
+                <div>
+                    <a href="{% url 'accounts:sales_invoice_po_selection' %}"
+                       class="inline-block px-4 py-1.5 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition">
+                        Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+    function toggleSearchFields() {
+        const searchType = document.getElementById('searchType').value;
+        const customerNameDiv = document.getElementById('customerNameDiv');
+        const poNoDiv = document.getElementById('poNoDiv');
+        
+        if (searchType === '0') {
+            customerNameDiv.style.display = 'block';
+            poNoDiv.style.display = 'none';
+        } else {
+            customerNameDiv.style.display = 'none';
+            poNoDiv.style.display = 'block';
+        }
+    }
+    
+    // Toggle work order dropdown panel
+    function toggleWODropdown(poId) {
+        const panel = document.getElementById('wo_panel_' + poId);
+        const allPanels = document.querySelectorAll('[id^="wo_panel_"]');
+        
+        // Close all other panels
+        allPanels.forEach(p => {
+            if (p.id !== 'wo_panel_' + poId) {
+                p.classList.add('hidden');
+            }
+        });
+        
+        // Toggle current panel
+        panel.classList.toggle('hidden');
+    }
+    
+    // Update display textbox when work orders are selected
+    function updateWODisplay(poId) {
+        const selectElement = document.getElementById('wo_select_' + poId);
+        const displayInput = document.getElementById('wo_display_' + poId);
+        const hiddenInput = document.getElementById('wo_ids_' + poId);
+        
+        const selectedOptions = Array.from(selectElement.selectedOptions);
+        
+        // Extract work order numbers (part before "-")
+        const woNumbers = selectedOptions.map(opt => {
+            const woText = opt.getAttribute('data-wotext');
+            const parts = woText.split('-');
+            return parts[0]; // Get the WO number part
+        });
+        
+        // Extract work order IDs
+        const woIds = selectedOptions.map(opt => opt.value);
+        
+        // Update display textbox with comma-separated WO numbers
+        displayInput.value = woNumbers.join(', ');
+        
+        // Update hidden field with comma-separated IDs
+        hiddenInput.value = woIds.join(',');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const isClickInside = event.target.closest('[id^="wo_panel_"]') || 
+                             event.target.closest('[id^="wo_display_"]');
+        
+        if (!isClickInside) {
+            const allPanels = document.querySelectorAll('[id^="wo_panel_"]');
+            allPanels.forEach(p => p.classList.add('hidden'));
+        }
+    });
+    
+    function selectPO(poId, poNo, poDate, customerId) {
+        // Get the selected work order IDs from hidden field
+        const woIdsInput = document.getElementById('wo_ids_' + poId);
+        const woIds = woIdsInput ? woIdsInput.value : '';
+
+        // Get the selected type
+        const typeSelect = document.getElementById('type_' + poId);
+        const typeValue = typeSelect ? typeSelect.value : '';
+
+        // Validate selections
+        if (!typeValue) {
+            alert('Please select invoice type');
+            return;
+        }
+
+        if (!woIds || woIds === '') {
+            alert('Please select at least one work order');
+            return;
+        }
+
+        // Redirect to create page with query params matching ASP.NET spec
+        // ASP.NET: poid, wn, pn, date, ty, cid
+        window.location.href = '{% url "accounts:sales_invoice_create" %}?poid=' + poId +
+                               '&wn=' + encodeURIComponent(woIds) +
+                               '&pn=' + encodeURIComponent(poNo) +
+                               '&date=' + encodeURIComponent(poDate) +
+                               '&ty=' + typeValue +
+                               '&cid=' + encodeURIComponent(customerId);
+    }
+    </script>
+
+    <!-- PO List -->
+    <div class="bg-white rounded shadow-sm border border-gray-200">
+        <div class="p-4 border-b border-gray-200">
+            <span class="text-sm text-gray-600">
+                Total Records: <strong class="text-gray-900">{{ total_count }}</strong>
+            </span>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-700" style="width: 50px;">SN</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-700" style="width: 100px;">FinYear</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-700">Name of Customer</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-700" style="width: 150px;">PO No</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-700" style="width: 120px;">Date</th>
+                        <th class="px-4 py-2 text-left font-semibold text-gray-700" style="width: 120px;">WO No</th>
+                        <th class="px-4 py-2 text-center font-semibold text-gray-700" style="width: 100px;">Type</th>
+                        <th class="px-4 py-2 text-center font-semibold text-gray-700" style="width: 100px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for po in page_obj %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-2 text-center text-gray-900">{{ forloop.counter|add:page_obj.start_index|add:"-1" }}</td>
+                        <td class="px-4 py-2 text-gray-900">{{ po.fin_year|default:po.finyearid }}</td>
+                        <td class="px-4 py-2 text-gray-900">{{ po.customer_name|default:"-" }}</td>
+                        <td class="px-4 py-2 text-gray-900">{{ po.pono|default:"-" }}</td>
+                        <td class="px-4 py-2 text-gray-900">{{ po.formatted_date|default:"-" }}</td>
+                        <td class="px-4 py-2 text-gray-900">
+                            <div class="relative" style="min-width: 200px;">
+                                <!-- Display textbox (readonly) -->
+                                <input type="text" 
+                                       id="wo_display_{{ po.poid }}"
+                                       readonly
+                                       placeholder="Select WO..."
+                                       onclick="toggleWODropdown({{ po.poid }})"
+                                       class="w-full px-2 py-1 text-xs border border-gray-300 rounded bg-white cursor-pointer"
+                                       style="min-width: 200px;">
+                                
+                                <!-- Hidden dropdown panel -->
+                                <div id="wo_panel_{{ po.poid }}" 
+                                     class="hidden absolute z-10 bg-white border border-gray-300 rounded shadow-lg mt-1"
+                                     style="min-width: 320px; max-height: 200px; overflow-y: auto;">
+                                    <select id="wo_select_{{ po.poid }}"
+                                            multiple
+                                            size="5"
+                                            onchange="updateWODisplay({{ po.poid }})"
+                                            class="w-full border-0 focus:outline-none text-xs"
+                                            style="min-height: 100px;">
+                                        {% for wo in po.work_orders %}
+                                        <option value="{{ wo.id }}" data-wotext="{{ wo.display }}">{{ wo.display }}</option>
+                                        {% empty %}
+                                        <option value="" disabled>No work orders</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Hidden field to store work order IDs -->
+                                <input type="hidden" id="wo_ids_{{ po.poid }}">
+                            </div>
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <select id="type_{{ po.poid }}" class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-sap-blue">
+                                <option value="">Select</option>
+                                {% for type in po.invoice_types %}
+                                <option value="{{ type.id }}">{{ type.description }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <button onclick="selectPO('{{ po.poid }}', '{{ po.pono }}', '{{ po.formatted_date }}', '{{ po.customer_id_display }}')"
+                                    class="inline-block px-3 py-1 text-xs text-white bg-sap-blue rounded hover:bg-sap-blue-hover transition">
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                            No customer POs found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="px-4 py-3 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-600">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
+                </div>
+                <div class="flex gap-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?page=1&search_type={{ search_type }}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if po_no %}&po_no={{ po_no }}{% endif %}" 
+                       class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition">
+                        First
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}&search_type={{ search_type }}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if po_no %}&po_no={{ po_no }}{% endif %}" 
+                       class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition">
+                        Previous
+                    </a>
+                    {% endif %}
+                    
+                    <span class="px-3 py-1 text-sm bg-sap-blue text-white rounded">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&search_type={{ search_type }}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if po_no %}&po_no={{ po_no }}{% endif %}" 
+                       class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition">
+                        Next
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}&search_type={{ search_type }}{% if customer_name %}&customer_name={{ customer_name }}{% endif %}{% if po_no %}&po_no={{ po_no }}{% endif %}" 
+                       class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 transition">
+                        Last
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

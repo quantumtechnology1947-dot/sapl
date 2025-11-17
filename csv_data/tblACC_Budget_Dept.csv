@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,DeptId,AccId,Amount,BGId
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,DeptId,AccId,Amount,BGId
 1,2014-05-05,4:34:23 PM,1,1,Sapl0001,,,37655226.48,13
 3,2014-05-05,4:02:18 PM,1,1,Sapl0001,,,340594.24,3
 4,2014-05-05,4:19:08 PM,1,1,Sapl0001,,,714629.7,4

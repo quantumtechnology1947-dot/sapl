@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,ItemId,LockUnlock,Type,LockedbyTranaction,LockDate,LockTime
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,ItemId,LockUnlock,Type,LockedbyTranaction,LockDate,LockTime
 16412,2022-02-07,11:49:33 AM,1,9,sapl0350                                         ,69808,0,2,Sapl0324,2022-03-31,9:30:42 AM
 16413,2022-02-08,10:18:11 AM,1,9,SAPL0324,24403,0,2,0952,2022-12-05,7:01:30 PM
 16414,2022-02-08,12:07:42 PM,1,9,Sapl0324,83169,0,2,Sapl0324,2022-11-03,3:20:15 PM

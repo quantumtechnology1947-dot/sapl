@@ -385,3 +385,33 @@ class BillBookingPrintView(LoginRequiredMixin, DetailView):
 # from .bank_master_views import BankListView, BankCreateView, BankUpdateView, BankDeleteView
 # from .process_master_views import ProcessListView, ProcessCreateView, ProcessUpdateView, ProcessDeleteView
 
+
+
+class BillBookingAuthorizeListView(BaseListViewMixin, ListView):
+    """
+    Display list of pending bills for authorization.
+    
+    Converted from: BillBooking_Authorize.aspx
+    Shows bills with pending status and allows bulk authorization
+    """
+    model = TblaccBillbookingMaster
+    template_name = 'accounts/invoices/bill_booking_authorize_list.html'
+    context_object_name = 'bills'
+    paginate_by = 20
+    search_fields = ['pvevno', 'supplierid', 'pono']
+    partial_template_name = 'accounts/partials/bill_booking_authorize_partial.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # By default, show only pending (unauthorized) bills
+        view_all = self.request.GET.get('view_all', '')
+        if not view_all:
+            queryset = queryset.filter(authorize=0)
+        
+        return queryset.order_by('-id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['view_all'] = self.request.GET.get('view_all', '')
+        return context

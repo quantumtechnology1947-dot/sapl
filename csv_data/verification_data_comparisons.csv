@@ -1,1 +1,1 @@
-﻿id,table_name,django_count,aspnet_count,differences,matching_records,different_records,django_only_records,aspnet_only_records,comparison_date,comparison_criteria
+id,table_name,django_count,aspnet_count,differences,matching_records,different_records,django_only_records,aspnet_only_records,comparison_date,comparison_criteria

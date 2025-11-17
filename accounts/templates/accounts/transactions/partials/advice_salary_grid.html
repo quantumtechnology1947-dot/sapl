@@ -1,0 +1,24 @@
+<tbody id="salaryGridBody">
+    {% if temp_salary %}
+        {% for item in temp_salary %}
+        <tr>
+            <td class="grid-cell"><input type="text" value="{{ item.proformainvno }}" readonly></td>
+            <td class="grid-cell"><input type="text" value="{{ item.amount }}" style="text-align: right;" readonly></td>
+            <td class="grid-cell"><input type="text" value="{{ item.particular }}" readonly></td>
+            <td class="grid-cell" style="text-align: center;">
+                <button type="button"
+                        hx-post="{% url 'accounts:advice-salary-delete-temp' item.id %}"
+                        hx-target="#salaryGridBody"
+                        hx-swap="outerHTML"
+                        style="border: none; background: none; color: red; font-weight: bold; cursor: pointer;">
+                    X
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="4" class="grid-cell empty-row">{{ message|default:"No salary entries yet. Click Insert to add employees." }}</td>
+        </tr>
+    {% endif %}
+</tbody>

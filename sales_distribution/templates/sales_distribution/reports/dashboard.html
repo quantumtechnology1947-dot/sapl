@@ -1,0 +1,128 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Sales Distribution Reports{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Sales Distribution Reports</h1>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-gray-500 text-sm font-medium">Total Customers</div>
+            <div class="text-3xl font-bold text-blue-600 mt-2">{{ total_customers }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-gray-500 text-sm font-medium">Total Enquiries</div>
+            <div class="text-3xl font-bold text-green-600 mt-2">{{ total_enquiries }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-gray-500 text-sm font-medium">Total Quotations</div>
+            <div class="text-3xl font-bold text-purple-600 mt-2">{{ total_quotations }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-gray-500 text-sm font-medium">Total POs</div>
+            <div class="text-3xl font-bold text-yellow-600 mt-2">{{ total_pos }}</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-gray-500 text-sm font-medium">Total Work Orders</div>
+            <div class="text-3xl font-bold text-red-600 mt-2">{{ total_workorders }}</div>
+        </div>
+    </div>
+
+    <!-- Reports List -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Available Reports</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+            <a href="{% url 'sales_distribution:report-customer-master' %}" class="block p-6 hover:bg-gray-50 transition">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Customer Master Report</h3>
+                        <p class="text-sm text-gray-500 mt-1">Complete list of all customers with filtering options</p>
+                    </div>
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
+            <a href="{% url 'sales_distribution:report-customer-enquiry' %}" class="block p-6 hover:bg-gray-50 transition">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Customer Enquiry Report</h3>
+                        <p class="text-sm text-gray-500 mt-1">All customer enquiries with search and date filters</p>
+                    </div>
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
+            <a href="{% url 'sales_distribution:report-customer-quotation' %}" class="block p-6 hover:bg-gray-50 transition">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Customer Quotation Report</h3>
+                        <p class="text-sm text-gray-500 mt-1">Quotations with status and customer filters</p>
+                    </div>
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
+            <a href="{% url 'sales_distribution:report-customer-po' %}" class="block p-6 hover:bg-gray-50 transition">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">Customer PO Report</h3>
+                        <p class="text-sm text-gray-500 mt-1">Purchase orders with date range and customer filters</p>
+                    </div>
+                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Recent Enquiries</h2>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for enquiry in recent_enquiries %}
+                <div class="p-4">
+                    <div class="flex justify-between">
+                        <span class="font-medium">{{ enquiry.enquiryno }}</span>
+                        <span class="text-sm text-gray-500">{{ enquiry.enquirydate }}</span>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1">Customer: {{ enquiry.customerid }}</div>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-gray-500">No recent enquiries</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Recent POs</h2>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% for po in recent_pos %}
+                <div class="p-4">
+                    <div class="flex justify-between">
+                        <span class="font-medium">{{ po.pono }}</span>
+                        <span class="text-sm text-gray-500">{{ po.podate }}</span>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1">Customer: {{ po.customerid }}</div>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-gray-500">No recent POs</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

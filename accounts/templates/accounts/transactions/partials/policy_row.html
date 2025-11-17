@@ -1,0 +1,17 @@
+<tr class="hover:bg-gray-50">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {{ policy.id }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {{ policy.cvname|default:"-" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {{ policy.cvdate|default:"-" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm">
+        <a href="{% url 'accounts:policy-download' policy.id %}"
+           class="text-blue-600 hover:text-blue-900 hover:underline">
+            {{ policy.cvfilename }}
+        </a>
+    </td>
+</tr>

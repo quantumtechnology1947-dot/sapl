@@ -102,6 +102,15 @@ from .product import ProductView
 # Universal Search views (1 view)
 from .search import UniversalSearchView
 
+# Reports views (5 views)
+from .reports import (
+    ReportsDashboardView,
+    CustomerMasterReportView,
+    CustomerPOReportView,
+    CustomerQuotationReportView,
+    CustomerEnquiryReportView
+)
+
 
 __all__ = [
     # Shared
@@ -188,4 +197,11 @@ __all__ = [
 
     # Search
     'UniversalSearchView',
+
+    # Reports
+    'ReportsDashboardView',
+    'CustomerMasterReportView',
+    'CustomerPOReportView',
+    'CustomerQuotationReportView',
+    'CustomerEnquiryReportView',
 ]

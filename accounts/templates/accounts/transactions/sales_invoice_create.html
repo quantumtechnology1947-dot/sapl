@@ -1,0 +1,482 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Sales Invoice - New{% endblock %}
+
+{% block page_title %}Sales Invoice - New{% endblock %}
+
+{% block extra_css %}
+<style>
+[x-cloak] { display: none !important; }
+
+/* Tab Container */
+.tab-buttons-container {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #d1d5db;
+    margin-bottom: -2px;
+    background-color: #f9fafb;
+    padding: 8px 8px 0 8px;
+}
+
+/* Tab Button Styling */
+.tab-button {
+    display: inline-block;
+    padding: 12px 32px;
+    border: 2px solid #cbd5e0;
+    border-bottom: 2px solid #d1d5db;
+    background: linear-gradient(to bottom, #ffffff, #f7fafc);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 15px;
+    color: #4a5568;
+    transition: all 0.2s ease;
+    border-radius: 8px 8px 0 0;
+    position: relative;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button:hover {
+    background: linear-gradient(to bottom, #ffffff, #edf2f7);
+    color: #2d3748;
+    border-color: #a0aec0;
+    transform: translateY(-2px);
+}
+
+.tab-button.active {
+    background: #ffffff;
+    border-color: #3182ce;
+    border-bottom-color: #ffffff;
+    font-weight: 600;
+    color: #2c5282;
+    box-shadow: 0 -2px 8px rgba(49, 130, 206, 0.15);
+    z-index: 10;
+}
+
+/* Tab Panel */
+.tab-panel {
+    border: 2px solid #d1d5db;
+    border-radius: 0 8px 8px 8px;
+    padding: 24px;
+    background-color: #ffffff;
+    margin-top: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-gray-100">
+    <!-- Header -->
+    <div class="bg-gray-200 px-4 py-2 mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Sales Invoice - New</h2>
+    </div>
+
+    <form method="post" id="salesInvoiceForm" class="bg-white p-4 border border-gray-300">
+        {% csrf_token %}
+
+        <!-- Invoice Header Section - 3 columns layout matching ASP.NET -->
+        <div class="grid grid-cols-3 gap-x-8 gap-y-3 mb-4 pb-4 border-b border-gray-300">
+            <!-- Column 1 -->
+            <div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Invoice No. :</label>
+                    <input type="text" name="invoiceno" value="{{ next_invoice_no }}"
+                           readonly class="w-full px-2 py-1 border border-gray-300 rounded bg-gray-100 text-sm">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">PO No. :</label>
+                    <input type="text" name="pono" value="{{ pono }}"
+                           readonly class="w-full px-2 py-1 border border-gray-300 rounded bg-gray-100 text-sm">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    {{ header_form.customercategory }}
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mode of Transport</label>
+                    {{ header_form.modeoftransport }}
+                </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date :</label>
+                    <input type="text" value="{{ current_date }}"
+                           readonly class="w-full px-2 py-1 border border-gray-300 rounded bg-gray-100 text-sm">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">PO Date :</label>
+                    <input type="text" name="podate" value="{{ podate }}"
+                           readonly class="w-full px-2 py-1 border border-gray-300 rounded bg-gray-100 text-sm">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Excisable Commodity</label>
+                    {{ header_form.commodity }}
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date Of Issue Of Invoice</label>
+                    {{ header_form.dateofissueinvoice }}
+                </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mode of Invoice :</label>
+                    {{ header_form.invoicemode }}
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">WO No. :</label>
+                    <input type="text" name="wono" value="{{ wono_display }}"
+                           readonly class="w-full px-2 py-1 border border-gray-300 rounded bg-gray-100 text-sm">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tariff Head No/ Exemption Notif. No.</label>
+                    {{ header_form.tariffheading }}
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date Of Removal</label>
+                    {{ header_form.dateofremoval }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden fields matching ASP.NET implementation -->
+        {{ header_form.timeofissueinvoice }}
+        {{ header_form.timeofremoval }}
+        {{ header_form.natureofremoval }}
+        {{ header_form.vehiregno }}
+        {{ header_form.rrgcno }}
+        {{ header_form.dutyrate }}
+
+        <!-- Hidden fields for PO context -->
+        <input type="hidden" name="po_id" value="{{ po_id }}">
+        <input type="hidden" name="customer_id" value="{{ customer_id }}">
+        <input type="hidden" name="work_order_ids" value="{{ work_order_ids }}">
+
+        <!-- Tab Container -->
+        <div class="mb-4">
+            <!-- Tab Buttons -->
+            <div class="tab-buttons-container">
+                <button type="button" class="tab-button active" data-tab="buyer" id="btn-buyer">
+                    Buyer
+                </button>
+                <button type="button" class="tab-button" data-tab="consignee" id="btn-consignee">
+                    Consignee
+                </button>
+                <button type="button" class="tab-button" data-tab="goods" id="btn-goods">
+                    Goods
+                </button>
+                <button type="button" class="tab-button" data-tab="taxation" id="btn-taxation">
+                    Taxation
+                </button>
+            </div>
+
+            <!-- Tab Panels -->
+            <div class="tab-panels">
+                <!-- Buyer Tab -->
+                <div id="tab-buyer" class="tab-panel">
+                    {% include 'accounts/transactions/partials/sales_invoice_buyer_tab.html' %}
+                </div>
+
+                <!-- Consignee Tab -->
+                <div id="tab-consignee" class="tab-panel hidden">
+                    {% include 'accounts/transactions/partials/sales_invoice_consignee_tab.html' %}
+                </div>
+
+                <!-- Goods Tab -->
+                <div id="tab-goods" class="tab-panel hidden">
+                    {% include 'accounts/transactions/partials/sales_invoice_items_tab.html' %}
+                </div>
+
+                <!-- Taxation Tab -->
+                <div id="tab-taxation" class="tab-panel hidden">
+                    {% include 'accounts/transactions/partials/sales_invoice_taxation_tab.html' %}
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Tab Navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetTab = this.getAttribute('data-tab');
+
+            // Remove active class from all buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Hide all panels
+            tabPanels.forEach(panel => panel.classList.add('hidden'));
+
+            // Show target panel
+            document.getElementById('tab-' + targetTab).classList.remove('hidden');
+        });
+    });
+
+    // Handle Next/Previous buttons in tabs
+    document.querySelectorAll('.btn-next-tab').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const nextTab = this.getAttribute('data-next-tab');
+            if (nextTab) {
+                const nextButton = document.querySelector(`[data-tab="${nextTab}"]`);
+                if (nextButton) nextButton.click();
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-prev-tab').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const prevTab = this.getAttribute('data-prev-tab');
+            if (prevTab) {
+                const prevButton = document.querySelector(`[data-tab="${prevTab}"]`);
+                if (prevButton) prevButton.click();
+            }
+        });
+    });
+});
+
+// Auto-fill time fields with current time
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const timeString = now.toTimeString().substring(0, 5); // Format: HH:MM
+
+    const timeOfIssue = document.getElementById('id_timeofissueinvoice');
+    const timeOfRemoval = document.getElementById('id_timeofremoval');
+
+    if (timeOfIssue) timeOfIssue.value = timeString;
+    if (timeOfRemoval) timeOfRemoval.value = timeString;
+});
+
+// Commodity to Tariff Auto-fill using HTMX endpoint
+document.getElementById('id_commodity')?.addEventListener('change', function() {
+    const commodityId = this.value;
+    if (commodityId) {
+        fetch(`{% url 'accounts:sales_invoice_get_tariff' %}?commodity_id=${commodityId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.tariff) {
+                    document.getElementById('id_tariffheading').value = data.tariff;
+                }
+            })
+            .catch(error => console.error('Error fetching tariff:', error));
+    } else {
+        document.getElementById('id_tariffheading').value = '';
+    }
+});
+
+// Cascading Dropdowns: Country → State → City (for Buyer and Consignee)
+document.addEventListener('DOMContentLoaded', function() {
+    // Helper function to populate dropdown with options
+    function populateDropdown(selectElement, items, valueField, textField, selectedValue) {
+        // Clear existing options except the first one (placeholder)
+        selectElement.innerHTML = '<option value="">Select ' + selectElement.getAttribute('data-label') + '</option>';
+
+        // Add new options
+        items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item[valueField];
+            option.textContent = item[textField];
+            if (selectedValue && item[valueField] == selectedValue) {
+                option.selected = true;
+            }
+            selectElement.appendChild(option);
+        });
+    }
+
+    // Auto-load cascading data on page load if initial values exist
+    function loadInitialCascadingData(countryId, stateSelectId, citySelectId, initialStateValue, initialCityValue) {
+        const countrySelect = document.getElementById(countryId);
+        const stateSelect = document.getElementById(stateSelectId);
+        const citySelect = document.getElementById(citySelectId);
+
+        if (!countrySelect || !stateSelect || !citySelect) return;
+
+        const initialCountryValue = countrySelect.value;
+
+        if (initialCountryValue) {
+            // Load states for initial country
+            fetch(`{% url 'accounts:sales_invoice_get_states' %}?country_id=${initialCountryValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateDropdown(stateSelect, data.states || [], 'sid', 'statename', initialStateValue);
+
+                    // After states loaded, if we have initial state value, load cities
+                    if (initialStateValue && stateSelect.value) {
+                        return fetch(`{% url 'accounts:sales_invoice_get_cities' %}?state_id=${stateSelect.value}`);
+                    }
+                })
+                .then(response => {
+                    if (response) return response.json();
+                })
+                .then(data => {
+                    if (data) {
+                        populateDropdown(citySelect, data.cities || [], 'cityid', 'cityname', initialCityValue);
+                    }
+                })
+                .catch(error => console.error('Error loading initial cascading data:', error));
+        }
+    }
+
+    // Buyer Country → State
+    document.getElementById('id_buyer_country')?.addEventListener('change', function() {
+        const countryId = this.value;
+        const stateSelect = document.getElementById('id_buyer_state');
+        const citySelect = document.getElementById('id_buyer_city');
+
+        if (countryId) {
+            fetch(`{% url 'accounts:sales_invoice_get_states' %}?country_id=${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateDropdown(stateSelect, data.states || [], 'sid', 'statename');
+                    // Clear city dropdown
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+                })
+                .catch(error => console.error('Error fetching states:', error));
+        } else {
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            citySelect.innerHTML = '<option value="">Select City</option>';
+        }
+    });
+
+    // Buyer State → City
+    document.getElementById('id_buyer_state')?.addEventListener('change', function() {
+        const stateId = this.value;
+        const citySelect = document.getElementById('id_buyer_city');
+
+        if (stateId) {
+            fetch(`{% url 'accounts:sales_invoice_get_cities' %}?state_id=${stateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateDropdown(citySelect, data.cities || [], 'cityid', 'cityname');
+                })
+                .catch(error => console.error('Error fetching cities:', error));
+        } else {
+            citySelect.innerHTML = '<option value="">Select City</option>';
+        }
+    });
+
+    // Consignee Country → State
+    document.getElementById('id_cong_country')?.addEventListener('change', function() {
+        const countryId = this.value;
+        const stateSelect = document.getElementById('id_cong_state');
+        const citySelect = document.getElementById('id_cong_city');
+
+        if (countryId) {
+            fetch(`{% url 'accounts:sales_invoice_get_states' %}?country_id=${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateDropdown(stateSelect, data.states || [], 'sid', 'statename');
+                    // Clear city dropdown
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+                })
+                .catch(error => console.error('Error fetching states:', error));
+        } else {
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            citySelect.innerHTML = '<option value="">Select City</option>';
+        }
+    });
+
+    // Consignee State → City
+    document.getElementById('id_cong_state')?.addEventListener('change', function() {
+        const stateId = this.value;
+        const citySelect = document.getElementById('id_cong_city');
+
+        if (stateId) {
+            fetch(`{% url 'accounts:sales_invoice_get_cities' %}?state_id=${stateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateDropdown(citySelect, data.cities || [], 'cityid', 'cityname');
+                })
+                .catch(error => console.error('Error fetching cities:', error));
+        } else {
+            citySelect.innerHTML = '<option value="">Select City</option>';
+        }
+    });
+
+    // Auto-load buyer cascading data on page load
+    // Read initial values from Django form's rendered selected options
+    const buyerStateSelect = document.getElementById('id_buyer_state');
+    const buyerCitySelect = document.getElementById('id_buyer_city');
+
+    // Get initial values from selected options or data attributes
+    let initialBuyerState = null;
+    let initialBuyerCity = null;
+
+    if (buyerStateSelect) {
+        const selectedStateOption = Array.from(buyerStateSelect.options).find(opt => opt.selected && opt.value);
+        initialBuyerState = selectedStateOption ? selectedStateOption.value : (buyerStateSelect.dataset.initial || null);
+    }
+
+    if (buyerCitySelect) {
+        const selectedCityOption = Array.from(buyerCitySelect.options).find(opt => opt.selected && opt.value);
+        initialBuyerCity = selectedCityOption ? selectedCityOption.value : (buyerCitySelect.dataset.initial || null);
+    }
+
+    loadInitialCascadingData('id_buyer_country', 'id_buyer_state', 'id_buyer_city', initialBuyerState, initialBuyerCity);
+
+    // Auto-load consignee cascading data on page load
+    const congStateSelect = document.getElementById('id_cong_state');
+    const congCitySelect = document.getElementById('id_cong_city');
+
+    let initialCongState = null;
+    let initialCongCity = null;
+
+    if (congStateSelect) {
+        const selectedStateOption = Array.from(congStateSelect.options).find(opt => opt.selected && opt.value);
+        initialCongState = selectedStateOption ? selectedStateOption.value : (congStateSelect.dataset.initial || null);
+    }
+
+    if (congCitySelect) {
+        const selectedCityOption = Array.from(congCitySelect.options).find(opt => opt.selected && opt.value);
+        initialCongCity = selectedCityOption ? selectedCityOption.value : (congCitySelect.dataset.initial || null);
+    }
+
+    loadInitialCascadingData('id_cong_country', 'id_cong_state', 'id_cong_city', initialCongState, initialCongCity);
+});
+
+// Copy Buyer to Consignee functionality
+document.getElementById('copy-buyer-btn')?.addEventListener('click', function() {
+    // Copy all buyer fields to consignee fields
+    document.getElementById('id_cong_name').value = document.getElementById('id_buyer_name').value;
+    document.getElementById('id_cong_add').value = document.getElementById('id_buyer_add').value;
+    document.getElementById('id_cong_country').value = document.getElementById('id_buyer_country').value;
+
+    // Trigger change event on country to load states
+    const countryChangeEvent = new Event('change', { bubbles: true });
+    document.getElementById('id_cong_country').dispatchEvent(countryChangeEvent);
+
+    // Wait for states to load, then set state
+    setTimeout(() => {
+        document.getElementById('id_cong_state').value = document.getElementById('id_buyer_state').value;
+
+        // Trigger change event on state to load cities
+        const stateChangeEvent = new Event('change', { bubbles: true });
+        document.getElementById('id_cong_state').dispatchEvent(stateChangeEvent);
+
+        // Wait for cities to load, then set city
+        setTimeout(() => {
+            document.getElementById('id_cong_city').value = document.getElementById('id_buyer_city').value;
+        }, 300);
+    }, 300);
+
+    document.getElementById('id_cong_cotper').value = document.getElementById('id_buyer_cotper').value;
+    document.getElementById('id_cong_ph').value = document.getElementById('id_buyer_ph').value;
+    document.getElementById('id_cong_mob').value = document.getElementById('id_buyer_mob').value;
+    document.getElementById('id_cong_email').value = document.getElementById('id_buyer_email').value;
+    document.getElementById('id_cong_tin').value = document.getElementById('id_buyer_tin').value;
+});
+</script>
+{% endblock %}

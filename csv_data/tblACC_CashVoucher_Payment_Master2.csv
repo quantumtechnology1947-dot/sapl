@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,CVPNo,PaidTo,ReceivedBy,CodeType
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,CVPNo,PaidTo,ReceivedBy,CodeType
 1,2013-10-10,5:30:33 PM,1,1,Sapl0031,0001,Santosh Dattatray Datre,Sapl0048,1
 2,2013-10-10,5:33:44 PM,1,1,Sapl0031,0002,Santosh Dattatray Datre,Sapl0048,1
 3,2013-10-10,5:36:31 PM,1,1,Sapl0031,0003,Santosh Dattatray Datre,Sapl0048,1

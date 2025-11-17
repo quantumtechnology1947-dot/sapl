@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,SupplierId,OpeningAmt
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,SupplierId,OpeningAmt
 5,2013-10-26,6:36:06 PM,Sapl0174,1,1,A007,9108.0
 6,2013-10-28,5:36:19 PM,Sapl0174,1,1,A003,6280.0
 7,2013-10-28,5:36:45 PM,Sapl0174,1,1,B002,60628.0

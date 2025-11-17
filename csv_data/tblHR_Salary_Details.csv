@@ -1,4 +1,4 @@
-﻿Id,Present,Absent,LateIn,HalfDay,Sunday,Coff,PL,OverTimeHrs,OverTimeRate,Installment,MobileExeAmt,Addition,Remarks1,Deduction,Remarks2,MId
+Id,Present,Absent,LateIn,HalfDay,Sunday,Coff,PL,OverTimeHrs,OverTimeRate,Installment,MobileExeAmt,Addition,Remarks1,Deduction,Remarks2,MId
 41,18.0,5.5,12.0,0.5,0.0,0.0,0.0,0.0,0.0,0.0,176.0,6000.0,Arrears,0.0,-,41
 42,12.0,12.5,0.0,0.5,0.0,1.0,0.0,0.0,0.0,0.0,85.0,0.0,-,0.0,-,42
 43,22.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-,0.0,-,43

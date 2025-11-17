@@ -1,0 +1,24 @@
+<tbody id="othersGridBody">
+    {% if temp_others %}
+        {% for item in temp_others %}
+        <tr>
+            <td class="grid-cell" style="text-align: center;">{{ forloop.counter }}</td>
+            <td class="grid-cell"><input type="text" value="{{ item.particular }}" readonly></td>
+            <td class="grid-cell"><input type="text" value="{{ item.amount }}" style="text-align: right;" readonly></td>
+            <td class="grid-cell" style="text-align: center;">
+                <button type="button"
+                        hx-post="{% url 'accounts:advice-others-delete-temp' item.id %}"
+                        hx-target="#othersGridBody"
+                        hx-swap="outerHTML"
+                        style="border: none; background: none; color: red; font-weight: bold; cursor: pointer;">
+                    X
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="4" class="grid-cell empty-row">{{ message|default:"No items added yet. Click Insert to add payment details." }}</td>
+        </tr>
+    {% endif %}
+</tbody>

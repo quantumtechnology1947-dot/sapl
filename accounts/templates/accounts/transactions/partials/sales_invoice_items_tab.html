@@ -1,0 +1,169 @@
+<!-- Goods/Items Tab Content matching ASP.NET layout -->
+<div class="space-y-4">
+    <!-- Items Grid Table -->
+    <div class="overflow-x-auto">
+        {{ goods_formset.management_form }}
+
+        <table class="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-300 px-2 py-1 text-left">SN</th>
+                    <th class="border border-gray-300 px-2 py-1 text-center">Select</th>
+                    <th class="border border-gray-300 px-2 py-1 text-left">Description (Item Description)</th>
+                    <th class="border border-gray-300 px-2 py-1 text-left">Unit</th>
+                    <th class="border border-gray-300 px-2 py-1 text-right">Qty (Total Quantity)</th>
+                    <th class="border border-gray-300 px-2 py-1 text-right">Rem Qty</th>
+                    <th class="border border-gray-300 px-2 py-1 text-left">Unit Of Qty</th>
+                    <th class="border border-gray-300 px-2 py-1 text-right">Req Qty</th>
+                    <th class="border border-gray-300 px-2 py-1 text-right">Rate</th>
+                    <th class="border border-gray-300 px-2 py-1 text-right">Amt in (%)</th>
+                </tr>
+            </thead>
+            <tbody id="items-table-body">
+                {% for form in goods_formset %}
+                <tr class="invoice-item-row hover:bg-gray-50" data-form-index="{{ forloop.counter0 }}">
+                    <td class="border border-gray-300 px-2 py-1">{{ forloop.counter }}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-center">
+                        {{ form.selected }}
+                        {{ form.item_id }}
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1">{{ form.initial.item_desc }}</td>
+                    <td class="border border-gray-300 px-2 py-1">{{ form.initial.unit }}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-right">{{ form.initial.total_qty }}</td>
+                    <td class="border border-gray-300 px-2 py-1 text-right item-remaining-qty">
+                        {{ form.initial.remaining_qty }}
+                        {{ form.remaining_qty }}
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1">
+                        <span class="text-sm">{{ form.initial.unit }}</span>
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1">
+                        {{ form.req_qty }}
+                        {% if form.req_qty.errors %}
+                            <div class="qty-error text-red-600 text-xs mt-1">
+                                {{ form.req_qty.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1">
+                        <input type="number" value="{{ form.initial.rate }}" readonly
+                               class="item-rate w-full px-1 py-0.5 border border-gray-300 rounded text-right bg-gray-100 text-xs">
+                    </td>
+                    <td class="border border-gray-300 px-2 py-1">
+                        {{ form.percentage }}
+                        {% if form.percentage.errors %}
+                            <div class="percentage-error text-red-600 text-xs mt-1">
+                                {{ form.percentage.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <input type="hidden" class="item-remaining-percentage" value="{{ form.initial.remaining_percentage }}">
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="border border-gray-300 px-2 py-2 text-center text-gray-500">
+                        No items available for this PO
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Formset errors -->
+    {% if goods_formset.non_form_errors %}
+        <div class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded">
+            {{ goods_formset.non_form_errors }}
+        </div>
+    {% endif %}
+
+    <!-- Navigation Buttons -->
+    <div class="flex gap-3 mt-6">
+        <button type="button" data-next-tab="taxation" class="btn-next-tab px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium">
+            Next
+        </button>
+        <a href="{% url 'accounts:sales_invoice_list' %}"
+           class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium inline-block">
+            Cancel
+        </a>
+    </div>
+</div>
+
+<script>
+// Items tab validation and interaction
+document.addEventListener('DOMContentLoaded', function() {
+    const itemRows = document.querySelectorAll('.invoice-item-row');
+
+    itemRows.forEach(row => {
+        const formIndex = row.getAttribute('data-form-index');
+        const checkbox = row.querySelector(`#id_form-${formIndex}-selected`);
+        const qtyInput = row.querySelector(`#id_form-${formIndex}-req_qty`);
+        const percentageInput = row.querySelector(`#id_form-${formIndex}-percentage`);
+
+        // Enable/disable inputs based on checkbox
+        checkbox?.addEventListener('change', function() {
+            if (this.checked) {
+                if (qtyInput) qtyInput.disabled = false;
+                if (percentageInput) percentageInput.disabled = false;
+            } else {
+                if (qtyInput) {
+                    qtyInput.disabled = true;
+                    qtyInput.value = '';
+                }
+                if (percentageInput) {
+                    percentageInput.disabled = true;
+                    percentageInput.value = '';
+                }
+            }
+        });
+
+        // Initialize disabled state
+        if (checkbox && !checkbox.checked) {
+            if (qtyInput) qtyInput.disabled = true;
+            if (percentageInput) percentageInput.disabled = true;
+        }
+
+        // Validate quantity against remaining qty
+        qtyInput?.addEventListener('input', function() {
+            const maxQty = parseFloat(qtyInput.getAttribute('max'));
+            const currentQty = parseFloat(this.value);
+
+            if (currentQty > maxQty) {
+                this.classList.add('border-red-500');
+                const errorDiv = row.querySelector('.qty-error');
+                if (errorDiv && !errorDiv.textContent) {
+                    errorDiv.textContent = `Exceeds remaining quantity of ${maxQty}`;
+                    errorDiv.classList.remove('hidden');
+                }
+            } else {
+                this.classList.remove('border-red-500');
+                const errorDiv = row.querySelector('.qty-error');
+                if (errorDiv && !errorDiv.textContent.includes('field is required')) {
+                    errorDiv.classList.add('hidden');
+                }
+            }
+        });
+
+        // Validate percentage
+        percentageInput?.addEventListener('input', function() {
+            const maxPercentage = parseFloat(percentageInput.getAttribute('max'));
+            const currentPercentage = parseFloat(this.value);
+
+            if (currentPercentage > maxPercentage) {
+                this.classList.add('border-red-500');
+                const errorDiv = row.querySelector('.percentage-error');
+                if (errorDiv && !errorDiv.textContent) {
+                    errorDiv.textContent = `Exceeds remaining ${maxPercentage}%`;
+                    errorDiv.classList.remove('hidden');
+                }
+            } else {
+                this.classList.remove('border-red-500');
+                const errorDiv = row.querySelector('.percentage-error');
+                if (errorDiv && !errorDiv.textContent.includes('field is required')) {
+                    errorDiv.classList.add('hidden');
+                }
+            }
+        });
+    });
+});
+</script>

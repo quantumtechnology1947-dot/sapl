@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,FinYearId,CompId,SessionId,ClearedQty,DId
+Id,SysDate,SysTime,FinYearId,CompId,SessionId,ClearedQty,DId
 14,2014-08-22,4:13:35 PM,2,1,Sapl0001,8.0,17
 15,2014-08-22,4:13:35 PM,2,1,Sapl0001,4.0,18
 16,2014-08-22,4:13:35 PM,2,1,Sapl0001,2.0,19

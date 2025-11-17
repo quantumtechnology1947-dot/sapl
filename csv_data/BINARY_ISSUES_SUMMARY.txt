@@ -1,0 +1,233 @@
+================================================================================
+BINARY DATA ISSUES - QUICK SUMMARY
+================================================================================
+
+Analysis Date: 2025-11-16
+Files Scanned: 280 CSV files
+Detailed Analysis: 16+ priority files
+
+================================================================================
+CRITICAL FINDINGS: NONE FOUND
+================================================================================
+
+✓ NO null bytes (\x00) - No BOM corruption
+✓ NO invalid UTF-8 - All multi-byte sequences valid
+✓ NO control characters - No hidden/dangerous chars
+✓ NO UTF-8 BOM markers - No \xEF\xBB\xBF
+✓ NO binary data corruption - All content readable
+
+OVERALL VERDICT: Data is SAFE for Django migration
+
+
+================================================================================
+ISSUES FOUND (Minor - Easily Fixable)
+================================================================================
+
+ISSUE #1: MIXED LINE ENDINGS (2 files - Low Severity)
+─────────────────────────────────────────────────────
+
+  Grouping_Events.csv
+    - Size: 6.6 KB
+    - Issue: Mix of CRLF (74 lines) + LF (13 lines)
+    - Impact: CSV parsers handle it, but inconsistent
+    - Fix: Normalize all to LF (Unix) or CRLF (Windows)
+    - Time: < 5 minutes
+
+  SD_Cust_master.csv
+    - Size: 128 KB
+    - Issue: Mix of CRLF (8 lines) + LF (2 lines)
+    - Impact: Same as above
+    - Fix: Same normalization
+    - Time: < 5 minutes
+
+
+ISSUE #2: NON-ASCII UTF-8 CHARACTERS (6+ files - Medium Severity)
+───────────────────────────────────────────────────────────────
+
+  HIGH IMPACT:
+  
+    tblDG_Item_Master.csv (16.3 MB)
+      - 1,201 non-ASCII bytes
+      - 328x Non-breaking spaces (U+00A0)
+      - 72x En dashes (U+2013)
+      - 3x Em dashes (U+2014)
+      - Fix: Replace with ASCII equivalents
+      - Time: 30-60 minutes
+  
+    tblMM_Supplier_master.csv (705 KB)
+      - 534 non-ASCII bytes
+      - 157x En dashes (U+2013)
+      - Fix: Replace dashes with hyphens
+      - Time: 20 minutes
+  
+    tblACC_SalesInvoice_Master.csv (466 KB)
+      - 250 non-ASCII bytes
+      - 82x En dashes (U+2013)
+      - 2x Non-breaking spaces
+      - Fix: Replace with ASCII equivalents
+      - Time: 20 minutes
+
+  MEDIUM IMPACT:
+  
+    SD_Cust_Enquiry_Master.csv (464 KB) - 194 non-ASCII bytes
+    SD_Cust_WorkOrder_Master.csv (459 KB) - 164 non-ASCII bytes
+    SD_Cust_WorkOrder_Products_Details.csv (216 KB) - 194 non-ASCII bytes
+  
+  MINOR IMPACT:
+  
+    21 other files with < 50 non-ASCII bytes each
+
+
+ISSUE #3: EMPTY BINARY COLUMNS (3 files - Informational)
+──────────────────────────────────────────────────────────
+
+  tblDG_Item_Master.csv
+    - Columns: FileData, AttData, FileName, FileSize, ContentType, AttContentType
+    - Status: ALL EMPTY (verified across 100 rows)
+    - Action: No immediate fix needed
+    - Note: Attachment feature not implemented
+
+  tblACC_BillBooking_Attach_Master.csv
+    - Columns: FileData, FileName, FileSize, ContentType
+    - Status: ALL EMPTY
+    - Action: Not needed
+
+  SD_Cust_Enquiry_Attach_Master.csv
+    - Columns: FileData, FileName, FileSize, ContentType
+    - Status: ALL EMPTY
+    - Action: Not needed
+
+
+================================================================================
+WHAT ARE THESE SPECIAL CHARACTERS?
+================================================================================
+
+Non-breaking Space (U+00A0) - NBSP
+├─ Looks like regular space: " "
+├─ Prevents line breaking (unwanted in CSV)
+├─ Used in product names, titles
+└─ Solution: Replace with regular space (0x20)
+
+En Dash (U+2013) - ENDASH
+├─ Typographic dash: "–" (longer than hyphen)
+├─ Used in ranges: "2020–2024"
+├─ Looks professional but breaks ASCII parsers
+└─ Solution: Replace with hyphen "-"
+
+Em Dash (U+2014) - EMDASH
+├─ Longer dash: "—"
+├─ Used for emphasis
+├─ Breaks ASCII parsers
+└─ Solution: Replace with hyphen "-"
+
+
+================================================================================
+QUICK FIX SCRIPTS
+================================================================================
+
+PYTHON: Normalize Line Endings
+────────────────────────────────
+import os
+
+for filename in ['Grouping_Events.csv', 'SD_Cust_master.csv']:
+    with open(filename, 'rb') as f:
+        content = f.read()
+    
+    # Normalize to LF
+    content = content.replace(b'\r\n', b'\n')
+    
+    with open(filename + '.fixed', 'wb') as f:
+        f.write(content)
+    
+    print(f"Fixed: {filename}")
+
+
+PYTHON: Normalize Non-ASCII Characters
+────────────────────────────────────────
+import pandas as pd
+
+files = [
+    'tblDG_Item_Master.csv',
+    'tblMM_Supplier_master.csv',
+    'tblACC_SalesInvoice_Master.csv',
+    'SD_Cust_Enquiry_Master.csv',
+    'SD_Cust_WorkOrder_Master.csv',
+    'SD_Cust_WorkOrder_Products_Details.csv',
+]
+
+for filename in files:
+    print(f"Processing {filename}...", end=' ')
+    df = pd.read_csv(filename, encoding='utf-8')
+    
+    # Normalize all string columns
+    for col in df.select_dtypes(include='object').columns:
+        df[col] = df[col].astype(str)
+        df[col] = df[col].str.replace('\u00A0', ' ', regex=False)
+        df[col] = df[col].str.replace('\u2013', '-', regex=False)
+        df[col] = df[col].str.replace('\u2014', '-', regex=False)
+    
+    # Save with _cleaned suffix
+    output = filename.replace('.csv', '_cleaned.csv')
+    df.to_csv(output, index=False, encoding='utf-8')
+    print(f"✓ Saved as {output}")
+
+
+================================================================================
+PRIORITY ACTION ITEMS
+================================================================================
+
+MUST DO:
+☐ Normalize non-ASCII characters in tblDG_Item_Master.csv (16.3 MB)
+  └─ Reason: Largest file, most special characters
+
+☐ Normalize non-ASCII in tblMM_Supplier_master.csv and tblACC_SalesInvoice_Master.csv
+  └─ Reason: Medium/large files with significant non-ASCII counts
+
+SHOULD DO:
+☐ Normalize line endings in Grouping_Events.csv and SD_Cust_master.csv
+  └─ Reason: Quick fix, ensures parsing consistency
+
+NICE TO HAVE:
+☐ Normalize non-ASCII in other 3 files
+☐ Document UTF-8 handling in Django import/export
+
+NOT NEEDED:
+✗ Binary column cleanup (data is safe, columns just empty)
+✗ Special encoding fixes (all UTF-8 valid already)
+
+
+================================================================================
+TESTING CHECKLIST
+================================================================================
+
+After applying fixes:
+
+☐ Import cleaned CSV into Django
+☐ Verify row count matches original
+☐ Check special characters display correctly
+☐ Run full Django model validation
+☐ Test export/import round-trip
+☐ Compare with legacy ASP.NET system
+☐ Verify no data loss
+
+
+================================================================================
+TIMELINE ESTIMATE
+================================================================================
+
+Task                          | Effort
+──────────────────────────────┼────────────
+Fix line endings (2 files)    | 15 min
+Normalize non-ASCII (6 files) | 1-2 hours
+Testing & validation          | 1-2 hours
+Documentation                 | 30 min
+──────────────────────────────┼────────────
+TOTAL                         | 3-4 hours
+
+
+================================================================================
+FULL REPORT
+================================================================================
+
+See: BINARY_ANALYSIS_REPORT.md for comprehensive technical details
+

@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,GRRNo,GINNo,GINId,TaxInvoiceNo,TaxInvoiceDate,ModVatApp,ModVatInv
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,GRRNo,GINNo,GINId,TaxInvoiceNo,TaxInvoiceDate,ModVatApp,ModVatInv
 9108,2018-04-13,4:19:54 PM,sapl0276,1,6,0001,0001,11473,20,2018-03-31,0,0
 9109,2018-04-13,4:24:47 PM,sapl0276,1,6,0002,0002,11474,20,2018-03-31,0,0
 9110,2018-04-14,10:59:50 AM,sapl0276,1,6,0003,0003,11475,MM-0225/18-19,2018-04-13,0,0

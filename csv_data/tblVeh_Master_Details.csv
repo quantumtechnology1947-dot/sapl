@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,SessionId,FinYearId,VehNo,Date,Vehical_Name,Contact,Destination,Address,FromKM,FromTo,Avg,Fluel_Date,Fluel_Rs,Material,Emp
+Id,SysDate,SysTime,CompId,SessionId,FinYearId,VehNo,Date,Vehical_Name,Contact,Destination,Address,FromKM,FromTo,Avg,Fluel_Date,Fluel_Rs,Material,Emp
 2,2022-02-16,4:35:17 PM,1,sapl0001,9,1,16-02-2022,ALTO MH12 AB 1234,9822355926/9850986845,HARDTECH HARDWARE,"1613 Shukrawar Peth Bhori Ali,",15000,16955,0,15-02-2022,800,BEARINGS,Akshay shrikrishana surwase
 3,2022-02-18,5:02:54 PM,1,sapl0357,9,2,18-02-2022,BOLERO PIKUP MH12 EF 5483,9423573682,DHANLAXMI PROFILES,"S.No.39/1/39/2,Manikbaug, Vadgaon (Bk)Pune",0,0,0,-,-,S S SHEET,Akshay shrikrishana surwase
 4,2022-02-19,12:17:26 PM,1,sapl0357,9,3,19-02-2022,ALTO CAR MH 12 FP 4744,-,COLOURSHINE POLYCOATS PVT. LTD.,"Gut No 7, Property no 393, Kasurdi road, kasurdi, bhor, pune",0,0,0,-,-,PAINT,Akshay shrikrishana surwase

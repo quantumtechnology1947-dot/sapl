@@ -1,4 +1,4 @@
-﻿Id,EnqId,CompId,SessionId,FinYearId,FileName,FileSize,ContentType,FileData
+Id,EnqId,CompId,SessionId,FinYearId,FileName,FileSize,ContentType,FileData
 3,32,1,Sapl0005,1,S A P L = 10298378.pdf,91928.0,application/pdf,
 4,635,1,sapl0292,6,Synergetic_PO_9887.pdf,225065.0,application/pdf,
 5,664,1,sapl0313,7,NOD0000115318_--A_CATDRAWING_1_Sheet_2.zip,2890239.0,application/octet-stream,

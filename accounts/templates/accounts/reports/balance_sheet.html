@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Balance Sheet - Accounts{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <div class="bg-gray-600 text-white px-4 py-2 mb-1">
+        <h1 class="text-sm font-bold">Balance Sheet</h1>
+    </div>
+
+    <!-- Balance Sheet Table -->
+    <div class="bg-white border border-gray-300">
+        <table class="w-full" style="border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #808080;">
+                    <th class="text-left px-4 py-2 font-bold text-white" style="width: 50%;">Liabilities</th>
+                    <th class="text-right px-4 py-2 font-bold text-white" style="width: 20%;"></th>
+                    <th class="text-left px-4 py-2 font-bold text-white" style="width: 30%;">Assets</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if report.liabilities or report.assets %}
+                    {% for liability, asset in report.rows %}
+                    <tr>
+                        <!-- Liability Column -->
+                        <td class="px-4 py-2" style="background-color: #CCFFFF; vertical-align: top;">
+                            {% if liability %}
+                            <a href="{{ liability.url }}" class="text-blue-600 underline hover:text-blue-800">{{ liability.name }}</a>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2 text-right" style="background-color: #CCFFFF; vertical-align: top;">
+                            {% if liability %}
+                            {{ liability.amount|floatformat:2 }}
+                            {% endif %}
+                        </td>
+
+                        <!-- Asset Column -->
+                        <td class="px-4 py-2" style="background-color: #CCFFFF; vertical-align: top;">
+                            {% if asset %}
+                            <a href="{{ asset.url }}" class="text-blue-600 underline hover:text-blue-800">{{ asset.name }}</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    <!-- Empty rows for spacing if needed -->
+                    {% for i in report.empty_rows %}
+                    <tr>
+                        <td class="px-4 py-2" style="background-color: #CCFFFF;">&nbsp;</td>
+                        <td class="px-4 py-2" style="background-color: #CCFFFF;">&nbsp;</td>
+                        <td class="px-4 py-2" style="background-color: #CCFFFF;">&nbsp;</td>
+                    </tr>
+                    {% endfor %}
+
+                    <!-- Total Row -->
+                    <tr style="border-top: 2px solid #000;">
+                        <td class="px-4 py-2 font-bold">Total</td>
+                        <td class="px-4 py-2 text-right font-bold">{{ report.total_liabilities|floatformat:2 }}</td>
+                        <td class="px-4 py-2 font-bold text-right">{{ report.total_assets|floatformat:2 }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="px-4 py-8 text-center text-gray-500">
+                            No balance sheet data available
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Print Button -->
+    <div class="mt-4 flex justify-end no-print">
+        <button onclick="window.print()"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm">
+            Print
+        </button>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        body { font-size: 11pt; }
+        table { page-break-inside: avoid; }
+    }
+</style>
+{% endblock %}

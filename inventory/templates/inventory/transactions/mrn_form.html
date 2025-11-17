@@ -1,117 +1,278 @@
-{% extends "core/base.html" %}
+{% extends "inventory/base.html" %}
 
-{% block title %}{% if object %}Edit{% else %}Create{% endif %} MRN - Cortex ERP{% endblock %}
-{% block page_title %}Material Return Note{% endblock %}
+{% block title %}Create MRN - Cortex ERP{% endblock %}
 
 {% block content %}
-<div class="max-w-full mx-auto px-4 py-2 max-w-6xl">
+<div class="max-w-full mx-auto px-4 py-2">
     <!-- Header -->
     <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-sm font-bold text-gray-800">{% if object %}Edit{% else %}Create{% endif %} Material Return Note</h1>
+                <h1 class="text-sm font-bold text-gray-800">Material Return Note [MRN] - New</h1>
                 <p class="text-sm text-gray-600 mt-1">Return materials back to inventory</p>
             </div>
-            <a href="{% url 'inventory:mrn-list' %}" 
+            <a href="{% url 'inventory:mrn-list' %}"
                class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors">
                 Back to List
             </a>
         </div>
     </div>
 
-    <!-- Info Box -->
-    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="ml-3">
-                <p class="text-sm text-green-700">
-                    <strong>Note:</strong> MRN returns unused or excess materials back to inventory, increasing stock levels.
-                </p>
-            </div>
-        </div>
+    <!-- Tab Navigation -->
+    <div class="mb-6 border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8">
+            <button onclick="showTab('item-search')" id="tab-item-search"
+                class="tab-button border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600">
+                Item Search
+            </button>
+            <button onclick="showTab('cart')" id="tab-cart"
+                class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Selected Items
+                {% if cart_count > 0 %}
+                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">{{ cart_count }}</span>
+                {% endif %}
+            </button>
+        </nav>
     </div>
 
-    <!-- Form -->
-    <form method="post" class="space-y-6">
-        {% csrf_token %}
-        
-        <!-- MRN Information -->
-        <div class="bg-white rounded border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">MRN Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="id_mrnno" class="block text-sm font-medium text-gray-700 mb-2">
-                        MRN Number <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.mrnno }}
-                    {% if auto_mrn_number %}
-                    <p class="text-xs text-gray-500 mt-1">Auto-generated: {{ auto_mrn_number }}</p>
-                    {% endif %}
-                    {% if form.mrnno.errors %}
-                    <p class="text-red-500 text-sm mt-1">{{ form.mrnno.errors.0 }}</p>
-                    {% endif %}
+    <!-- Tab 1: Item Search -->
+    <div id="content-item-search" class="tab-content">
+        <!-- Search Form -->
+        <div class="bg-white rounded border border-gray-200 p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Search Items</h2>
+            <form method="get" class="flex gap-4 items-end">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search By</label>
+                    <select name="search_type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select</option>
+                        <option value="item_code" {% if search_type == 'item_code' %}selected{% endif %}>Item Code</option>
+                        <option value="description" {% if search_type == 'description' %}selected{% endif %}>Description</option>
+                        <option value="location" {% if search_type == 'location' %}selected{% endif %}>Location</option>
+                    </select>
                 </div>
-            </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search Value</label>
+                    <input type="text" name="search_value" value="{{ search_value }}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter search text...">
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
+                    Search
+                </button>
+            </form>
         </div>
 
-        <!-- Item Selection Instructions -->
+        <!-- Search Results -->
+        {% if items %}
+        <div class="bg-white rounded border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto" style="max-height: 500px; overflow-y: auto;">
+                <table class="min-w-full divide-y divide-gray-200 text-xs">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">SN</th>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Item Code</th>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Description</th>
+                            <th class="px-4 py-2 text-center text-xs font-bold text-gray-700">UOM</th>
+                            <th class="px-4 py-2 text-center text-xs font-bold text-gray-700">Location</th>
+                            <th class="px-4 py-2 text-center text-xs font-bold text-gray-700">BG Group/WO No</th>
+                            <th class="px-4 py-2 text-center text-xs font-bold text-gray-700">Dept/WO</th>
+                            <th class="px-4 py-2 text-right text-xs font-bold text-gray-700">Ret. Qty</th>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-700">Remarks</th>
+                            <th class="px-4 py-2 text-center text-xs font-bold text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for item in items %}
+                        <tr class="hover:bg-gray-50">
+                            <form method="post" action="{% url 'inventory:mrn-add-to-cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <input type="hidden" name="item_code" value="{{ item.item_code }}">
+                                <input type="hidden" name="description" value="{{ item.description }}">
+                                <input type="hidden" name="uom" value="{{ item.uom }}">
+                                <input type="hidden" name="location" value="{{ item.location }}">
+
+                                <td class="px-4 py-2 text-xs text-gray-900">{{ forloop.counter }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-900">{{ item.item_code }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-900">{{ item.description|truncatewords:8 }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-600 text-center">{{ item.uom }}</td>
+                                <td class="px-4 py-2 text-xs text-gray-600 text-center">{{ item.location }}</td>
+                                <td class="px-4 py-2 text-center">
+                                    <select name="bg_or_wo" onchange="toggleDeptWO(this)"
+                                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                        <option value="">Select</option>
+                                        <option value="bg">BG Group</option>
+                                        <option value="wo">WO No</option>
+                                    </select>
+                                </td>
+                                <td class="px-4 py-2">
+                                    <select name="dept_id" class="dept-select hidden w-full px-2 py-1 text-xs border border-gray-300 rounded">
+                                        <option value="">Select</option>
+                                        {% for bg in bg_groups %}
+                                        <option value="{{ bg.id }}">{{ bg.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="text" name="wo_no" placeholder="WO Number"
+                                        class="wo-input hidden w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="number" name="return_qty" step="0.001" min="0.001"
+                                        placeholder="0.000" required
+                                        class="w-24 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="text" name="remarks" placeholder="Remarks"
+                                        class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-3 py-1 rounded transition-colors">
+                                        Add
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% elif search_type and search_value %}
         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-yellow-700">
-                        <strong>Instructions:</strong> After creating the MRN, you'll be able to add items with their return quantities, departments, and work order numbers.
-                    </p>
-                </div>
-            </div>
+            <p class="text-sm text-yellow-700">No items found matching your search criteria.</p>
         </div>
-
-        <!-- Form Errors -->
-        {% if form.non_field_errors %}
-        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-red-700">{{ form.non_field_errors.0 }}</p>
-                </div>
-            </div>
+        {% else %}
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+            <p class="text-sm text-blue-700">Please select search type and enter search value to find items.</p>
         </div>
         {% endif %}
+    </div>
 
-        <!-- Submit Buttons -->
-        <div class="flex gap-3 justify-end bg-white rounded border border-gray-200 p-6">
-            <a href="{% url 'inventory:mrn-list' %}" 
-               class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-md transition-colors">
-                Cancel
-            </a>
-            <button type="submit" 
-                    class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-md transition-colors">
-                <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                {% if object %}Update{% else %}Create{% endif %} MRN
-            </button>
+    <!-- Tab 2: Cart (Selected Items) -->
+    <div id="content-cart" class="tab-content hidden">
+        {% if cart_items %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="bg-white rounded border border-gray-200 overflow-hidden mb-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-xs">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">SN</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Item Code</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Description</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-700">UOM</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-700">BG Group</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-700">WO No</th>
+                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-700">Ret. Qty</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Remarks</th>
+                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-700">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for item in cart_items %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-xs text-gray-900">{{ forloop.counter }}</td>
+                                <td class="px-4 py-3 text-xs font-medium text-gray-900">{{ item.item_code }}</td>
+                                <td class="px-4 py-3 text-xs text-gray-900">{{ item.description }}</td>
+                                <td class="px-4 py-3 text-xs text-gray-600 text-center">{{ item.uom }}</td>
+                                <td class="px-4 py-3 text-xs text-gray-600 text-center">
+                                    {% if item.bg_or_wo == 'bg' %}
+                                        {{ item.dept_id }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-xs text-gray-600 text-center">
+                                    {% if item.bg_or_wo == 'wo' %}
+                                        {{ item.wo_no }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-xs font-bold text-blue-600 text-right">{{ item.return_qty|floatformat:3 }}</td>
+                                <td class="px-4 py-3 text-xs text-gray-600">{{ item.remarks|default:"-" }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <form method="post" action="{% url 'inventory:mrn-remove-from-cart' %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="item_id" value="{{ item.item_id }}">
+                                        <button type="submit" class="text-red-600 hover:text-red-900 text-xs font-medium"
+                                            onclick="return confirm('Remove this item from cart?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Generate MRN Button -->
+            <div class="flex gap-3 justify-center bg-white rounded border border-gray-200 p-6">
+                <a href="{% url 'inventory:mrn-list' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-8 py-2 rounded-md transition-colors">
+                    Cancel
+                </a>
+                <button type="submit"
+                        class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-8 py-2 rounded-md transition-colors"
+                        onclick="return confirm('Generate Material Return Note with {{ cart_count }} items?');">
+                    <svg class="w-5 h-5 inline-block mr-1 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Generate MRN
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <p class="text-sm text-yellow-700">
+                <strong>No items in cart.</strong> Please go to "Item Search" tab and add items to generate MRN.
+            </p>
         </div>
-    </form>
+        {% endif %}
+    </div>
 </div>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+
+    // Remove active styling from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('border-blue-500', 'text-blue-600');
+        button.classList.add('border-transparent', 'text-gray-500');
+    });
+
+    // Show selected tab content
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+
+    // Add active styling to selected tab button
+    const activeButton = document.getElementById('tab-' + tabName);
+    activeButton.classList.add('border-blue-500', 'text-blue-600');
+    activeButton.classList.remove('border-transparent', 'text-gray-500');
+}
+
+function toggleDeptWO(select) {
+    const row = select.closest('tr');
+    const deptSelect = row.querySelector('.dept-select');
+    const woInput = row.querySelector('.wo-input');
+
+    deptSelect.classList.add('hidden');
+    woInput.classList.add('hidden');
+    deptSelect.removeAttribute('required');
+    woInput.removeAttribute('required');
+
+    if (select.value === 'bg') {
+        deptSelect.classList.remove('hidden');
+        deptSelect.setAttribute('required', 'required');
+    } else if (select.value === 'wo') {
+        woInput.classList.remove('hidden');
+        woInput.setAttribute('required', 'required');
+    }
+}
+</script>
 {% endblock %}
-
-
-
-
-
-
-
-

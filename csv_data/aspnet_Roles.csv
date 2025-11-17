@@ -1,4 +1,4 @@
-﻿RoleId,RoleName,LoweredRoleName,Description,ApplicationId
+RoleId,RoleName,LoweredRoleName,Description,ApplicationId
 9FE6D3DD-FF28-47A2-A97F-7D63F96CAFD7,Account_Master,account_master,,C95F9494-9804-471C-B1C1-A091168DA06F
 7CB27A30-C6E7-44E2-8340-9B40404485BC,Account_Report,account_report,,C95F9494-9804-471C-B1C1-A091168DA06F
 1DFB636A-9D1A-4489-9585-025227C8C687,Account_Transaction,account_transaction,,C95F9494-9804-471C-B1C1-A091168DA06F

@@ -1,4 +1,4 @@
-﻿Id,InvoiceNo,ItemId,ReqQty,Qty,AmtInPer,Rate,MId,Unit
+Id,InvoiceNo,ItemId,ReqQty,Qty,AmtInPer,Rate,MId,Unit
 2770,0001,2193,1.0,1.0,100.0,245000.0,870,1
 2771,0002,2231,12.0,12.0,100.0,2300.0,871,3
 2772,0002,2232,20.0,20.0,100.0,2300.0,871,3

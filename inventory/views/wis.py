@@ -31,7 +31,7 @@ from ..models import (
     TblinvMaterialservicenoteMaster, TblinvMaterialservicenoteDetails,
     TblinvSupplierChallanMaster, TblinvSupplierChallanDetails,
     TblinvCustomerChallanMaster, TblinvCustomerChallanDetails,
-    TblinvWisMaster, TblinvWisDetails,
+    TblinvWisMaster, TblinvWisDetails, TblinvWoreleaseWis,
     TblvehProcessMaster,
     TblinvAutowisTimeschedule,
 )
@@ -54,24 +54,170 @@ from ..services import (
 )
 
 
-class WISListView(BaseListViewMixin, ListView):
+class WISListView(LoginRequiredMixin, CompanyFinancialYearMixin, ListView):
     """
-    WIS List View
-    Display all work instruction sheets with status filtering
+    WIS List View - Shows work orders and allows releasing WIS
+    Display all work orders with WIS release information
 
     Converted from: aspnet/Module/Inventory/Transactions/ReleaseWIS.aspx
-    Optimized: Uses BaseListViewMixin with built-in search, pagination, and query optimization.
     """
-    model = TblinvWisMaster
     template_name = 'inventory/transactions/wis_list.html'
-    context_object_name = 'wis_list'
+    context_object_name = 'workorders'
     paginate_by = 20
-    search_fields = ['wisno', 'wono']
-    ordering = ['-id']
 
-    # No need to override get_queryset() - BaseListViewMixin handles company/year filtering and search
-    # No need to override get_context_data() - BaseListViewMixin handles search_query
+    def get_queryset(self):
+        from sales_distribution.models import SdCustWorkorderMaster, TblsdWoCategory
 
+        compid = self.request.session.get('compid', 1)
+        finyearid = self.request.session.get('finyearid', 1)
+
+        # Get WO category filter
+        category_id = self.request.GET.get('category', '')
+        wono_search = self.request.GET.get('wono', '')
+
+        # Base queryset - ONLY show OPEN work orders (CloseOpen=0)
+        qs = SdCustWorkorderMaster.objects.filter(
+            compid=compid,
+            closeopen=0  # Only open work orders as per ASP.NET line 89
+        ).select_related()
+
+        # Apply filters
+        if category_id and category_id.isdigit():
+            qs = qs.filter(cid=int(category_id))
+
+        if wono_search:
+            qs = qs.filter(wono__icontains=wono_search)
+
+        return qs.order_by('wono')  # ASC order by WONo as per ASP.NET
+
+    def get_context_data(self, **kwargs):
+        from sales_distribution.models import TblsdWoCategory
+        from human_resource.models import TblhrOfficestaff
+
+        context = super().get_context_data(**kwargs)
+
+        compid = self.request.session.get('compid', 1)
+        finyearid = self.request.session.get('finyearid', 1)
+
+        # Add release information to each work order in the paginated list
+        # This ensures data persists after pagination
+        workorders = context.get('workorders') or context.get('object_list', [])
+
+        for wo in workorders:
+            # Count total releases for this WO
+            release_count = TblinvWoreleaseWis.objects.filter(
+                wono=wo.wono
+            ).count()
+            wo.release_count = release_count
+
+            # Get latest release info (most recent by Id DESC)
+            latest_release = TblinvWoreleaseWis.objects.filter(
+                wono=wo.wono,
+                compid=compid
+            ).order_by('-id').first()
+
+            if latest_release:
+                wo.release_date = latest_release.releasesysdate
+                wo.release_time = latest_release.releasesystime
+                # Get employee name from HR table (use filter().first() to handle duplicate empid)
+                staff = TblhrOfficestaff.objects.filter(empid=latest_release.releaseby).first()
+                if staff:
+                    wo.release_by = f"{staff.title}. {staff.employeename}" if staff.title else staff.employeename
+                else:
+                    wo.release_by = latest_release.releaseby
+            else:
+                wo.release_date = None
+                wo.release_time = None
+                wo.release_by = None
+
+        # Get WO categories for dropdown
+        categories = TblsdWoCategory.objects.filter(
+            compid=compid,
+            finyearid=finyearid
+        )
+        context['categories'] = categories
+        context['selected_category'] = self.request.GET.get('category', '')
+        context['wono_search'] = self.request.GET.get('wono', '')
+
+        return context
+
+
+class WISReleaseWOView(LoginRequiredMixin, CompanyFinancialYearMixin, View):
+    """
+    Release WO for WIS - Updates WO and creates release record
+    Matches ASP.NET logic (lines 171-180)
+    """
+    def post(self, request, *args, **kwargs):
+        from datetime import datetime
+        from sales_distribution.models import SdCustWorkorderMaster
+
+        wono = request.POST.get('wono')
+        wo_id = request.POST.get('wo_id')
+        compid = request.session.get('compid', 1)
+        finyearid = request.session.get('finyearid', 1)
+        username = request.user.username
+
+        try:
+            # Check if work order exists
+            wo = SdCustWorkorderMaster.objects.get(
+                id=wo_id,
+                compid=compid
+            )
+
+            # Update ReleaseWIS field to 1 (as per ASP.NET line 176)
+            wo.releasewis = 1
+            wo.save(update_fields=['releasewis'])
+
+            # Create WIS release record (as per ASP.NET line 178)
+            now = datetime.now()
+            TblinvWoreleaseWis.objects.create(
+                compid=compid,
+                finyearid=finyearid,
+                wono=wono,
+                releasesysdate=now.strftime('%d-%m-%Y'),
+                releasesystime=now.strftime('%I:%M:%S %p'),  # 12-hour format with AM/PM
+                releaseby=username
+            )
+
+            messages.success(request, f'WIS released successfully for Work Order {wono}!')
+        except SdCustWorkorderMaster.DoesNotExist:
+            messages.error(request, f'Work Order {wono} not found!')
+        except Exception as e:
+            messages.error(request, f'Error releasing WIS: {str(e)}')
+
+        return redirect('inventory:wis-list')
+
+
+class WISStopWOView(LoginRequiredMixin, CompanyFinancialYearMixin, View):
+    """
+    Stop WO for WIS - Sets ReleaseWIS to 0
+    Matches ASP.NET logic (lines 182-189)
+    NOTE: Does NOT delete release records, only updates flag
+    """
+    def post(self, request, *args, **kwargs):
+        from sales_distribution.models import SdCustWorkorderMaster
+
+        wo_id = request.POST.get('wo_id')
+        wono = request.POST.get('wono')
+        compid = request.session.get('compid', 1)
+
+        try:
+            # Get work order and update ReleaseWIS to 0 (as per ASP.NET line 186)
+            wo = SdCustWorkorderMaster.objects.get(
+                id=wo_id,
+                compid=compid
+            )
+
+            wo.releasewis = 0
+            wo.save(update_fields=['releasewis'])
+
+            messages.success(request, f'WIS stopped for Work Order {wono}!')
+        except SdCustWorkorderMaster.DoesNotExist:
+            messages.error(request, f'Work Order {wono} not found!')
+        except Exception as e:
+            messages.error(request, f'Error stopping WIS: {str(e)}')
+
+        return redirect('inventory:wis-list')
 
 
 class WISCreateView(LoginRequiredMixin, CompanyFinancialYearMixin, CreateView):
@@ -148,7 +294,7 @@ class WISDetailView(LoginRequiredMixin, CompanyFinancialYearMixin, DetailView):
             item = None
             if detail.itemid:
                 try:
-                    item = TbldgItemMaster.objects.get(itemid=detail.itemid)
+                    item = TbldgItemMaster.objects.get(id=detail.itemid)
                 except TbldgItemMaster.DoesNotExist:
                     pass
             details_with_items.append({
@@ -227,7 +373,7 @@ class WISActualRunView(LoginRequiredMixin, CompanyFinancialYearMixin, TemplateVi
             item = None
             if detail.itemid:
                 try:
-                    item = TbldgItemMaster.objects.get(itemid=detail.itemid)
+                    item = TbldgItemMaster.objects.get(id=detail.itemid)
                 except TbldgItemMaster.DoesNotExist:
                     pass
             details_with_items.append({
@@ -266,7 +412,7 @@ class WISPrintView(LoginRequiredMixin, CompanyFinancialYearMixin, DetailView):
             item = None
             if detail.itemid:
                 try:
-                    item = TbldgItemMaster.objects.get(itemid=detail.itemid)
+                    item = TbldgItemMaster.objects.get(id=detail.itemid)
                 except TbldgItemMaster.DoesNotExist:
                     pass
             details_with_items.append({
@@ -340,3 +486,222 @@ class AutoWISTimeScheduleRowView(LoginRequiredMixin, DetailView):
     model = TblinvAutowisTimeschedule
     template_name = 'inventory/masters/partials/autowis_timeschedule_row.html'
     context_object_name = 'schedule'
+
+
+# ============================================================================
+# WIS DRY RUN VIEWS
+# ============================================================================
+
+
+class WISDryRunEntryView(LoginRequiredMixin, CompanyFinancialYearMixin, ListView):
+    """
+    Dry Run Entry Point - Lists Work Orders with "Dry Run" button
+
+    Converted from: WIS_Dry_Actual_Run.aspx
+    """
+    template_name = 'inventory/transactions/wis_dryrun_entry.html'
+    context_object_name = 'workorders'
+    paginate_by = 20
+
+    def get_queryset(self):
+        from sales_distribution.models import SdCustWorkorderMaster
+
+        compid = self.request.session.get('compid', 1)
+
+        # Get filter parameters
+        wo_type = self.request.GET.get('wo_type', '')
+        wono_search = self.request.GET.get('wono', '')
+
+        # Base queryset - ONLY show OPEN work orders with ReleaseWIS=1
+        qs = SdCustWorkorderMaster.objects.filter(
+            compid=compid,
+            closeopen=0,  # Open work orders only
+            releasewis=1  # Must be released for WIS
+        ).select_related()
+
+        # Apply filters
+        if wo_type and wo_type.isdigit():
+            qs = qs.filter(cid=int(wo_type))
+
+        if wono_search:
+            qs = qs.filter(wono__icontains=wono_search)
+
+        return qs.order_by('wono')
+
+    def get_context_data(self, **kwargs):
+        from sales_distribution.models import TblsdWoCategory
+
+        context = super().get_context_data(**kwargs)
+
+        compid = self.request.session.get('compid', 1)
+        finyearid = self.request.session.get('finyearid', 1)
+
+        # Get WO types/categories for dropdown
+        wo_categories = TblsdWoCategory.objects.filter(
+            compid=compid,
+            finyearid=finyearid
+        )
+        context['wo_categories'] = wo_categories
+        context['selected_wo_type'] = self.request.GET.get('wo_type', '')
+        context['wono_search'] = self.request.GET.get('wono', '')
+
+        return context
+
+
+class WISDryRunAssemblyView(LoginRequiredMixin, CompanyFinancialYearMixin, TemplateView):
+    """
+    Dry Run for Assemblies - Displays hierarchical tree of assemblies
+
+    Converted from: WIS_ActualRun_Assembly.aspx
+    """
+    template_name = 'inventory/transactions/wis_dryrun_assembly.html'
+
+    def get_context_data(self, **kwargs):
+        from sales_distribution.models import SdCustWorkorderMaster
+        from design.models import TbldgBomMaster, TbldgItemMaster
+        from ..services import WISDryRunService
+
+        context = super().get_context_data(**kwargs)
+
+        wono = self.kwargs.get('wono')
+        compid = self.request.session.get('compid', 1)
+
+        # Get Work Order details (use filter + first to handle duplicates)
+        wo = SdCustWorkorderMaster.objects.filter(
+            wono=wono, compid=compid
+        ).order_by('-id').first()
+
+        if not wo:
+            context['error'] = f'Work Order {wono} not found'
+            return context
+
+        context['wo'] = wo
+
+        # Get BOM assembly items (items that are assemblies/sub-assemblies)
+        # Filter for items that have children (are parents in hierarchy)
+        assembly_pids = TbldgBomMaster.objects.filter(
+            wono=wono,
+            compid=compid,
+            pid__gt=0  # Has parent, so is a sub-assembly
+        ).values_list('cid', flat=True).distinct()
+
+        assembly_items = []
+        for pid in assembly_pids:
+            bom = TbldgBomMaster.objects.filter(
+                wono=wono,
+                cid=pid,
+                compid=compid
+            ).first()
+
+            if bom and bom.itemid:
+                try:
+                    item = TbldgItemMaster.objects.get(id=bom.itemid, compid=compid)
+
+                    # Calculate BOM quantity
+                    bom_qty = WISDryRunService.calculate_bom_tree_qty(
+                        wono, bom.pid, bom.cid, 0, compid
+                    )
+
+                    assembly_items.append({
+                        'pid': bom.pid,
+                        'cid': bom.cid,
+                        'item_code': item.partno or item.itemcode or '-',
+                        'description': item.manfdesc or item.itemname or '-',
+                        'uom': item.uombasic or '-',
+                        'unit_qty': float(bom.qty) if bom.qty else 0,
+                        'bom_qty': bom_qty,
+                    })
+                except TbldgItemMaster.DoesNotExist:
+                    pass
+
+        context['assembly_items'] = assembly_items
+
+        return context
+
+
+class WISDryRunMaterialView(LoginRequiredMixin, CompanyFinancialYearMixin, TemplateView):
+    """
+    Dry Run for Materials - Displays hierarchical tree with all quantities
+
+    Enhanced version of WISActualRunView with complete BOM calculations.
+    Converted from: WIS_ActualRun_Material.aspx
+    """
+    template_name = 'inventory/transactions/wis_dryrun_material.html'
+
+    def get_context_data(self, **kwargs):
+        from sales_distribution.models import SdCustWorkorderMaster
+        from ..services import WISDryRunService
+
+        context = super().get_context_data(**kwargs)
+
+        wono = self.kwargs.get('wono')
+        compid = self.request.session.get('compid', 1)
+        finyearid = self.request.session.get('finyearid', 1)
+
+        # Get Work Order details (use filter + first to handle duplicates)
+        wo = SdCustWorkorderMaster.objects.filter(
+            wono=wono, compid=compid
+        ).order_by('-id').first()
+
+        if not wo:
+            context['error'] = f'Work Order {wono} not found'
+            return context
+
+        context['wo'] = wo
+
+        # Get dry run data (all calculations)
+        try:
+            materials = WISDryRunService.get_dry_run_data(wono, compid, finyearid)
+            context['materials'] = materials
+
+            # Calculate totals
+            context['total_items'] = len(materials)
+            context['items_to_issue'] = len([m for m in materials if m['dry_run_qty'] > 0])
+            context['items_with_shortage'] = len([m for m in materials if m['has_shortage']])
+
+        except Exception as e:
+            context['error'] = f'Error calculating dry run: {str(e)}'
+            context['materials'] = []
+
+        return context
+
+
+class WISExecuteActualRunView(LoginRequiredMixin, CompanyFinancialYearMixin, View):
+    """
+    Execute Actual Run - POST only view to execute real material issuance
+
+    Calls WISDryRunService.execute_actual_run() which:
+    - Creates WIS Master and Details records
+    - Updates stock quantities
+    - Marks Work Order as DryActualRun=1
+    """
+
+    def post(self, request, *args, **kwargs):
+        from ..services import WISDryRunService
+
+        wono = kwargs.get('wono')
+        compid = request.session.get('compid', 1)
+        finyearid = request.session.get('finyearid', 1)
+        username = request.user.username
+
+        # Execute actual run
+        result = WISDryRunService.execute_actual_run(wono, compid, finyearid, username)
+
+        if result['success']:
+            messages.success(request, result['message'])
+            messages.info(request, f"{result['items_issued']} items issued successfully.")
+
+            # Redirect to WIS detail page
+            from ..models import TblinvWisMaster
+            wis = TblinvWisMaster.objects.filter(
+                wisno=result['wis_no'],
+                compid=compid
+            ).first()
+
+            if wis:
+                return redirect('inventory:wis-detail', pk=wis.pk)
+            else:
+                return redirect('inventory:wis-dryrun-entry')
+        else:
+            messages.error(request, result['message'])
+            return redirect('inventory:wis-dryrun-material', wono=wono)

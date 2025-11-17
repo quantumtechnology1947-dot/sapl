@@ -1,4 +1,4 @@
-﻿Id,MId,PONo,PRNo,PRId,SPRNo,SPRId,Qty,Rate,Discount,AddDesc,PF,ExST,VAT,DelDate,AmendmentNo,BudgetCode,flag
+Id,MId,PONo,PRNo,PRId,SPRNo,SPRId,Qty,Rate,Discount,AddDesc,PF,ExST,VAT,DelDate,AmendmentNo,BudgetCode,flag
 43322,7558,0001,0001,32994,,,24.0,580.0,0.0,,1,31,94,2018-04-14,0,1,0
 43323,7559,0002,,,0812,13299,50.0,32.0,0.0,,1,31,94,2018-04-16,1,2,0
 43324,7560,0003,,,0776,13190,6.0,202.66,0.0,,1,31,94,2018-04-16,2,0,0
@@ -3330,9 +3330,9 @@
 46724,8298,0732,,,0331,14272,60.0,175.0,0.0,,1,31,94,2018-09-28,1,0,0
 46725,8298,0732,,,0322,14241,120.0,90.0,0.0,,1,31,94,2018-09-28,1,0,0
 46726,8298,0732,,,0322,14242,10.0,270.0,0.0,,1,31,94,2018-09-28,1,0,0
-46727,8299,0733,,,0335,14276,2.0,750.0,0.0,"Holdback clutch removing of “Kavitsu” make Planetary reduction gear box.
+46727,8299,0733,,,0335,14276,2.0,750.0,0.0,"Holdback clutch removing of "Kavitsu" make Planetary reduction gear box.
 4KT08X
-– Qty.2
+- Qty.2
 Nos.Labour Charges of overhauling only.",1,1,2,2018-09-29,1,2,0
 46728,8300,0734,,,0298,14184,6900.0,50.9,0.0,,1,31,94,2018-10-01,2,0,0
 46729,8300,0734,,,0218,13938,34.2,171.05,0.0,,1,31,94,2018-10-01,2,0,0
@@ -16274,13 +16274,13 @@ PCD : Dia. 69.11 as per drawing",1,31,94,2021-01-30,0,1,0
 59925,15163,0615,0123,42110,,,3.0,136475.0,0.0,FA47B CMPZ71S/BY/HR/KY/AK1H/SB 1,1,31,94,2021-02-20,0,4,0
 59926,15164,0616,0124,42111,,,48.0,515.0,1.0,,1,31,94,2021-02-15,0,1,0
 59927,15164,0616,0124,42112,,,48.0,640.0,1.0,,1,31,94,2021-02-15,0,1,0
-59928,15165,0617,0125,42113,,,15.0,1852.0,6.0,"Series – Interroll Friction Conveyor Roller Series 3800
+59928,15165,0617,0125,42113,,,15.0,1852.0,6.0,"Series - Interroll Friction Conveyor Roller Series 3800
 
-Tube – MS Tube dia 50x1.5 (MS Z/p) with 5mm thick PU Coating after which the dia becomes 60mm
-Rod – MS Rod 14 mm Female Thread M8x15 (MS Z/p)
-Bearing – MS Std Bearing 6002
-End Cap – Polyamide End Cap
-Type – Double Steel Sprocket 1/2  Pitch, Z=14T
+Tube - MS Tube dia 50x1.5 (MS Z/p) with 5mm thick PU Coating after which the dia becomes 60mm
+Rod - MS Rod 14 mm Female Thread M8x15 (MS Z/p)
+Bearing - MS Std Bearing 6002
+End Cap - Polyamide End Cap
+Type - Double Steel Sprocket 1/2  Pitch, Z=14T
 
 RL=376mm, EL=AGL=438mm
 	15",1,31,94,2021-03-03,0,1,0

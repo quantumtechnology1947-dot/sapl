@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,SessionId,FinYearId,PRJCTNO,WONo,GenDate,VendorPlan,VendorDate,AssemlyDate,AssemlyNo
+Id,SysDate,SysTime,CompId,SessionId,FinYearId,PRJCTNO,WONo,GenDate,VendorPlan,VendorDate,AssemlyDate,AssemlyNo
 1,,,,,,,,,1,,,1
 2,2021-03-17,12:10:32 PM,1,sapl0326,8,11,J0142,17/03/2021,8,13/03/2021,17/03/2021,2
 3,2021-03-17,12:16:35 PM,1,sapl0326,8,3,J0139,17/03/2021,3,04/03/2021,17/03/2021,3

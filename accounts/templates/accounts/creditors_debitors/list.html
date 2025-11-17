@@ -1,0 +1,264 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Creditors / Debitors - Accounts{% endblock %}
+
+{% block content %}
+<style>
+    .cd-container {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+    }
+    .header-bar {
+        background: linear-gradient(to bottom, #6b7280 0%, #4b5563 100%);
+        color: white;
+        padding: 4px 8px;
+        font-weight: bold;
+        font-size: 11pt;
+        border: 1px solid #374151;
+    }
+    .tab-container {
+        margin-top: 10px;
+    }
+    .tab-buttons {
+        display: flex;
+        gap: 2px;
+        border-bottom: 2px solid #9ca3af;
+    }
+    .tab-button {
+        padding: 6px 20px;
+        background-color: #f3f4f6;
+        border: 1px solid #9ca3af;
+        border-bottom: none;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 10pt;
+        transition: all 0.2s;
+    }
+    .tab-button:hover {
+        background-color: #e5e7eb;
+    }
+    .tab-button.active {
+        background-color: white;
+        border-bottom: 2px solid white;
+        margin-bottom: -2px;
+    }
+    .tab-content {
+        border: 1px solid #9ca3af;
+        border-top: none;
+        padding: 12px;
+        background-color: white;
+    }
+    .cd-grid-container {
+        border: 3px double #666699;
+        height: 400px;
+        overflow: auto;
+        width: 100%;
+        background-color: white;
+        margin-top: 8px;
+    }
+    .cd-grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+    .cd-grid thead {
+        background-color: #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+    .cd-grid th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #d1d5db;
+        font-size: 10pt;
+        font-weight: bold;
+    }
+    .cd-grid tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    .cd-grid tbody tr:hover {
+        background-color: #e0f2fe;
+    }
+    .cd-grid td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .total-bar {
+        text-align: center;
+        margin-top: 10px;
+        padding: 8px;
+        background-color: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+    }
+    .total-label {
+        font-weight: bold;
+        font-size: 11pt;
+    }
+    .btn-add {
+        background-color: #dc2626;
+        color: white;
+        border: none;
+        padding: 4px 16px;
+        font-size: 10pt;
+        cursor: pointer;
+        border-radius: 2px;
+        margin-bottom: 8px;
+    }
+    .btn-add:hover {
+        background-color: #b91c1c;
+    }
+    .btn-detail {
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        padding: 2px 8px;
+        font-size: 9pt;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    .btn-detail:hover {
+        background-color: #2563eb;
+    }
+</style>
+
+<div class="cd-container max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td class="header-bar">
+                &nbsp;Creditors / Debitors
+            </td>
+        </tr>
+    </table>
+
+    <!-- Tabs for Creditors and Debitors -->
+    <div class="tab-container">
+        <!-- Tab Buttons -->
+        <div class="tab-buttons">
+            <button id="creditorsTab" onclick="showTab('creditors')" class="tab-button active">
+                Creditors
+            </button>
+            <button id="debitorsTab" onclick="showTab('debitors')" class="tab-button">
+                Debitors
+            </button>
+        </div>
+
+        <!-- Creditors Tab Content -->
+        <div id="creditorsContent" class="tab-content" style="display: block;">
+            <button class="btn-add" onclick="window.location.href='{% url 'accounts:creditor-create' %}'">
+                Add New Creditor
+            </button>
+
+            <div class="cd-grid-container">
+                <table class="cd-grid">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; width: 30%;">Supplier Name</th>
+                            <th style="text-align: right; width: 14%;">Opening</th>
+                            <th style="text-align: right; width: 14%;">Booked Bills</th>
+                            <th style="text-align: right; width: 14%;">TDS</th>
+                            <th style="text-align: right; width: 14%;">Payments</th>
+                            <th style="text-align: right; width: 14%;">Closing</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for creditor in creditors %}
+                        <tr>
+                            <td style="text-align: left; font-weight: bold;">
+                                <a href="{% url 'accounts:creditor-detail' creditor.supplier_id %}" style="color: #003366; text-decoration: none;">
+                                    {{ creditor.supplier_name }}
+                                </a>
+                            </td>
+                            <td style="text-align: right;">{{ creditor.opening|floatformat:2 }}</td>
+                            <td style="text-align: right;">{{ creditor.booked_bills|floatformat:2 }}</td>
+                            <td style="text-align: right;">{{ creditor.tds|floatformat:2 }}</td>
+                            <td style="text-align: right;">{{ creditor.payments|floatformat:2 }}</td>
+                            <td style="text-align: right;">{{ creditor.closing|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: maroon; font-size: 12pt;">
+                                No creditors to display!
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="total-bar">
+                <span class="total-label">Total Closing Balance: </span>
+                <span class="total-label">{{ creditors_total|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <!-- Debitors Tab Content -->
+        <div id="debitorsContent" class="tab-content" style="display: none;">
+            <button class="btn-add" onclick="window.location.href='{% url 'accounts:debitor-create' %}'">
+                Add New Debitor
+            </button>
+
+            <div class="cd-grid-container">
+                <table class="cd-grid">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; width: 35%;">Customer Name</th>
+                            <th style="text-align: right; width: 16%;">Opening</th>
+                            <th style="text-align: right; width: 16%;">Sales Invoices</th>
+                            <th style="text-align: right; width: 16%;">Service Invoices</th>
+                            <th style="text-align: right; width: 17%;">Proforma Invoices</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for debitor in debitors %}
+                        <tr>
+                            <td style="text-align: left; font-weight: bold;">
+                                <a href="{% url 'accounts:debitor-detail' debitor.customer_id %}" style="color: #003366; text-decoration: none;">
+                                    {{ debitor.customer_name }}
+                                </a>
+                            </td>
+                            <td style="text-align: right;">{{ debitor.opening|floatformat:2 }}</td>
+                            <td style="text-align: right;">{{ debitor.sales_invoices|floatformat:2 }}</td>
+                            <td style="text-align: right;">{{ debitor.service_invoices|floatformat:2 }}</td>
+                            <td style="text-align: right;">{{ debitor.proforma_invoices|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: maroon; font-size: 12pt;">
+                                No debitors to display!
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="total-bar">
+                <span class="total-label">Total Closing Balance: </span>
+                <span class="total-label">{{ debitors_total|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    document.getElementById('creditorsContent').style.display = 'none';
+    document.getElementById('debitorsContent').style.display = 'none';
+
+    // Remove active class from all tab buttons
+    document.getElementById('creditorsTab').classList.remove('active');
+    document.getElementById('debitorsTab').classList.remove('active');
+
+    // Show selected tab content and activate button
+    if (tabName === 'creditors') {
+        document.getElementById('creditorsContent').style.display = 'block';
+        document.getElementById('creditorsTab').classList.add('active');
+    } else {
+        document.getElementById('debitorsContent').style.display = 'block';
+        document.getElementById('debitorsTab').classList.add('active');
+    }
+}
+</script>
+
+{% endblock %}

@@ -169,78 +169,85 @@ class MCNPrintView(LoginRequiredMixin, CompanyFinancialYearMixin, DetailView):
 # ============================================================================
 
 
-class ClosingStockView(LoginRequiredMixin, CompanyFinancialYearMixin, FormView):
+class ClosingStockView(LoginRequiredMixin, HTMXResponseMixin, ListView):
     """
-    Closing Stock Process View
+    Closing Stock View - SAP Fiori-style inline editing
+
+    Manages period-based aggregate closing stock values (not item-level tracking).
+    Shows all records in a table with inline add form in footer.
 
     Converted from: aspnet/Module/Inventory/Transactions/ClosingStock.aspx
+    Pattern: SAP Fiori-style (like VehicleMasterListView)
+    Requirements: 11.1
     """
+    model = TblinvMaterialreturnMaster  # Placeholder - will use service
     template_name = 'inventory/transactions/closing_stock.html'
-    form_class = None  # Set in get_form_class()
-    success_url = reverse_lazy('inventory:closing-stock-report')
+    partial_template_name = 'inventory/transactions/partials/closing_stock_partial.html'
+    context_object_name = 'records'
 
-    def get_form_class(self):
-        from ..forms import ClosingStockForm
-        return ClosingStockForm
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['compid'] = self.get_compid()
-        return kwargs
-
-    def form_valid(self, form):
+    def get_queryset(self):
+        """Get all closing stock records (no company/year filtering)"""
         from ..services import ClosingStockService
-
-        item_id = form.cleaned_data['item'].itemid
-        physical_qty = form.cleaned_data['physical_qty']
-        remarks = form.cleaned_data.get('remarks', '')
-
-        system_qty = ClosingStockService.get_system_stock(item_id)
-        variance = ClosingStockService.calculate_variance(system_qty, physical_qty)
-
-        # Store in session for report
-        self.request.session['closing_stock_data'] = {
-            'item_id': item_id,
-            'system_qty': str(system_qty),
-            'physical_qty': str(physical_qty),
-            'variance': str(variance),
-            'remarks': remarks
-        }
-
-        messages.success(self.request, 'Closing stock recorded successfully!')
-        return super().form_valid(form)
-
-
-
-class ClosingStockReportView(LoginRequiredMixin, CompanyFinancialYearMixin, TemplateView):
-    """
-    Closing Stock Report View
-
-    Displays all items with system stock quantities and variance analysis.
-    Converted from: aspnet/Module/Inventory/Transactions/ClosingStock.aspx (report page)
-    """
-    template_name = 'inventory/transactions/closing_stock_report.html'
+        return ClosingStockService.get_all_records()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Get all items with stock
-        from design.models import TbldgItemMaster
-        from ..services import ClosingStockService
-
-        compid = self.get_compid()
-        items = TbldgItemMaster.objects.filter(compid=compid).order_by('itemcode')
-
-        stock_data = []
-        for item in items:
-            system_qty = ClosingStockService.get_system_stock(item.itemid)
-            stock_data.append({
-                'item': item,
-                'system_qty': system_qty
-            })
-
-        context['stock_data'] = stock_data
+        from ..forms import ClosingStockForm
+        context['form'] = ClosingStockForm()
         return context
+
+    def post(self, request, *args, **kwargs):
+        """Handle inline create from footer form"""
+        from ..forms import ClosingStockForm
+        from ..services import ClosingStockService
+        from datetime import datetime
+
+        action = request.POST.get('action')
+
+        if action == 'delete':
+            # Handle delete
+            record_id = request.POST.get('record_id')
+            if ClosingStockService.delete_record(record_id):
+                messages.success(request, 'Closing stock record deleted successfully!')
+            else:
+                messages.error(request, 'Error deleting record')
+
+            if request.headers.get('HX-Request'):
+                self.object_list = self.get_queryset()
+                context = self.get_context_data()
+                return render(request, self.partial_template_name, context)
+
+            return redirect('inventory:closing-stock')
+
+        # Handle create
+        form = ClosingStockForm(request.POST)
+        if form.is_valid():
+            # Convert dates to DD-MM-YYYY format for storage
+            from_date = form.cleaned_data['from_date'].strftime('%d-%m-%Y')
+            to_date = form.cleaned_data['to_date'].strftime('%d-%m-%Y')
+            value = form.cleaned_data['closing_stock_value']
+
+            ClosingStockService.create_record(from_date, to_date, value)
+
+            messages.success(request, 'Closing stock record created successfully!')
+
+            # HTMX partial response
+            if request.headers.get('HX-Request'):
+                self.object_list = self.get_queryset()
+                context = self.get_context_data()
+                return render(request, self.partial_template_name, context)
+
+            return redirect('inventory:closing-stock')
+
+        # Form errors
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+        context['form'] = form
+
+        if request.headers.get('HX-Request'):
+            return render(request, self.partial_template_name, context)
+
+        return render(request, self.template_name, context)
 
 
 

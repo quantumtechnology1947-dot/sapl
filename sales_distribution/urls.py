@@ -130,5 +130,14 @@ urlpatterns = [
     # path('masters/wo-subcategory/create/', views.WOSubcategoryCreateView.as_view(), name='wo-subcategory-create'),
     # path('masters/wo-subcategory/<int:scid>/update/', views.WOSubcategoryUpdateView.as_view(), name='wo-subcategory-update'),
     # path('masters/wo-subcategory/<int:scid>/delete/', views.WOSubcategoryDeleteView.as_view(), name='wo-subcategory-delete'),
+
+    # ========================================================================
+    # REPORTS
+    # ========================================================================
+    path('reports/', views.ReportsDashboardView.as_view(), name='reports-dashboard'),
+    path('reports/customer-master/', views.CustomerMasterReportView.as_view(), name='report-customer-master'),
+    path('reports/customer-po/', views.CustomerPOReportView.as_view(), name='report-customer-po'),
+    path('reports/customer-quotation/', views.CustomerQuotationReportView.as_view(), name='report-customer-quotation'),
+    path('reports/customer-enquiry/', views.CustomerEnquiryReportView.as_view(), name='report-customer-enquiry'),
 ]
 

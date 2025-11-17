@@ -108,13 +108,42 @@ urlpatterns = [
     path('transactions/contra-entry/<int:id>/delete/', views.ContraEntryDeleteView.as_view(), name='contra-entry-delete'),
 
     # ========================================================================
-    # Transaction URLs - Advice Payment
+    # Transaction URLs - Advice Payment (Main tabbed interface)
     # ========================================================================
-    path('transactions/advice/', views.AdvicePaymentListView.as_view(), name='advice-list'),
-    path('transactions/advice/create/', views.AdvicePaymentCreateView.as_view(), name='advice-create'),
-    path('transactions/advice/<int:advice_id>/edit/', views.AdvicePaymentUpdateView.as_view(), name='advice-edit'),
-    path('transactions/advice/<int:advice_id>/delete/', views.AdvicePaymentDeleteView.as_view(), name='advice-delete'),
-    path('transactions/advice/<int:advice_id>/print/', views.AdvicePaymentPrintView.as_view(), name='advice-print'),
+    path('transactions/advice/', views.AdviceView.as_view(), name='advice'),
+    # HTMX endpoints for Advice
+    path('transactions/advice/autocomplete/', views.AdviceAutocompleteView.as_view(), name='advice-autocomplete'),
+    path('transactions/advice/insert-temp/', views.AdviceInsertTempView.as_view(), name='advice-insert-temp'),
+    path('transactions/advice/delete-temp/<int:temp_id>/', views.AdviceDeleteTempView.as_view(), name='advice-delete-temp'),
+    path('transactions/advice/proceed/', views.AdviceProceedView.as_view(), name='advice-proceed'),
+    # Creditors sub-tab endpoints
+    path('transactions/advice/creditors-search/', views.AdviceSearchBillsView.as_view(), name='advice-creditors-search'),
+    path('transactions/advice/creditors-add-temp/', views.AdviceAddBillToTempView.as_view(), name='advice-creditors-add-temp'),
+    path('transactions/advice/creditors-delete-temp/<int:temp_id>/', views.AdviceDeleteCreditorTempView.as_view(), name='advice-creditors-delete-temp'),
+    path('transactions/advice/creditors-proceed/', views.AdviceProceedCreditorView.as_view(), name='advice-creditors-proceed'),
+    
+    # Salary sub-tab endpoints
+    path('transactions/advice/salary-insert-temp/', views.AdviceSalaryInsertTempView.as_view(), name='advice-salary-insert-temp'),
+    path('transactions/advice/salary-delete-temp/<int:temp_id>/', views.AdviceSalaryDeleteTempView.as_view(), name='advice-salary-delete-temp'),
+    path('transactions/advice/salary-proceed/', views.AdviceSalaryProceedView.as_view(), name='advice-salary-proceed'),
+    
+    # Others sub-tab endpoints
+    path('transactions/advice/others-insert-temp/', views.AdviceOthersInsertTempView.as_view(), name='advice-others-insert-temp'),
+    path('transactions/advice/others-delete-temp/<int:temp_id>/', views.AdviceOthersDeleteTempView.as_view(), name='advice-others-delete-temp'),
+    path('transactions/advice/others-proceed/', views.AdviceOthersProceedView.as_view(), name='advice-others-proceed'),
+    # TODO: Implement these views
+    # path('transactions/advice/list/', views.AdvicePaymentListView.as_view(), name='advice-list'),
+    # path('transactions/advice/create/', views.AdvicePaymentCreateView.as_view(), name='advice-create'),
+    # path('transactions/advice/<int:advice_id>/edit/', views.AdvicePaymentUpdateView.as_view(), name='advice-edit'),
+    # path('transactions/advice/<int:advice_id>/delete/', views.AdvicePaymentDeleteView.as_view(), name='advice-delete'),
+    # path('transactions/advice/<int:advice_id>/print/', views.AdvicePaymentPrintView.as_view(), name='advice-print'),
+
+    # ========================================================================
+    # Transaction URLs - Policy Documents
+    # ========================================================================
+    path('transactions/policy/', views.PolicyListView.as_view(), name='policy-list'),
+    path('transactions/policy/upload/', views.PolicyUploadView.as_view(), name='policy-upload'),
+    path('transactions/policy/<int:pk>/download/', views.PolicyDownloadView.as_view(), name='policy-download'),
 
     # ========================================================================
     # Transaction URLs - Capital Particulars
@@ -137,30 +166,35 @@ urlpatterns = [
     # ========================================================================
     path('ajax/get-states/', views.GetStatesView.as_view(), name='get-states'),
     path('ajax/get-cities/', views.GetCitiesView.as_view(), name='get-cities'),
+    path('ajax/get-states-json/', views.GetStatesJSONView.as_view(), name='get-states-json'),
+    path('ajax/get-cities-json/', views.GetCitiesJSONView.as_view(), name='get-cities-json'),
 
     # ========================================================================
     # Invoice URLs - Sales Invoice
+    # NOTE: Sales Invoice URLs moved to transactions/sales-invoice/
+    # See: path('transactions/sales-invoice/', include('accounts.urls_sales_invoice'))
     # ========================================================================
-    path('invoices/sales-invoice/', views.SalesInvoiceListView.as_view(), name='sales-invoice-list'),
-    path('invoices/sales-invoice/create/', views.SalesInvoiceCreateView.as_view(), name='sales-invoice-create'),
-    path('invoices/sales-invoice/<int:id>/edit/', views.SalesInvoiceUpdateView.as_view(), name='sales-invoice-edit'),
-    path('invoices/sales-invoice/<int:id>/delete/', views.SalesInvoiceDeleteView.as_view(), name='sales-invoice-delete'),
-    path('invoices/sales-invoice/<int:id>/print/', views.SalesInvoicePrintView.as_view(), name='sales-invoice-print'),
 
     # ========================================================================
     # Invoice URLs - Service Tax Invoice
     # ========================================================================
-    path('invoices/service-tax-invoice/', views.ServiceTaxInvoiceListView.as_view(), name='service-tax-invoice-list'),
-    path('invoices/service-tax-invoice/create/', views.ServiceTaxInvoiceCreateView.as_view(), name='service-tax-invoice-create'),
-    path('invoices/service-tax-invoice/<int:id>/edit/', views.ServiceTaxInvoiceUpdateView.as_view(), name='service-tax-invoice-edit'),
-    path('invoices/service-tax-invoice/<int:id>/delete/', views.ServiceTaxInvoiceDeleteView.as_view(), name='service-tax-invoice-delete'),
-    path('invoices/service-tax-invoice/<int:id>/print/', views.ServiceTaxInvoicePrintView.as_view(), name='service-tax-invoice-print'),
+    path('transactions/service-tax-invoice/', views.service_tax_invoice_list, name='service-tax-invoice-list'),
+    path('transactions/service-tax-invoice/create/', views.service_tax_invoice_create, name='service-tax-invoice-create'),
+    path('transactions/service-tax-invoice/<int:invoice_id>/edit/', views.service_tax_invoice_edit, name='service-tax-invoice-edit'),
+    path('transactions/service-tax-invoice/<int:invoice_id>/delete/', views.service_tax_invoice_delete, name='service-tax-invoice-delete'),
+    path('transactions/service-tax-invoice/<int:invoice_id>/print/', views.service_tax_invoice_print, name='service-tax-invoice-print'),
+    # HTMX Endpoints
+    path('transactions/service-tax-invoice/api/get-states/', views.get_states_by_country, name='service-tax-invoice-get-states'),
+    path('transactions/service-tax-invoice/api/get-cities/', views.get_cities_by_state, name='service-tax-invoice-get-cities'),
+    path('transactions/service-tax-invoice/api/customer-autocomplete/', views.customer_autocomplete, name='service-tax-invoice-customer-autocomplete'),
+    path('transactions/service-tax-invoice/api/copy-buyer/', views.copy_buyer_to_consignee, name='service-tax-invoice-copy-buyer'),
 
 
     # ========================================================================
     # Invoice URLs - Bill Booking
     # ========================================================================
     path('invoices/bill-booking/', views.BillBookingListView.as_view(), name='bill-booking-list'),
+    path('invoices/bill-booking/authorize-list/', views.BillBookingAuthorizeListView.as_view(), name='bill-booking-authorize-list'),
     path('invoices/bill-booking/create/', views.BillBookingCreateView.as_view(), name='bill-booking-create'),
     path('invoices/bill-booking/<int:id>/edit/', views.BillBookingUpdateView.as_view(), name='bill-booking-edit'),
     path('invoices/bill-booking/<int:id>/delete/', views.BillBookingDeleteView.as_view(), name='bill-booking-delete'),
@@ -180,7 +214,7 @@ urlpatterns = [
     path('invoices/proforma-invoice/<int:id>/edit/', views.ProformaInvoiceUpdateView.as_view(), name='proforma-invoice-edit'),
     path('invoices/proforma-invoice/<int:id>/delete/', views.ProformaInvoiceDeleteView.as_view(), name='proforma-invoice-delete'),
     path('invoices/proforma-invoice/<int:id>/print/', views.ProformaInvoicePrintView.as_view(), name='proforma-invoice-print'),
-    path('invoices/proforma-invoice/<int:proforma_id>/convert-to-sales/', views.ProformaToSalesInvoiceView.as_view(), name='proforma-to-sales-invoice'),
+    # path('invoices/proforma-invoice/<int:proforma_id>/convert-to-sales/', views.ProformaToSalesInvoiceView.as_view(), name='proforma-to-sales-invoice'),
 
     # ========================================================================
     # Invoice URLs - Credit Note
@@ -216,6 +250,33 @@ urlpatterns = [
     path('transactions/iou/<int:id>/delete/', views.IOUDeleteView.as_view(), name='iou-delete'),
     path('transactions/iou/<int:id>/authorize/', views.IOUAuthorizeView.as_view(), name='iou-authorize'),
     path('transactions/iou/<int:id>/receive/', views.IOUReceiveView.as_view(), name='iou-receive'),
+
+    # ========================================================================
+    # Creditors/Debitors URLs
+    # Converted from ASP.NET CreditorsDebitors.aspx
+    # ========================================================================
+    # Main list view with dual tabs
+    path('transactions/creditors-debitors/', views.CreditorsDebitorsListView.as_view(), name='creditors-debitors'),
+
+    # HTMX tab endpoints
+    path('transactions/creditors-debitors/creditors-tab/', views.CreditorsTabView.as_view(), name='creditors-tab'),
+    path('transactions/creditors-debitors/debitors-tab/', views.DebitorsTabView.as_view(), name='debitors-tab'),
+
+    # Creditor CRUD
+    path('transactions/creditors-debitors/creditor/create/', views.CreditorCreateView.as_view(), name='creditor-create'),
+    path('transactions/creditors-debitors/creditor/<int:pk>/delete/', views.CreditorDeleteView.as_view(), name='creditor-delete'),
+
+    # Debitor CRUD
+    path('transactions/creditors-debitors/debitor/create/', views.DebitorCreateView.as_view(), name='debitor-create'),
+    path('transactions/creditors-debitors/debitor/<int:pk>/delete/', views.DebitorDeleteView.as_view(), name='debitor-delete'),
+
+    # Detail views - transaction history
+    path('transactions/creditors-debitors/creditor/<str:supplier_id>/detail/', views.CreditorsDetailView.as_view(), name='creditor-detail'),
+    path('transactions/creditors-debitors/debitor/<str:customer_id>/detail/', views.DebitorsDetailView.as_view(), name='debitor-detail'),
+
+    # Sundry creditors - balance sheet view
+    path('transactions/creditors-debitors/sundry-creditors/', views.SundryCreditorsView.as_view(), name='sundry-creditors'),
+    path('transactions/creditors-debitors/sundry-creditors/<str:category>/', views.SundryCreditorsCategoryView.as_view(), name='sundry-creditors-category'),
 
     # ========================================================================
     # Bank Reconciliation URLs
@@ -380,4 +441,19 @@ urlpatterns = [
     # path('masters/loan-master/create/', views.LoanMasterCreateView.as_view(), name='loan-master-create'),
     # path('masters/loan-master/<int:pk>/update/', views.LoanMasterUpdateView.as_view(), name='loan-master-update'),
     # path('masters/loan-master/<int:pk>/delete/', views.LoanMasterDeleteView.as_view(), name='loan-master-delete'),
+    
+    # ========================================================================
+    # IOU Payment/Receipt URLs
+    # Converted from ASP.NET Module/Accounts/Transactions/IOU_PaymentReceipt.aspx
+    # ========================================================================
+    path('transactions/iou-payment-receipt/', views.IOUPaymentReceiptView.as_view(), name='iou-payment-receipt'),
+    path('transactions/iou-payment-receipt/payment/delete/<int:payment_id>/', views.IOUPaymentDeleteView.as_view(), name='iou-payment-delete'),
+    path('transactions/iou-payment-receipt/payment/authorize/<int:payment_id>/', views.IOUPaymentAuthorizeView.as_view(), name='iou-payment-authorize'),
+    path('transactions/iou-payment-receipt/receipt/delete/<int:receipt_id>/', views.IOUReceiptDeleteView.as_view(), name='iou-receipt-delete'),
+    path('transactions/iou-payment-receipt/receipt/add/<int:receipt_id>/', views.IOUReceiptAddView.as_view(), name='iou-receipt-add'),
+    
+    # ========================================================================
+    # Transaction URLs - Sales Invoice
+    # ========================================================================
+    path('transactions/sales-invoice/', include('accounts.urls_sales_invoice')),
 ]

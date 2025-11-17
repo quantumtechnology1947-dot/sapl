@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,AccessType,Access,ModId,SubModId
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,AccessType,Access,ModId,SubModId
 1,2013-07-29,11:21:18 AM,Sapl0001,1,1,Sapl0001,1,0,2,7
 2,2013-07-29,11:21:18 AM,Sapl0001,1,1,Sapl0001,2,0,2,7
 3,2013-07-29,11:21:18 AM,Sapl0001,1,1,Sapl0001,3,0,2,7

@@ -1,70 +1,129 @@
 {% extends 'inventory/base.html' %}
 
-{% block title %}WIS List - Inventory{% endblock %}
+{% block title %}Release WO for WIS - Inventory{% endblock %}
 
 {% block content %}
 <div class="max-w-full mx-auto px-4 py-2">
     <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-sm font-bold text-gray-800">Work Instruction Sheet (WIS)</h1>
-                <p class="text-sm text-gray-600 mt-1">Production material planning</p>
+                <h1 class="text-sm font-bold text-gray-800">Release WO for WIS</h1>
+                <p class="text-sm text-gray-600 mt-1">Work Order Management for WIS</p>
             </div>
-            <a href="{% url 'inventory:wis-create' %}" 
-               class="bg-pink-600 hover:bg-pink-700 text-white font-medium px-6 py-2 rounded-md shadow-sm transition-colors">
-                + New WIS
-            </a>
         </div>
     </div>
 
-    <!-- Search Bar Component -->
-{% include 'core/components/search_bar.html' with placeholder='Search by WIS number or work order...' %}
+    <!-- Filter Section -->
+    <div class="bg-white rounded border border-gray-200 p-4 mb-4">
+        <form method="get" action="{% url 'inventory:wis-list' %}" class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <label for="category" class="text-sm font-medium text-gray-700">WO Category</label>
+                <select name="category" id="category"
+                        class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.cid }}" {% if selected_category == cat.cid|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.cname }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-    {% if wis_list %}
+            <div class="flex items-center gap-2">
+                <label for="wono" class="text-sm font-medium text-gray-700">WONo</label>
+                <input type="text" name="wono" id="wono" value="{{ wono_search }}"
+                       class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+                       placeholder="Enter WO Number">
+            </div>
+
+            <button type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2 rounded text-sm transition-colors">
+                Search
+            </button>
+
+            {% if selected_category or wono_search %}
+            <a href="{% url 'inventory:wis-list' %}"
+               class="text-sm text-gray-600 hover:text-gray-800 underline">
+                Clear Filters
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Work Orders Table -->
+    {% if workorders %}
     <div class="bg-white rounded border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-pink-50">
+                <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-pink-900 uppercase tracking-wider">WIS No</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-pink-900 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-pink-900 uppercase tracking-wider">WO Number</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-pink-900 uppercase tracking-wider">Production Qty</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-pink-900 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-pink-900 uppercase tracking-wider">Actions</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-12">SN</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-24">Action</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">WO No</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Project Title</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">Rel Count</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">Rel Date</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">Rel Time</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Release By</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    {% for wis in wis_list %}
+                    {% for wo in workorders %}
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'inventory:wis-detail' wis.wisid %}" 
-                               class="text-pink-600 hover:text-pink-900 font-medium">
-                                {{ wis.wisno }}
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                            {% if wo.releasewis == 1 %}
+                            <form method="post" action="{% url 'inventory:wis-stop-wo' %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="wo_id" value="{{ wo.id }}">
+                                <input type="hidden" name="wono" value="{{ wo.wono }}">
+                                <button type="submit"
+                                        class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-1 rounded text-xs transition-colors">
+                                    Stop
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{% url 'inventory:wis-release-wo' %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="wo_id" value="{{ wo.id }}">
+                                <input type="hidden" name="wono" value="{{ wo.wono }}">
+                                <button type="submit"
+                                        class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-1 rounded text-xs transition-colors">
+                                    Release
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center font-medium">
+                            {{ wo.wono }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
+                            {{ wo.sysdate }}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900">
+                            {{ wo.taskprojecttitle|default:"-" }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
+                            {% if wo.release_count > 0 %}
+                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">
+                                {{ wo.release_count }}
                             </a>
+                            {% else %}
+                            <span class="text-gray-400">0</span>
+                            {% endif %}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {{ wis.wisdate|date:"d/m/Y" }}
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
+                            {{ wo.release_date|default:"-" }}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-900">
-                            {{ wis.wonumber|default:"-" }}
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
+                            {{ wo.release_time|default:"-" }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                            {{ wis.productionqty|floatformat:3 }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                {% if wis.status == 'Draft' %}bg-gray-100 text-gray-800
-                                {% elif wis.status == 'Released' %}bg-blue-100 text-blue-800
-                                {% else %}bg-green-100 text-green-800{% endif %}">
-                                {{ wis.status|default:"Draft" }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{% url 'inventory:wis-detail' wis.wisid %}" 
-                               class="text-pink-600 hover:text-pink-900 mr-3">View</a>
-                            <a href="{% url 'inventory:wis-print' wis.wisid %}" 
-                               class="text-blue-600 hover:text-blue-900" target="_blank">Print</a>
+                        <td class="px-4 py-3 text-sm text-gray-900">
+                            {{ wo.release_by|default:"-" }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -72,29 +131,55 @@
             </table>
         </div>
     </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="mt-4 flex justify-center">
+        <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if selected_category %}&category={{ selected_category }}{% endif %}{% if wono_search %}&wono={{ wono_search }}{% endif %}"
+               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                First
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if wono_search %}&wono={{ wono_search }}{% endif %}"
+               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Previous
+            </a>
+            {% endif %}
+
+            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if wono_search %}&wono={{ wono_search }}{% endif %}"
+               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Next
+            </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if wono_search %}&wono={{ wono_search }}{% endif %}"
+               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Last
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+
     {% else %}
     <div class="bg-white rounded border border-gray-200 p-12 text-center">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No WIS found</h3>
-        <p class="mt-1 text-sm text-gray-500">Get started by creating a new work instruction sheet.</p>
-        <div class="mt-6">
-            <a href="{% url 'inventory:wis-create' %}" 
-               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700">
-                + New WIS
-            </a>
-        </div>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No Work Orders found</h3>
+        <p class="mt-1 text-sm text-gray-500">
+            {% if selected_category or wono_search %}
+            Try adjusting your filters or search criteria.
+            {% else %}
+            No work orders available for WIS release.
+            {% endif %}
+        </p>
     </div>
     {% endif %}
 </div>
 {% endblock %}
-
-
-
-
-
-
-
-

@@ -55,6 +55,7 @@ from .mrqn_new import (
 # Authorized MCN
 from .authorized_mcn import (
     AuthorizedMCNListView,
+    AuthorizedMCNAutocompleteView,
     AuthorizedMCNCreateView,
     AuthorizedMCNDetailView,
     AuthorizedMCNDeleteView,
@@ -110,6 +111,7 @@ __all__ = [
 
     # Authorized MCN
     'AuthorizedMCNListView',
+    'AuthorizedMCNAutocompleteView',
     'AuthorizedMCNCreateView',
     'AuthorizedMCNDetailView',
     'AuthorizedMCNDeleteView',

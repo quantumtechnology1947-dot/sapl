@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,TINo,EmpId,Type,WONo,BGGroupId,ProjectName,TourStartDate,TourStartTime,TourEndDate,TourEndTime,NoOfDays,NameAddressSerProvider,ContactPerson,ContactNo,Email,PlaceOfTourCountry,PlaceOfTourState,PlaceOfTourCity
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,TINo,EmpId,Type,WONo,BGGroupId,ProjectName,TourStartDate,TourStartTime,TourEndDate,TourEndTime,NoOfDays,NameAddressSerProvider,ContactPerson,ContactNo,Email,PlaceOfTourCountry,PlaceOfTourState,PlaceOfTourCity
 2,2013-12-17,4:42:45 PM,Sapl0174,1,1,0001,Sapl0039,1,NA,2,INSTALLATION,2013-04-02,04:25:00:PM,2013-04-02,04:25:00:PM,7,PHALTAN wo NO 0788,-,-,-,1,21,405
 3,2013-12-17,4:42:22 PM,Sapl0174,1,1,0002,Sapl0103,1,NA,2,iNSTALLATION FOR WO 0788,2013-04-02,04:40:00:PM,2013-04-02,04:40:00:PM,7,-,-,-,-,1,21,405
 4,2013-12-17,4:45:00 PM,Sapl0174,1,1,0003,Sapl0097,1,NA,2,iNSTALLATION FOR WO 0788,2013-04-02,04:42:00:PM,2013-04-04,04:42:00:PM,7,-,-,-,-,1,21,405

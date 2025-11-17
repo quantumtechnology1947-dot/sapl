@@ -1,4 +1,4 @@
-﻿Id,SessionId,CompId,FinYearId,ItemDesc,TotalQty,Rate,Discount,MId,Unit
+Id,SessionId,CompId,FinYearId,ItemDesc,TotalQty,Rate,Discount,MId,Unit
 19,Sapl0005,1,1,Air Hoist with Tackle for Door handling,4.0,144000.0,0.0,8,16
 20,Sapl0005,1,1,3022-R302K/R302N--ROBO PEDASTAL 1,2.0,40500.0,0.0,9,1
 21,Sapl0005,1,1,3022-R302 J--ROBO PEDASTAL 2,1.0,32000.0,0.0,9,1

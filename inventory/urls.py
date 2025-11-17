@@ -31,6 +31,8 @@ urlpatterns = [
     # Material Return Note (MRN)
     path('mrn/', views.MRNListView.as_view(), name='mrn-list'),
     path('mrn/create/', views.MRNCreateView.as_view(), name='mrn-create'),
+    path('mrn/add-to-cart/', views.MRNAddToCartView.as_view(), name='mrn-add-to-cart'),
+    path('mrn/remove-from-cart/', views.MRNRemoveFromCartView.as_view(), name='mrn-remove-from-cart'),
     path('mrn/<int:pk>/', views.MRNDetailView.as_view(), name='mrn-detail'),
     path('mrn/<int:pk>/delete/', views.MRNDeleteView.as_view(), name='mrn-delete'),
     path('mrn/<int:pk>/print/', views.MRNPrintView.as_view(), name='mrn-print'),
@@ -102,12 +104,20 @@ urlpatterns = [
     
     # WIS (Work Instruction Sheet)
     path('wis/', views.WISListView.as_view(), name='wis-list'),
+    path('wis/release-wo/', views.WISReleaseWOView.as_view(), name='wis-release-wo'),
+    path('wis/stop-wo/', views.WISStopWOView.as_view(), name='wis-stop-wo'),
     path('wis/create/', views.WISCreateView.as_view(), name='wis-create'),
     path('wis/<int:pk>/', views.WISDetailView.as_view(), name='wis-detail'),
     path('wis/<int:pk>/release/', views.WISReleaseView.as_view(), name='wis-release'),
     path('wis/<int:pk>/actual-run/', views.WISActualRunView.as_view(), name='wis-actual-run'),
     path('wis/<int:pk>/print/', views.WISPrintView.as_view(), name='wis-print'),
-    
+
+    # WIS Dry Run (Material Issuance Simulation)
+    path('wis/dry-run/', views.WISDryRunEntryView.as_view(), name='wis-dryrun-entry'),
+    path('wis/dry-run/<str:wono>/assembly/', views.WISDryRunAssemblyView.as_view(), name='wis-dryrun-assembly'),
+    path('wis/dry-run/<str:wono>/material/', views.WISDryRunMaterialView.as_view(), name='wis-dryrun-material'),
+    path('wis/dry-run/<str:wono>/execute/', views.WISExecuteActualRunView.as_view(), name='wis-dryrun-execute'),
+
     # Item Location
     path('item-location/', views.ItemLocationListView.as_view(), name='item-location-list'),
     path('item-location/create/', views.ItemLocationCreateView.as_view(), name='item-location-create'),
@@ -129,7 +139,6 @@ urlpatterns = [
     
     # Closing Stock
     path('closing-stock/', views.ClosingStockView.as_view(), name='closing-stock'),
-    path('closing-stock/report/', views.ClosingStockReportView.as_view(), name='closing-stock-report'),
 
     # ============================================================================
     # AUTO WIS TIME SCHEDULE

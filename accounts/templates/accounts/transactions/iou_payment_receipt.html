@@ -1,0 +1,309 @@
+{% extends 'core/base.html' %}
+
+{% block title %}IOU Payment/Receipt - Accounts{% endblock %}
+
+{% block content %}
+<style>
+    /* Classic ASP.NET styling */
+    body {
+        font-family: Verdana, Arial, sans-serif;
+        font-size: 8pt;
+    }
+
+    .header-table {
+        width: 100%;
+        background-color: #5d7b9d;
+        border: 1px solid #5d7b9d;
+        margin-bottom: 5px;
+    }
+
+    .header-cell {
+        color: white;
+        font-weight: bold;
+        font-size: 10pt;
+        padding: 3px 5px;
+    }
+
+    .main-tabs {
+        margin-top: 2px;
+        border-bottom: 1px solid #999999;
+    }
+
+    .main-tab {
+        display: inline-block;
+        padding: 4px 12px;
+        margin-right: 2px;
+        background-color: #ece9d8;
+        border: 1px solid #999999;
+        border-bottom: none;
+        font-size: 8pt;
+        font-weight: bold;
+        cursor: pointer;
+        color: #000;
+    }
+
+    .main-tab.active {
+        background-color: white;
+        border-bottom: 1px solid white;
+        margin-bottom: -1px;
+    }
+
+    .tab-content-wrapper {
+        border: 1px solid #999999;
+        border-top: none;
+        background-color: white;
+        padding: 8px;
+        display: none;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .tab-content-wrapper.active {
+        display: block;
+    }
+
+    .grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8pt;
+        border: 1px solid #999999;
+    }
+
+    .grid-header {
+        background-color: #d3d3d3;
+        font-weight: bold;
+        padding: 3px;
+        border: 1px solid #999999;
+        text-align: left;
+    }
+
+    .grid-cell {
+        border: 1px solid #999999;
+        padding: 2px 4px;
+    }
+
+    .grid-cell input[type="text"],
+    .grid-cell input[type="number"],
+    .grid-cell input[type="date"],
+    .grid-cell select {
+        width: 100%;
+        border: 1px solid #7f9db9;
+        font-size: 8pt;
+        padding: 1px 2px;
+    }
+
+    .btn-edit, .btn-delete, .btn-update, .btn-cancel, .btn-add {
+        background-color: #d32f2f;
+        color: white;
+        border: 1px solid #b71c1c;
+        padding: 2px 8px;
+        font-size: 8pt;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .btn-edit:hover, .btn-delete:hover, .btn-update:hover, .btn-cancel:hover, .btn-add:hover {
+        background-color: #b71c1c;
+    }
+
+    .empty-row {
+        text-align: center;
+        color: maroon;
+        padding: 8px;
+        font-size: 10pt;
+    }
+
+    .checkbox-cell {
+        text-align: center;
+    }
+</style>
+
+<div>
+    <!-- Header Bar -->
+    <table class="header-table" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="header-cell">&nbsp;IOU: Payment/Receipt</td>
+        </tr>
+    </table>
+
+    <!-- Main Tabs -->
+    <div class="main-tabs">
+        <span class="main-tab {% if active_tab == 'payment' %}active{% endif %}" onclick="showMainTab('payment')">Payment</span>
+        <span class="main-tab {% if active_tab == 'receipt' %}active{% endif %}" onclick="showMainTab('receipt')">Receipt</span>
+    </div>
+
+    <!-- Payment Tab Content -->
+    <div id="paymentTab" class="tab-content-wrapper {% if active_tab == 'payment' %}active{% endif %}">
+        <table class="grid-table" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <th class="grid-header" style="width: 5%;">Edit</th>
+                    <th class="grid-header" style="width: 3%;">Delete</th>
+                    <th class="grid-header" style="width: 3%;">SN</th>
+                    <th class="grid-header" style="width: 8%;">Date</th>
+                    <th class="grid-header" style="width: 15%;">Employee Name</th>
+                    <th class="grid-header" style="width: 10%;">Amount</th>
+                    <th class="grid-header" style="width: 15%;">Reason</th>
+                    <th class="grid-header" style="width: 20%;">Narration</th>
+                    <th class="grid-header" style="width: 5%;">Authorize</th>
+                </tr>
+            </thead>
+            <tbody id="paymentGridBody">
+                {% if payments %}
+                    {% for payment in payments %}
+                    <tr id="payment-row-{{ payment.id }}">
+                        <td class="grid-cell" style="text-align: center;">
+                            <a href="#" class="btn-edit" onclick="editPayment({{ payment.id }}); return false;">Edit</a>
+                        </td>
+                        <td class="grid-cell" style="text-align: center;">
+                            {% if not payment.authorize %}
+                            <a href="#" class="btn-delete" 
+                               hx-post="{% url 'accounts:iou-payment-delete' payment.id %}"
+                               hx-target="#paymentGridBody"
+                               hx-swap="innerHTML"
+                               hx-confirm="Are you sure you want to delete this payment?"
+                               >Delete</a>
+                            {% endif %}
+                        </td>
+                        <td class="grid-cell" style="text-align: right;">{{ payment.id }}</td>
+                        <td class="grid-cell" style="text-align: center;">{{ payment.paymentdate }}</td>
+                        <td class="grid-cell">{{ payment.empname }}</td>
+                        <td class="grid-cell" style="text-align: right;">{{ payment.amount|floatformat:2 }}</td>
+                        <td class="grid-cell">{{ payment.reason_name }}</td>
+                        <td class="grid-cell">{{ payment.narration }}</td>
+                        <td class="grid-cell checkbox-cell">
+                            <input type="checkbox" 
+                                   {% if payment.authorize %}checked disabled{% endif %}
+                                   hx-post="{% url 'accounts:iou-payment-authorize' payment.id %}"
+                                   hx-target="#paymentGridBody"
+                                   hx-swap="innerHTML"
+                                   {% if payment.authorize %}disabled{% endif %}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="grid-cell empty-row">No data to display!</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Receipt Tab Content -->
+    <div id="receiptTab" class="tab-content-wrapper {% if active_tab == 'receipt' %}active{% endif %}">
+        <table class="grid-table" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <th class="grid-header" style="width: 6%;">Edit</th>
+                    <th class="grid-header" style="width: 3%;">Delete</th>
+                    <th class="grid-header" style="width: 3%;">SN</th>
+                    <th class="grid-header" style="width: 8%;">Pay. Date</th>
+                    <th class="grid-header" style="width: 15%;">Employee Name</th>
+                    <th class="grid-header" style="width: 12%;">Reason</th>
+                    <th class="grid-header" style="width: 15%;">Narration</th>
+                    <th class="grid-header" style="width: 8%;">Amount</th>
+                    <th class="grid-header" style="width: 8%;">Rec. Amt</th>
+                    <th class="grid-header" style="width: 10%;">Receipt Date</th>
+                    <th class="grid-header" style="width: 5%;"></th>
+                </tr>
+            </thead>
+            <tbody id="receiptGridBody">
+                {% if receipts %}
+                    {% for receipt in receipts %}
+                    <tr id="receipt-row-{{ receipt.id }}">
+                        <td class="grid-cell" style="text-align: center;">
+                            <a href="#" class="btn-edit" onclick="editReceipt({{ receipt.id }}); return false;">Edit</a>
+                        </td>
+                        <td class="grid-cell" style="text-align: center;">
+                            <a href="#" class="btn-delete"
+                               hx-post="{% url 'accounts:iou-receipt-delete' receipt.id %}"
+                               hx-target="#receiptGridBody"
+                               hx-swap="innerHTML"
+                               hx-confirm="Are you sure you want to delete this receipt?"
+                               >Delete</a>
+                        </td>
+                        <td class="grid-cell" style="text-align: center;">{{ receipt.id }}</td>
+                        <td class="grid-cell" style="text-align: center;">{{ receipt.paymentdate }}</td>
+                        <td class="grid-cell">{{ receipt.empname }}</td>
+                        <td class="grid-cell">{{ receipt.reason_name }}</td>
+                        <td class="grid-cell">{{ receipt.narration }}</td>
+                        <td class="grid-cell" style="text-align: right;">{{ receipt.amount|floatformat:2 }}</td>
+                        <td class="grid-cell">
+                            <span class="receipt-amt-display">{{ receipt.recivedamt|default:""|floatformat:2 }}</span>
+                            <input type="number" class="receipt-amt-input" style="display:none;" 
+                                   value="{{ receipt.recivedamt|default:"" }}" step="0.01">
+                        </td>
+                        <td class="grid-cell">
+                            <span class="receipt-date-display">{{ receipt.receiptdate|default:"" }}</span>
+                            <input type="date" class="receipt-date-input" style="display:none;" 
+                                   value="{{ receipt.receiptdate|date:'Y-m-d'|default:"" }}">
+                        </td>
+                        <td class="grid-cell" style="text-align: center;">
+                            <button class="btn-add receipt-add-btn"
+                                    hx-post="{% url 'accounts:iou-receipt-add' receipt.id %}"
+                                    hx-include="closest tr"
+                                    hx-target="#receiptGridBody"
+                                    hx-swap="innerHTML"
+                                    style="display:none;">Add</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="11" class="grid-cell empty-row">No data to display!</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function showMainTab(tabName) {
+    // Hide all tabs
+    document.getElementById('paymentTab').classList.remove('active');
+    document.getElementById('receiptTab').classList.remove('active');
+
+    // Remove active class from all tab buttons
+    const tabButtons = document.querySelectorAll('.main-tab');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+
+    // Show selected tab and activate button
+    if (tabName === 'payment') {
+        document.getElementById('paymentTab').classList.add('active');
+        event.target.classList.add('active');
+    } else {
+        document.getElementById('receiptTab').classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // Update URL parameter
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabName);
+    window.history.pushState({}, '', url);
+}
+
+function editPayment(id) {
+    alert('Edit functionality will be implemented with inline editing');
+}
+
+function editReceipt(id) {
+    const row = document.getElementById('receipt-row-' + id);
+    const amtDisplay = row.querySelector('.receipt-amt-display');
+    const amtInput = row.querySelector('.receipt-amt-input');
+    const dateDisplay = row.querySelector('.receipt-date-display');
+    const dateInput = row.querySelector('.receipt-date-input');
+    const addBtn = row.querySelector('.receipt-add-btn');
+
+    // Toggle display
+    amtDisplay.style.display = 'none';
+    amtInput.style.display = 'block';
+    dateDisplay.style.display = 'none';
+    dateInput.style.display = 'block';
+    addBtn.style.display = 'inline-block';
+}
+</script>
+
+{% endblock %}

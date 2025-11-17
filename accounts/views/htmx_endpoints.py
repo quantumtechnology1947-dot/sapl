@@ -63,17 +63,41 @@ class GetStatesView(LoginRequiredMixin, View):
     Converted from FBV to CBV for consistency.
     Requirements: 3.1, 10.3, 12.3
     """
-    
+
     def get(self, request):
         """Return state dropdown HTML for HTMX."""
+        from sys_admin.models import Tblstate
+
         country_id = request.GET.get('country')
-        
+
         context = {
             'country_id': country_id,
             'states': Tblstate.objects.filter(cid=country_id).order_by('statename') if country_id else []
         }
-        
+
         return render(request, 'accounts/partials/state_dropdown.html', context)
+
+
+class GetStatesJSONView(LoginRequiredMixin, View):
+    """
+    JSON endpoint to get states for a selected country.
+    Used by JavaScript cascading dropdowns.
+    """
+
+    def get(self, request):
+        """Return states as JSON."""
+        from sys_admin.models import Tblstate
+
+        country_id = request.GET.get('country_id')
+
+        if not country_id:
+            return JsonResponse({'states': []})
+
+        states = Tblstate.objects.filter(cid_id=country_id).order_by('statename')
+        states_list = [{'id': s.sid, 'name': s.statename} for s in states]
+
+        return JsonResponse({'states': states_list})
+
 
 class GetCitiesView(LoginRequiredMixin, View):
     """
@@ -81,17 +105,40 @@ class GetCitiesView(LoginRequiredMixin, View):
     Converted from FBV to CBV for consistency.
     Requirements: 3.1, 10.3, 12.3
     """
-    
+
     def get(self, request):
         """Return city dropdown HTML for HTMX."""
+        from sys_admin.models import Tblcity
+
         state_id = request.GET.get('state')
-        
+
         context = {
             'state_id': state_id,
             'cities': Tblcity.objects.filter(sid=state_id).order_by('cityname') if state_id else []
         }
-        
+
         return render(request, 'accounts/partials/city_dropdown.html', context)
+
+
+class GetCitiesJSONView(LoginRequiredMixin, View):
+    """
+    JSON endpoint to get cities for a selected state.
+    Used by JavaScript cascading dropdowns.
+    """
+
+    def get(self, request):
+        """Return cities as JSON."""
+        from sys_admin.models import Tblcity
+
+        state_id = request.GET.get('state_id')
+
+        if not state_id:
+            return JsonResponse({'cities': []})
+
+        cities = Tblcity.objects.filter(sid_id=state_id).order_by('cityname')
+        cities_list = [{'id': c.cityid, 'name': c.cityname} for c in cities]
+
+        return JsonResponse({'cities': cities_list})
 
 
 

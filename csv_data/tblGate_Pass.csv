@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,GPNo,EmpId,Authorize,AuthorizedBy,AuthorizeDate,AuthorizeTime
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,GPNo,EmpId,Authorize,AuthorizedBy,AuthorizeDate,AuthorizeTime
 12624,2020-08-28,3:59:18 PM,sapl0059,1,8,0001,,0,,,
 12625,2020-08-29,10:02:28 AM,sapl0219,1,7,1084,,0,,,
 12626,2020-09-02,3:08:42 PM,sapl0250,1,8,0002,,0,,,

@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,GINNo,PONo,POMId,ChallanNo,ChallanDate,GateEntryNo,GDate,GTime,ModeofTransport,VehicleNo
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,GINNo,PONo,POMId,ChallanNo,ChallanDate,GateEntryNo,GDate,GTime,ModeofTransport,VehicleNo
 11473,2018-04-13,4:17:48 PM,1,6,sapl0276,0001,1415,7485,20,2018-03-31,1529,2018-03-31,04:12:00 PM,-,-
 11474,2018-04-13,4:22:59 PM,1,6,sapl0276,0002,1476,7546,20,2018-03-31,1530,2018-03-31,04:22:00 PM,-,-
 11475,2018-04-14,10:43:06 AM,1,6,sapl0276,0003,1487,7557,MM-0225/18-19,2018-04-13,001,2018-04-13,10:42:00 AM,-,-

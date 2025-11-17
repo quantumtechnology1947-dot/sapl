@@ -1,0 +1,29 @@
+{% if bills %}
+    {% for bill in bills %}
+    <tr>
+        <td class="grid-cell" style="text-align: center;">
+            <input type="checkbox" name="bill_check_{{ bill.id }}" value="{{ bill.id }}">
+        </td>
+        <td class="grid-cell">{{ bill.pvevno }}</td>
+        <td class="grid-cell">{{ bill.pono }}</td>
+        <td class="grid-cell">{{ bill.billno }}</td>
+        <td class="grid-cell">{{ bill.billdate|date:"d-m-Y" }}</td>
+        <td class="grid-cell">{{ bill.against_bill }}</td>
+        <td class="grid-cell" style="text-align: right;">{{ bill.actual_amt|floatformat:2 }}</td>
+        <td class="grid-cell" style="text-align: right;">{{ bill.paid_amt|floatformat:2 }}</td>
+        <td class="grid-cell" style="text-align: right;">{{ bill.balance_amt|floatformat:2 }}</td>
+        <td class="grid-cell">
+            <input type="number" name="amount_{{ bill.id }}" step="0.01" class="form-input" style="width: 100px; text-align: right;" value="{{ bill.balance_amt }}">
+        </td>
+        <td class="grid-cell">
+            <input type="text" name="narration_{{ bill.id }}" class="form-input" style="width: 150px;" placeholder="Narration">
+        </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="11" class="grid-cell empty-row">
+            {{ message|default:"No pending bills found for this supplier" }}
+        </td>
+    </tr>
+{% endif %}

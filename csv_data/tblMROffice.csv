@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,SessionId,FinYearId,ForModule,Format,FileName,Size,ContentType,Data
+Id,SysDate,SysTime,CompId,SessionId,FinYearId,ForModule,Format,FileName,Size,ContentType,Data
 3,2013-08-13,11:14:52 AM,1,Sapl0001,1,13,MR_QD,MR_QD.doc,314880,application/msword,
 4,2013-08-13,11:15:02 AM,1,Sapl0001,1,13,MR_QF1,MR_QF1.doc,419840,application/msword,
 5,2013-08-13,11:15:21 AM,1,Sapl0001,1,2,SM_QD,SM_QD.doc,188928,application/msword,

@@ -1,4 +1,4 @@
-﻿SCId,SysDate,SysTime,CompId,FinYearId,SessionId,CId,SCName,Symbol
+SCId,SysDate,SysTime,CompId,FinYearId,SessionId,CId,SCName,Symbol
 2,2013-04-01,09:28:26 AM,1,1,Sapl0002,35,Welding & Inspection Fixtures,F
 4,2013-04-03,2:20:39 PM,1,1,Sapl0001,35,Conveyor System,C
 5,2013-04-03,2:20:50 PM,1,1,Sapl0001,35,Material Handling System,H

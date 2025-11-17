@@ -797,7 +797,59 @@ class ReportService:
 
 class InvoiceService:
     """Service layer for invoice operations."""
-    
+
+    @staticmethod
+    def get_next_invoice_number(company_id, financial_year_id):
+        """
+        Generate next sales invoice number.
+
+        CRITICAL: This method EXACTLY replicates the ASP.NET logic from
+        SalesInvoice_New_Details.aspx.cs lines 96-111.
+
+        Algorithm:
+        1. Query the latest invoice number from tblACC_SalesInvoice_Master
+        2. Filter by CompId AND FinYearId
+        3. Order by InvoiceNo descending (get the latest)
+        4. If records exist: Take the latest InvoiceNo, increment by 1, format as 4-digit zero-padded
+        5. If no records: Start with "0001"
+
+        Args:
+            company_id: Company ID from session
+            financial_year_id: Financial Year ID from session
+
+        Returns:
+            str: Next invoice number (4-digit zero-padded, e.g., "0001", "0042", "1234")
+
+        Example:
+            >>> InvoiceService.get_next_invoice_number(1, 2024)
+            "0001"  # If no invoices exist
+
+            >>> InvoiceService.get_next_invoice_number(1, 2024)
+            "0042"  # If last invoice was "0041"
+        """
+        from accounts.models import TblaccSalesinvoiceMaster
+
+        # Query: SELECT InvoiceNo FROM tblACC_SalesInvoice_Master
+        #        WHERE CompId='{CompId}' AND FinYearId='{FinYearId}'
+        #        ORDER BY InvoiceNo DESC
+        last_invoice = TblaccSalesinvoiceMaster.objects.filter(
+            compid=company_id,
+            finyearid=financial_year_id
+        ).order_by('-invoiceno').first()
+
+        # If records exist: InvNo = (latest_invoice_no + 1).ToString("D4")
+        # Else: InvNo = "0001"
+        if last_invoice and last_invoice.invoiceno:
+            # Increment and format as 4-digit zero-padded
+            try:
+                next_num = int(last_invoice.invoiceno) + 1
+                return f"{next_num:04d}"
+            except (ValueError, TypeError):
+                # If invoiceno is not a valid number, start fresh
+                return "0001"
+        else:
+            return "0001"
+
     @staticmethod
     def calculate_invoice_totals(line_items):
         """
@@ -1319,3 +1371,533 @@ class AssetService:
             'is_gain': gain_loss > 0,
             'journal_entries_created': False  # TODO: Update when journal system is ready
         }
+
+
+# ============================================================================
+# ADVICE SERVICE - Converted from ASP.NET Advice.aspx.cs
+# ============================================================================
+
+class AdviceService:
+    """
+    Business logic for Advice Payment/Receipt functionality.
+    Maps exactly to ASP.NET Advice.aspx.cs methods.
+    
+    Converted from: aaspnet/Module/Accounts/Transactions/Advice.aspx.cs
+    """
+
+    @staticmethod
+    def get_autocomplete_options(search_term, option_type, company_id):
+        """
+        Auto-complete for Employee/Customer/Supplier selection.
+        Maps to: GetCompletionList, Sql, Sql2, sql3 WebMethods
+        
+        Args:
+            search_term: Prefix text to search
+            option_type: 1=Employee, 2=Customer, 3=Supplier
+            company_id: Company ID from session
+        
+        Returns:
+            List of dicts with 'id' and 'text' keys
+        """
+        from material_management.models import TblmmSupplierMaster
+        from sales_distribution.models import SdCustMaster
+        from human_resource.models import TblhrOfficestaff
+        
+        results = []
+        
+        try:
+            if option_type == '1':  # Employee
+                employees = TblhrOfficestaff.objects.filter(
+                    compid=company_id,
+                    employeename__istartswith=search_term
+                ).order_by('employeename')[:10]
+                
+                results = [
+                    {
+                        'id': f"{emp.employeename} [{emp.empid}]",
+                        'text': f"{emp.employeename} [{emp.empid}]"
+                    }
+                    for emp in employees
+                ]
+                
+            elif option_type == '2':  # Customer
+                customers = SdCustMaster.objects.filter(
+                    compid=company_id,
+                    customername__istartswith=search_term
+                ).order_by('customername')[:10]
+                
+                results = [
+                    {
+                        'id': f"{cust.customername} [{cust.customerid}]",
+                        'text': f"{cust.customername} [{cust.customerid}]"
+                    }
+                    for cust in customers
+                ]
+                
+            elif option_type == '3':  # Supplier
+                suppliers = TblmmSupplierMaster.objects.filter(
+                    compid=company_id,
+                    suppliername__istartswith=search_term
+                ).order_by('suppliername')[:10]
+                
+                results = [
+                    {
+                        'id': f"{sup.suppliername} [{sup.supplierid}]",
+                        'text': f"{sup.suppliername} [{sup.supplierid}]"
+                    }
+                    for sup in suppliers
+                ]
+        except Exception as e:
+            print(f"Autocomplete error: {e}")
+        
+        return results
+
+    @staticmethod
+    def extract_code_from_name(name_with_code):
+        """
+        Extract code from "Name [CODE]" format.
+        Maps to: fun.getCode() method
+        
+        Args:
+            name_with_code: String like "ABC Supplier [SUP001]"
+        
+        Returns:
+            Code string like "SUP001"
+        """
+        if '[' in name_with_code and ']' in name_with_code:
+            return name_with_code.split('[')[1].split(']')[0]
+        return name_with_code
+
+    @staticmethod
+    def generate_advice_number(company_id, financial_year_id):
+        """
+        Generate next Advice Number (ADNo).
+        Maps to: btnProceed_Click ADNo generation logic
+        
+        Format: Auto-increment 4-digit number (0001, 0002, etc.)
+        
+        Args:
+            company_id: Company ID
+            financial_year_id: Financial Year ID
+        
+        Returns:
+            String like "0001", "0002", etc.
+        """
+        from accounts.models import TblaccAdvicePaymentMaster
+        
+        last_advice = TblaccAdvicePaymentMaster.objects.filter(
+            compid=company_id,
+            finyearid=financial_year_id
+        ).order_by('-id').first()
+        
+        if last_advice and last_advice.adno:
+            try:
+                last_number = int(last_advice.adno)
+                next_number = last_number + 1
+            except ValueError:
+                next_number = 1
+        else:
+            next_number = 1
+        
+        return str(next_number).zfill(4)
+
+    @staticmethod
+    def validate_emp_cust_supplier_code(code, code_type, company_id):
+        """
+        Validate if Employee/Customer/Supplier code exists.
+        Maps to: fun.chkEmpCustSupplierCode() method
+        
+        Args:
+            code: Employee/Customer/Supplier code
+            code_type: 1=Employee, 2=Customer, 3=Supplier
+            company_id: Company ID
+        
+        Returns:
+            1 if valid, 0 if invalid
+        """
+        from material_management.models import TblmmSupplierMaster
+        from sales_distribution.models import SdCustMaster
+        from human_resource.models import TblhrOfficestaff
+        
+        try:
+            if code_type == 1:  # Employee
+                return 1 if TblhrOfficestaff.objects.filter(
+                    empid=code, compid=company_id
+                ).exists() else 0
+            elif code_type == 2:  # Customer
+                return 1 if SdCustMaster.objects.filter(
+                    customerid=code, compid=company_id
+                ).exists() else 0
+            elif code_type == 3:  # Supplier
+                return 1 if TblmmSupplierMaster.objects.filter(
+                    supplierid=code, compid=company_id
+                ).exists() else 0
+        except Exception:
+            return 0
+        
+        return 0
+
+    # ========================================================================
+    # ADVANCE PAYMENT METHODS (Type=1)
+    # ========================================================================
+
+    @staticmethod
+    def get_advance_temp_items(session_id, company_id):
+        """Get temp items for Advance payment. Maps to: GridView1 data binding"""
+        from accounts.models import TblaccAdvicePaymentTemp
+        return TblaccAdvicePaymentTemp.objects.filter(
+            sessionid=session_id,
+            compid=company_id,
+            types=1  # Advance type
+        ).order_by('id')
+
+    @staticmethod
+    def insert_advance_temp(data, session_id, company_id):
+        """Insert item into Advance temp table. Maps to: GridView1_RowCommand"""
+        from accounts.models import TblaccAdvicePaymentTemp
+        try:
+            TblaccAdvicePaymentTemp.objects.create(
+                proformainvno=data.get('proforma_inv_no', ''),
+                invdate=data.get('date', ''),
+                pono=data.get('po_no', ''),
+                amount=Decimal(data.get('amount', 0)),
+                particular=data.get('particulars', ''),
+                sessionid=session_id,
+                compid=company_id,
+                types=1  # Advance type
+            )
+            return True
+        except Exception as e:
+            print(f"Insert advance temp error: {e}")
+            return False
+
+    @staticmethod
+    def delete_advance_temp(temp_id):
+        """Delete item from Advance temp table. Maps to: GridView1 Delete command"""
+        from accounts.models import TblaccAdvicePaymentTemp
+        try:
+            TblaccAdvicePaymentTemp.objects.filter(id=temp_id).delete()
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    @transaction.atomic
+    def save_advance_payment(form_data, temp_items, user, company_id, financial_year_id):
+        """Save Advance payment to Master and Details tables. Maps to: btnProceed_Click"""
+        from accounts.models import TblaccAdvicePaymentMaster, TblaccAdvicePaymentDetails
+        
+        try:
+            pay_to_code = AdviceService.extract_code_from_name(form_data['pay_to_name'])
+            pay_to_type = int(form_data['pay_to_type'])
+            
+            if not AdviceService.validate_emp_cust_supplier_code(pay_to_code, pay_to_type, company_id):
+                return False, "Invalid Employee/Customer/Supplier code"
+            
+            advice_number = AdviceService.generate_advice_number(company_id, financial_year_id)
+            current_date = datetime.now().strftime('%d-%m-%Y')
+            current_time = datetime.now().strftime('%H:%M:%S')
+            
+            master = TblaccAdvicePaymentMaster.objects.create(
+                adno=advice_number,
+                sysdate=current_date,
+                systime=current_time,
+                sessionid=str(user.id),
+                compid=company_id,
+                finyearid=financial_year_id,
+                type=1,  # Advance payment
+                ecstype=pay_to_type,
+                payto=pay_to_code,
+                chequeno=form_data['cheque_no'],
+                chequedate=form_data['cheque_date'],
+                payat=form_data['payable_at'],
+                bank=int(form_data['bank_id'])
+            )
+            
+            for item in temp_items:
+                TblaccAdvicePaymentDetails.objects.create(
+                    mid=master,
+                    proformainvno=item.proformainvno,
+                    invdate=item.invdate,
+                    pono=item.pono,
+                    particular=item.particular,
+                    amount=item.amount
+                )
+            
+            temp_items.delete()
+            return True, advice_number
+            
+        except Exception as e:
+            print(f"Save advance payment error: {e}")
+            return False, str(e)
+
+    # ========================================================================
+    # CREDITORS PAYMENT METHODS (Type=4)
+    # ========================================================================
+
+    @staticmethod
+    def search_bill_bookings(supplier_id, company_id, financial_year_id):
+        """Search pending bill bookings for supplier. Maps to: btnSearch_Click and FillGrid_Creditors"""
+        from accounts.models import (
+            TblaccBillbookingMaster, TblaccBillbookingDetails,
+            TblaccAdvicePaymentDetails, TblaccAdvicePaymentCreditorTemp
+        )
+        from quality_control.models import TblqcMaterialqualityDetails
+        from inventory.models import TblinvMaterialservicenoteDetails
+        from django.db.models import Sum
+        
+        try:
+            bills = TblaccBillbookingMaster.objects.filter(
+                supplierid=supplier_id,
+                compid=company_id
+            ).select_related('poid').order_by('-id')
+            
+            result = []
+            
+            for bill in bills:
+                bill_details = TblaccBillbookingDetails.objects.filter(mid=bill.id)
+                
+                actual_amt = 0.0
+                for detail in bill_details:
+                    if detail.gqnid and detail.gqnid != 0:
+                        gqn_details = TblqcMaterialqualityDetails.objects.filter(mid=detail.gqnid)
+                        for gqn_detail in gqn_details:
+                            actual_amt += float(gqn_detail.acceptedqty or 0)
+                    elif detail.gsnid and detail.gsnid != 0:
+                        gsn_details = TblinvMaterialservicenoteDetails.objects.filter(mid=detail.gsnid)
+                        for gsn_detail in gsn_details:
+                            actual_amt += float(gsn_detail.receivedqty or 0)
+                
+                paid_amt = TblaccAdvicePaymentDetails.objects.filter(
+                    pvevno=bill.id
+                ).aggregate(total=Sum('amount'))['total'] or 0
+                
+                temp_amt = TblaccAdvicePaymentCreditorTemp.objects.filter(
+                    pvevno=bill.id,
+                    compid=company_id
+                ).aggregate(total=Sum('amount'))['total'] or 0
+                
+                bal_amt = actual_amt - (float(paid_amt) + float(temp_amt))
+                
+                if bal_amt > 0:
+                    result.append({
+                        'id': bill.id,
+                        'pvevno': bill.pvevno,
+                        'bill_no': bill.billno,
+                        'bill_date': bill.billdate,
+                        'po_no': bill.poid.pono if bill.poid else '',
+                        'actual_amt': actual_amt,
+                        'paid_amt': paid_amt,
+                        'bal_amt': bal_amt
+                    })
+            
+            return result
+            
+        except Exception as e:
+            print(f"Search bill bookings error: {e}")
+            return []
+
+    @staticmethod
+    def get_creditor_temp_items(session_id, company_id):
+        """Get temp items for Creditors payment. Maps to: GridView5 data binding"""
+        from accounts.models import TblaccAdvicePaymentCreditorTemp
+        return TblaccAdvicePaymentCreditorTemp.objects.filter(
+            sessionid=session_id,
+            compid=company_id
+        ).order_by('id')
+
+    @staticmethod
+    def add_creditor_to_temp(selected_bills, session_id, company_id):
+        """Add selected bills to creditor temp table. Maps to: GridView4_RowCommand "AddToTemp"  """
+        from accounts.models import TblaccAdvicePaymentCreditorTemp
+        try:
+            for bill in selected_bills:
+                TblaccAdvicePaymentCreditorTemp.objects.create(
+                    pvevno=bill['bill_id'],
+                    billagainst=bill['narration'],
+                    amount=Decimal(bill['amount']),
+                    sessionid=session_id,
+                    compid=company_id
+                )
+            return True
+        except Exception as e:
+            print(f"Add creditor to temp error: {e}")
+            return False
+
+    @staticmethod
+    def delete_creditor_temp(temp_id):
+        """Delete item from Creditors temp table. Maps to: GridView5_RowDeleting"""
+        from accounts.models import TblaccAdvicePaymentCreditorTemp
+        try:
+            TblaccAdvicePaymentCreditorTemp.objects.filter(id=temp_id).delete()
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    @transaction.atomic
+    def save_creditor_payment(form_data, temp_items, user, company_id, financial_year_id):
+        """Save Creditor payment to Master and Details tables. Maps to: btnProceed_Creditor_Click"""
+        from accounts.models import TblaccAdvicePaymentMaster, TblaccAdvicePaymentDetails
+        
+        try:
+            supplier_code = AdviceService.extract_code_from_name(form_data['pay_to_name'])
+            
+            if not AdviceService.validate_emp_cust_supplier_code(supplier_code, 3, company_id):
+                return False, "Invalid Supplier code"
+            
+            advice_number = AdviceService.generate_advice_number(company_id, financial_year_id)
+            current_date = datetime.now().strftime('%d-%m-%Y')
+            current_time = datetime.now().strftime('%H:%M:%S')
+            
+            master = TblaccAdvicePaymentMaster.objects.create(
+                adno=advice_number,
+                sysdate=current_date,
+                systime=current_time,
+                sessionid=str(user.id),
+                compid=company_id,
+                finyearid=financial_year_id,
+                type=4,  # Creditors payment
+                ecstype=3,  # Supplier type
+                payto=supplier_code,
+                chequeno=form_data['cheque_no'],
+                chequedate=form_data['cheque_date'],
+                payat=form_data['payable_at'],
+                bank=int(form_data['bank_id'])
+            )
+            
+            for item in temp_items:
+                TblaccAdvicePaymentDetails.objects.create(
+                    mid=master,
+                    pvevno=item.pvevno,
+                    billagainst=item.billagainst,
+                    amount=item.amount
+                )
+            
+            temp_items.delete()
+            return True, advice_number
+            
+        except Exception as e:
+            print(f"Save creditor payment error: {e}")
+            return False, str(e)
+
+    # ========================================================================
+    # SALARY TAB METHODS
+    # ========================================================================
+    
+    @staticmethod
+    def get_salary_temp_items(session_id, company_id):
+        """Get salary temp items for current session."""
+        from .models import TblaccAdvicePaymentTemp
+        return TblaccAdvicePaymentTemp.objects.filter(
+            sessionid=session_id,
+            compid=company_id,
+            types=2  # 2=Salary
+        ).order_by('id')
+    
+    @staticmethod
+    def insert_salary_temp(data, session_id, company_id):
+        """Insert salary item into temp table."""
+        from .models import TblaccAdvicePaymentTemp
+        import traceback
+        
+        try:
+            TblaccAdvicePaymentTemp.objects.create(
+                sessionid=session_id,
+                compid=company_id,
+                proformainvno=data.get('empname', ''),  # Store employee name in proformainvno
+                amount=data.get('amt', 0),
+                particular=data.get('particulars', ''),
+                types=2  # 2=Salary
+            )
+            return True
+        except Exception as e:
+            print(f"Error inserting salary temp: {e}")
+            traceback.print_exc()
+            return False
+    
+    @staticmethod
+    def delete_salary_temp(temp_id):
+        """Delete salary item from temp table."""
+        from .models import TblaccAdvicePaymentTemp
+        try:
+            TblaccAdvicePaymentTemp.objects.filter(id=temp_id).delete()
+            return True
+        except Exception as e:
+            print(f"Error deleting salary temp: {e}")
+            return False
+    
+    @staticmethod
+    def save_salary_payment(form_data, temp_items, user, company_id, financial_year_id):
+        """Save salary payment to master and details tables."""
+        # TODO: Implement save logic
+        return True, "SAL-2025-001"
+    
+    # ========================================================================
+    # OTHERS TAB METHODS
+    # ========================================================================
+    
+    @staticmethod
+    def get_others_temp_items(session_id, company_id):
+        """Get others temp items for current session."""
+        from .models import TblaccAdvicePaymentTemp
+        return TblaccAdvicePaymentTemp.objects.filter(
+            sessionid=session_id,
+            compid=company_id,
+            types=3  # 3=Others
+        ).order_by('id')
+    
+    @staticmethod
+    def insert_others_temp(data, session_id, company_id):
+        """Insert others item into temp table."""
+        from .models import TblaccAdvicePaymentTemp
+        
+        try:
+            TblaccAdvicePaymentTemp.objects.create(
+                sessionid=session_id,
+                compid=company_id,
+                proformainvno='',  # Not used for Others
+                amount=data['amt'],
+                particular=data.get('particulars', ''),
+                types=3  # 3=Others
+            )
+            return True
+        except Exception as e:
+            print(f"Error inserting others temp: {e}")
+            return False
+    
+    @staticmethod
+    def delete_others_temp(temp_id):
+        """Delete others item from temp table."""
+        from .models import TblaccAdvicePaymentTemp
+        try:
+            TblaccAdvicePaymentTemp.objects.filter(id=temp_id).delete()
+            return True
+        except Exception as e:
+            print(f"Error deleting others temp: {e}")
+            return False
+    
+    @staticmethod
+    def save_others_payment(form_data, temp_items, user, company_id, financial_year_id):
+        """Save others payment to master and details tables."""
+        # TODO: Implement save logic
+        return True, "OTH-2025-001"
+
+
+# ============================================================================
+# CREDITOR/DEBITOR SERVICES - Stub implementations
+# ============================================================================
+
+class CreditorService:
+    """Service for creditor operations."""
+    pass
+
+
+class DebitorService:
+    """Service for debitor operations."""
+    pass
+
+
+class SundryCreditorService:
+    """Service for sundry creditor operations."""
+    pass

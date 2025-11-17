@@ -1,0 +1,367 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Bank Reconciliation - New - Accounts{% endblock %}
+
+{% block content %}
+<style>
+    .bank-recon-container {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+    }
+    .header-bar {
+        background: linear-gradient(to bottom, #6b7280 0%, #4b5563 100%);
+        color: white;
+        padding: 4px 8px;
+        font-weight: bold;
+        font-size: 11pt;
+        border: 1px solid #374151;
+    }
+    .bank-grid-container {
+        border: 3px double #666699;
+        height: 125px;
+        overflow: auto;
+        width: 99%;
+        background-color: white;
+        margin-top: 2px;
+    }
+    .bank-grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+    .bank-grid thead {
+        background-color: #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+    .bank-grid th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #d1d5db;
+        font-size: 10pt;
+        font-weight: bold;
+    }
+    .bank-grid tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    .bank-grid tbody tr:hover {
+        background-color: #e0f2fe;
+    }
+    .bank-grid td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .tab-container {
+        margin-top: 10px;
+    }
+    .tab-buttons {
+        display: flex;
+        gap: 2px;
+        border-bottom: 2px solid #9ca3af;
+    }
+    .tab-button {
+        padding: 6px 20px;
+        background-color: #f3f4f6;
+        border: 1px solid #9ca3af;
+        border-bottom: none;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 10pt;
+        transition: all 0.2s;
+    }
+    .tab-button:hover {
+        background-color: #e5e7eb;
+    }
+    .tab-button.active {
+        background-color: white;
+        border-bottom: 2px solid white;
+        margin-bottom: -2px;
+    }
+    .tab-content {
+        border: 1px solid #9ca3af;
+        border-top: none;
+        padding: 12px;
+        background-color: white;
+    }
+    .filter-bar {
+        padding: 8px;
+        background-color: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 8px;
+    }
+    .filter-bar label {
+        font-weight: bold;
+        font-size: 10pt;
+        margin-right: 4px;
+    }
+    .filter-bar input[type="checkbox"] {
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+    .filter-bar input[type="date"] {
+        padding: 2px 4px;
+        border: 1px solid #9ca3af;
+        font-size: 10pt;
+        width: 100px;
+    }
+    .btn-search {
+        background-color: #dc2626;
+        color: white;
+        border: none;
+        padding: 4px 16px;
+        font-size: 10pt;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    .btn-search:hover {
+        background-color: #b91c1c;
+    }
+    .btn-submit {
+        background-color: #dc2626;
+        color: white;
+        border: none;
+        padding: 4px 20px;
+        font-size: 10pt;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    .btn-submit:hover {
+        background-color: #b91c1c;
+    }
+    .transaction-grid-container {
+        border: 1px solid #999999;
+        height: 240px;
+        overflow: auto;
+        width: 100%;
+        background-color: white;
+    }
+    .transaction-grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+    .transaction-grid thead {
+        background-color: #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+    .transaction-grid th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #d1d5db;
+        font-size: 10pt;
+        font-weight: bold;
+    }
+    .transaction-grid tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    .transaction-grid tbody tr:hover {
+        background-color: #e0f2fe;
+    }
+    .transaction-grid td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .total-bar {
+        text-align: center;
+        margin-top: 10px;
+        padding: 8px;
+        background-color: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+    }
+    .total-label {
+        font-weight: bold;
+        font-size: 11pt;
+    }
+</style>
+
+<div class="bank-recon-container max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td class="header-bar">
+                &nbsp;Bank Reconciliation - New
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-top: 2px;">
+                <!-- Banks Grid -->
+                <div class="bank-grid-container">
+                    <table class="bank-grid">
+                        <thead>
+                            <tr>
+                                <th style="text-align: right; width: 5%;">SN</th>
+                                <th style="text-align: left; width: 50%;">&nbsp;</th>
+                                <th style="text-align: right; width: 20%;">Opening Amount</th>
+                                <th style="text-align: right; width: 25%;">Closing Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bank in banks_data %}
+                            <tr>
+                                <td style="text-align: right;">{{ forloop.counter }}</td>
+                                <td style="text-align: left; font-weight: bold;">{{ bank.trans }}</td>
+                                <td style="text-align: right;">{{ bank.opamt|floatformat:2 }}</td>
+                                <td style="text-align: right;">{{ bank.clamt|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 30px; color: maroon; font-size: 12pt;">
+                                    No data to display !
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Tabs for Payment and Receipt -->
+    <div class="tab-container">
+        <!-- Tab Buttons -->
+        <div class="tab-buttons">
+            <button id="paymentTab" onclick="showTab('payment')" class="tab-button active">
+                Payment
+            </button>
+            <button id="receiptTab" onclick="showTab('receipt')" class="tab-button">
+                Receipt
+            </button>
+        </div>
+
+        <!-- Payment Tab Content -->
+        <div id="paymentContent" class="tab-content" style="display: block;">
+            <div class="filter-bar">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" id="chkCheckAll" />
+                <label for="chkCheckAll">Check All</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" id="chkShowAll" />
+                <label for="chkShowAll">Show All</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>From Date : </label>
+                <input type="date" />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>To Date : </label>
+                <input type="date" />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button class="btn-search">Search</button>
+            </div>
+
+            <div class="transaction-grid-container">
+                <table class="transaction-grid">
+                    <thead>
+                        <tr>
+                            <th style="text-align: right; width: 3%;">SN</th>
+                            <th style="text-align: center; width: 6%;">BVP No</th>
+                            <th style="text-align: left; width: 17%;">Particulars</th>
+                            <th style="text-align: center; width: 6%;">Vch Type</th>
+                            <th style="text-align: center; width: 7%;">Trans. Type</th>
+                            <th style="text-align: left; width: 7%;">Inst. No</th>
+                            <th style="text-align: center; width: 8%;">Inst. Date</th>
+                            <th style="text-align: left; width: 10%;">Bank Name</th>
+                            <th style="text-align: right; width: 8%;">Credit</th>
+                            <th style="text-align: center; width: 3%;"></th>
+                            <th style="text-align: left; width: 8%;">Bank Date</th>
+                            <th style="text-align: left; width: 8%;">Add. Charges</th>
+                            <th style="text-align: left; width: 9%;">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="13" style="text-align: center; padding: 40px; color: maroon; font-size: 12pt;">
+                                No data to display !
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="total-bar">
+                <button class="btn-submit">Submit</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="total-label">Total : </span>
+                <span class="total-label">0</span>
+            </div>
+        </div>
+
+        <!-- Receipt Tab Content -->
+        <div id="receiptContent" class="tab-content" style="display: none;">
+            <div class="filter-bar">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" id="chkCheckAll_rec" />
+                <label for="chkCheckAll_rec">Check All</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" id="chkShowAll_rec" />
+                <label for="chkShowAll_rec">Show All</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>From Date : </label>
+                <input type="date" />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>To Date : </label>
+                <input type="date" />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button class="btn-search">Search</button>
+            </div>
+
+            <div class="transaction-grid-container">
+                <table class="transaction-grid">
+                    <thead>
+                        <tr>
+                            <th style="text-align: right; width: 3%;">SN</th>
+                            <th style="text-align: center; width: 6%;">BVR No</th>
+                            <th style="text-align: left; width: 17%;">Particulars</th>
+                            <th style="text-align: center; width: 6%;">Vch Type</th>
+                            <th style="text-align: center; width: 7%;">Trans. Type</th>
+                            <th style="text-align: left; width: 7%;">Inst. No</th>
+                            <th style="text-align: center; width: 8%;">Inst. Date</th>
+                            <th style="text-align: left; width: 10%;">Bank Name</th>
+                            <th style="text-align: right; width: 8%;">Debit</th>
+                            <th style="text-align: center; width: 3%;"></th>
+                            <th style="text-align: left; width: 8%;">Bank Date</th>
+                            <th style="text-align: right; width: 8%;">Add. Charges</th>
+                            <th style="text-align: left; width: 9%;">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="13" style="text-align: center; padding: 40px; color: maroon; font-size: 12pt;">
+                                No data to display !
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="total-bar">
+                <button class="btn-submit">Submit</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="total-label">Total : </span>
+                <span class="total-label">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    document.getElementById('paymentContent').style.display = 'none';
+    document.getElementById('receiptContent').style.display = 'none';
+
+    // Remove active class from all tab buttons
+    document.getElementById('paymentTab').classList.remove('active');
+    document.getElementById('receiptTab').classList.remove('active');
+
+    // Show selected tab content and activate button
+    if (tabName === 'payment') {
+        document.getElementById('paymentContent').style.display = 'block';
+        document.getElementById('paymentTab').classList.add('active');
+    } else {
+        document.getElementById('receiptContent').style.display = 'block';
+        document.getElementById('receiptTab').classList.add('active');
+    }
+}
+</script>
+
+{% endblock %}

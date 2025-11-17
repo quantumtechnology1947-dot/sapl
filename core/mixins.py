@@ -25,23 +25,13 @@ class CompanyFinancialYearMixin:
     
     def get_finyearid(self):
         """Get financial year ID from session"""
-        # If not in session, get the latest financial year
+        # If not in session, default to FY 2013-2014 (id=1) where opening balance data exists
         finyearid = self.request.session.get('finyearid')
         if not finyearid:
-            # Try to get the latest financial year from database
-            try:
-                from sys_admin.models import TblfinancialMaster
-                latest_fy = TblfinancialMaster.objects.filter(
-                    compid=self.get_compid()
-                ).order_by('-finyearid').first()
-                if latest_fy:
-                    finyearid = latest_fy.finyearid
-                    # Set it in session for future requests
-                    self.request.session['finyearid'] = finyearid
-                else:
-                    finyearid = 1
-            except:
-                finyearid = 1
+            # Default to FinYearId=1 (2013-2014) which contains all opening balance data
+            finyearid = 1
+            # Set it in session for future requests
+            self.request.session['finyearid'] = finyearid
         return finyearid
     
     def get_sessionid(self):

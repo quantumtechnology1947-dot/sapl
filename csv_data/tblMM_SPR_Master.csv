@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,SPRNo,Checked,CheckedBy,CheckedDate,CheckedTime,Approve,ApprovedBy,ApproveDate,ApproveTime,Authorize,AuthorizedBy,AuthorizeDate,AuthorizeTime
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,SPRNo,Checked,CheckedBy,CheckedDate,CheckedTime,Approve,ApprovedBy,ApproveDate,ApproveTime,Authorize,AuthorizedBy,AuthorizeDate,AuthorizeTime
 4097,2018-04-16,9:17:18 AM,sapl0059,1,6,0001,1,Sapl0002,2018-04-17,4:25:51 PM,1,1,28-10-2025,16:37:45,1,1,28-10-2025,16:38:03
 4098,2018-04-17,10:14:41 AM,Sapl0251,1,6,0002,1,Sapl0002,2018-04-17,4:25:51 PM,0,,,,1,Sapl0002,2018-04-17,4:26:12 PM
 4099,2018-04-17,10:27:45 AM,Sapl0251,1,6,0003,1,Sapl0002,2018-04-17,4:25:51 PM,0,,,,1,Sapl0002,2018-04-17,4:26:12 PM

@@ -1,4 +1,4 @@
-﻿Id,Name_Proj,Wo_No,Cust_Name,Proj_Leader,No_Fix_Rqu,Sr.No,Name_Acti,Rev_No,No_Days,From,To,Reason_Delay
+Id,Name_Proj,Wo_No,Cust_Name,Proj_Leader,No_Fix_Rqu,Sr.No,Name_Acti,Rev_No,No_Days,From,To,Reason_Delay
 1,f,2,d,f,g,A,DAP DATE WITH CUSTOMER,3,3,2012-02-05 00:00:00,2015-05-07 00:00:00,h
 2,k,8,h,j,j,B,DESIGN FINALISATION,8,6,2011-03-08 00:00:00,2014-04-08 00:00:00,h
 3,h,7,k,l,8,C,BROUGHT PURCHASE PARTS,5,7,2012-07-05 00:00:00,2015-02-08 00:00:00,t

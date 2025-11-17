@@ -1,0 +1,153 @@
+<!-- Taxation Tab Content matching ASP.NET layout -->
+<div class="space-y-4">
+    <!-- CGST/IGST Dropdown -->
+    <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">CGST/IGST</label>
+        </div>
+        <div class="col-span-4">
+            {{ taxation_form.cenvat }}
+        </div>
+    </div>
+
+    <!-- VAT/SGST Type -->
+    <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">VAT/SGST Type</label>
+        </div>
+        <div class="col-span-4">
+            {{ taxation_form.selectedcst }}
+        </div>
+    </div>
+
+    <!-- VAT/SGST Rate -->
+    <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">VAT/SGST Rate</label>
+        </div>
+        <div class="col-span-4">
+            {{ taxation_form.vat }}
+        </div>
+    </div>
+
+    <!-- Hidden fields for optional charges (defaulted to 0) -->
+    <input type="hidden" name="addtype" value="0">
+    <input type="hidden" name="addamt" value="0">
+    <input type="hidden" name="deductiontype" value="0">
+    <input type="hidden" name="deduction" value="0">
+    <input type="hidden" name="pftype" value="0">
+    <input type="hidden" name="pf" value="0">
+    <input type="hidden" name="sedtype" value="0">
+    <input type="hidden" name="sed" value="0">
+    <input type="hidden" name="aedtype" value="0">
+    <input type="hidden" name="aed" value="0">
+    <input type="hidden" name="freighttype" value="0">
+    <input type="hidden" name="freight" value="0">
+    <input type="hidden" name="insurancetype" value="0">
+    <input type="hidden" name="insurance" value="0">
+    <input type="hidden" name="otheramt" value="0">
+
+    <!-- Totals Display (Right aligned) -->
+    <div class="flex justify-end mt-6">
+        <div class="w-1/3 bg-gray-100 border border-gray-300 rounded p-4">
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">Subtotal:</span>
+                    <span id="display-subtotal" class="font-mono">0.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">CGST/IGST Amount:</span>
+                    <span id="display-cenvat" class="font-mono">0.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">VAT/SGST Amount:</span>
+                    <span id="display-vat" class="font-mono">0.00</span>
+                </div>
+                <div class="border-t border-gray-400 my-2"></div>
+                <div class="flex justify-between text-base font-bold">
+                    <span>Grand Total:</span>
+                    <span id="display-grand-total" class="font-mono">0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="flex gap-3 mt-6">
+        <button type="submit" name="action" value="save"
+                class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium">
+            Submit
+        </button>
+        <a href="{% url 'accounts:sales_invoice_list' %}"
+           class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium inline-block">
+            Cancel
+        </a>
+    </div>
+</div>
+
+<script>
+// Tax calculation
+document.addEventListener('DOMContentLoaded', function() {
+    const cenvatSelect = document.getElementById('id_cenvat');
+    const vatSelect = document.getElementById('id_vat');
+
+    function calculateTaxTotals() {
+        // Get selected items and calculate subtotal
+        let subtotal = 0;
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+
+        checkedItems.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            const qtyInput = row.querySelector('.item-req-qty');
+            const rateInput = row.querySelector('.item-rate');
+
+            if (qtyInput && rateInput) {
+                const qty = parseFloat(qtyInput.value) || 0;
+                const rate = parseFloat(rateInput.value) || 0;
+                subtotal += qty * rate;
+            }
+        });
+
+        // Extract tax rates from dropdown text
+        let cenvatRate = 0;
+        let vatRate = 0;
+
+        if (cenvatSelect && cenvatSelect.selectedIndex > 0) {
+            const cenvatText = cenvatSelect.options[cenvatSelect.selectedIndex].text;
+            const cenvatMatch = cenvatText.match(/(\d+\.?\d*)/);
+            cenvatRate = cenvatMatch ? parseFloat(cenvatMatch[1]) : 0;
+        }
+
+        if (vatSelect && vatSelect.selectedIndex > 0) {
+            const vatText = vatSelect.options[vatSelect.selectedIndex].text;
+            const vatMatch = vatText.match(/(\d+\.?\d*)/);
+            vatRate = vatMatch ? parseFloat(vatMatch[1]) : 0;
+        }
+
+        // Calculate tax amounts
+        const cenvatAmount = (subtotal * cenvatRate) / 100;
+        const vatAmount = (subtotal * vatRate) / 100;
+        const grandTotal = subtotal + cenvatAmount + vatAmount;
+
+        // Update display
+        document.getElementById('display-subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('display-cenvat').textContent = cenvatAmount.toFixed(2);
+        document.getElementById('display-vat').textContent = vatAmount.toFixed(2);
+        document.getElementById('display-grand-total').textContent = grandTotal.toFixed(2);
+    }
+
+    // Attach events
+    cenvatSelect?.addEventListener('change', calculateTaxTotals);
+    vatSelect?.addEventListener('change', calculateTaxTotals);
+
+    // Calculate on item changes
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('.item-req-qty') || e.target.matches('.item-checkbox')) {
+            calculateTaxTotals();
+        }
+    });
+
+    // Initial calculation
+    calculateTaxTotals();
+});
+</script>

@@ -1,4 +1,4 @@
-﻿Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Design,VendorPlanDate,VendorAct,WONo,VendorPlan
+Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Design,VendorPlanDate,VendorAct,WONo,VendorPlan
 1,7,00777-01-00,UNIT 01,NOS,1.0,11-03-2021,12-03-2021,planned,J0142,2
 2,11,00776-01-00,UNIT 01,NOS,1.0,13-03-2021,13-03-2021,planned,J0141,3
 3,11,00776-02-00,UNIT 02,NOS,1.0,13-03-2021,13-03-2021,planned,J0141,3

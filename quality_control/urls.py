@@ -41,8 +41,9 @@ urlpatterns = [
 
     # Authorized MCN
     path('authorized-mcn/', views.AuthorizedMCNListView.as_view(), name='authorized-mcn-list'),
+    path('authorized-mcn/autocomplete/', views.AuthorizedMCNAutocompleteView.as_view(), name='authorized-mcn-autocomplete'),
+    path('authorized-mcn/<str:wo_no>/', views.AuthorizedMCNDetailView.as_view(), name='authorized-mcn-detail'),
     path('authorized-mcn/create/', views.AuthorizedMCNCreateView.as_view(), name='authorized-mcn-create'),
-    path('authorized-mcn/<int:pk>/', views.AuthorizedMCNDetailView.as_view(), name='authorized-mcn-detail'),
     path('authorized-mcn/<int:pk>/delete/', views.AuthorizedMCNDeleteView.as_view(), name='authorized-mcn-delete'),
 
     # Scrap Register

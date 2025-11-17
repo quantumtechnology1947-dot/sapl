@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,CVPNo,PaidTo,ReceivedBy,CodeType
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,CVPNo,PaidTo,ReceivedBy,CodeType
 3487,2018-04-17,8:48:55 AM,1,6,Sapl0031,0001,Panchshil Yuva Pratishthan,Sapl0061,1
 3488,2018-04-17,9:01:49 AM,1,6,Sapl0031,0002,Sangeeta Pasalkar [Sapl0114],Sapl0114,1
 3489,2018-04-17,9:02:39 AM,1,6,Sapl0031,0003,Ranjana Kunjir [Sapl0113],Sapl0113,1

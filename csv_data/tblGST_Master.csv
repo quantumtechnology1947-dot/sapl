@@ -1,4 +1,4 @@
-﻿Id,GSTRate,RateValue,CGSTRate,SGSTRate,IGSTRate,HSNApplicable,Live,EffectiveFrom
+Id,GSTRate,RateValue,CGSTRate,SGSTRate,IGSTRate,HSNApplicable,Live,EffectiveFrom
 1,GST @ 0% (Exempt),0.0,0.0,0.0,0.0,"Essential items, fresh produce, books, healthcare, education",1,2025-09-22
 2,GST @ 5% (Essential),5.0,2.5,2.5,5.0,"Packaged foods, medicines, daily necessities",1,2025-09-22
 3,GST @ 18% (Standard),18.0,9.0,9.0,18.0,"Most goods and services, electronics, restaurants",1,2025-09-22

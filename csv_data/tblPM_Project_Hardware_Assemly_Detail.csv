@@ -1,4 +1,4 @@
-﻿Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Design,VendorPlanDate,VendorAct,WONo,VendorPlan,AssemlyDate,Remark,AssemlyNo
+Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Design,VendorPlanDate,VendorAct,WONo,VendorPlan,AssemlyDate,Remark,AssemlyNo
 1,11,E100-181-015,"Type:-Gas Spring ,Type of Gas Spring:-Mounting Direction Fixed Type ,Stroke:-100MM, Min Length:-181 ,Cylinder Dia(Ø):-15, Part number:- GS142",NOS,2.0,13-03-2021,13-03-2021,14-03-2021,J0142,8,15-03-2021,,2
 2,3,B032-000-010,TAPER ROLLER BEARING 32010 X - 50X80X20 - SKF,NOS,2.0,23-02-2021,05-03-2021,02-03-2021,J0139,3,08-03-2021,,3
 3,3,H045-022-200,CHEMICAL ANCHORE FASTNER -22X200,NOS,10.0,03-03-2021,07-03-2021,09-03-2021,J0139,3,NA,,3

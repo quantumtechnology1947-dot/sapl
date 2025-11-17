@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,ItemId,WONo,PId,CId,Flag
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,ItemId,WONo,PId,CId,Flag
 7,2013-10-19,11:23:18 AM,1,1,Sapl0006,7191,N0006,1,243,1
 8,2013-10-19,11:33:46 AM,1,1,Sapl0006,5509,N0006,1,243,1
 9,2013-10-19,11:38:50 AM,1,1,Sapl0006,5509,N0006,243,317,1

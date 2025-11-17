@@ -105,34 +105,37 @@ class MaterialRequisitionService(BaseTransactionService):
         return errors
     
     @staticmethod
-    def get_pending_mrs_for_issue(compid, finyearid):
+    def get_pending_mrs_for_issue(compid, finyearid, limit=50):
         """
         Get MRS with pending quantities for material issue
         Returns MRS where (Req Qty - Issued Qty) > 0
+
+        OPTIMIZED: Only checks recent MRS (default: last 50) to avoid N+1 query issues
         """
         from django.db.models import Sum, F, Q
-        
-        # Get all MRS
+
+        # Get recent MRS only (limit to improve performance)
+        # This prevents loading 14,000+ records at once
         mrs_list = TblinvMaterialrequisitionMaster.objects.filter(
             compid=compid,
             finyearid__lte=finyearid
-        ).order_by('-id')
-        
+        ).order_by('-id')[:limit]  # Limit to recent records only
+
         pending_mrs = []
-        
+
         for mrs in mrs_list:
             # Get total requested quantity
             req_qty = TblinvMaterialrequisitionDetails.objects.filter(
                 mid=mrs.id
             ).aggregate(total=Sum('reqqty'))['total'] or 0
-            
+
             # Get total issued quantity
             issued_qty = TblinvMaterialissueDetails.objects.filter(
                 mrsid=mrs.id
             ).aggregate(total=Sum('issueqty'))['total'] or 0
-            
+
             balance = req_qty - issued_qty
-            
+
             if balance > 0:
                 pending_mrs.append({
                     'mrs': mrs,
@@ -140,7 +143,7 @@ class MaterialRequisitionService(BaseTransactionService):
                     'issued_qty': issued_qty,
                     'balance_qty': balance
                 })
-        
+
         return pending_mrs
     
     @staticmethod
@@ -1811,82 +1814,85 @@ class MaterialCreditNoteService(BaseTransactionService):
 class ClosingStockService:
     """
     Service for Closing Stock operations
-    
-    Handles period-end stock reconciliation.
-    
-    Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6
+
+    Manages period-based aggregate closing stock values (not item-level tracking).
+    Used for financial reporting and balance sheet calculations.
+
+    Converted from: aspnet/Module/Inventory/Transactions/ClosingStock.aspx
+    Requirements: 11.1
     """
-    
+
     @staticmethod
-    def get_system_stock(item_id, as_of_date=None):
+    def get_all_records():
         """
-        Get system stock as of date
-        
-        Args:
-            item_id: Item master ID
-            as_of_date: Date to check stock (optional)
-            
+        Get all closing stock records ordered by ID descending (latest first)
+
         Returns:
-            Decimal: System stock quantity
+            QuerySet: All TblinvClosingstck records
         """
-        from inventory.models import Tblitemmaster
-        from decimal import Decimal
-        
-        try:
-            item = Tblitemmaster.objects.get(itemid=item_id)
-            return item.currentstock or Decimal('0')
-        except:
-            return Decimal('0')
-    
+        from inventory.models import TblinvClosingstck
+        return TblinvClosingstck.objects.all().order_by('-id')
+
     @staticmethod
-    def calculate_variance(system_qty, physical_qty):
+    def create_record(from_date, to_date, closing_stock_value):
         """
-        Calculate variance between system and physical stock
-        
+        Create a new closing stock period record
+
         Args:
-            system_qty: System stock quantity
-            physical_qty: Physical count quantity
-            
+            from_date: Period start date (DD-MM-YYYY string)
+            to_date: Period end date (DD-MM-YYYY string)
+            closing_stock_value: Total closing stock value (float)
+
         Returns:
-            Decimal: Variance (positive = excess, negative = shortage)
+            TblinvClosingstck: Created record
         """
-        from decimal import Decimal
-        
-        try:
-            system = Decimal(str(system_qty))
-            physical = Decimal(str(physical_qty))
-            variance = physical - system
-            return variance.quantize(Decimal('0.001'))
-        except:
-            return Decimal('0.000')
-    
+        from inventory.models import TblinvClosingstck
+
+        record = TblinvClosingstck()
+        record.fromdt = from_date
+        record.todt = to_date
+        record.clstock = float(closing_stock_value)
+        record.save()
+
+        return record
+
     @staticmethod
-    def generate_adjustment_entries(variances):
+    def delete_record(record_id):
         """
-        Create stock adjustment entries for variances
-        
+        Delete a closing stock record
+
         Args:
-            variances: List of dicts with item_id, system_qty, physical_qty, variance
-            
+            record_id: Record ID to delete
+
         Returns:
-            bool: Success status
+            bool: True if deleted successfully
         """
-        from inventory.models import Tblitemmaster
-        from django.db import transaction
-        from decimal import Decimal
-        
+        from inventory.models import TblinvClosingstck
+
         try:
-            with transaction.atomic():
-                for var in variances:
-                    if var['variance'] != Decimal('0'):
-                        item = Tblitemmaster.objects.get(itemid=var['item_id'])
-                        item.currentstock = Decimal(str(var['physical_qty']))
-                        item.save()
-                
-                return True
-        except Exception as e:
-            print(f"Error generating adjustments: {e}")
+            record = TblinvClosingstck.objects.get(id=record_id)
+            record.delete()
+            return True
+        except TblinvClosingstck.DoesNotExist:
             return False
+
+    @staticmethod
+    def get_latest_closing_stock():
+        """
+        Get the most recent closing stock value
+
+        Used by financial reports and calculations (matches ASP.NET Check_TotalClosingStock function)
+
+        Returns:
+            float: Latest closing stock value, or 0.0 if no records exist
+        """
+        from inventory.models import TblinvClosingstck
+
+        try:
+            latest = TblinvClosingstck.objects.all().order_by('-id').first()
+            return latest.clstock if latest and latest.clstock else 0.0
+        except:
+            return 0.0
 
 
 
@@ -3747,3 +3753,350 @@ class AnalyticsService:
         ).order_by('-total_issued')[:limit]
         
         return list(fast_moving)
+
+
+# ============================================================================
+# WIS DRY RUN SERVICE
+# ============================================================================
+
+class WISDryRunService:
+    """
+    Service for WIS Dry Run calculations and material issuance simulation.
+
+    Converted from: WIS_ActualRun_Material.aspx.cs
+
+    Features:
+    - Recursive BOM (Bill of Materials) tree traversal
+    - Calculate material requirements through hierarchical assemblies
+    - Check stock availability vs requirements
+    - Simulate material issuance (Dry Run)
+    - Execute actual material issuance with stock updates
+    """
+
+    @staticmethod
+    def calculate_bom_tree_qty(wono, pid, cid, level, compid):
+        """
+        Recursive function to calculate BOM quantity through parent-child hierarchy.
+
+        Matches ASP.NET CalBOMTreeQty() method logic.
+
+        Args:
+            wono: Work Order number
+            pid: Parent ID in BOM hierarchy (0 = root)
+            cid: Child ID in BOM hierarchy
+            level: Current recursion level
+            compid: Company ID
+
+        Returns:
+            float: Calculated quantity considering parent multipliers
+        """
+        from design.models import TbldgBomMaster
+
+        # Get BOM record for this PId/CId combination
+        bom = TbldgBomMaster.objects.filter(
+            wono=wono,
+            pid=pid,
+            cid=cid,
+            compid=compid
+        ).first()
+
+        if not bom or not bom.qty:
+            return 0
+
+        qty = float(bom.qty) if bom.qty else 0
+
+        # If not root level (PId > 0), multiply by parent quantity
+        if pid > 0:
+            # Find parent BOM record where this PId is the CId
+            parent_bom = TbldgBomMaster.objects.filter(
+                wono=wono,
+                cid=pid,
+                compid=compid
+            ).first()
+
+            if parent_bom:
+                # Recursively calculate parent quantity
+                parent_qty = WISDryRunService.calculate_bom_tree_qty(
+                    wono, parent_bom.pid, parent_bom.cid, level + 1, compid
+                )
+                qty = qty * parent_qty
+
+        return qty
+
+    @staticmethod
+    def get_total_wis_issued_qty(wono, itemid, pid, cid, compid):
+        """
+        Get total quantity already issued for this WO+Item+PId+CId combination.
+
+        Matches ASP.NET GetSchTime_TWIS_Qty stored procedure logic.
+
+        Args:
+            wono: Work Order number
+            itemid: Item ID
+            pid: Parent ID
+            cid: Child ID
+            compid: Company ID
+
+        Returns:
+            float: Total quantity previously issued
+        """
+        from .models import TblinvWisDetails
+        from django.db.models import Sum
+
+        total = TblinvWisDetails.objects.filter(
+            mid__wono=wono,
+            itemid=itemid,
+            pid=pid,
+            cid=cid,
+            mid__compid=compid
+        ).aggregate(total=Sum('issuedqty'))['total']
+
+        return float(total) if total else 0
+
+    @staticmethod
+    def generate_wis_number(compid, finyearid):
+        """
+        Generate next WIS number in format "0001", "0002", etc.
+
+        Matches ASP.NET GetSchTime_WISNo stored procedure.
+
+        Args:
+            compid: Company ID
+            finyearid: Financial Year ID
+
+        Returns:
+            str: Next WIS number
+        """
+        from .models import TblinvWisMaster
+
+        # Get max WIS number for this company and financial year
+        last_wis = TblinvWisMaster.objects.filter(
+            compid=compid,
+            finyearid=finyearid
+        ).order_by('-id').first()
+
+        if last_wis and last_wis.wisno:
+            try:
+                last_num = int(last_wis.wisno)
+                new_num = last_num + 1
+            except (ValueError, TypeError):
+                new_num = 1
+        else:
+            new_num = 1
+
+        # Format as 4-digit string
+        return f'{new_num:04d}'
+
+    @staticmethod
+    def get_dry_run_data(wono, compid, finyearid):
+        """
+        Main dry run calculation - returns complete material list with all quantities.
+
+        Matches ASP.NET GetDataTable() method logic.
+
+        Args:
+            wono: Work Order number
+            compid: Company ID
+            finyearid: Financial Year ID
+
+        Returns:
+            list: List of dicts containing:
+                - item_id, item_code, description, uom
+                - pid, cid (hierarchy)
+                - unit_qty, bom_qty
+                - stock_qty, total_wis_qty
+                - balance_bom_qty
+                - dry_run_qty (calculated: min(balance, stock))
+                - after_stock_qty (stock remaining after issuance)
+                - level (tree depth)
+        """
+        from design.models import TbldgBomMaster, TbldgItemMaster
+
+        materials = []
+
+        # Get all BOM items for this work order
+        bom_items = TbldgBomMaster.objects.filter(
+            wono=wono,
+            compid=compid
+        ).select_related().order_by('pid', 'cid')
+
+        for bom in bom_items:
+            if not bom.itemid:
+                continue
+
+            # bom.itemid is already the TbldgItemMaster object (ForeignKey relationship)
+            item = bom.itemid
+
+            # Verify it belongs to correct company
+            if item.compid != compid:
+                continue
+
+            # Calculate BOM quantity (recursive through tree)
+            bom_qty = WISDryRunService.calculate_bom_tree_qty(
+                wono, bom.pid, bom.cid, 0, compid
+            )
+
+            # Get stock quantity
+            stock_qty = float(item.stockqty) if item.stockqty else 0
+
+            # Get total already issued for this item in this WO
+            total_wis_qty = WISDryRunService.get_total_wis_issued_qty(
+                wono, item.id, bom.pid, bom.cid, compid
+            )
+
+            # Calculate balance BOM quantity
+            balance_bom_qty = bom_qty - total_wis_qty
+            if balance_bom_qty < 0:
+                balance_bom_qty = 0
+
+            # Calculate dry run quantity (what would be issued)
+            if stock_qty >= balance_bom_qty:
+                dry_run_qty = balance_bom_qty
+            else:
+                dry_run_qty = stock_qty  # Issue what's available
+
+            # Calculate after stock quantity
+            after_stock_qty = stock_qty - dry_run_qty
+
+            # Determine tree level (0 = root, 1+ = nested)
+            level = 0
+            if bom.pid > 0:
+                # Count parents to determine level
+                current_pid = bom.pid
+                while current_pid > 0:
+                    parent_bom = TbldgBomMaster.objects.filter(
+                        wono=wono,
+                        cid=current_pid,
+                        compid=compid
+                    ).first()
+                    if parent_bom:
+                        level += 1
+                        current_pid = parent_bom.pid
+                    else:
+                        break
+
+            materials.append({
+                'item_id': item.id,
+                'item_code': item.partno or item.itemcode or '-',
+                'description': item.manfdesc or item.itemname or '-',
+                'uom': item.uombasic or '-',
+                'pid': bom.pid,
+                'cid': bom.cid,
+                'unit_qty': float(bom.qty) if bom.qty else 0,
+                'bom_qty': bom_qty,
+                'stock_qty': stock_qty,
+                'total_wis_qty': total_wis_qty,
+                'balance_bom_qty': balance_bom_qty,
+                'dry_run_qty': dry_run_qty,
+                'after_stock_qty': after_stock_qty,
+                'level': level,
+                'has_shortage': stock_qty < balance_bom_qty,
+            })
+
+        return materials
+
+    @staticmethod
+    def execute_actual_run(wono, compid, finyearid, username):
+        """
+        Execute actual material issuance (not dry run).
+
+        Matches ASP.NET WIS_Material() method logic.
+
+        IMPORTANT: This method:
+        - Creates WIS Master and Details records
+        - **UPDATES stock quantities** (deducts from tblDG_Item_Master.StockQty)
+        - Marks Work Order as DryActualRun = 1
+
+        Args:
+            wono: Work Order number
+            compid: Company ID
+            finyearid: Financial Year ID
+            username: Current user username
+
+        Returns:
+            dict: {
+                'success': bool,
+                'wis_no': str (if successful),
+                'message': str,
+                'items_issued': int,
+            }
+        """
+        from datetime import datetime
+        from .models import TblinvWisMaster, TblinvWisDetails
+        from design.models import TbldgItemMaster
+        from sales_distribution.models import SdCustWorkorderMaster
+        from django.db import transaction
+
+        try:
+            # Get dry run data (calculate what to issue)
+            materials = WISDryRunService.get_dry_run_data(wono, compid, finyearid)
+
+            # Filter only items with qty to issue
+            items_to_issue = [m for m in materials if m['dry_run_qty'] > 0]
+
+            if not items_to_issue:
+                return {
+                    'success': False,
+                    'message': 'No materials to issue (all quantities are zero or already issued)',
+                    'items_issued': 0,
+                }
+
+            # Use database transaction for atomic operation
+            with transaction.atomic():
+                # 1. Generate WIS number
+                wis_no = WISDryRunService.generate_wis_number(compid, finyearid)
+
+                # 2. Create WIS Master record
+                now = datetime.now()
+                wis_master = TblinvWisMaster.objects.create(
+                    wisno=wis_no,
+                    wono=wono,
+                    compid=compid,
+                    finyearid=finyearid,
+                    sessionid=username,
+                    sysdate=now.strftime('%d-%m-%Y'),
+                    systime=now.strftime('%H:%M:%S'),
+                )
+
+                # 3. Create WIS Details and update stock for each item
+                items_issued_count = 0
+                for item_data in items_to_issue:
+                    # Create WIS detail record
+                    TblinvWisDetails.objects.create(
+                        mid=wis_master,
+                        wisno=wis_no,
+                        pid=item_data['pid'],
+                        cid=item_data['cid'],
+                        itemid=item_data['item_id'],
+                        issuedqty=item_data['dry_run_qty'],
+                    )
+
+                    # UPDATE stock quantity (CRITICAL: Deduct issued quantity)
+                    item_obj = TbldgItemMaster.objects.get(
+                        id=item_data['item_id'],
+                        compid=compid
+                    )
+                    new_stock = float(item_obj.stockqty or 0) - item_data['dry_run_qty']
+                    item_obj.stockqty = new_stock
+                    item_obj.save(update_fields=['stockqty'])
+
+                    items_issued_count += 1
+
+                # 4. Mark Work Order as DryActualRun = 1
+                wo = SdCustWorkorderMaster.objects.get(wono=wono, compid=compid)
+                wo.dryactualrun = 1
+                wo.save(update_fields=['dryactualrun'])
+
+            return {
+                'success': True,
+                'wis_no': wis_no,
+                'message': f'Material issuance completed successfully. WIS No: {wis_no}',
+                'items_issued': items_issued_count,
+            }
+
+        except Exception as e:
+            return {
+                'success': False,
+                'message': f'Error executing actual run: {str(e)}',
+                'items_issued': 0,
+            }

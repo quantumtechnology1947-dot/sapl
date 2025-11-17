@@ -1,1 +1,1 @@
-# Playwright tests for SAPL ERP
+# Playwright tests module

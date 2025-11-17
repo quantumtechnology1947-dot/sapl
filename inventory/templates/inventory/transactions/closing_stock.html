@@ -1,226 +1,50 @@
-{% extends 'core/base.html' %}
-{% load static %}
+{% extends 'inventory/base.html' %}
 
-{% block title %}Closing Stock - Physical Count{% endblock %}
+{% block title %}Closing Stock - Cortex ERP{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <!-- Page Header -->
-    <div class="bg-white shadow-sm rounded-lg mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-semibold text-gray-900">Closing Stock</h1>
-                    <p class="mt-1 text-sm text-gray-600">Record physical count of inventory items</p>
-                </div>
-                <a href="{% url 'inventory:closing-stock-report' %}"
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    View Report
-                </a>
+<div class="max-w-full mx-auto px-4 py-2">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 mb-6 -mx-4 px-4 py-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">Closing Stock</h1>
+                <p class="text-sm text-gray-600 mt-1">Manage period-based closing stock records</p>
             </div>
         </div>
     </div>
 
-    <!-- Instructions Card -->
-    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="ml-3">
-                <h3 class="text-sm font-medium text-blue-800">Instructions</h3>
-                <div class="mt-2 text-sm text-blue-700">
-                    <ul class="list-disc list-inside space-y-1">
-                        <li>Select an item from the dropdown</li>
-                        <li>System quantity will be automatically displayed</li>
-                        <li>Enter the physical count from your inventory</li>
-                        <li>System will calculate the variance automatically</li>
-                    </ul>
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="rounded-md p-3 {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 {% if message.tags == 'success' %}text-green-400{% elif message.tags == 'error' %}text-red-400{% else %}text-blue-400{% endif %}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        {% if message.tags == 'success' %}
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        {% elif message.tags == 'error' %}
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        {% else %}
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        {% endif %}
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium">{{ message }}</p>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
+    {% endif %}
 
-    <!-- Form Card -->
-    <div class="bg-white shadow-sm rounded-lg">
-        <form method="post" id="closingStockForm">
-            {% csrf_token %}
-
-            <div class="px-6 py-4 space-y-6">
-                <!-- Messages -->
-                {% if messages %}
-                <div class="space-y-2">
-                    {% for message in messages %}
-                    <div class="rounded-md {% if message.tags == 'error' %}bg-red-50 border border-red-200{% elif message.tags == 'success' %}bg-green-50 border border-green-200{% else %}bg-blue-50 border border-blue-200{% endif %} p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                {% if message.tags == 'error' %}
-                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                </svg>
-                                {% elif message.tags == 'success' %}
-                                <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                {% else %}
-                                <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                </svg>
-                                {% endif %}
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm {% if message.tags == 'error' %}text-red-800{% elif message.tags == 'success' %}text-green-800{% else %}text-blue-800{% endif %}">
-                                    {{ message }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                <!-- Form Errors -->
-                {% if form.errors %}
-                <div class="rounded-md bg-red-50 border border-red-200 p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-red-800">Please correct the following errors:</h3>
-                            <div class="mt-2 text-sm text-red-700">
-                                <ul class="list-disc list-inside space-y-1">
-                                    {% for field, errors in form.errors.items %}
-                                        {% for error in errors %}
-                                        <li>{{ field }}: {{ error }}</li>
-                                        {% endfor %}
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- Item Selection -->
-                <div>
-                    <label for="{{ form.item.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ form.item.label }}
-                        <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.item }}
-                    {% if form.item.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ form.item.help_text }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- System Quantity -->
-                <div>
-                    <label for="{{ form.system_qty.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ form.system_qty.label }}
-                    </label>
-                    {{ form.system_qty }}
-                    <p class="mt-1 text-sm text-gray-500">Auto-calculated from system records</p>
-                </div>
-
-                <!-- Physical Quantity -->
-                <div>
-                    <label for="{{ form.physical_qty.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ form.physical_qty.label }}
-                        <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.physical_qty }}
-                    {% if form.physical_qty.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ form.physical_qty.help_text }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Remarks -->
-                <div>
-                    <label for="{{ form.remarks.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                        {{ form.remarks.label }}
-                    </label>
-                    {{ form.remarks }}
-                    {% if form.remarks.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ form.remarks.help_text }}</p>
-                    {% endif %}
-                </div>
-
-                <!-- Variance Display (will be shown via JavaScript) -->
-                <div id="varianceDisplay" class="hidden">
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-yellow-800">Variance Detected</h3>
-                                <div class="mt-2 text-sm text-yellow-700">
-                                    <p>Variance: <span id="varianceValue" class="font-semibold"></span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between rounded-b-lg">
-                <a href="{% url 'inventory:dashboard' %}"
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Cancel
-                </a>
-                <button type="submit"
-                        class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Record Closing Stock
-                </button>
-            </div>
-        </form>
+    <!-- Table with inline add form -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden" id="closing-stock-container">
+        {% include 'inventory/transactions/partials/closing_stock_partial.html' %}
     </div>
 </div>
 
-<script>
-// Calculate variance when physical quantity is entered
-document.addEventListener('DOMContentLoaded', function() {
-    const physicalQtyInput = document.getElementById('id_physical_qty');
-    const systemQtyInput = document.getElementById('id_system_qty');
-    const varianceDisplay = document.getElementById('varianceDisplay');
-    const varianceValue = document.getElementById('varianceValue');
-
-    if (physicalQtyInput && systemQtyInput) {
-        physicalQtyInput.addEventListener('input', function() {
-            const systemQty = parseFloat(systemQtyInput.value) || 0;
-            const physicalQty = parseFloat(physicalQtyInput.value) || 0;
-            const variance = physicalQty - systemQty;
-
-            if (physicalQtyInput.value && variance !== 0) {
-                varianceValue.textContent = variance.toFixed(3);
-                varianceDisplay.classList.remove('hidden');
-
-                if (variance > 0) {
-                    varianceValue.classList.add('text-green-600');
-                    varianceValue.classList.remove('text-red-600');
-                } else {
-                    varianceValue.classList.add('text-red-600');
-                    varianceValue.classList.remove('text-green-600');
-                }
-            } else {
-                varianceDisplay.classList.add('hidden');
-            }
-        });
-    }
-});
-</script>
+<script src="https://unpkg.com/htmx.org@1.9.6"></script>
 {% endblock %}

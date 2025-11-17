@@ -1,4 +1,4 @@
-﻿Id,CustomerName,Address,GST,DCNo,DCDate,Attention,Contact,Responsible_By,Type,ItemCode,Description,HSN,Quantity,Rate,Amount,TQty,TAmt,Gst_per,GTotal,Remark,Transport,vehicleNo,LRNo,Acknowledgement,UOM,SysDate,SysTime,SessionId,CompId,FinYearId,GrandTotal,GSTWORDS
+Id,CustomerName,Address,GST,DCNo,DCDate,Attention,Contact,Responsible_By,Type,ItemCode,Description,HSN,Quantity,Rate,Amount,TQty,TAmt,Gst_per,GTotal,Remark,Transport,vehicleNo,LRNo,Acknowledgement,UOM,SysDate,SysTime,SessionId,CompId,FinYearId,GrandTotal,GSTWORDS
 1,SAI ENTERPRIZES,GUJARWADI,27AABCT2018B8ZR,518,22-11-2019,-,9898989898,KONDE,ORIGINAL,650-25-66,SPACER,-,95,5.0,475.0,95.0,475.0,18.0,560.5,-,ANIKET JADHAV,-,-,Received material in good condition,,,,,,,,
 2,K.K. HEAT TREATMENT,NARHE,-,519,22-11-2019,-,0000000000,SHUBHANGI KHAWADGAVE,ORIGINAL,00660-01-02,HOUSING,-,2,1.0,2.0,2.0,2.0,0.0,2.0,-,-,-,-,Received material in good condition,,,,,,,,
 3,sai enterprises ,gujarwadi,,520,23-11-2019,-,0000000000,SHUBHANGI KHAWADGAVE,ORIGINAL,651-05-01,SHAFT,&nbsp;,2,1.0,2.0,26.0,26.0,0.0,0.0,FOR BLACHODISING,BOLERO,-,-,Received material in good condition,,,,,,,,

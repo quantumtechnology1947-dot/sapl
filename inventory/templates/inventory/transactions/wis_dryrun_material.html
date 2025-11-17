@@ -1,0 +1,236 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}WIS Dry Run - Material - Inventory{% endblock %}
+
+{% block content %}
+<div class="max-w-full mx-auto px-4 py-2">
+    <div class="bg-white shadow-sm border-b border-gray-200 -mx-4 -mt-6 px-4 py-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-bold text-gray-800">WIS Dry Run - Material Issuance Simulation</h1>
+                <p class="text-sm text-gray-600 mt-1">Work Order: <span class="font-semibold">{{ wo.wono }}</span> - {{ wo.taskprojecttitle }}</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'inventory:wis-dryrun-entry' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-red-700">{{ error }}</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Items</p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ total_items }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Items to Issue</p>
+                    <p class="text-2xl font-semibold text-green-700">{{ items_to_issue }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 p-4">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-red-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Shortages</p>
+                    <p class="text-2xl font-semibold text-red-700">{{ items_with_shortage }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Material Tree Display -->
+    <div class="bg-white rounded border border-gray-200 overflow-hidden mb-6">
+        <div class="px-6 py-4 bg-pink-50 border-b border-pink-100">
+            <h2 class="text-lg font-semibold text-pink-900">Material Requirements</h2>
+            <p class="text-sm text-gray-600 mt-1">Preview of material issuance with stock availability</p>
+        </div>
+
+        {% if materials %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-xs">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">SN</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Item Code</th>
+                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                        <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">UOM</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Unit Qty</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">BOM Qty</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Stock Qty</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Total WIS Qty</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Balance BOM</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase bg-yellow-50">Dry Run Qty</th>
+                        <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase bg-blue-50">After Stock</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in materials %}
+                    <tr class="hover:bg-gray-50 {% if item.has_shortage %}bg-red-50{% endif %}">
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900">{{ forloop.counter }}</td>
+                        <td class="px-3 py-2 text-xs text-gray-900 font-medium">
+                            <!-- Indentation based on level (tree structure) -->
+                            <span style="padding-left: {{ item.level }}em;">{{ item.item_code }}</span>
+                        </td>
+                        <td class="px-3 py-2 text-xs text-gray-900">{{ item.description|truncatewords:8 }}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-center">{{ item.uom }}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-right">{{ item.unit_qty|floatformat:3 }}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-right font-medium">{{ item.bom_qty|floatformat:3 }}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-right {% if item.has_shortage %}text-red-700 font-semibold{% else %}text-gray-900{% endif %}">
+                            {{ item.stock_qty|floatformat:3 }}
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-600 text-right">{{ item.total_wis_qty|floatformat:3 }}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900 text-right">{{ item.balance_bom_qty|floatformat:3 }}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-right bg-yellow-50">
+                            <span class="font-bold {% if item.dry_run_qty > 0 %}text-green-700{% else %}text-gray-400{% endif %}">
+                                {{ item.dry_run_qty|floatformat:3 }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-right bg-blue-50">
+                            <span class="{% if item.after_stock_qty < 10 %}text-red-700 font-semibold{% else %}text-blue-700{% endif %}">
+                                {{ item.after_stock_qty|floatformat:3 }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div class="text-sm">
+                    <p class="text-gray-600">
+                        <span class="font-semibold text-yellow-700">Dry Run Qty</span> = What will be issued (min of Balance BOM and Stock)
+                    </p>
+                    <p class="text-gray-600 mt-1">
+                        <span class="font-semibold text-blue-700">After Stock</span> = Stock remaining after issuance
+                    </p>
+                    {% if items_with_shortage > 0 %}
+                    <p class="text-red-600 mt-2 font-medium">
+                        <svg class="inline h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        {{ items_with_shortage }} item(s) have insufficient stock (highlighted in red)
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="flex gap-3">
+                    <a href="{% url 'inventory:wis-dryrun-entry' %}"
+                       class="inline-flex items-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded text-sm transition-colors">
+                        Cancel
+                    </a>
+                    {% if items_to_issue > 0 %}
+                    <button type="button" onclick="document.getElementById('confirmModal').classList.remove('hidden')"
+                       class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded text-sm transition-colors shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Execute Actual Run
+                    </button>
+                    {% else %}
+                    <button type="button" disabled
+                       class="inline-flex items-center bg-gray-400 text-white font-medium px-6 py-2 rounded text-sm cursor-not-allowed">
+                        No Materials to Issue
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="p-8 text-center text-gray-500">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No materials found</h3>
+            <p class="mt-1 text-sm text-gray-500">No material components found in BOM for this work order.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Execute Actual Run?</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">
+                    This will execute the <strong>actual material issuance</strong> for Work Order <strong>{{ wo.wono }}</strong>.
+                </p>
+                <p class="text-sm text-red-600 font-medium mt-2">
+                    ⚠️ This action will:
+                </p>
+                <ul class="text-sm text-gray-600 text-left mt-2 space-y-1">
+                    <li>• Create WIS records</li>
+                    <li>• <strong>Update stock quantities</strong></li>
+                    <li>• Mark work order as processed</li>
+                </ul>
+                <p class="text-sm text-gray-500 mt-2">
+                    Are you sure you want to proceed?
+                </p>
+            </div>
+            <div class="items-center px-4 py-3">
+                <form method="post" action="{% url 'inventory:wis-dryrun-execute' wo.wono %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 bg-green-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        Yes, Execute
+                    </button>
+                </form>
+                <button type="button" onclick="document.getElementById('confirmModal').classList.add('hidden')"
+                        class="mt-3 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

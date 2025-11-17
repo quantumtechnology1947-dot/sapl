@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,WONo,AccId,Amount,BudgetCodeId
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,WONo,AccId,Amount,BudgetCodeId
 0,2014-05-05,4:58:19 PM,1,1,Sapl0001,N0015,,1576478.22,1
 1,2013-12-14,3:56:34 PM,1,1,Sapl0003,N0054,,45000.0,1
 2,2013-12-14,3:58:26 PM,1,1,Sapl0003,T0008,,23704.45,1

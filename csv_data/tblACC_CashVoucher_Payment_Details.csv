@@ -1,4 +1,4 @@
-﻿Id,BillNo,BillDate,PONo,PODate,Particulars,WONo,BGGroup,AcHead,Amount,BudgetCode,PVEVNo,MId
+Id,BillNo,BillDate,PONo,PODate,Particulars,WONo,BGGroup,AcHead,Amount,BudgetCode,PVEVNo,MId
 4126,056,2018-04-03,,,Ambedkar Jayanti festival exp.,NA,8,51,2000.0,0,,3487
 4127,salary-feb.2018,2018-04-03,,,salary-feb.2018,NA,24,52,9000.0,0,,3488
 4128,salary-feb.2018,2018-04-03,,,salary-feb.2018,NA,24,52,9000.0,0,,3489

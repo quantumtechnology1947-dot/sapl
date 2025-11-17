@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,DANo,WRNo,WRId,ItemId,IssuedQty,DispatchQty,FreightCharges,Vehicleby,OctroiCharges
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,DANo,WRNo,WRId,ItemId,IssuedQty,DispatchQty,FreightCharges,Vehicleby,OctroiCharges
 2,2013-04-04,4:24:58 PM,Sapl0005,1,1,0001,0004,49,84,3.0,3.0,Customer,Self,Customer
 3,2013-04-04,4:24:58 PM,Sapl0005,1,1,0001,0004,50,85,2.0,2.0,Customer,Self,Customer
 4,2013-04-09,10:32:42 AM,Sapl0005,1,1,0002,0005,51,92,40.0,20.0,Self,Self,Self

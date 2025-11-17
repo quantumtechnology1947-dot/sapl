@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,DebitNo,Date,SCE,Refrence,Particulars,Amount,Types
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,DebitNo,Date,SCE,Refrence,Particulars,Amount,Types
 5,2014-08-20,12:45:05 PM,sapl0031,1,2,0001,20-08-2014,S004,Bill.No.0563 (pvev.no.0544),canteen material,2460.0,3
 6,2014-08-30,11:16:00 AM,sapl0031,1,2,0002,30-08-2014,D001,Bill.No.673 (pvev.no.0554),EXTRA AMT.,55.38,3
 7,2014-08-30,3:57:43 PM,sapl0031,1,2,0003,30-08-2014,I001,Bill.No.C1514 (pvev.no.0579),Pu tube 6mm 100mtr rejected,3800.0,3

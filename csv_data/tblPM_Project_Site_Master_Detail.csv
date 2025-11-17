@@ -1,4 +1,4 @@
-﻿Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Design,Manf,BOP,Assemly,WONo,GenDate,Hrs
+Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Design,Manf,BOP,Assemly,WONo,GenDate,Hrs
 1,1,,,,,,,,,,,
 4,2,00771-00-00,6 METER LENGTH STRUCTURE,NOS,1.0,50,10,16-02-2021,95,N0234,,
 8,3,00760-00-00,Roof Finalization Fixture,NOS,1.0,02-02-2021,,,Select,N0231,,0.0

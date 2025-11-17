@@ -1,4 +1,4 @@
-﻿Id,MId,PRNo,PId,CId,ItemId,Qty,SupplierId,Rate,Discount,AHId,DelDate,Remarks,Type
+Id,MId,PRNo,PId,CId,ItemId,Qty,SupplierId,Rate,Discount,AHId,DelDate,Remarks,Type
 1,1,0001,,,8587,200.0,L001,2.1,0.0,28,2013-04-15,,
 2,2,0002,,,10429,6.0,V001,1352.0,0.0,28,2013-05-04,,
 3,2,0002,,,10430,18.0,V001,2082.0,0.0,28,2013-05-04,,

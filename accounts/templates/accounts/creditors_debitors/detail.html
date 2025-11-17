@@ -1,0 +1,253 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if is_debitor %}Debitor{% else %}Creditor{% endif %} Transaction Detail - Accounts{% endblock %}
+
+{% block content %}
+<style>
+    .detail-container {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+    }
+    .header-bar {
+        background: linear-gradient(to bottom, #6b7280 0%, #4b5563 100%);
+        color: white;
+        padding: 4px 8px;
+        font-weight: bold;
+        font-size: 11pt;
+        border: 1px solid #374151;
+    }
+    .info-box {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        padding: 12px;
+        margin-top: 10px;
+    }
+    .info-box table {
+        width: 100%;
+        font-size: 10pt;
+    }
+    .info-box td {
+        padding: 4px 8px;
+    }
+    .info-box .label {
+        font-weight: bold;
+        width: 150px;
+    }
+    .filter-bar {
+        padding: 8px;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .filter-bar label {
+        font-weight: bold;
+        font-size: 10pt;
+    }
+    .filter-bar input[type="date"] {
+        padding: 2px 4px;
+        border: 1px solid #9ca3af;
+        font-size: 10pt;
+        width: 120px;
+    }
+    .btn-filter {
+        background-color: #dc2626;
+        color: white;
+        border: none;
+        padding: 4px 16px;
+        font-size: 10pt;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    .btn-filter:hover {
+        background-color: #b91c1c;
+    }
+    .btn-back {
+        background-color: #6b7280;
+        color: white;
+        border: none;
+        padding: 4px 16px;
+        font-size: 10pt;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+    .btn-back:hover {
+        background-color: #4b5563;
+    }
+    .txn-grid-container {
+        border: 3px double #666699;
+        max-height: 450px;
+        overflow: auto;
+        width: 100%;
+        background-color: white;
+        margin-top: 10px;
+    }
+    .txn-grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+    .txn-grid thead {
+        background-color: #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+    .txn-grid th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #d1d5db;
+        font-size: 10pt;
+        font-weight: bold;
+    }
+    .txn-grid tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    .txn-grid tbody tr:hover {
+        background-color: #e0f2fe;
+    }
+    .txn-grid td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+</style>
+
+<div class="detail-container max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td class="header-bar">
+                &nbsp;{% if is_debitor %}Debitor{% else %}Creditor{% endif %} Transaction Detail
+            </td>
+        </tr>
+    </table>
+
+    <!-- Back Button -->
+    <div style="margin-top: 10px;">
+        <button class="btn-back" onclick="window.location.href='{% url 'accounts:creditors-debitors' %}'">
+            &larr; Back to List
+        </button>
+    </div>
+
+    <!-- Summary Info -->
+    <div class="info-box">
+        <table>
+            <tr>
+                <td class="label">{% if is_debitor %}Customer Name:{% else %}Supplier Name:{% endif %}</td>
+                <td>{% if is_debitor %}{{ customer.customername }}{% else %}{{ supplier.suppliername }}{% endif %}</td>
+            </tr>
+            <tr>
+                <td class="label">Opening Balance:</td>
+                <td>{{ summary.opening|floatformat:2 }}</td>
+            </tr>
+            {% if not is_debitor %}
+            <tr>
+                <td class="label">Booked Bills:</td>
+                <td>{{ summary.booked_bills|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td class="label">TDS:</td>
+                <td>{{ summary.tds|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td class="label">Payments:</td>
+                <td>{{ summary.payments|floatformat:2 }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td class="label">Sales Invoices:</td>
+                <td>{{ summary.sales_invoices|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td class="label">Service Invoices:</td>
+                <td>{{ summary.service_invoices|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td class="label">Proforma Invoices:</td>
+                <td>{{ summary.proforma_invoices|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td class="label" style="font-size: 12pt; color: #dc2626;">Closing Balance:</td>
+                <td style="font-weight: bold; font-size: 12pt; color: #dc2626;">{{ summary.closing|floatformat:2 }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Date Range Filter -->
+    <form method="get" class="filter-bar">
+        <label>From Date:</label>
+        <input type="date" name="from_date" value="{{ from_date }}" />
+
+        <label>To Date:</label>
+        <input type="date" name="to_date" value="{{ to_date }}" />
+
+        <button type="submit" class="btn-filter">Filter</button>
+    </form>
+
+    <!-- Transaction Grid -->
+    <div class="txn-grid-container">
+        <table class="txn-grid">
+            <thead>
+                <tr>
+                    <th style="text-align: right; width: 5%;">SN</th>
+                    <th style="text-align: center; width: 10%;">Date</th>
+                    <th style="text-align: left; width: 15%;">Type</th>
+                    <th style="text-align: left; width: 12%;">Voucher No</th>
+                    <th style="text-align: left; width: 30%;">Narration</th>
+                    <th style="text-align: right; width: 10%;">Debit</th>
+                    <th style="text-align: right; width: 10%;">Credit</th>
+                    <th style="text-align: right; width: 12%;">Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Opening Balance Row -->
+                <tr style="background-color: #fef3c7;">
+                    <td style="text-align: right;">-</td>
+                    <td style="text-align: center;">-</td>
+                    <td style="text-align: left; font-weight: bold;">Opening Balance</td>
+                    <td style="text-align: left;">-</td>
+                    <td style="text-align: left;">-</td>
+                    <td style="text-align: right;">-</td>
+                    <td style="text-align: right;">-</td>
+                    <td style="text-align: right; font-weight: bold;">{{ summary.opening|floatformat:2 }}</td>
+                </tr>
+
+                {% for txn in transactions %}
+                <tr>
+                    <td style="text-align: right;">{{ forloop.counter }}</td>
+                    <td style="text-align: center;">{{ txn.date|date:"d-m-Y" }}</td>
+                    <td style="text-align: left;">{{ txn.type }}</td>
+                    <td style="text-align: left;">{{ txn.voucher_no }}</td>
+                    <td style="text-align: left;">{{ txn.narration }}</td>
+                    <td style="text-align: right;">{% if txn.debit %}{{ txn.debit|floatformat:2 }}{% else %}-{% endif %}</td>
+                    <td style="text-align: right;">{% if txn.credit %}{{ txn.credit|floatformat:2 }}{% else %}-{% endif %}</td>
+                    <td style="text-align: right;">{{ txn.balance|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px; color: maroon; font-size: 12pt;">
+                        No transactions found for the selected period!
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <!-- Closing Balance Row -->
+                {% if transactions %}
+                <tr style="background-color: #dbeafe; font-weight: bold;">
+                    <td style="text-align: right;">-</td>
+                    <td style="text-align: center;">-</td>
+                    <td style="text-align: left;">Closing Balance</td>
+                    <td style="text-align: left;">-</td>
+                    <td style="text-align: left;">-</td>
+                    <td style="text-align: right;">-</td>
+                    <td style="text-align: right;">-</td>
+                    <td style="text-align: right;">{{ summary.closing|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

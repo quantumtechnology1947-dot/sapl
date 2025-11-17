@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,CVRNo,CashReceivedAgainst,CashReceivedBy,WONo,BGGroup,AcHead,Amount,Others,CodeTypeRA,CodeTypeRB,BudgetCode
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,CVRNo,CashReceivedAgainst,CashReceivedBy,WONo,BGGroup,AcHead,Amount,Others,CodeTypeRA,CodeTypeRB,BudgetCode
 286,2018-05-15,9:06:07 AM,1,6,Sapl0285,0001,Sapl0276,Sapl0031,NA,15,50,25.0,AGAINST IOU,1,1,0
 287,2018-05-15,9:06:57 AM,1,6,Sapl0285,0002,Sapl0219,Sapl0031,NA,4,50,2.0,AGAINST IOU,1,1,0
 288,2018-05-15,9:09:56 AM,1,6,Sapl0285,0003,Sapl0224,Sapl0031,NA,19,50,70.0,AGAINST IOU,1,1,0

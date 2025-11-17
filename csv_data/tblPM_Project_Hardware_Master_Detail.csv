@@ -1,4 +1,4 @@
-﻿Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Rdesign,Design,WONo,Remark,Vendor1,Vendor2
+Id,PRJCTNO,ItemCode,Description,UOM,BOMQ,Rdesign,Design,WONo,Remark,Vendor1,Vendor2
 3,2,Z157-001-000,"Drill Bit-RL 10, Kennametal Part No. 1010785",NOS,48.0,1,05-02-2021,P0061,,,
 4,3,B032-000-010,TAPER ROLLER BEARING 32010 X - 50X80X20 - SKF,NOS,2.0,1,23-02-2021,J0139,,,
 5,3,H045-022-200,CHEMICAL ANCHORE FASTNER -22X200,NOS,10.0,1,03-03-2021,J0139,,,
@@ -280,7 +280,7 @@
 281,30,D502-303-410,"DC Servo Motor SM0803GE4-KCF-NNV Motor,750w with brake,2500 lines encoder, 2.4 Nm_Moon make",NOS,1.0,1,,T0035,,,
 282,30,Q501-602-202,"M2DC-20D5S Servo Drive,24-70VDC,20.0A,Basic type 1_Moon Make",NOS,1.0,1,,T0035,,,
 283,30,D601-502-906,"Gear Box Ratio 100:1 ,o/p rpm 15,640 Nm Torque,lift speed 6mtr/min,swl 300kg_Bonfiglioli make",NOS,0.0,1,,T0035,,,
-284,30,D500-400-588,"NEMA24(60mm) 1.8°2-Phase  Hybrid Stepper Motor with planetary gearbox,Length 158.5mm, Gear ratio 10 Output Torque 25N.m, Rated Current 4.0A/Phase_Moon Make",NOS,4.0,1,,T0035,,,
+284,30,D500-400-588,"NEMA24(60mm) 1.8 deg2-Phase  Hybrid Stepper Motor with planetary gearbox,Length 158.5mm, Gear ratio 10 Output Torque 25N.m, Rated Current 4.0A/Phase_Moon Make",NOS,4.0,1,,T0035,,,
 285,30,R401-090-210,"Simens Contactor ,24 VDC coil Current 9 amp 3TF30[With Auxiliary contacts 1NC $ Type 3TF30 01-0B]",NOS,4.0,1,,T0037,,,
 286,30,S214-001-060,TEKNIC MAKE INDICATING LIMIT SWITCH WITH ADJUSTABLE ROLLER LEVER ARM VS(METAL) NG1-VS-510 L024,NOS,2.0,1,,T0037,,,
 287,30,B001-025-047,Ball Bearing - 6005 Zz - 25 x 47 x 12 - SKF,NOS,26.0,1,,T0037,,,

@@ -1,0 +1,37 @@
+{% if payments %}
+    {% for payment in payments %}
+    <tr id="payment-row-{{ payment.id }}">
+        <td class="grid-cell" style="text-align: center;">
+            <a href="#" class="btn-edit" onclick="editPayment({{ payment.id }}); return false;">Edit</a>
+        </td>
+        <td class="grid-cell" style="text-align: center;">
+            {% if not payment.authorize %}
+            <a href="#" class="btn-delete" 
+               hx-post="{% url 'accounts:iou-payment-delete' payment.id %}"
+               hx-target="#paymentGridBody"
+               hx-swap="innerHTML"
+               hx-confirm="Are you sure you want to delete this payment?"
+               >Delete</a>
+            {% endif %}
+        </td>
+        <td class="grid-cell" style="text-align: right;">{{ payment.id }}</td>
+        <td class="grid-cell" style="text-align: center;">{{ payment.paymentdate }}</td>
+        <td class="grid-cell">{{ payment.empname }}</td>
+        <td class="grid-cell" style="text-align: right;">{{ payment.amount|floatformat:2 }}</td>
+        <td class="grid-cell">{{ payment.reason_name }}</td>
+        <td class="grid-cell">{{ payment.narration }}</td>
+        <td class="grid-cell checkbox-cell">
+            <input type="checkbox" 
+                   {% if payment.authorize %}checked disabled{% endif %}
+                   hx-post="{% url 'accounts:iou-payment-authorize' payment.id %}"
+                   hx-target="#paymentGridBody"
+                   hx-swap="innerHTML"
+                   {% if payment.authorize %}disabled{% endif %}>
+        </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="9" class="grid-cell empty-row">No data to display!</td>
+    </tr>
+{% endif %}

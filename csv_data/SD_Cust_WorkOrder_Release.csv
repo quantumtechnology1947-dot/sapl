@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,WRNo,WONo,ItemId,IssuedQty
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,WRNo,WONo,ItemId,IssuedQty
 35,2013-04-03,9:56:27 AM,Sapl0005,1,1,0001,N0001,67,4.0
 36,2013-04-03,1:57:33 PM,Sapl0005,1,1,0002,J0001,71,2.0
 37,2013-04-03,1:57:33 PM,Sapl0005,1,1,0002,J0001,72,1.0

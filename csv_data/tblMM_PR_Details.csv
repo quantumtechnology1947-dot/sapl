@@ -1,4 +1,4 @@
-﻿Id,PRNo,PId,CId,Qty,SupplierId,Rate,Discount,AHId,DelDate,Remarks,Type,ItemId,MId
+Id,PRNo,PId,CId,Qty,SupplierId,Rate,Discount,AHId,DelDate,Remarks,Type,ItemId,MId
 32993,0001,,,38.0,S098,80.0,0.0,42,2018-04-14,,,60015,6684
 32994,0001,,,38.0,S061,580.0,0.0,42,2018-04-14,,,60016,6684
 32995,0002,,,2.0,L002,3865.0,40.0,28,2018-04-30,,,59219,6685

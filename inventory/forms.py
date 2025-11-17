@@ -1362,59 +1362,54 @@ class ItemLocationForm(forms.ModelForm):
 
 class ClosingStockForm(forms.Form):
     """
-    Form for closing stock physical count entry
+    Form for period-based closing stock entry
+
+    Records aggregate closing stock VALUE for a date period (not item-level tracking).
 
     Converted from: aspnet/Module/Inventory/Transactions/ClosingStock.aspx
+    Requirements: 11.1
     """
 
-    item = forms.ModelChoiceField(
-        queryset=None,
-        widget=forms.Select(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+    from_date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
         }),
-        label='Item'
+        label='From',
+        input_formats=['%Y-%m-%d', '%d-%m-%Y']
     )
 
-    system_qty = forms.DecimalField(
-        required=False,
-        disabled=True,
-        widget=forms.NumberInput(attrs={
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50',
-            'readonly': 'readonly'
+    to_date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
         }),
-        label='System Quantity'
+        label='To',
+        input_formats=['%Y-%m-%d', '%d-%m-%Y']
     )
 
-    physical_qty = forms.DecimalField(
+    closing_stock_value = forms.DecimalField(
         max_digits=18,
-        decimal_places=3,
+        decimal_places=2,
         widget=forms.NumberInput(attrs={
-            'placeholder': 'Enter physical count',
-            'step': '0.001',
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            'placeholder': 'Enter closing stock value',
+            'step': '0.01',
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
         }),
-        label='Physical Quantity'
+        label='Closing Stock'
     )
 
-    remarks = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={
-            'rows': 3,
-            'placeholder': 'Enter any remarks or notes',
-            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-        }),
-        label='Remarks'
-    )
+    def clean(self):
+        """Validate that to_date is not before from_date"""
+        cleaned_data = super().clean()
+        from_date = cleaned_data.get('from_date')
+        to_date = cleaned_data.get('to_date')
 
-    def __init__(self, *args, **kwargs):
-        compid = kwargs.pop('compid', None)
-        super().__init__(*args, **kwargs)
-        # Fixed: Import from design module where item master actually exists
-        from design.models import TbldgItemMaster
-        queryset = TbldgItemMaster.objects.all()
-        if compid:
-            queryset = queryset.filter(compid=compid)
-        self.fields['item'].queryset = queryset.order_by('itemcode')
+        if from_date and to_date:
+            if to_date < from_date:
+                raise forms.ValidationError('To date must be on or after From date')
+
+        return cleaned_data
 
 
 

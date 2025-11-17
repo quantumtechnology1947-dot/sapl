@@ -1,4 +1,4 @@
-﻿Id,MId,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,Date,WONo,Dept,Types,AmendmentNo
+Id,MId,SysDate,SysTime,SessionId,CompId,FinYearId,EmpId,Date,WONo,Dept,Types,AmendmentNo
 1,16,2015-06-24,2:58:16 PM,Sapl0001,1,3,Sapl0025,2015-06-24,N0093,0,1,0
 2,16,2015-06-24,2:58:40 PM,Sapl0001,1,3,Sapl0025,2015-06-24,N0093,0,1,1
 3,17,2017-03-31,2:09:13 PM,Sapl0005,1,4,Sapl0076,2017-04-12,N0159,0,1,0

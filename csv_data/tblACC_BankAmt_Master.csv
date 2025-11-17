@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,Amt,BankId
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,Amt,BankId
 6,2018-07-24,10:33:23 AM,sapl0202,1,6,9662195.74,5
 7,2018-07-25,2:56:04 PM,Sapl0003,1,6,10000.0,6
 8,2022-01-21,10:05:44 AM,sapl0001,1,9,19333183.78,10

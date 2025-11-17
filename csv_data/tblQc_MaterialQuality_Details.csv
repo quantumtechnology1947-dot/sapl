@@ -1,4 +1,4 @@
-﻿Id,GQNNo,GRRId,NormalAccQty,AcceptedQty,DeviatedQty,SegregatedQty,RejectedQty,RejectionReason,SN,PN,Remarks,MId
+Id,GQNNo,GRRId,NormalAccQty,AcceptedQty,DeviatedQty,SegregatedQty,RejectedQty,RejectionReason,SN,PN,Remarks,MId
 32376,0001,32705,1.0,1.0,0.0,0.0,0.0,0,,,,9083
 32377,0002,32696,6.0,6.0,0.0,0.0,0.0,0,,,,9084
 32378,0002,32697,1.0,1.0,0.0,0.0,0.0,0,,,,9084

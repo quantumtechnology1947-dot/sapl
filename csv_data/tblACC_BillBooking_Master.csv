@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,PVEVNo,SupplierId,POId,BillNo,BillDate,CENVATEntryNo,CENVATEntryDate,OtherCharges,OtherChaDesc,Narration,DebitAmt,DiscountType,Discount,Authorize,AuthorizeBy,AuthorizeDate,AuthorizeTime,InvoiceType,AHId,TDSCode
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,PVEVNo,SupplierId,POId,BillNo,BillDate,CENVATEntryNo,CENVATEntryDate,OtherCharges,OtherChaDesc,Narration,DebitAmt,DiscountType,Discount,Authorize,AuthorizeBy,AuthorizeDate,AuthorizeTime,InvoiceType,AHId,TDSCode
 8061,2018-04-28,11:22:25 AM,Sapl0285,1,6,0002,T020,,MM-0225/18-19,2018-04-13,-,2018-04-13,0.0,-,-,0.0,0,0.0,0,,,,0,41,0
 8062,2018-04-28,11:39:30 AM,Sapl0285,1,6,0003,S180,,01,2018-04-14,-,2018-04-14,0.0,-,-,0.0,0,0.0,0,,,,0,28,0
 8063,2018-04-30,9:44:04 AM,Sapl0285,1,6,0004,M010,,8,2018-04-08,-,2018-04-08,0.0,-,-,0.0,0,0.0,0,,,,0,28,0

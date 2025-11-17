@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,SessionId,CompId,FinYearId,BVRNo,Types,ReceiveType,ReceivedFrom,InvoiceNo,ChequeNo,ChequeDate,ChequeReceivedBy,BankName,BankAccNo,ChequeClearanceDate,Narration,Amount,DrawnAt,TransactionType,WONo,BGGroup
+Id,SysDate,SysTime,SessionId,CompId,FinYearId,BVRNo,Types,ReceiveType,ReceivedFrom,InvoiceNo,ChequeNo,ChequeDate,ChequeReceivedBy,BankName,BankAccNo,ChequeClearanceDate,Narration,Amount,DrawnAt,TransactionType,WONo,BGGroup
 1,2013-11-20,19:19:05,Sapl0050,1,1,0001,2,2,M001,0 ,904045,2013-04-01,Sapl0050,STANDARD CHARTERED,-,2013-11-06,-,834375.0,5,4,,
 3,2013-12-07,17:13:16,sapl0173,1,1,0002,2,2,M007,0 ,904045,2013-04-01,Sapl0050,STANDARD CHARTERED,0,2013-04-06,-,834375.0,5,4,,
 4,2013-12-07,17:15:03,sapl0173,1,1,0003,3,2,B005,1851213,025405,2013-04-02,Sapl0050,IDBI,0,2013-04-03,-,74350.0,5,4,,

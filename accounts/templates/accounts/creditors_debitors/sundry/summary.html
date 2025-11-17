@@ -1,0 +1,155 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Sundry Creditors - Accounts{% endblock %}
+
+{% block content %}
+<style>
+    .sundry-container {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+    }
+    .header-bar {
+        background: linear-gradient(to bottom, #6b7280 0%, #4b5563 100%);
+        color: white;
+        padding: 4px 8px;
+        font-weight: bold;
+        font-size: 11pt;
+        border: 1px solid #374151;
+    }
+    .sundry-grid-container {
+        border: 3px double #666699;
+        max-height: 500px;
+        overflow: auto;
+        width: 100%;
+        background-color: white;
+        margin-top: 10px;
+    }
+    .sundry-grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+    .sundry-grid thead {
+        background-color: #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+    .sundry-grid th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #d1d5db;
+        font-size: 10pt;
+        font-weight: bold;
+    }
+    .sundry-grid tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    .sundry-grid tbody tr:hover {
+        background-color: #e0f2fe;
+    }
+    .sundry-grid td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .sundry-grid tfoot {
+        background-color: #dbeafe;
+        font-weight: bold;
+        position: sticky;
+        bottom: 0;
+    }
+    .sundry-grid tfoot td {
+        padding: 6px 8px;
+        border-top: 2px solid #d1d5db;
+    }
+    .btn-back {
+        background-color: #6b7280;
+        color: white;
+        border: none;
+        padding: 4px 16px;
+        font-size: 10pt;
+        cursor: pointer;
+        border-radius: 2px;
+        margin-top: 10px;
+    }
+    .btn-back:hover {
+        background-color: #4b5563;
+    }
+    .btn-category {
+        color: #3b82f6;
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-weight: bold;
+    }
+    .btn-category:hover {
+        color: #2563eb;
+    }
+</style>
+
+<div class="sundry-container max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td class="header-bar">
+                &nbsp;Sundry Creditors - Balance Sheet View
+            </td>
+        </tr>
+    </table>
+
+    <!-- Back Button -->
+    <button class="btn-back" onclick="window.location.href='{% url 'accounts:creditors-debitors' %}'">
+        &larr; Back to Creditors/Debitors
+    </button>
+
+    <!-- Sundry Creditors Grid -->
+    <div class="sundry-grid-container">
+        <table class="sundry-grid">
+            <thead>
+                <tr>
+                    <th style="text-align: right; width: 5%;">SN</th>
+                    <th style="text-align: left; width: 40%;">Category</th>
+                    <th style="text-align: right; width: 15%;">Opening</th>
+                    <th style="text-align: right; width: 13%;">Debit</th>
+                    <th style="text-align: right; width: 13%;">Credit</th>
+                    <th style="text-align: right; width: 14%;">Closing</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td style="text-align: right;">{{ forloop.counter }}</td>
+                    <td style="text-align: left;">
+                        <button class="btn-category"
+                                onclick="window.location.href='{% url 'accounts:sundry-creditors-category' category.category %}'">
+                            {{ category.category }}
+                        </button>
+                    </td>
+                    <td style="text-align: right;">{{ category.opening|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ category.debit|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ category.credit|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ category.closing|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: maroon; font-size: 12pt;">
+                        No sundry creditors data available!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if categories %}
+            <tfoot>
+                <tr>
+                    <td colspan="2" style="text-align: left;">Grand Total</td>
+                    <td style="text-align: right;">{{ grand_opening|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ grand_debit|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ grand_credit|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ grand_closing|floatformat:2 }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

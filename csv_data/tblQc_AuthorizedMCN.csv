@@ -1,4 +1,4 @@
-﻿Id,SysDate,SysTime,CompId,FinYearId,SessionId,MCNId,MCNDId,QAQty
+Id,SysDate,SysTime,CompId,FinYearId,SessionId,MCNId,MCNDId,QAQty
 1,2017-12-15,4:06:35 PM,1,5,Sapl0001,1,1,4.0
 2,2017-12-15,4:06:35 PM,1,5,Sapl0001,1,2,4.0
 3,2017-12-15,4:06:35 PM,1,5,Sapl0001,1,3,4.0

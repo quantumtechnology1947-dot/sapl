@@ -1,0 +1,142 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Sundry Creditors - {{ category }} - Accounts{% endblock %}
+
+{% block content %}
+<style>
+    .category-container {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+    }
+    .header-bar {
+        background: linear-gradient(to bottom, #6b7280 0%, #4b5563 100%);
+        color: white;
+        padding: 4px 8px;
+        font-weight: bold;
+        font-size: 11pt;
+        border: 1px solid #374151;
+    }
+    .category-grid-container {
+        border: 3px double #666699;
+        max-height: 500px;
+        overflow: auto;
+        width: 100%;
+        background-color: white;
+        margin-top: 10px;
+    }
+    .category-grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+    .category-grid thead {
+        background-color: #e5e7eb;
+        position: sticky;
+        top: 0;
+    }
+    .category-grid th {
+        padding: 6px 8px;
+        border-bottom: 2px solid #d1d5db;
+        font-size: 10pt;
+        font-weight: bold;
+    }
+    .category-grid tbody tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    .category-grid tbody tr:hover {
+        background-color: #e0f2fe;
+    }
+    .category-grid td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .category-grid tfoot {
+        background-color: #dbeafe;
+        font-weight: bold;
+        position: sticky;
+        bottom: 0;
+    }
+    .category-grid tfoot td {
+        padding: 6px 8px;
+        border-top: 2px solid #d1d5db;
+    }
+    .btn-back {
+        background-color: #6b7280;
+        color: white;
+        border: none;
+        padding: 4px 16px;
+        font-size: 10pt;
+        cursor: pointer;
+        border-radius: 2px;
+        margin-top: 10px;
+    }
+    .btn-back:hover {
+        background-color: #4b5563;
+    }
+</style>
+
+<div class="category-container max-w-full mx-auto px-4 py-2">
+    <!-- Page Header -->
+    <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td class="header-bar">
+                &nbsp;Sundry Creditors - Category: {{ category }}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Back Button -->
+    <button class="btn-back" onclick="window.location.href='{% url 'accounts:sundry-creditors' %}'">
+        &larr; Back to Summary
+    </button>
+
+    <!-- Category Suppliers Grid -->
+    <div class="category-grid-container">
+        <table class="category-grid">
+            <thead>
+                <tr>
+                    <th style="text-align: right; width: 5%;">SN</th>
+                    <th style="text-align: left; width: 30%;">Supplier Name</th>
+                    <th style="text-align: right; width: 13%;">Opening</th>
+                    <th style="text-align: right; width: 13%;">Booked Bills</th>
+                    <th style="text-align: right; width: 10%;">TDS</th>
+                    <th style="text-align: right; width: 13%;">Payments</th>
+                    <th style="text-align: right; width: 13%;">Closing</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for supplier in suppliers %}
+                <tr>
+                    <td style="text-align: right;">{{ forloop.counter }}</td>
+                    <td style="text-align: left; font-weight: bold;">{{ supplier.supplier_name }}</td>
+                    <td style="text-align: right;">{{ supplier.opening|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ supplier.booked_bills|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ supplier.tds|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ supplier.payments|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ supplier.closing|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: maroon; font-size: 12pt;">
+                        No suppliers found in this category!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if suppliers %}
+            <tfoot>
+                <tr>
+                    <td colspan="2" style="text-align: left;">Total</td>
+                    <td style="text-align: right;">{{ total_opening|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ total_booked_bills|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ total_tds|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ total_payments|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ total_closing|floatformat:2 }}</td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{% endblock %}

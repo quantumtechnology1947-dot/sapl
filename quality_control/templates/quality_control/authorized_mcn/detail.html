@@ -1,24 +1,185 @@
-{% extends 'quality_control/base.html' %}
-{% block title %}Authorized MCN Details{% endblock %}
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Authorize MCN - {{ wo_no }}{% endblock %}
+
 {% block content %}
-<div class="mb-6 flex justify-between items-center">
-    <h2 class="text-sm font-bold">Authorized MCN Details</h2>
-    <a href="{% url 'quality_control:authorized-mcn-list' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Back</a>
-</div>
-<div class="bg-white rounded border border-gray-200 p-6">
-    <div class="grid grid-cols-2 gap-4">
-        <div><p class="text-gray-600">MCN ID</p><p class="font-medium">{{ authorized_mcn.mcnid }}</p></div>
-        <div><p class="text-gray-600">MCN Detail ID</p><p class="font-medium">{{ authorized_mcn.mcndid }}</p></div>
-        <div><p class="text-gray-600">QA Quantity</p><p class="font-medium">{{ authorized_mcn.qaqty }}</p></div>
-        <div><p class="text-gray-600">Date</p><p class="font-medium">{{ authorized_mcn.sysdate }}</p></div>
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header" style="background-color: #0070C0; color: white;">
+            <h5 class="mb-0">Authorize [MCN]</h5>
+        </div>
+        <div class="card-body">
+            <!-- Work Order Header Info -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <strong>WONo:</strong> {{ wo_no }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Project Name:</strong> {{ project_title }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Customer Name:</strong> {{ customer_name }}
+                </div>
+            </div>
+
+            <!-- MCN Items Form -->
+            <form method="post" id="authorize-form">
+                {% csrf_token %}
+
+                <!-- MCN Items Table -->
+                <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+                    <table class="table table-sm table-bordered table-hover">
+                        <thead style="background-color: #f8f9fa; position: sticky; top: 0; z-index: 10;">
+                            <tr>
+                                <th style="width: 40px;">SN</th>
+                                <th style="width: 100px;">MCN No</th>
+                                <th style="width: 100px;">Date</th>
+                                <th style="width: 80px;">Draw/Img</th>
+                                <th style="width: 80px;">Spec.sheet</th>
+                                <th style="width: 120px;">Item Code</th>
+                                <th>Description</th>
+                                <th style="width: 60px;">UOM</th>
+                                <th style="width: 90px; text-align: right;">MCN Qty</th>
+                                <th style="width: 50px; text-align: center;">Select</th>
+                                <th style="width: 110px;">QA Qty</th>
+                                <th style="width: 110px; text-align: right;">Tot QA Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in mcn_items %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td class="text-center">{{ item.mcn_no }}</td>
+                                <td class="text-center">{{ item.mcn_date }}</td>
+                                <td class="text-center">
+                                    {% if item.has_drawing %}
+                                    <a href="{% url 'inventory:item-image-download' item.item_id %}"
+                                       target="_blank"
+                                       style="color: #0070C0; text-decoration: underline;">
+                                        View
+                                    </a>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if item.has_spec %}
+                                    <a href="{% url 'inventory:item-spec-download' item.item_id %}"
+                                       target="_blank"
+                                       style="color: #0070C0; text-decoration: underline;">
+                                        View
+                                    </a>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ item.item_code }}</td>
+                                <td>{{ item.description }}</td>
+                                <td class="text-center">{{ item.uom }}</td>
+                                <td class="text-right">{{ item.mcn_qty|floatformat:3 }}</td>
+                                <td class="text-center">
+                                    <input type="checkbox"
+                                           name="check_{{ item.id }}"
+                                           id="check_{{ item.id }}"
+                                           class="form-check-input">
+                                    <!-- Hidden fields for item data -->
+                                    <input type="hidden" name="mcn_master_id_{{ item.id }}" value="{{ item.mcn_id }}">
+                                    <input type="hidden" name="mcn_detail_id_{{ item.id }}" value="{{ item.id }}">
+                                </td>
+                                <td>
+                                    <input type="number"
+                                           name="qa_qty_{{ item.id }}"
+                                           id="qa_qty_{{ item.id }}"
+                                           value="0"
+                                           step="0.001"
+                                           min="0"
+                                           max="{{ item.mcn_qty }}"
+                                           class="form-control form-control-sm"
+                                           style="width: 100px;">
+                                </td>
+                                <td class="text-right">{{ item.tot_qa_qty|floatformat:3 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="12" class="text-center text-muted py-4">
+                                    No MCN items found for this Work Order
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row mt-3">
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-danger">Submit</button>
+                        <a href="{% url 'quality_control:authorized-mcn-list' %}" class="btn btn-secondary ml-2">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Make header sticky */
+    thead {
+        background-color: #f8f9fa;
+    }
+
+    /* Ensure text alignment for numeric columns */
+    .text-right {
+        text-align: right !important;
+    }
+
+    .text-center {
+        text-align: center !important;
+    }
+</style>
+
+<script>
+    // Auto-check checkbox when QA Qty is entered
+    document.querySelectorAll('input[type="number"][name^="qa_qty_"]').forEach(function(input) {
+        input.addEventListener('input', function() {
+            const itemId = this.name.replace('qa_qty_', '');
+            const checkbox = document.getElementById('check_' + itemId);
+            if (parseFloat(this.value) > 0) {
+                checkbox.checked = true;
+            }
+        });
+    });
+
+    // Validate form before submission
+    document.getElementById('authorize-form').addEventListener('submit', function(e) {
+        const checkboxes = this.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length === 0) {
+            e.preventDefault();
+            alert('Please select at least one item and enter QA quantity');
+            return false;
+        }
+
+        // Validate that checked items have QA Qty > 0
+        let hasValidQty = false;
+        checkboxes.forEach(function(checkbox) {
+            const itemId = checkbox.name.replace('check_', '');
+            const qaQtyInput = document.getElementById('qa_qty_' + itemId);
+            if (qaQtyInput && parseFloat(qaQtyInput.value) > 0) {
+                hasValidQty = true;
+            }
+        });
+
+        if (!hasValidQty) {
+            e.preventDefault();
+            alert('Please enter QA quantity greater than 0 for selected items');
+            return false;
+        }
+
+        return confirm('Are you sure you want to authorize the selected MCN items?');
+    });
+</script>
 {% endblock %}
-
-
-
-
-
-
-
-

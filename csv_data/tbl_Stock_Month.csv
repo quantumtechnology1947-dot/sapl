@@ -1,4 +1,4 @@
-﻿Id,SrNO,Item_code,Group,Description,Unit,Qty_month,ReOrder,Min_order,Day
+Id,SrNO,Item_code,Group,Description,Unit,Qty_month,ReOrder,Min_order,Day
 1,1,I001-003-200,A,STRAIGHT SHANK DRILL - DIA 3.2MM MAKE ADDISON,NOS.,5,2,5,10
 2,2,I001-004-500,A,STRAIGHT SHANK DRILL - DIA 4.5MM MAKE ADDISON,NOS.,5,2,5,10
 3,3,I001-006-800,A,STRAIGHT SHANK DRILL - DIA 6.8MM MAKE ADDISON,NOS.,5,2,5,10
