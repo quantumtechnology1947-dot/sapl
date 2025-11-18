@@ -3,64 +3,42 @@
 
 {% block title %}Sales Invoice - New{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/sales_invoice_calculations.js' %}"></script>
+{% endblock %}
+
 {% block page_title %}Sales Invoice - New{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <style>
 [x-cloak] { display: none !important; }
 
-/* Tab Container */
-.tab-buttons-container {
-    display: flex;
-    gap: 8px;
-    border-bottom: 2px solid #d1d5db;
-    margin-bottom: -2px;
-    background-color: #f9fafb;
-    padding: 8px 8px 0 8px;
-}
-
-/* Tab Button Styling */
-.tab-button {
-    display: inline-block;
-    padding: 12px 32px;
-    border: 2px solid #cbd5e0;
-    border-bottom: 2px solid #d1d5db;
-    background: linear-gradient(to bottom, #ffffff, #f7fafc);
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 15px;
-    color: #4a5568;
-    transition: all 0.2s ease;
-    border-radius: 8px 8px 0 0;
+/* Tab hiding - off-screen positioning (Playwright-compatible) */
+.tab-panels {
     position: relative;
-    white-space: nowrap;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.tab-button:hover {
-    background: linear-gradient(to bottom, #ffffff, #edf2f7);
-    color: #2d3748;
-    border-color: #a0aec0;
-    transform: translateY(-2px);
+.tab-panel {
+    /* Active tab - normal flow */
+    position: relative;
+}
+
+.tab-panel.tab-hide {
+    /* Hidden tabs - move off-screen but keep in DOM for Playwright */
+    position: absolute;
+    left: -99999px;
+    top: auto;
+    /* Elements off-screen are still accessible to Playwright with state:'attached' */
+}
+
+/* Tab button hover effects that can't be done with Tailwind alone */
+.tab-button:hover:not(.active) {
+    transform: translateY(-1px) !important;
 }
 
 .tab-button.active {
-    background: #ffffff;
-    border-color: #3182ce;
-    border-bottom-color: #ffffff;
-    font-weight: 600;
-    color: #2c5282;
-    box-shadow: 0 -2px 8px rgba(49, 130, 206, 0.15);
-    z-index: 10;
-}
-
-/* Tab Panel */
-.tab-panel {
-    border: 2px solid #d1d5db;
-    border-radius: 0 8px 8px 8px;
-    padding: 24px;
-    background-color: #ffffff;
-    margin-top: 0;
+    transform: translateY(3px) !important;
+    margin-bottom: -3px !important;
 }
 </style>
 {% endblock %}
@@ -159,17 +137,29 @@
         <!-- Tab Container -->
         <div class="mb-4">
             <!-- Tab Buttons -->
-            <div class="tab-buttons-container">
-                <button type="button" class="tab-button active" data-tab="buyer" id="btn-buyer">
+            <div class="flex gap-1 border-b-4 border-gray-200 mb-0 bg-gray-50 px-3 pt-3 rounded-t-lg">
+                <button type="button" 
+                        class="tab-button inline-flex items-center justify-center px-9 py-3.5 border-2 border-gray-300 border-b-0 bg-gradient-to-b from-gray-100 to-gray-200 cursor-pointer font-semibold text-sm text-gray-700 transition-all duration-200 rounded-t-lg relative whitespace-nowrap shadow-md tracking-wide uppercase min-w-[140px] hover:from-white hover:to-gray-100 hover:text-gray-900 hover:border-gray-400 hover:shadow-lg active" 
+                        data-tab="buyer" 
+                        id="btn-buyer">
                     Buyer
                 </button>
-                <button type="button" class="tab-button" data-tab="consignee" id="btn-consignee">
+                <button type="button" 
+                        class="tab-button inline-flex items-center justify-center px-9 py-3.5 border-2 border-gray-300 border-b-0 bg-gradient-to-b from-gray-100 to-gray-200 cursor-pointer font-semibold text-sm text-gray-700 transition-all duration-200 rounded-t-lg relative whitespace-nowrap shadow-md tracking-wide uppercase min-w-[140px] hover:from-white hover:to-gray-100 hover:text-gray-900 hover:border-gray-400 hover:shadow-lg" 
+                        data-tab="consignee" 
+                        id="btn-consignee">
                     Consignee
                 </button>
-                <button type="button" class="tab-button" data-tab="goods" id="btn-goods">
+                <button type="button" 
+                        class="tab-button inline-flex items-center justify-center px-9 py-3.5 border-2 border-gray-300 border-b-0 bg-gradient-to-b from-gray-100 to-gray-200 cursor-pointer font-semibold text-sm text-gray-700 transition-all duration-200 rounded-t-lg relative whitespace-nowrap shadow-md tracking-wide uppercase min-w-[140px] hover:from-white hover:to-gray-100 hover:text-gray-900 hover:border-gray-400 hover:shadow-lg" 
+                        data-tab="goods" 
+                        id="btn-goods">
                     Goods
                 </button>
-                <button type="button" class="tab-button" data-tab="taxation" id="btn-taxation">
+                <button type="button" 
+                        class="tab-button inline-flex items-center justify-center px-9 py-3.5 border-2 border-gray-300 border-b-0 bg-gradient-to-b from-gray-100 to-gray-200 cursor-pointer font-semibold text-sm text-gray-700 transition-all duration-200 rounded-t-lg relative whitespace-nowrap shadow-md tracking-wide uppercase min-w-[140px] hover:from-white hover:to-gray-100 hover:text-gray-900 hover:border-gray-400 hover:shadow-lg" 
+                        data-tab="taxation" 
+                        id="btn-taxation">
                     Taxation
                 </button>
             </div>
@@ -177,22 +167,22 @@
             <!-- Tab Panels -->
             <div class="tab-panels">
                 <!-- Buyer Tab -->
-                <div id="tab-buyer" class="tab-panel">
+                <div id="tab-buyer" class="tab-panel border-2 border-gray-300 rounded-b-lg rounded-tr-lg p-6 bg-white mt-0">
                     {% include 'accounts/transactions/partials/sales_invoice_buyer_tab.html' %}
                 </div>
 
                 <!-- Consignee Tab -->
-                <div id="tab-consignee" class="tab-panel hidden">
+                <div id="tab-consignee" class="tab-panel tab-hide border-2 border-gray-300 rounded-b-lg rounded-tr-lg p-6 bg-white mt-0">
                     {% include 'accounts/transactions/partials/sales_invoice_consignee_tab.html' %}
                 </div>
 
                 <!-- Goods Tab -->
-                <div id="tab-goods" class="tab-panel hidden">
+                <div id="tab-goods" class="tab-panel tab-hide border-2 border-gray-300 rounded-b-lg rounded-tr-lg p-6 bg-white mt-0">
                     {% include 'accounts/transactions/partials/sales_invoice_items_tab.html' %}
                 </div>
 
                 <!-- Taxation Tab -->
-                <div id="tab-taxation" class="tab-panel hidden">
+                <div id="tab-taxation" class="tab-panel tab-hide border-2 border-gray-300 rounded-b-lg rounded-tr-lg p-6 bg-white mt-0">
                     {% include 'accounts/transactions/partials/sales_invoice_taxation_tab.html' %}
                 </div>
             </div>
@@ -203,6 +193,19 @@
 <script>
 // Tab Navigation
 document.addEventListener('DOMContentLoaded', function() {
+    // CRITICAL FIX: Unhide all tabs DURING form submission using capture phase
+    // This ensures fields are visible when browser collects form data
+    const form = document.getElementById('salesInvoiceForm');
+    if (form) {
+        // Use capture phase (runs before bubbling) to unhide tabs early
+        form.addEventListener('submit', function(e) {
+            // Remove 'tab-hide' class from all tab panels IMMEDIATELY so their data gets submitted
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('tab-hide');
+            });
+        }, true);  // true = capture phase
+    }
+
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabPanels = document.querySelectorAll('.tab-panel');
 
@@ -210,17 +213,23 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const targetTab = this.getAttribute('data-tab');
 
-            // Remove active class from all buttons
-            tabButtons.forEach(btn => btn.classList.remove('active'));
+            // Remove active styling from all buttons
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('bg-white', 'border-blue-500', 'text-blue-900', 'font-bold', 'shadow-xl', 'z-10');
+                btn.classList.add('bg-gradient-to-b', 'from-gray-100', 'to-gray-200', 'border-gray-300', 'text-gray-700', 'font-semibold');
+            });
 
-            // Add active class to clicked button
+            // Add active styling to clicked button
             this.classList.add('active');
+            this.classList.remove('bg-gradient-to-b', 'from-gray-100', 'to-gray-200', 'border-gray-300', 'text-gray-700', 'font-semibold');
+            this.classList.add('bg-white', 'border-blue-500', 'text-blue-900', 'font-bold', 'shadow-xl', 'z-10');
 
             // Hide all panels
-            tabPanels.forEach(panel => panel.classList.add('hidden'));
+            tabPanels.forEach(panel => panel.classList.add('tab-hide'));
 
             // Show target panel
-            document.getElementById('tab-' + targetTab).classList.remove('hidden');
+            document.getElementById('tab-' + targetTab).classList.remove('tab-hide');
         });
     });
 
@@ -277,24 +286,25 @@ document.getElementById('id_commodity')?.addEventListener('change', function() {
     }
 });
 
+// Helper function to populate dropdown with options (MUST BE GLOBAL for Copy from Buyer to work)
+function populateDropdown(selectElement, items, valueField, textField, selectedValue) {
+    // Clear existing options except the first one (placeholder)
+    selectElement.innerHTML = '<option value="">Select ' + selectElement.getAttribute('data-label') + '</option>';
+
+    // Add new options
+    items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item[valueField];
+        option.textContent = item[textField];
+        if (selectedValue && item[valueField] == selectedValue) {
+            option.selected = true;
+        }
+        selectElement.appendChild(option);
+    });
+}
+
 // Cascading Dropdowns: Country → State → City (for Buyer and Consignee)
 document.addEventListener('DOMContentLoaded', function() {
-    // Helper function to populate dropdown with options
-    function populateDropdown(selectElement, items, valueField, textField, selectedValue) {
-        // Clear existing options except the first one (placeholder)
-        selectElement.innerHTML = '<option value="">Select ' + selectElement.getAttribute('data-label') + '</option>';
-
-        // Add new options
-        items.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item[valueField];
-            option.textContent = item[textField];
-            if (selectedValue && item[valueField] == selectedValue) {
-                option.selected = true;
-            }
-            selectElement.appendChild(option);
-        });
-    }
 
     // Auto-load cascading data on page load if initial values exist
     function loadInitialCascadingData(countryId, stateSelectId, citySelectId, initialStateValue, initialCityValue) {
@@ -448,35 +458,79 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Copy Buyer to Consignee functionality
-document.getElementById('copy-buyer-btn')?.addEventListener('click', function() {
+document.getElementById('copy-buyer-btn')?.addEventListener('click', async function() {
+    console.log('Copy from Buyer clicked');
+
     // Copy all buyer fields to consignee fields
     document.getElementById('id_cong_name').value = document.getElementById('id_buyer_name').value;
     document.getElementById('id_cong_add').value = document.getElementById('id_buyer_add').value;
-    document.getElementById('id_cong_country').value = document.getElementById('id_buyer_country').value;
 
-    // Trigger change event on country to load states
-    const countryChangeEvent = new Event('change', { bubbles: true });
-    document.getElementById('id_cong_country').dispatchEvent(countryChangeEvent);
+    // Get buyer values
+    const buyerCountryId = document.getElementById('id_buyer_country').value;
+    const buyerStateId = document.getElementById('id_buyer_state').value;
+    const buyerCityId = document.getElementById('id_buyer_city').value;
 
-    // Wait for states to load, then set state
-    setTimeout(() => {
-        document.getElementById('id_cong_state').value = document.getElementById('id_buyer_state').value;
+    console.log('Buyer location IDs:', {buyerCountryId, buyerStateId, buyerCityId});
 
-        // Trigger change event on state to load cities
-        const stateChangeEvent = new Event('change', { bubbles: true });
-        document.getElementById('id_cong_state').dispatchEvent(stateChangeEvent);
+    // Set country first
+    document.getElementById('id_cong_country').value = buyerCountryId;
 
-        // Wait for cities to load, then set city
-        setTimeout(() => {
-            document.getElementById('id_cong_city').value = document.getElementById('id_buyer_city').value;
-        }, 300);
-    }, 300);
+    // Load states for the selected country
+    if (buyerCountryId && buyerStateId) {
+        try {
+            const stateSelect = document.getElementById('id_cong_state');
+            const citySelect = document.getElementById('id_cong_city');
 
+            console.log('Fetching states for country:', buyerCountryId);
+            // Fetch and populate states
+            const statesResponse = await fetch(`{% url 'accounts:sales_invoice_get_states' %}?country_id=${buyerCountryId}`);
+            const statesData = await statesResponse.json();
+            console.log('States fetched:', statesData.states?.length);
+
+            populateDropdown(stateSelect, statesData.states || [], 'sid', 'statename');
+
+            // Small delay to ensure DOM is updated
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Set the state value after states are loaded (convert to string to ensure match)
+            stateSelect.value = String(buyerStateId);
+            console.log('State value set to:', stateSelect.value, 'Expected:', buyerStateId);
+
+            // Fetch and populate cities for the selected state
+            if (buyerCityId) {
+                console.log('Fetching cities for state:', buyerStateId);
+                const citiesResponse = await fetch(`{% url 'accounts:sales_invoice_get_cities' %}?state_id=${buyerStateId}`);
+                const citiesData = await citiesResponse.json();
+                console.log('Cities fetched:', citiesData.cities?.length);
+
+                populateDropdown(citySelect, citiesData.cities || [], 'cityid', 'cityname');
+
+                // Small delay to ensure DOM is updated
+                await new Promise(resolve => setTimeout(resolve, 50));
+
+                // Set the city value after cities are loaded (convert to string to ensure match)
+                citySelect.value = String(buyerCityId);
+                console.log('City value set to:', citySelect.value, 'Expected:', buyerCityId);
+            }
+
+            console.log('Location copy completed successfully');
+        } catch (error) {
+            console.error('Error copying buyer location data:', error);
+            alert('Error copying location data. Please select state and city manually.');
+        }
+    }
+
+    // Copy other fields
     document.getElementById('id_cong_cotper').value = document.getElementById('id_buyer_cotper').value;
     document.getElementById('id_cong_ph').value = document.getElementById('id_buyer_ph').value;
     document.getElementById('id_cong_mob').value = document.getElementById('id_buyer_mob').value;
     document.getElementById('id_cong_email').value = document.getElementById('id_buyer_email').value;
     document.getElementById('id_cong_tin').value = document.getElementById('id_buyer_tin').value;
+    document.getElementById('id_cong_fax').value = document.getElementById('id_buyer_fax').value;
+    document.getElementById('id_cong_vat').value = document.getElementById('id_buyer_vat').value;
+    document.getElementById('id_cong_ecc').value = document.getElementById('id_buyer_ecc').value;
+
+    console.log('Copy from Buyer completed');
 });
 </script>
 {% endblock %}

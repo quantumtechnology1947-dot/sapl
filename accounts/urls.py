@@ -4,6 +4,21 @@ URL patterns for the Accounts module.
 
 from django.urls import path, include
 from . import views
+from accounts.views.transactions.sales_invoice import (
+    SalesInvoiceListView,
+    SalesInvoicePOSelectionView,
+    SalesInvoiceCreateView,
+    SalesInvoiceUpdateView,
+    SalesInvoiceDeleteView,
+    SalesInvoicePrintView,
+    CustomerAutocompleteView,
+    GetStatesView as SalesInvoiceGetStatesView,
+    GetCitiesView as SalesInvoiceGetCitiesView,
+    GetCommodityTariffView,
+    SearchCustomerView,
+    CopyBuyerToConsigneeView,
+    CalculateRemainingQuantityView,
+)
 
 app_name = 'accounts'
 
@@ -454,6 +469,90 @@ urlpatterns = [
     
     # ========================================================================
     # Transaction URLs - Sales Invoice
+    # (Consolidated from accounts/urls_sales_invoice.py)
+    # MAPS: SalesInvoice_New.aspx and SalesInvoice_New_Details.aspx
     # ========================================================================
-    path('transactions/sales-invoice/', include('accounts.urls_sales_invoice')),
+
+    # Invoice List/Dashboard
+    path('transactions/sales-invoice/',
+         SalesInvoiceListView.as_view(),
+         name='sales_invoice_list'),
+
+    # Step 1: PO Selection (SalesInvoice_New.aspx)
+    path('transactions/sales-invoice/select-po/',
+         SalesInvoicePOSelectionView.as_view(),
+         name='sales_invoice_po_selection'),
+
+    # Step 2: Create Invoice (SalesInvoice_New_Details.aspx)
+    path('transactions/sales-invoice/create/',
+         SalesInvoiceCreateView.as_view(),
+         name='sales_invoice_create'),
+
+    # Edit, Delete, Print
+    path('transactions/sales-invoice/<int:invoice_id>/edit/',
+         SalesInvoiceUpdateView.as_view(),
+         name='sales_invoice_edit'),
+
+    path('transactions/sales-invoice/<int:invoice_id>/delete/',
+         SalesInvoiceDeleteView.as_view(),
+         name='sales_invoice_delete'),
+
+    path('transactions/sales-invoice/<int:invoice_id>/print/',
+         SalesInvoicePrintView.as_view(),
+         name='sales_invoice_print'),
+
+    # HTMX Endpoints - Cascading Dropdowns (Country → State → City)
+    path('transactions/sales-invoice/api/get-states/',
+         SalesInvoiceGetStatesView.as_view(),
+         name='sales_invoice_get_states'),
+
+    path('transactions/sales-invoice/api/get-cities/',
+         SalesInvoiceGetCitiesView.as_view(),
+         name='sales_invoice_get_cities'),
+
+    # HTMX Endpoints - Customer Autocomplete
+    path('transactions/sales-invoice/api/customer-autocomplete/',
+         CustomerAutocompleteView.as_view(),
+         name='customer_autocomplete'),
+
+    # HTMX Endpoints - Commodity Tariff Auto-fill
+    path('transactions/sales-invoice/api/get-commodity-tariff/',
+         GetCommodityTariffView.as_view(),
+         name='sales_invoice_get_tariff'),
+
+    # HTMX Endpoints - Search and Populate Customer
+    path('transactions/sales-invoice/api/search-customer/',
+         SearchCustomerView.as_view(),
+         name='sales_invoice_search_customer'),
+
+    # HTMX Endpoints - Copy Buyer to Consignee
+    path('transactions/sales-invoice/api/copy-buyer-to-consignee/',
+         CopyBuyerToConsigneeView.as_view(),
+         name='sales_invoice_copy_buyer'),
+
+    # HTMX Endpoints - Calculate Remaining Quantity
+    path('transactions/sales-invoice/api/calculate-remaining-qty/',
+         CalculateRemainingQuantityView.as_view(),
+         name='sales_invoice_calc_remaining_qty'),
+
+    # Legacy HTMX endpoints (fallback)
+    path('transactions/sales-invoice/get-states/',
+         SalesInvoiceGetStatesView.as_view(),
+         name='sales_invoice_get_states_old'),
+
+    path('transactions/sales-invoice/get-cities/',
+         SalesInvoiceGetCitiesView.as_view(),
+         name='sales_invoice_get_cities_old'),
+
+    path('transactions/sales-invoice/customer-autocomplete/',
+         CustomerAutocompleteView.as_view(),
+         name='sales_invoice_customer_autocomplete_old'),
+
+    path('transactions/sales-invoice/get-tariff/',
+         GetCommodityTariffView.as_view(),
+         name='sales_invoice_get_tariff_old'),
+
+    path('transactions/sales-invoice/copy-buyer/',
+         CopyBuyerToConsigneeView.as_view(),
+         name='sales_invoice_copy_buyer_old'),
 ]

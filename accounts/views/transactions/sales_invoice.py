@@ -26,7 +26,7 @@ from accounts.models import (
     TblaccSalesinvoiceMasterType,
     TblexcisecommodityMaster,
 )
-from accounts.forms_sales_invoice import (
+from accounts.forms import (
     POSelectionSearchForm,
     SalesInvoiceHeaderForm,
     SalesInvoiceBuyerForm,
@@ -34,7 +34,7 @@ from accounts.forms_sales_invoice import (
     SalesInvoiceGoodsFormSet,
     SalesInvoiceTaxationForm,
 )
-from accounts.services_sales_invoice import SalesInvoiceService, SalesInvoiceValidationService
+from accounts.services import SalesInvoiceService, SalesInvoiceValidationService
 from sales_distribution.models import (
     SdCustMaster,
     SdCustPoMaster,
@@ -335,15 +335,44 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
         # Auto-generate invoice number (lines 96-111)
         next_invoice_no = SalesInvoiceService.generate_invoice_number(
             request.session.get('compid'),
-            request.session.get('finyear')
+            request.session.get('finyearid')  # FIX: Changed from 'finyear' to 'finyearid'
         )
 
         # Initialize forms
+        # Parse date from query param (YYYY-MM-DD format) for date inputs
+        # CRITICAL: Database stores dates as strings in DD-MM-YYYY format (ASP.NET style)
+        # But HTML5 date inputs require YYYY-MM-DD format
+        invoice_date_str = None  # For HTML5 date input (YYYY-MM-DD)
+        if podate:
+            try:
+                # podate comes as YYYY-MM-DD from query param
+                from datetime import datetime
+                date_obj = datetime.strptime(podate, '%Y-%m-%d')
+                invoice_date_str = date_obj.strftime('%Y-%m-%d')  # Keep in YYYY-MM-DD for HTML5
+            except ValueError:
+                # If date parsing fails, use today
+                invoice_date_str = datetime.now().strftime('%Y-%m-%d')
+        
+        # If no date provided, use today's date
+        if not invoice_date_str:
+            invoice_date_str = datetime.now().strftime('%Y-%m-%d')
+        
         header_form = SalesInvoiceHeaderForm(initial={
             'invoiceno': next_invoice_no,
             'pono': pono,
             'wono': wono_display,
             'invoicemode': invoice_mode_display,
+            'dateofissueinvoice': invoice_date_str,  # Pass as YYYY-MM-DD string
+            'dateofremoval': invoice_date_str,  # Also set removal date to same value
+            'timeofissueinvoice': '00:00:00',  # Default time
+            'timeofremoval': '00:00:00',  # Default time
+            'customercategory': '1',  # Default to first category
+            'commodity': '1',  # Default to first commodity (will be changed by user)
+            'modeoftransport': '1',  # Default to "By Road"
+            'natureofremoval': '1',  # Default value
+            'vehiregno': '-',
+            'rrgcno': '-',
+            'dutyrate': '-',
         })
 
         # Pre-fill buyer info from customer (lines 139-171)
@@ -441,6 +470,7 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
             'vat_label': vat_label,
             'show_cst': show_cst,
             'current_date': datetime.now().strftime('%d-%m-%Y'),
+            'invoice_date_str': invoice_date_str,  # For HTML5 date input debugging
         }
 
         return render(request, self.template_name, context)
@@ -551,16 +581,84 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
         ])
 
         if not forms_valid:
-            # Collect all errors
-            all_errors = []
-            for form in [header_form, buyer_form, consignee_form, taxation_form]:
-                all_errors.extend(form.errors.values())
+            # Collect all errors with form context
+            error_messages = []
+
+            # Header form errors
+            if header_form.errors:
+                for field, errors in header_form.errors.items():
+                    for error in errors:
+                        if field == '__all__':
+                            error_messages.append(f"Header: {error}")
+                        else:
+                            field_label = header_form.fields.get(field).label if field in header_form.fields else field
+                            error_messages.append(f"Header - {field_label}: {error}")
+
+            # Buyer form errors
+            if buyer_form.errors:
+                for field, errors in buyer_form.errors.items():
+                    for error in errors:
+                        if field == '__all__':
+                            error_messages.append(f"Buyer: {error}")
+                        else:
+                            field_label = buyer_form.fields.get(field).label if field in buyer_form.fields else field
+                            error_messages.append(f"Buyer - {field_label}: {error}")
+
+            # Consignee form errors
+            if consignee_form.errors:
+                for field, errors in consignee_form.errors.items():
+                    for error in errors:
+                        if field == '__all__':
+                            error_messages.append(f"Consignee: {error}")
+                        else:
+                            field_label = consignee_form.fields.get(field).label if field in consignee_form.fields else field
+                            error_messages.append(f"Consignee - {field_label}: {error}")
+
+            # Goods formset errors
             if goods_formset.errors:
-                all_errors.extend(goods_formset.errors)
+                for i, form_errors in enumerate(goods_formset.errors):
+                    if form_errors:
+                        for field, errors in form_errors.items():
+                            for error in errors:
+                                error_messages.append(f"Item {i+1} - {field}: {error}")
 
-            messages.error(request, 'Input data is invalid. Please check all fields.')
+            # Taxation form errors
+            if taxation_form.errors:
+                for field, errors in taxation_form.errors.items():
+                    for error in errors:
+                        if field == '__all__':
+                            error_messages.append(f"Taxation: {error}")
+                        else:
+                            field_label = taxation_form.fields.get(field).label if field in taxation_form.fields else field
+                            error_messages.append(f"Taxation - {field_label}: {error}")
 
-            # Re-render with errors
+            # Display errors to user
+            if error_messages:
+                for error_msg in error_messages[:5]:  # Show first 5 errors
+                    messages.error(request, error_msg)
+                if len(error_messages) > 5:
+                    messages.warning(request, f"And {len(error_messages) - 5} more validation errors. Please review all fields.")
+            else:
+                messages.error(request, 'Input data is invalid. Please check all fields.')
+
+            # Re-render with errors - include all context variables needed for template
+            # NOTE: datetime already imported at module level (line 18)
+
+            # Get invoice type description
+            invoice_type_obj = TblaccSalesinvoiceMasterType.objects.filter(id=invoice_type).first()
+
+            # Auto-generate invoice number (needed for template)
+            next_invoice_no = SalesInvoiceService.generate_invoice_number(
+                request.session.get('compid'),
+                request.session.get('finyearid')  # FIX: Changed from 'finyear' to 'finyearid'
+            )
+
+            # DEBUG: Log to file
+            with open('validation_debug.log', 'a') as f:
+                f.write(f"Setting context - next_invoice_no: {next_invoice_no}\n")
+                f.write(f"Setting context - current_date: {datetime.now().strftime('%d-%m-%Y')}\n")
+                f.write(f"Setting context - wono_display: {wono_display}\n")
+
             context = {
                 'header_form': header_form,
                 'buyer_form': buyer_form,
@@ -569,7 +667,17 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
                 'taxation_form': taxation_form,
                 'poid': poid,
                 'pono': pono,
+                'podate': context_data.get('podate', ''),
+                'wono_display': wono_display,
+                'work_order_ids': wono_ids,
                 'invoice_type': invoice_type,
+                'invoice_mode_display': invoice_type_obj.description if invoice_type_obj else '',
+                'customer_id': custcode,
+                'custcode': custcode,
+                'vat_label': 'SGST' if invoice_type == '2' else 'CST',
+                'show_cst': invoice_type != '2',
+                'current_date': datetime.now().strftime('%d-%m-%Y'),
+                'next_invoice_no': next_invoice_no,  # Added for template readonly fields
             }
             return render(request, self.template_name, context)
 
@@ -583,7 +691,44 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
 
         if not selected_items:
             messages.error(request, 'Please select at least one item')
-            return self.get(request, *args, **kwargs)
+            # Re-render with error - include all context
+            # NOTE: datetime already imported at module level (line 19)
+            invoice_type_obj = TblaccSalesinvoiceMasterType.objects.filter(id=invoice_type).first()
+            next_invoice_no = SalesInvoiceService.generate_invoice_number(
+                request.session.get('compid'),
+                request.session.get('finyearid')  # FIX: Changed from 'finyear' to 'finyearid'
+            )
+
+            # DEBUG: Log to file
+            with open('validation_debug.log', 'a') as f:
+                f.write("="*50 + "\n")
+                f.write(f"NO ITEMS SELECTED ERROR at {datetime.now()}\n")
+                f.write(f"next_invoice_no: {next_invoice_no}\n")
+                f.write(f"current_date: {datetime.now().strftime('%d-%m-%Y')}\n")
+                f.write(f"wono_display: {wono_display}\n")
+                f.write("="*50 + "\n")
+
+            context = {
+                'header_form': header_form,
+                'buyer_form': buyer_form,
+                'consignee_form': consignee_form,
+                'goods_formset': goods_formset,
+                'taxation_form': taxation_form,
+                'poid': poid,
+                'pono': pono,
+                'podate': context_data.get('podate', ''),
+                'wono_display': wono_display,
+                'work_order_ids': wono_ids,
+                'invoice_type': invoice_type,
+                'invoice_mode_display': invoice_type_obj.description if invoice_type_obj else '',
+                'customer_id': custcode,
+                'custcode': custcode,
+                'vat_label': 'SGST' if invoice_type == '2' else 'CST',
+                'show_cst': invoice_type != '2',
+                'current_date': datetime.now().strftime('%d-%m-%Y'),
+                'next_invoice_no': next_invoice_no,
+            }
+            return render(request, self.template_name, context)
 
         # Validate remaining quantities (lines 308-344)
         for item_data in selected_items:
@@ -609,7 +754,34 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
                     f'Requested quantity for item {po_detail.itemdesc} '
                     f'exceeds remaining quantity ({remaining_qty})'
                 )
-                return self.get(request, *args, **kwargs)
+                # Re-render with error - include all context
+                # NOTE: datetime already imported at module level (line 19)
+                invoice_type_obj = TblaccSalesinvoiceMasterType.objects.filter(id=invoice_type).first()
+                next_invoice_no = SalesInvoiceService.generate_invoice_number(
+                    request.session.get('compid'),
+                    request.session.get('finyearid')  # FIX: Changed from 'finyear' to 'finyearid'
+                )
+                context = {
+                    'header_form': header_form,
+                    'buyer_form': buyer_form,
+                    'consignee_form': consignee_form,
+                    'goods_formset': goods_formset,
+                    'taxation_form': taxation_form,
+                    'poid': poid,
+                    'pono': pono,
+                    'podate': context_data.get('podate', ''),
+                    'wono_display': wono_display,
+                    'work_order_ids': wono_ids,
+                    'invoice_type': invoice_type,
+                    'invoice_mode_display': invoice_type_obj.description if invoice_type_obj else '',
+                    'customer_id': custcode,
+                    'custcode': custcode,
+                    'vat_label': 'SGST' if invoice_type == '2' else 'CST',
+                    'show_cst': invoice_type != '2',
+                    'current_date': datetime.now().strftime('%d-%m-%Y'),
+                    'next_invoice_no': next_invoice_no,
+                }
+                return render(request, self.template_name, context)
 
             # Validate amount percentage (prevent exceeding 100%)
             amount_percent = item_data.get('amtinper', 0) or 0
@@ -622,7 +794,34 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
                     )
                 except ValidationError as e:
                     messages.error(request, str(e))
-                    return self.get(request, *args, **kwargs)
+                    # Re-render with error - include all context
+                    # NOTE: datetime already imported at module level (line 19)
+                    invoice_type_obj = TblaccSalesinvoiceMasterType.objects.filter(id=invoice_type).first()
+                    next_invoice_no = SalesInvoiceService.generate_invoice_number(
+                        request.session.get('compid'),
+                        request.session.get('finyearid')  # FIX: Changed from 'finyear' to 'finyearid'
+                    )
+                    context = {
+                        'header_form': header_form,
+                        'buyer_form': buyer_form,
+                        'consignee_form': consignee_form,
+                        'goods_formset': goods_formset,
+                        'taxation_form': taxation_form,
+                        'poid': poid,
+                        'pono': pono,
+                        'podate': context_data.get('podate', ''),
+                        'wono_display': wono_display,
+                        'work_order_ids': wono_ids,
+                        'invoice_type': invoice_type,
+                        'invoice_mode_display': invoice_type_obj.description if invoice_type_obj else '',
+                        'customer_id': custcode,
+                        'custcode': custcode,
+                        'vat_label': 'SGST' if invoice_type == '2' else 'CST',
+                        'show_cst': invoice_type != '2',
+                        'current_date': datetime.now().strftime('%d-%m-%Y'),
+                        'next_invoice_no': next_invoice_no,
+                    }
+                    return render(request, self.template_name, context)
 
         # Save invoice master (lines 398-420)
         invoice_master = TblaccSalesinvoiceMaster()
@@ -631,10 +830,10 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
         invoice_master.sysdate = datetime.now().strftime('%d-%m-%Y')
         invoice_master.systime = datetime.now().strftime('%H:%M:%S')
         invoice_master.compid = request.session.get('compid')
-        invoice_master.finyearid = request.session.get('finyear')
+        invoice_master.finyearid = request.session.get('finyearid')  # FIX: Changed from 'finyear' to 'finyearid'
         invoice_master.sessionid = str(request.user.id)
 
-        # Header fields
+        # Header fields - basic info
         # Generate invoice number fresh at save time to prevent collisions
         invoice_master.invoiceno = SalesInvoiceService.generate_invoice_number(
             request.session.get('compid'),
@@ -646,25 +845,75 @@ class SalesInvoiceCreateView(CompanyFinancialYearMixin, View):
         invoice_master.poid = poid
         invoice_master.customercode = custcode
 
-        # Map header form fields
-        for field in header_form.cleaned_data:
-            if hasattr(invoice_master, field):
-                setattr(invoice_master, field, header_form.cleaned_data[field])
+        # Map header form fields (dates already converted to DD-MM-YYYY by form clean methods)
+        invoice_master.dateofissueinvoice = header_form.cleaned_data.get('dateofissueinvoice')
+        invoice_master.dateofremoval = header_form.cleaned_data.get('dateofremoval')
+        invoice_master.timeofissueinvoice = header_form.cleaned_data.get('timeofissueinvoice', '00:00:00')
+        invoice_master.timeofremoval = header_form.cleaned_data.get('timeofremoval', '00:00:00')
+        invoice_master.customercategory = header_form.cleaned_data.get('customercategory')
+        invoice_master.commodity = header_form.cleaned_data.get('commodity')
+        invoice_master.tariffheading = header_form.cleaned_data.get('tariffheading', '-')
+        invoice_master.modeoftransport = header_form.cleaned_data.get('modeoftransport')
+        invoice_master.natureofremoval = header_form.cleaned_data.get('natureofremoval')
+        invoice_master.vehiregno = header_form.cleaned_data.get('vehiregno', '-')
+        invoice_master.rrgcno = header_form.cleaned_data.get('rrgcno', '-')
+        invoice_master.dutyrate = header_form.cleaned_data.get('dutyrate', '-')
 
         # Map buyer form fields
-        for field in buyer_form.cleaned_data:
-            if hasattr(invoice_master, field):
-                setattr(invoice_master, field, buyer_form.cleaned_data[field])
+        invoice_master.buyer_name = buyer_form.cleaned_data.get('buyer_name')
+        invoice_master.buyer_add = buyer_form.cleaned_data.get('buyer_add')
+        invoice_master.buyer_country = buyer_form.cleaned_data.get('buyer_country')
+        invoice_master.buyer_state = buyer_form.cleaned_data.get('buyer_state')
+        # buyer_city is a ForeignKey, handle specially
+        buyer_city_id = buyer_form.cleaned_data.get('buyer_city')
+        if buyer_city_id:
+            from sys_admin.models import Tblcity
+            invoice_master.buyer_city = Tblcity.objects.get(cityid=buyer_city_id)
+        invoice_master.buyer_cotper = buyer_form.cleaned_data.get('buyer_cotper')
+        invoice_master.buyer_ph = buyer_form.cleaned_data.get('buyer_ph')
+        invoice_master.buyer_mob = buyer_form.cleaned_data.get('buyer_mob')
+        invoice_master.buyer_email = buyer_form.cleaned_data.get('buyer_email')
+        invoice_master.buyer_tin = buyer_form.cleaned_data.get('buyer_tin')
+        invoice_master.buyer_fax = buyer_form.cleaned_data.get('buyer_fax', '-')
+        invoice_master.buyer_vat = buyer_form.cleaned_data.get('buyer_vat', '-')
+        invoice_master.buyer_ecc = buyer_form.cleaned_data.get('buyer_ecc', '-')
 
         # Map consignee form fields
-        for field in consignee_form.cleaned_data:
-            if hasattr(invoice_master, field):
-                setattr(invoice_master, field, consignee_form.cleaned_data[field])
+        invoice_master.cong_name = consignee_form.cleaned_data.get('cong_name')
+        invoice_master.cong_add = consignee_form.cleaned_data.get('cong_add')
+        invoice_master.cong_country = consignee_form.cleaned_data.get('cong_country')
+        invoice_master.cong_state = consignee_form.cleaned_data.get('cong_state')
+        # cong_city is a ForeignKey, handle specially
+        cong_city_id = consignee_form.cleaned_data.get('cong_city')
+        if cong_city_id:
+            from sys_admin.models import Tblcity
+            invoice_master.cong_city = Tblcity.objects.get(cityid=cong_city_id)
+        invoice_master.cong_cotper = consignee_form.cleaned_data.get('cong_cotper')
+        invoice_master.cong_ph = consignee_form.cleaned_data.get('cong_ph')
+        invoice_master.cong_mob = consignee_form.cleaned_data.get('cong_mob')
+        invoice_master.cong_email = consignee_form.cleaned_data.get('cong_email')
+        invoice_master.cong_tin = consignee_form.cleaned_data.get('cong_tin')
+        invoice_master.cong_fax = consignee_form.cleaned_data.get('cong_fax', '-')
+        invoice_master.cong_vat = consignee_form.cleaned_data.get('cong_vat', '-')
+        invoice_master.cong_ecc = consignee_form.cleaned_data.get('cong_ecc', '-')
 
         # Map taxation form fields (lines 417)
-        for field in taxation_form.cleaned_data:
-            if hasattr(invoice_master, field):
-                setattr(invoice_master, field, taxation_form.cleaned_data[field])
+        invoice_master.addtype = taxation_form.cleaned_data.get('addtype', 0)
+        invoice_master.addamt = taxation_form.cleaned_data.get('addamt', 0)
+        invoice_master.otheramt = taxation_form.cleaned_data.get('otheramt', 0)
+        invoice_master.deductiontype = taxation_form.cleaned_data.get('deductiontype', 0)
+        invoice_master.deduction = taxation_form.cleaned_data.get('deduction', 0)
+        invoice_master.pftype = taxation_form.cleaned_data.get('pftype', 0)
+        invoice_master.pf = taxation_form.cleaned_data.get('pf', 0)
+        invoice_master.cenvat = taxation_form.cleaned_data.get('cenvat')
+        invoice_master.sedtype = taxation_form.cleaned_data.get('sedtype', 0)
+        invoice_master.sed = taxation_form.cleaned_data.get('sed', 0)
+        invoice_master.aedtype = taxation_form.cleaned_data.get('aedtype', 0)
+        invoice_master.aed = taxation_form.cleaned_data.get('aed', 0)
+        invoice_master.freighttype = taxation_form.cleaned_data.get('freighttype', 0)
+        invoice_master.freight = taxation_form.cleaned_data.get('freight', 0)
+        invoice_master.insurancetype = taxation_form.cleaned_data.get('insurancetype', 0)
+        invoice_master.insurance = taxation_form.cleaned_data.get('insurance', 0)
 
         # Handle VAT/CST based on invoice type (lines 407-415)
         if invoice_type == '2':  # Within MH

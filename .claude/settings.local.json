@@ -47,7 +47,15 @@
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_snapshot",
       "mcp__playwright__browser_install",
-      "Bash(pip show:*)"
+      "Bash(pip show:*)",
+      "Bash(npx playwright install chromium)",
+      "Bash(npx playwright test:*)",
+      "Bash(tasklist:*)",
+      "Bash(node test_submit_fix.js:*)",
+      "Bash(node test_form_submission.js:*)",
+      "Bash(node test_complete_submission.js:*)",
+      "Bash(for:*)",
+      "Bash(do rm \"$f\" 2)"
     ],
     "deny": [],
     "ask": []
